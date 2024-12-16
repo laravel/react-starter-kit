@@ -1,15 +1,11 @@
 import { cn } from "@/lib/utils"
-
 import InputError from '@/Components/InputError';
 import AuthLayout from '@/Layouts/AuthLayout';
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { FormEventHandler } from 'react';
-
 import { Head, Link, useForm } from '@inertiajs/react';
-
 import { LoaderCircle } from 'lucide-react';
-// import { FormEventHandler } from 'react';
 
 export default function Register({
     name,
@@ -100,7 +96,7 @@ export default function Register({
                         <InputError message={errors.passowrd_confirmation} className="mt-2" />
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>
-                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Register
                     </Button>
                     <hr />
