@@ -1,15 +1,11 @@
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
-  Command,
-  Frame,
-  LifeBuoy,
   Map,
   PieChart,
-  Send,
-  Settings2,
-  SquareTerminal,
+  Github,
+  BookOpenText,
+  AppWindowMac,
+  Rocket,
 } from "lucide-react"
 
 import { NavMain } from "@/Components/NavMain"
@@ -35,86 +31,21 @@ const data = {
   },
   navMain: [
     {
-      title: "Playground",
+      title: "Sidebar Menu Item",
       url: "#",
-      icon: SquareTerminal,
-      isActive: true,
+      icon: AppWindowMac,
+      isActive: false,
       items: [
         {
-          title: "History",
+          title: "Link 1",
           url: "#",
         },
         {
-          title: "Starred",
+          title: "Link 2",
           url: "#",
         },
         {
-          title: "Settings",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "#",
-      icon: Settings2,
-      items: [
-        {
-          title: "General",
-          url: "#",
-        },
-        {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
+          title: "Link 3",
           url: "#",
         },
       ],
@@ -122,29 +53,29 @@ const data = {
   ],
   navSecondary: [
     {
-      title: "Support",
-      url: "#",
-      icon: LifeBuoy,
+      title: "Github Repo",
+      url: "https://github.com/laravel/react-starter-kit",
+      icon: Github,
     },
     {
-      title: "Feedback",
-      url: "#",
-      icon: Send,
+      title: "Documentation",
+      url: "https://laravel.com/docs/starter-kits",
+      icon: BookOpenText,
     },
   ],
   projects: [
     {
-      name: "Design Engineering",
+      title: "Project 1",
       url: "#",
-      icon: Frame,
+      icon: Rocket,
     },
     {
-      name: "Sales & Marketing",
+      title: "Project 2",
       url: "#",
       icon: PieChart,
     },
     {
-      name: "Travel",
+      title: "Project 3",
       url: "#",
       icon: Map,
     },
