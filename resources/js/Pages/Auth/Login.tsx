@@ -1,35 +1,43 @@
-import { cn } from "@/lib/utils"
-import InputError from '@/Components/InputError';
-import AuthLayout from '@/Layouts/AuthLayout';
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { LoaderCircle } from 'lucide-react';
-import { Head, Link, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler } from "react";
+import { Head, Link, useForm } from "@inertiajs/react";
+import { LoaderCircle } from "lucide-react";
+
+// Components
+import InputError from "@/Components/InputError";
+import AuthLayout from "@/Layouts/AuthLayout";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+
+interface LoginForm {
+    email: string;
+    password: string;
+    remember: boolean;
+}
+
+interface LoginProps {
+    status?: string;
+    canResetPassword: boolean;
+    name?: string;
+    quote?: { author: string; content: string };
+}
 
 export default function Login({
     status,
     canResetPassword,
     name,
     quote
-}: {
-    status?: string;
-    canResetPassword: boolean;
-    name?: string;
-    quote?: array;
-}) {
-    const { data, setData, post, processing, errors, reset } = useForm({
-        email: '',
-        password: '',
+}: LoginProps) {
+    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+        email: "",
+        password: "",
         remember: false,
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
-        post(route('login'), {
-            onFinish: () => reset('password'),
+        post(route("login"), {
+            onFinish: () => reset("password"),
         });
     };
 
@@ -51,34 +59,35 @@ export default function Login({
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email</Label>
-                        <Input 
-                            id="email" 
-                            type="email" 
-                            placeholder="Email Address" 
-                            required 
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            required
                             value={data.email}
                             autoFocus
-                            onChange={(e) => setData('email', e.target.value)}
-                            />
+                            onChange={(e) => setData("email", e.target.value)}
+                        />
                         <InputError message={errors.email} className="mt-2" />
                     </div>
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
-                            <a
-                                href="#"
-                                className="ml-auto text-sm underline-offset-4 hover:underline"
-                            >
-                                Forgot your password?
-                            </a>
+                            {canResetPassword && (
+                                <Link
+                                    href={route("password.request")}
+                                    className="ml-auto text-sm underline-offset-4 hover:underline"
+                                >
+                                    Forgot your password?
+                                </Link>
+                            )}
                         </div>
-                        <Input 
-                            id="password" 
-                            type="password" 
-                            required 
+                        <Input
+                            id="password"
+                            type="password"
+                            required
                             value={data.password}
-                            onChange={(e) => setData('password', e.target.value)}
+                            onChange={(e) => setData("password", e.target.value)}
                         />
                         <InputError message={errors.password} className="mt-2" />
                     </div>
@@ -90,9 +99,9 @@ export default function Login({
                 </div>
                 <div className="text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <a href={route('register')} className="underline underline-offset-4">
+                    <Link href={route("register")} className="underline underline-offset-4">
                         Sign up
-                    </a>
+                    </Link>
                 </div>
             </form>
         </AuthLayout>
