@@ -32,7 +32,40 @@ This shell file will run the following commands, which you may wish to run manua
 6. npm run dev
 
 
-### ShadCN UI
+## Front-end App Structure
+
+The majority of the front-end code is located in the `resources/js` folder. Specifically you'll want to note the following folders:
+
+1. **Components** - All your React components are located here
+2. **Pages** - All your Pages are here, including Login.tsx, Register.tsx, Dashboard.tsx, etc
+3. **Layouts** - All the Layouts for you app will live here.
+
+### Components
+
+In the components folder is where all your React components will live. Inside this folder you'll also notice a sub-folder called `ui`. This is where you'll find all the ShadCN UI components. More documentation about this below.
+
+### Pages
+
+Most of your application pages will live in this folder. Here you will find the Page templates for Login, Register, Dashboard, etc. These pages are rendered via Inertia. Here's an example, located inside of `routes/web.php`, of how the dashboard page is rendered:
+
+```php
+Route::get('/dashboard', function () {
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
+```
+
+This code will load the `resources/js/Pages/Dashboard.tsx` file.
+
+### Layouts
+
+All your pages will utilize a layout as the structure for each page. These layout files are located in the `resources/js/Layouts` folder. Currently, there are two layouts, `AppLayout` and `AuthLayout`.
+
+1. **AppLayout** - This layout will be used for all authenticated users.
+2. **AuthLayout** - This layout will be used for unauthenticated users and this layout is used specifically for all the Authentication views.
+
+---
+
+## ShadCN UI
 
 All the ShadCN components will be installed inside of the `resources/js/Components/ui` folder.
 
