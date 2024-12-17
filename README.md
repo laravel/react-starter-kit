@@ -11,6 +11,27 @@
 
 Welcome to the Laravel React Starter Kit. This starter kit utilizes Intertia v2, Tailwind V3 (soon to be V4), React 19, and ShadCN UI.
 
+## Installation
+
+To install the React Starter Kit, run the following command:
+
+```
+git clone https://github.com/laravel/react-starter-kit.git
+cd react-starter-kit
+chmod +x install.sh && ./install.sh
+```
+
+This shell file will run the following commands, which you may wish to run manually:
+
+1. git checkout develop
+2. cp .env.example .env
+3. composer install
+4. php artisan key:generate
+5. php artisan migrate
+6. npm install
+7. npm run dev
+
+
 ### ShadCN UI
 
 All the ShadCN components will be installed inside of the `resources/js/Components/ui` folder.
