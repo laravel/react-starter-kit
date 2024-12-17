@@ -61,7 +61,7 @@ export default function Register({
                             onChange={(e) => setData("name", e.target.value)}
                             disabled={processing}
                         />
-                        <InputError message={errors.name} className="mt-2" />
+                        <InputError message={errors.name} />
                     </div>
 
                     <div className="grid gap-2">
@@ -74,7 +74,7 @@ export default function Register({
                             onChange={(e) => setData("email", e.target.value)}
                             disabled={processing}
                         />
-                        <InputError message={errors.email} className="mt-2" />
+                        <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
@@ -87,7 +87,7 @@ export default function Register({
                             onChange={(e) => setData("password", e.target.value)}
                             disabled={processing}
                         />
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError message={errors.password} />
                     </div>
 
                     <div className="grid gap-2">
@@ -102,7 +102,7 @@ export default function Register({
                             }
                             disabled={processing}
                         />
-                        <InputError message={errors.password_confirmation} className="mt-2" />
+                        <InputError message={errors.password_confirmation} />
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}

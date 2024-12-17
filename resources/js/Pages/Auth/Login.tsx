@@ -68,7 +68,7 @@ export default function Login({
                             autoFocus
                             onChange={(e) => setData("email", e.target.value)}
                         />
-                        <InputError message={errors.email} className="mt-2" />
+                        <InputError message={errors.email} />
                     </div>
                     <div className="grid gap-2">
                         <div className="flex items-center">
@@ -89,7 +89,7 @@ export default function Login({
                             value={data.password}
                             onChange={(e) => setData("password", e.target.value)}
                         />
-                        <InputError message={errors.password} className="mt-2" />
+                        <InputError message={errors.password} />
                     </div>
                     <Button type="submit" className="w-full" disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
