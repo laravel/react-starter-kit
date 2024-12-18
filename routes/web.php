@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\PasswordController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -21,6 +22,7 @@ Route::get('/dashboard', function () {
 Route::middleware('auth')->group(function () {
     Route::redirect('settings' , 'settings/profile');
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     //Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     //Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });

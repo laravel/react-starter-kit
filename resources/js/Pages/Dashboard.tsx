@@ -1,9 +1,18 @@
 import AppLayout from "@/Layouts/AppLayout"
 import { Head } from '@inertiajs/react';
 
+const breadcrumbItems = [
+    {
+        title: 'Dashboard',
+        href: '/dashboard'
+    }
+]
+
 export default function Page() {
     return (
-        <AppLayout>
+        <AppLayout
+            breadcrumbItems={breadcrumbItems}
+        >
             <Head title="Dashboard" />
             <div className="flex flex-1 flex-col gap-4 p-4">
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
