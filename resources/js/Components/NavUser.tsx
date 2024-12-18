@@ -4,6 +4,7 @@ import {
     ChevronsUpDown,
     LogOut,
     SquareUserRound,
+    Settings
 } from "lucide-react"
 
 import {
@@ -89,8 +90,8 @@ export function NavUser() {
                                     href={route('profile.edit')}
                                     as="button"
                                 >
-                                    <SquareUserRound />
-                                    Profile
+                                    <Settings />
+                                    Settings
                                 </Link>
                             </DropdownMenuItem>
                         </DropdownMenuGroup>
