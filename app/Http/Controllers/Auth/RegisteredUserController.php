@@ -21,12 +21,7 @@ class RegisteredUserController extends Controller
      */
     public function create(): Response
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
-
-        return Inertia::render('Auth/Register', [
-            'name' => config('app.name'),
-            'quote' => ['message' => trim($message), 'author' => trim($author)]
-        ]);
+        return Inertia::render('Auth/Register');
     }
 
     /**

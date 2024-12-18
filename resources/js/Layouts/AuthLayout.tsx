@@ -1,24 +1,23 @@
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 
 // Components
 import ApplicationLogo from "@/Components/ApplicationLogo";
 
-interface Quote {
-    message: string;
-    author: string;
-}
-
 interface AuthLayoutProps {
     children: React.ReactNode;
+    title?: string;
+    description?: string;
     name?: string;
-    quote?: Quote;
 }
 
 export default function AuthLayout({
     children,
-    name,
-    quote
+    title,
+    description
 }: AuthLayoutProps) {
+    const name = usePage().props.name;
+    const quote = usePage().props.quote;
+
     return (
         <div className="px-8 sm:px-0 relative h-dvh flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
             <div className="relative hidden h-full flex-col bg-muted p-10 text-white dark:border-r lg:flex">
@@ -49,6 +48,12 @@ export default function AuthLayout({
                     >
                         <ApplicationLogo className="h-10 sm:h-12 fill-current text-black" />
                     </Link>
+                    <div className="flex flex-col items-start sm:items-center gap-2 text-left sm:text-center">
+                        <h1 className="text-2xl font-bold">{title}</h1>
+                        <p className="text-balance text-sm text-muted-foreground">
+                            {description}
+                        </p>
+                    </div>
                     {children}
                 </div>
             </div>

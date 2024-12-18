@@ -18,15 +18,11 @@ interface LoginForm {
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
-    name?: string;
-    quote?: { author: string; content: string };
 }
 
 export default function Login({
     status,
-    canResetPassword,
-    name,
-    quote
+    canResetPassword
 }: LoginProps) {
     const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
         email: "",
@@ -42,7 +38,10 @@ export default function Login({
     };
 
     return (
-        <AuthLayout name={name} quote={quote}>
+        <AuthLayout 
+            title="Login to your account"
+            description="Enter your email and password below to login"
+        >
             <Head title="Log in" />
 
             {status && (
@@ -50,12 +49,7 @@ export default function Login({
                     {status}
                 </div>
             )}
-            <div className="flex flex-col items-start sm:items-center gap-2 text-left sm:text-center">
-                <h1 className="text-2xl font-bold">Login to your account</h1>
-                <p className="text-balance text-sm text-muted-foreground">
-                    Enter your email and password below to login
-                </p>
-            </div>
+
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">

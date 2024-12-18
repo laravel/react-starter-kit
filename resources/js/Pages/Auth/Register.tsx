@@ -16,15 +16,7 @@ interface RegisterForm {
     password_confirmation: string;
 }
 
-interface RegisterProps {
-    name?: string;
-    quote?: { author: string; content: string };
-}
-
-export default function Register({
-    name,
-    quote
-}: RegisterProps) {
+export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
         name: "",
         email: "",
@@ -40,14 +32,11 @@ export default function Register({
     };
 
     return (
-        <AuthLayout name={name} quote={quote}>
+        <AuthLayout 
+            title="Create an account"
+            description="Enter your name, email and password below."
+        >
             <Head title="Register" />
-            <div className="flex flex-col items-start sm:items-center gap-2 text-left sm:text-center">
-                <h1 className="text-2xl font-bold">Create an account</h1>
-                <p className="text-balance text-sm text-muted-foreground">
-                    Enter your name, email and password below.
-                </p>
-            </div>
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
@@ -61,7 +50,7 @@ export default function Register({
                             onChange={(e) => setData("name", e.target.value)}
                             disabled={processing}
                         />
-                        <InputError message={errors.name} />
+                        <InputError message={errors.name} className="mt-2" />
                     </div>
 
                     <div className="grid gap-2">
