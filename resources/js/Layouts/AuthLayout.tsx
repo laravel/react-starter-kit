@@ -43,6 +43,12 @@ export default function AuthLayout({
             </div>
             <div className="lg:p-8 w-full">
                 <div className="mx-auto flex w-full flex-col justify-center space-y-6 sm:w-[350px]">
+                    <Link
+                        href={route("home")}
+                        className="relative z-20 flex lg:hidden items-center justify-center"
+                    >
+                        <ApplicationLogo className="h-10 sm:h-12 fill-current text-black" />
+                    </Link>
                     {children}
                 </div>
             </div>
