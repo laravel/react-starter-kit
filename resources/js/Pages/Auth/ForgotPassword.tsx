@@ -55,10 +55,11 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 <hr />
             </form>
             <div className="text-center text-sm space-x-1">
+                
+                <span>Return back to the</span>
                 <Link href={route("login")} className="underline underline-offset-4">
-                    Click here
+                    login page
                 </Link>
-                <span>to return back to the login page</span>
             </div>
         </AuthLayout>
     );
