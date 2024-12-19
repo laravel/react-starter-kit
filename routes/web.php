@@ -1,7 +1,8 @@
 <?php
 
-use App\Http\Controllers\Settings\ProfileController;
+use App\Http\Controllers\Settings\DeleteController;
 use App\Http\Controllers\Settings\PasswordController;
+use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -15,11 +16,12 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::middleware('auth')->group(function () {
+    
+    Route::get('/dashboard', function () {
+        return Inertia::render('Dashboard');
+    })->name('dashboard');
 
-Route::middleware(['auth', 'password.confirm'])->group(function () {
     Route::redirect('settings' , 'settings/profile');
     
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -28,6 +30,9 @@ Route::middleware(['auth', 'password.confirm'])->group(function () {
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
     
+    Route::get('settings/delete', [DeleteController::class, 'edit'])->name('delete.edit');
+    Route::delete('settings/delete', [DeleteController::class, 'destroy'])->name('delete.destroy');
+
     //Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 

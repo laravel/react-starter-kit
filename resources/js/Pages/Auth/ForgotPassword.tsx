@@ -32,34 +32,36 @@ export default function ForgotPassword({ status }: { status?: string }) {
                 </div>
             )}
 
-            <form onSubmit={submit}>
-                <div className="grid gap-2">
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input
-                        id="email"
-                        type="email"
-                        name="email"
-                        value={data.email}
-                        autoFocus
-                        onChange={(e) => setData('email', e.target.value)}
-                    />
+            <div className="space-y-6">
+                <form onSubmit={submit}>
+                    <div className="grid gap-2">
+                        <Label htmlFor="email">Email Address</Label>
+                        <Input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value={data.email}
+                            autoFocus
+                            onChange={(e) => setData('email', e.target.value)}
+                        />
 
-                    <InputError message={errors.email} className="mt-2" />
-                </div>
+                        <InputError message={errors.email} className="mt-2" />
+                    </div>
 
-                <div className="mt-4 flex items-center justify-start">
-                    <Button className="w-full" disabled={processing}>
-                        Email Password Reset Link
-                    </Button>
-                </div>
-                <hr />
-            </form>
-            <div className="text-center text-sm space-x-1">
+                    <div className="my-6 flex items-center justify-start">
+                        <Button className="w-full" disabled={processing}>
+                            Email Password Reset Link
+                        </Button>
+                    </div>
                 
-                <span>Return back to the</span>
-                <Link href={route("login")} className="underline underline-offset-4">
-                    login page
-                </Link>
+                    <hr />
+                </form>
+                <div className="text-center text-sm space-x-1">
+                    <span>Return back to the</span>
+                    <Link href={route("login")} className="underline underline-offset-4">
+                        login page
+                    </Link>
+                </div>
             </div>
         </AuthLayout>
     );

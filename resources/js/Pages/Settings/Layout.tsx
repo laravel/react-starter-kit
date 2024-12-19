@@ -14,7 +14,7 @@ const sidebarNavItems = [
         href: "/settings/password",
     },
     {
-        title: "Deletion",
+        title: "Account Removal",
         href: "/settings/delete",
     }
 ]
