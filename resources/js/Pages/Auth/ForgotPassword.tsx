@@ -1,9 +1,11 @@
 // Components
 import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/AuthLayout";
+import AuthLayout from "@/Layouts/Auth/AuthBase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+import { LoaderCircle } from "lucide-react";
 
 import { Head, useForm, Link } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -50,6 +52,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
 
                     <div className="my-6 flex items-center justify-start">
                         <Button className="w-full" disabled={processing}>
+                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             Email Password Reset Link
                         </Button>
                     </div>

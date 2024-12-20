@@ -2,7 +2,17 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Link } from "@inertiajs/react";
 import { Separator } from "@/components/ui/separator"
-import SidebarNav from "@/Pages/Profile/SidebarNav"
+import { Label } from "@/components/ui/label";
+
+import {
+    Select,
+    SelectContent,
+    SelectGroup,
+    SelectItem,
+    SelectLabel,
+    SelectTrigger,
+    SelectValue,
+  } from "@/components/ui/select"
 
 const sidebarNavItems = [
     {
@@ -41,12 +51,12 @@ export default function Layout({
             <Separator className="my-6" />
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                 <aside className="lg:w-1/5">
-                    <nav className="flex space-x-2 lg:flex-col lg:space-x-0 lg:space-y-1">
+                    <nav className="hidden space-x-2 flex-col space-x-0 space-y-1 lg:flex">
                         {sidebarNavItems.map((item) => (
                             <Button size="sm" key={item.href} variant="ghost" 
                                 asChild
                                 className={cn(
-                                    "w-full justify-start",
+                                    "w-full justify-center md:justify-start",
                                     window.location.pathname == item.href
                                         ? "bg-muted"
                                         : "hover:underline"
@@ -60,6 +70,23 @@ export default function Layout({
                             </Button>
                         ))}
                     </nav>
+                    <div className="block lg:hidden w-full [&>button]:w-full [&>button]:mt-2">
+                        <Label>Settings Menu</Label>
+                        <Select className="w-full" onValueChange={(href) => window.location.href = href} value={window.location.pathname}>
+                            <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder={sidebarNavItems.find(item => window.location.pathname === item.href)?.title || "Settings Menu"}></SelectValue>
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectGroup>
+                                {sidebarNavItems.map((item) => (
+                                    <SelectItem selected={window.location.pathname == item.href} key={item.href} value={item.href}>
+                                        {item.title}
+                                    </SelectItem>
+                                ))}
+                                </SelectGroup>
+                            </SelectContent>
+                        </Select>
+                    </div>
                 </aside>
                 <div className="flex-1 lg:max-w-2xl">
                     <section className="max-w-xl">

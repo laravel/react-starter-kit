@@ -55,7 +55,7 @@ export default function App({
                                                     )}
                                                 </BreadcrumbItem>
                                                 {!isLast && (
-                                                    <BreadcrumbSeparator className="hidden md:block" />
+                                                    <BreadcrumbSeparator />
                                                 )}
                                             </Fragment>
                                         );

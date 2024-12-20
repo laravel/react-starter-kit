@@ -1,9 +1,11 @@
 // Components
 import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/AuthLayout";
+import AuthLayout from "@/Layouts/Auth/AuthBase";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+
+import { LoaderCircle } from "lucide-react";
 
 import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -86,6 +88,7 @@ export default function ResetPassword({
 
                     <div className="grid gap-2">
                         <Button className="w-full" disabled={processing}>
+                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                             Reset Password
                         </Button>
                     </div>

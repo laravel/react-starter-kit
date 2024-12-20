@@ -1,6 +1,8 @@
 // Components
-import AuthLayout from "@/Layouts/AuthLayout";
+import AuthLayout from "@/Layouts/Auth/AuthBase";
 import { Button } from "@/components/ui/button";
+
+import { LoaderCircle } from "lucide-react";
 
 import { Head, Link, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
@@ -35,6 +37,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             <form onSubmit={submit}>
                 <div className="mt-4 flex items-center justify-between">
                     <Button disabled={processing}>
+                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Resend Verification Email
                     </Button>
 

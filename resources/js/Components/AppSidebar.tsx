@@ -84,6 +84,7 @@ const data = {
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
+        // Sidebar variant can be "sidebar", "floating" or "inset"
         <Sidebar variant="inset" {...props}>
             <SidebarHeader>
                 <SidebarMenu>
