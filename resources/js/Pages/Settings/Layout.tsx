@@ -42,7 +42,24 @@ export default function Layout({
 }: LayoutProps) {
     return (
         <div className="space-y-6 p-10 pb-16">
-            <div className="space-y-0.5">
+            <div className="block lg:hidden w-full [&>button]:w-full pb-2 space-y-2">
+                <Label>Settings Menu</Label>
+                <Select className="w-full" onValueChange={(href) => window.location.href = href} value={window.location.pathname}>
+                    <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder={sidebarNavItems.find(item => window.location.pathname === item.href)?.title || "Settings Menu"}></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectGroup>
+                        {sidebarNavItems.map((item) => (
+                            <SelectItem selected={window.location.pathname == item.href} key={item.href} value={item.href}>
+                                {item.title}
+                            </SelectItem>
+                        ))}
+                        </SelectGroup>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="space-y-0.5 lg:block hidden">
                 <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
                 <p className="text-muted-foreground">
                     Manage your profile and account settings
@@ -70,23 +87,6 @@ export default function Layout({
                             </Button>
                         ))}
                     </nav>
-                    <div className="block lg:hidden w-full [&>button]:w-full [&>button]:mt-2">
-                        <Label>Settings Menu</Label>
-                        <Select className="w-full" onValueChange={(href) => window.location.href = href} value={window.location.pathname}>
-                            <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={sidebarNavItems.find(item => window.location.pathname === item.href)?.title || "Settings Menu"}></SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                {sidebarNavItems.map((item) => (
-                                    <SelectItem selected={window.location.pathname == item.href} key={item.href} value={item.href}>
-                                        {item.title}
-                                    </SelectItem>
-                                ))}
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                    </div>
                 </aside>
                 <div className="flex-1 lg:max-w-2xl">
                     <section className="max-w-xl">
