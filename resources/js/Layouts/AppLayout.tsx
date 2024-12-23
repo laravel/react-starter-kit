@@ -6,13 +6,13 @@ import {
     BreadcrumbPage,
     BreadcrumbLink,
     BreadcrumbSeparator
-} from "@/components/ui/breadcrumb"
-import { Separator } from "@/components/ui/separator"
+} from "@/Components/ui/breadcrumb"
+import { Separator } from "@/Components/ui/separator"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
 import { PropsWithChildren, Fragment } from 'react';
 
 interface BreadcrumbItem {

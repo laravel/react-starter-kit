@@ -2,7 +2,7 @@
 import InputError from "@/Components/InputError";
 import AuthLayout from "@/Layouts/Auth/AuthBase";
 import { Button } from "@/Components/ui/button";
-import { Input } from "@/components/ui/input";
+import { Input } from "@/Components/ui/input";
 
 import { LoaderCircle } from "lucide-react";
 

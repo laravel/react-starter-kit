@@ -10,7 +10,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
     useSidebar,
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
 
 export function NavProjects({
     projects,

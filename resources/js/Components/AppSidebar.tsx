@@ -23,7 +23,7 @@ import {
     SidebarGroup,
     SidebarGroupLabel,
     SidebarGroupContent
-} from "@/components/ui/sidebar"
+} from "@/Components/ui/sidebar"
 import ApplicationLogo from "./ApplicationLogo"
 
 const data = {
