@@ -5,7 +5,7 @@ import {
     Github,
     BookOpenText,
     AppWindowMac,
-    Rocket,
+    Rocket
 } from "lucide-react"
 
 import { NavMain } from "@/Components/NavMain"
@@ -20,6 +20,9 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    SidebarGroup,
+    SidebarGroupLabel,
+    SidebarGroupContent
 } from "@/components/ui/sidebar"
 import ApplicationLogo from "./ApplicationLogo"
 
@@ -85,7 +88,7 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     return (
         // Sidebar variant can be "sidebar", "floating" or "inset"
-        <Sidebar variant="inset" {...props}>
+        <Sidebar variant="inset" {...props} collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
@@ -105,9 +108,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             </SidebarHeader>
             <SidebarContent>
                 <NavMain items={data.navMain} />
-                <NavSecondary items={data.navSecondary} className="mt-auto" />
             </SidebarContent>
             <SidebarFooter>
+                <NavSecondary items={data.navSecondary} className="mt-auto" />
                 <NavUser user={data.user} />
             </SidebarFooter>
         </Sidebar>

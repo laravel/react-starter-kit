@@ -68,7 +68,7 @@ export default function Layout({
             <Separator className="my-6" />
             <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
                 <aside className="lg:w-1/5">
-                    <nav className="hidden space-x-2 flex-col space-x-0 space-y-1 lg:flex">
+                    <nav className="hidden flex-col space-x-0 space-y-1 lg:flex">
                         {sidebarNavItems.map((item) => (
                             <Button size="sm" key={item.href} variant="ghost" 
                                 asChild
