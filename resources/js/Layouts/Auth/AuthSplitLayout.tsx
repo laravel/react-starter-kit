@@ -3,7 +3,6 @@ import ApplicationLogo from "@/Components/ApplicationLogo"
 
 interface AuthLayoutProps {
     children: React.ReactNode
-    name?: string
     title?: string
     description?: string
 }
@@ -11,10 +10,10 @@ interface AuthLayoutProps {
 export default function AuthSplitLayout({
     children,
     title,
-    description,
-    name
+    description
 }: AuthLayoutProps) {
     const quote = usePage().props.quote;
+    const name = usePage().props.name;
 
     return (
         <div className="px-8 sm:px-0 relative h-dvh flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">
