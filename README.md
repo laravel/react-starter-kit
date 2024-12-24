@@ -5,7 +5,7 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
-<img src="https://cdn.devdojo.com/images/december2024/preview.png" />
+<img src="https://cdn.devdojo.com/images/december2024/screenshot.png" />
 
 ## Introduction
 
