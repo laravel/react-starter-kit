@@ -3,7 +3,6 @@ import SettingsLayout from './Layout';
 
 // Components
 import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/AuthLayout";
 import { Button } from "@/Components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert"
 import { Input } from "@/Components/ui/input";
@@ -87,9 +86,6 @@ export default function DeleteUserForm({
                 title="Delete Account"
                 description="Remove your account and all of its resources."
             >
-
-
-
                 <Dialog>
                     <DialogTrigger asChild><Button onClick={confirmUserDeletion} variant="destructive">
                         Delete Account

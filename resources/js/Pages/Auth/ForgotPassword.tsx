@@ -1,16 +1,16 @@
 // Components
-import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/Auth/AuthBase";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+import { FormEventHandler } from 'react'
+import { Head, useForm, Link } from '@inertiajs/react'
+import { LoaderCircle } from "lucide-react"
 
-import { LoaderCircle } from "lucide-react";
-
-import { Head, useForm, Link } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import InputError from "@/Components/InputError"
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import AuthLayout from "@/Layouts/Auth/AuthBase"
 
 export default function ForgotPassword({ status }: { status?: string }) {
+    
     const { data, setData, post, processing, errors } = useForm({
         email: '',
     });

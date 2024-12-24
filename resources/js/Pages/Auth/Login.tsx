@@ -1,41 +1,47 @@
-import { FormEventHandler } from "react";
-import { Head, Link, useForm } from "@inertiajs/react";
-import { LoaderCircle } from "lucide-react";
+import { FormEventHandler } from "react"
+import { Head, Link, useForm } from "@inertiajs/react"
+import { LoaderCircle } from "lucide-react"
 
-// Components
-import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/Auth/AuthBase";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+import InputError from "@/Components/InputError"
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import AuthLayout from "@/Layouts/Auth/AuthBase"
 
 interface LoginForm {
-    email: string;
-    password: string;
-    remember: boolean;
+    email: string
+    password: string
+    remember: boolean
 }
 
 interface LoginProps {
-    status?: string;
-    canResetPassword: boolean;
+    status?: string
+    canResetPassword: boolean
 }
 
 export default function Login({
     status,
     canResetPassword
 }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<LoginForm>({
+    const { 
+        data, 
+        setData, 
+        post, 
+        processing, 
+        errors, 
+        reset 
+    } = useForm<LoginForm>({
         email: "",
         password: "",
         remember: false,
-    });
+    })
 
     const submit: FormEventHandler = (e) => {
-        e.preventDefault();
+        e.preventDefault()
         post(route("login"), {
             onFinish: () => reset("password"),
-        });
-    };
+        })
+    }
 
     return (
         <AuthLayout 
@@ -58,12 +64,13 @@ export default function Login({
                             id="email"
                             type="email"
                             required
-                            value={data.email}
                             autoFocus
+                            value={data.email}
                             onChange={(e) => setData("email", e.target.value)}
                         />
                         <InputError message={errors.email} />
                     </div>
+
                     <div className="grid gap-2">
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
@@ -85,19 +92,31 @@ export default function Login({
                         />
                         <InputError message={errors.password} />
                     </div>
-                    <Button type="submit" className="w-full" disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+
+                    <Button 
+                        type="submit" 
+                        className="w-full" 
+                        disabled={processing}
+                    >
+                        {processing && (
+                            <LoaderCircle className="h-4 w-4 animate-spin" />
+                        )}
                         Login
                     </Button>
+
                     <hr />
                 </div>
+
                 <div className="text-center text-sm">
                     Don&apos;t have an account?{" "}
-                    <Link href={route("register")} className="underline underline-offset-4">
+                    <Link 
+                        href={route("register")} 
+                        className="underline underline-offset-4"
+                    >
                         Sign up
                     </Link>
                 </div>
             </form>
         </AuthLayout>
-    );
+    )
 }

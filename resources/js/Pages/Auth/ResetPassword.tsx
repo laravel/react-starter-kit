@@ -1,22 +1,27 @@
-// Components
-import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/Auth/AuthBase";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+import { FormEventHandler } from 'react'
+import { Head, useForm } from '@inertiajs/react'
+import { LoaderCircle } from "lucide-react"
 
-import { LoaderCircle } from "lucide-react";
+import InputError from "@/Components/InputError"
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import AuthLayout from "@/Layouts/Auth/AuthBase"
 
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+interface ResetPasswordProps {
+    token: string
+    email: string
+}
 
-export default function ResetPassword({
-    token,
-    email,
-}: {
-    token: string;
-    email: string;
-}) {
+interface ResetPasswordForm {
+    token: string
+    email: string
+    password: string
+    password_confirmation: string
+}
+
+export default function ResetPassword({ token, email }: ResetPasswordProps) {
+    
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -25,12 +30,11 @@ export default function ResetPassword({
     });
 
     const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-
+        e.preventDefault()
         post(route('password.store'), {
             onFinish: () => reset('password', 'password_confirmation'),
-        });
-    };
+        })
+    }
 
     return (
         <AuthLayout
@@ -47,10 +51,10 @@ export default function ResetPassword({
                             id="email"
                             type="email"
                             name="email"
-                            readOnly
                             value={data.email}
                             className="mt-1 block w-full"
                             autoComplete="username"
+                            readOnly
                             onChange={(e) => setData('email', e.target.value)}
                         />
                         <InputError message={errors.email} className="mt-2" />
@@ -65,35 +69,40 @@ export default function ResetPassword({
                             value={data.password}
                             className="mt-1 block w-full"
                             autoComplete="new-password"
-                            isFocused={true}
+                            autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                         />
                         <InputError message={errors.password} className="mt-2" />
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm Password</Label>
+                        <Label htmlFor="password_confirmation">
+                            Confirm Password
+                        </Label>
                         <Input
+                            id="password_confirmation"
                             type="password"
                             name="password_confirmation"
                             value={data.password_confirmation}
                             className="mt-1 block w-full"
                             autoComplete="new-password"
-                            onChange={(e) =>
-                                setData('password_confirmation', e.target.value)
-                            }
+                            onChange={(e) => setData('password_confirmation', e.target.value)}
                         />
-                        <InputError message={errors.password_confirmation} />
+                        <InputError message={errors.password_confirmation} className="mt-2" />
                     </div>
 
-                    <div className="grid gap-2">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Reset Password
-                        </Button>
-                    </div>
+                    <Button 
+                        type="submit"
+                        className="w-full" 
+                        disabled={processing}
+                    >
+                        {processing && (
+                            <LoaderCircle className="h-4 w-4 animate-spin" />
+                        )}
+                        Reset Password
+                    </Button>
                 </div>
             </form>
         </AuthLayout>
-    );
+    )
 }

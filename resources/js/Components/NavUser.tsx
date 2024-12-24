@@ -57,7 +57,7 @@ function UserInfo({ user }: { user: User }) {
 }
 
 export function NavUser() {
-    const { auth: { user } } = usePage<PageProps>().props
+    const { auth: { user } } = usePage().props
 
     return (
         <SidebarMenu>

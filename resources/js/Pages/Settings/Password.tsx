@@ -1,9 +1,8 @@
 import AppLayout from '@/Layouts/AppLayout';
 import SettingsLayout from './Layout';
 import InputError from '@/Components/InputError';
-import { Separator } from "@/Components/ui/separator"
 import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage, Head } from '@inertiajs/react';
+import { useForm, Head } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
 import { Button } from "@/Components/ui/button";

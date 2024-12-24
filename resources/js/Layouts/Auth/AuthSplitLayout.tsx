@@ -1,21 +1,19 @@
-import { Link, usePage } from "@inertiajs/react";
-
-// Components
-import ApplicationLogo from "@/Components/ApplicationLogo";
+import { Link, usePage } from "@inertiajs/react"
+import ApplicationLogo from "@/Components/ApplicationLogo"
 
 interface AuthLayoutProps {
-    children: React.ReactNode;
-    title?: string;
-    description?: string;
-    name?: string;
+    children: React.ReactNode
+    name?: string
+    title?: string
+    description?: string
 }
 
 export default function AuthSplitLayout({
     children,
     title,
-    description
+    description,
+    name
 }: AuthLayoutProps) {
-    const name = usePage().props.name;
     const quote = usePage().props.quote;
 
     return (

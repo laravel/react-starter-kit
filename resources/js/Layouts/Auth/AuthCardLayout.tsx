@@ -1,23 +1,18 @@
-import { Link, usePage } from "@inertiajs/react";
-
-// Components
-import ApplicationLogo from "@/Components/ApplicationLogo";
-import { Button } from "@/Components/ui/button"
+import { Link, usePage } from "@inertiajs/react"
+import ApplicationLogo from "@/Components/ApplicationLogo"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
 } from "@/Components/ui/card"
-import { Input } from "@/Components/ui/input"
-import { Label } from "@/Components/ui/label"
 
 interface AuthLayoutProps {
-    children: React.ReactNode;
-    title?: string;
-    description?: string;
-    name?: string;
+    children: React.ReactNode
+    name?: string
+    title?: string
+    description?: string
 }
 
 export default function AuthCardLayout({

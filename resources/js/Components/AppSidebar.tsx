@@ -19,10 +19,6 @@ interface NavItem {
     icon: React.ComponentType
 }
 
-interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
-    className?: string
-}
-
 const footerNavItems: NavItem[] = [
     {
         title: "Github Repo",
@@ -36,14 +32,9 @@ const footerNavItems: NavItem[] = [
     },
 ]
 
-export function AppSidebar({ className, ...props }: AppSidebarProps) {
+export function AppSidebar() {
     return (
-        <Sidebar 
-            variant="inset" 
-            collapsible="offcanvas"
-            className={className} 
-            {...props}
-        >
+        <Sidebar variant="inset" collapsible="offcanvas">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>

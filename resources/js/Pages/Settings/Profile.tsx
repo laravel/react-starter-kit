@@ -1,16 +1,20 @@
-import AppLayout from '@/Layouts/AppLayout';
-import SettingsLayout from './Layout';
-import InputError from '@/Components/InputError';
-import { Separator } from "@/Components/ui/separator"
-import { Transition } from '@headlessui/react';
-import { Link, useForm, usePage, Head } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { FormEventHandler } from 'react'
+import { Head, Link, useForm, usePage } from '@inertiajs/react'
+import { Transition } from '@headlessui/react'
 
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
-import { Label } from "@/Components/ui/label";
+import InputError from '@/Components/InputError'
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import { Label } from "@/Components/ui/label"
+import AppLayout from '@/Layouts/AppLayout'
+import SettingsLayout from './Layout'
 
-const breadcrumbItems = [
+interface BreadcrumbItem {
+    title: string
+    href: string
+}
+
+const breadcrumbItems: BreadcrumbItem[] = [
     {
         title: 'Dashboard',
         href: '/dashboard'
@@ -20,7 +24,6 @@ const breadcrumbItems = [
         href: '/settings/profile'
     }
 ]
-
 
 export default function Profile({
     mustVerifyEmail,

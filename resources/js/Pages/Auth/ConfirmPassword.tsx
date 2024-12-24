@@ -1,13 +1,12 @@
 // Components
-import InputError from "@/Components/InputError";
-import AuthLayout from "@/Layouts/Auth/AuthBase";
-import { Button } from "@/Components/ui/button";
-import { Input } from "@/Components/ui/input";
+import { FormEventHandler } from 'react'
+import { Head, useForm } from '@inertiajs/react'
+import { LoaderCircle } from "lucide-react"
 
-import { LoaderCircle } from "lucide-react";
-
-import { Head, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import InputError from "@/Components/InputError"
+import { Button } from "@/Components/ui/button"
+import { Input } from "@/Components/ui/input"
+import AuthLayout from "@/Layouts/Auth/AuthBase"
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({

@@ -1,11 +1,12 @@
+import { Fragment } from 'react'
 import { AppSidebar } from "@/Components/AppSidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
+    BreadcrumbLink,
     BreadcrumbList,
     BreadcrumbPage,
-    BreadcrumbLink,
-    BreadcrumbSeparator
+    BreadcrumbSeparator,
 } from "@/Components/ui/breadcrumb"
 import { Separator } from "@/Components/ui/separator"
 import {
@@ -13,16 +14,15 @@ import {
     SidebarProvider,
     SidebarTrigger,
 } from "@/Components/ui/sidebar"
-import { PropsWithChildren, Fragment } from 'react';
 
-interface BreadcrumbItem {
-    title: string;
-    href: string;
+interface BreadcrumbItemType {
+    title: string
+    href: string
 }
 
 interface AppLayoutProps {
-    children: React.ReactNode;
-    breadcrumbItems?: BreadcrumbItem[];
+    children: React.ReactNode
+    breadcrumbItems?: BreadcrumbItemType[]
 }
 
 export default function App({ 

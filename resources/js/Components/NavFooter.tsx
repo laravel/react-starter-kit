@@ -5,7 +5,7 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuAction,
+    SidebarMenuAction
 } from "@/Components/ui/sidebar"
 
 interface NavItem {
@@ -14,34 +14,37 @@ interface NavItem {
     icon: LucideIcon
 }
 
-interface NavFooterProps extends React.ComponentPropsWithoutRef<typeof SidebarGroup> {
-    items: NavItem[]
-}
-
-export function NavFooter({ items, ...props }: NavFooterProps) {
-    const renderNavItem = (item: NavItem) => (
-        <SidebarMenuItem key={item.title}>
-            <SidebarMenuButton asChild>
-                <a 
-                    href={item.url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                >
-                    <item.icon />
-                    <span>{item.title}</span>
-                </a>
-            </SidebarMenuButton>
-            <SidebarMenuAction showOnHover>
-                <ExternalLink />
-            </SidebarMenuAction>
-        </SidebarMenuItem>
-    )
-
+export function NavFooter({ 
+    items, 
+    className,
+    ...props 
+}: React.ComponentPropsWithoutRef<typeof SidebarGroup> & { 
+    items: NavItem[] 
+}) {
     return (
-        <SidebarGroup {...props}>
+        <SidebarGroup 
+            {...props} 
+            className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}
+        >
             <SidebarGroupContent>
                 <SidebarMenu>
-                    {items.map(renderNavItem)}
+                    {items.map((item) => (
+                        <SidebarMenuItem key={item.title}>
+                            <SidebarMenuButton asChild>
+                                <a 
+                                    href={item.url} 
+                                    target="_blank" 
+                                    rel="noopener noreferrer"
+                                >
+                                    <item.icon />
+                                    <span>{item.title}</span>
+                                </a>
+                            </SidebarMenuButton>
+                            <SidebarMenuAction showOnHover>
+                                <ExternalLink />
+                            </SidebarMenuAction>
+                        </SidebarMenuItem>
+                    ))}
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>
