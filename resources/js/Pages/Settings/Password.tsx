@@ -1,14 +1,14 @@
 import AppLayout from '@/Layouts/AppLayout';
 import SettingsLayout from './Layout';
 import InputError from '@/Components/InputError';
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/Components/ui/separator"
 import { Transition } from '@headlessui/react';
 import { Link, useForm, usePage, Head } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/Components/ui/button";
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 
 const breadcrumbItems = [
     {

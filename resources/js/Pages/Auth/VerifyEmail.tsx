@@ -1,6 +1,6 @@
 // Components
 import AuthLayout from "@/Layouts/Auth/AuthBase";
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 
 import { LoaderCircle } from "lucide-react";
 

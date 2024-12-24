@@ -1,8 +1,8 @@
 import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 import { Link } from "@inertiajs/react";
-import { Separator } from "@/components/ui/separator"
-import { Label } from "@/components/ui/label";
+import { Separator } from "@/Components/ui/separator"
+import { Label } from "@/Components/ui/label";
 
 import {
     Select,
@@ -12,7 +12,7 @@ import {
     SelectLabel,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select"
+  } from "@/Components/ui/select"
 
 const sidebarNavItems = [
     {

@@ -4,10 +4,10 @@ import SettingsLayout from './Layout';
 // Components
 import InputError from "@/Components/InputError";
 import AuthLayout from "@/Layouts/AuthLayout";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/Components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert"
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 
 import {
     Dialog,
@@ -18,7 +18,7 @@ import {
     DialogTrigger,
     DialogFooter,
     DialogClose
-} from "@/components/ui/dialog"
+} from "@/Components/ui/dialog"
 
 import { useForm, Head } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
