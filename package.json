@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
-        "dev": "vite"
+        "dev": "vite",
+        "prepare": "husky"
     },
     "devDependencies": {
         "@inertiajs/react": "^2.0.0",
