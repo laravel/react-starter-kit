@@ -11,6 +11,7 @@
         "autoprefixer": "^10.4.20",
         "axios": "^1.7.4",
         "concurrently": "^9.0.1",
+        "husky": "^9.1.7",
         "laravel-vite-plugin": "^1.0",
         "postcss": "^8.4.49",
         "react": "^19.0.0",
