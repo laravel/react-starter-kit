@@ -4,7 +4,7 @@
     "scripts": {
         "build": "vite build",
         "dev": "vite",
-        "prepare": "husky"
+        "prepare": "husky install"
     },
     "devDependencies": {
         "@inertiajs/react": "^2.0.0",
