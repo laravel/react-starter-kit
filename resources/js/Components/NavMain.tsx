@@ -1,53 +1,48 @@
 "use client"
 
-import { ChevronRight, LayoutDashboard, type LucideIcon } from "lucide-react"
-
+import { LayoutDashboard, type LucideIcon } from "lucide-react"
 import { Link } from "@inertiajs/react"
-
-import {
-    Collapsible,
-    CollapsibleContent,
-    CollapsibleTrigger,
-} from "@/Components/ui/collapsible"
 import {
     SidebarGroup,
-    SidebarGroupLabel,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
-    SidebarMenuSub,
-    SidebarMenuSubButton,
-    SidebarMenuSubItem,
 } from "@/Components/ui/sidebar"
 
-export function NavMain({
-    items,
-}: {
-    items: {
-        title: string
-        url: string
-        icon: LucideIcon
-        isActive?: boolean
-        items?: {
-            title: string
-            url: string
-        }[]
-    }[]
-}) {
+interface NavItem {
+    title: string
+    url: string
+    icon: LucideIcon
+    isActive?: boolean
+}
+
+interface NavMainProps {
+    items?: NavItem[]
+}
+
+export function NavMain({ items = [] }: NavMainProps) {
     return (
-        <>
-            <SidebarGroup>
-                <SidebarMenu>
-                    <SidebarMenuItem>
-                        <SidebarMenuButton asChild isActive>
-                            <Link href={route('dashboard')}>
-                                <LayoutDashboard />
-                                <span>Dashboard</span>
+        <SidebarGroup>
+            <SidebarMenu>
+                <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive>
+                        <Link href={route('dashboard')}>
+                            <LayoutDashboard />
+                            <span>Dashboard</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+                {items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild isActive={item.isActive}>
+                            <Link href={item.url}>
+                                <item.icon />
+                                <span>{item.title}</span>
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
-                </SidebarMenu>
-            </SidebarGroup>
-        </>
+                ))}
+            </SidebarMenu>
+        </SidebarGroup>
     )
 }

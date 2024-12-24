@@ -41,7 +41,7 @@ export default function Layout({
     description 
 }: LayoutProps) {
     return (
-        <div className="space-y-6 p-10 pb-16">
+        <div className="p-10 pb-16">
             <div className="block lg:hidden w-full [&>button]:w-full pb-2 space-y-2">
                 <Label>Settings Menu</Label>
                 <Select className="w-full" onValueChange={(href) => window.location.href = href} value={window.location.pathname}>

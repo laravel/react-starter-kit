@@ -1,12 +1,7 @@
 "use client"
 
-import {
-    ChevronsUpDown,
-    LogOut,
-    SquareUserRound,
-    Settings
-} from "lucide-react"
-
+import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
+import { Link, usePage } from '@inertiajs/react'
 import {
     Avatar,
     AvatarFallback,
@@ -27,22 +22,42 @@ import {
     SidebarMenuItem,
 } from "@/Components/ui/sidebar"
 
-import { Link, usePage } from '@inertiajs/react';
+interface User {
+    name: string
+    email: string
+    avatar?: string
+}
+
+interface PageProps {
+    auth: {
+        user: User
+    }
+}
+
+function getInitials(fullName: string): string {
+    const names = fullName.trim().split(' ')
+    if (names.length === 0) return ''
+    if (names.length === 1) return names[0].charAt(0).toUpperCase()
+    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase()
+}
+
+function UserInfo({ user }: { user: User }) {
+    return (
+        <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+            <Avatar className="h-8 w-8 rounded-md">
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="rounded-md">{getInitials(user.name)}</AvatarFallback>
+            </Avatar>
+            <div className="grid flex-1 text-left text-sm leading-tight">
+                <span className="truncate font-semibold">{user.name}</span>
+                <span className="truncate text-xs">{user.email}</span>
+            </div>
+        </div>
+    )
+}
 
 export function NavUser() {
-
-    const user = usePage().props.auth.user;
-    function getInitials(fullName) {
-        const names = fullName.trim().split(' ');
-
-        if (names.length === 0) return '';
-
-        if (names.length === 1) {
-            return names[0].charAt(0).toUpperCase();
-        }
-
-        return `${names[0].charAt(0).toUpperCase()}${names[names.length - 1].charAt(0).toUpperCase()}`;
-    }
+    const { auth: { user } } = usePage<PageProps>().props
 
     return (
         <SidebarMenu>
@@ -55,7 +70,9 @@ export function NavUser() {
                         >
                             <Avatar className="h-8 w-8 rounded-md">
                                 <AvatarImage src={user.avatar} alt={user.name} />
-                                <AvatarFallback className="rounded-md">{getInitials(user.name)}</AvatarFallback>
+                                <AvatarFallback className="rounded-md">
+                                    {getInitials(user.name)}
+                                </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
                                 <span className="truncate font-semibold">{user.name}</span>
@@ -71,16 +88,7 @@ export function NavUser() {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
-                            <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                                <Avatar className="h-8 w-8 rounded-md">
-                                    <AvatarImage src={user.avatar} alt={user.name} />
-                                    <AvatarFallback className="rounded-md">{getInitials(user.name)}</AvatarFallback>
-                                </Avatar>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">{user.name}</span>
-                                    <span className="truncate text-xs">{user.email}</span>
-                                </div>
-                            </div>
+                            <UserInfo user={user} />
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
@@ -90,7 +98,7 @@ export function NavUser() {
                                     href={route('profile.edit')}
                                     as="button"
                                 >
-                                    <Settings />
+                                    <Settings className="mr-2" />
                                     Settings
                                 </Link>
                             </DropdownMenuItem>
@@ -103,7 +111,7 @@ export function NavUser() {
                                 href={route('logout')}
                                 as="button"
                             >
-                                <LogOut />
+                                <LogOut className="mr-2" />
                                 Log out
                             </Link>
                         </DropdownMenuItem>
