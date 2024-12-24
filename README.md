@@ -5,6 +5,8 @@
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 
+<img src="https://cdn.devdojo.com/images/december2024/preview.png" />
+
 ## Introduction
 
 Welcome to the <a href="https://laravel.com" target="_blank">Laravel</a> React</a> Starter Kit. This starter kit utilizes <a href="https://inertiajs.com/" target="_blank">Intertia v2</a>, <a href="https://tailwindcss.com/" target="_blank">Tailwind CSS</a>,V3 (soon to be V4), <a href="https://reactjs.dev" target="_blank">React 19</a>, and <a href="https://ui.shadcn.com/" target="_blank">ShadCN UI</a>.
