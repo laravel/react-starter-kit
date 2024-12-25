@@ -14,6 +14,21 @@ import {
 const appName =
     import.meta.env.VITE_APP_NAME || 'Laravel';
 
+// window.appearance = 'system';
+
+// // Initialize appearance
+// if (typeof window !== 'undefined') {
+//     const appearance = localStorage.getItem('appearance') || 'system';
+//     window.appearance = appearance;
+    
+//     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+//     const shouldBeDark = appearance === 'dark' || (appearance === 'system' && prefersDark);
+    
+//     if (shouldBeDark) {
+//         document.body.classList.add('dark');
+//     }
+// }
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) =>

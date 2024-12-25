@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import AppearanceToggle from '@/Components/AppearanceToggle';
 import { AppSidebar } from "@/Components/AppSidebar"
 import {
     Breadcrumb,
@@ -33,37 +34,40 @@ export default function App({
         <SidebarProvider>
             <AppSidebar />
             <SidebarInset>
-                <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
-                    <SidebarTrigger className="-ml-1" />
-                    {breadcrumbItems.length > 0 && (
-                        <>
-                            <Separator orientation="vertical" className="mr-2 h-4" />
-                            <Breadcrumb>
-                                <BreadcrumbList>
-                                    {breadcrumbItems.map((item, index) => {
-                                        const isLast = index === breadcrumbItems.length - 1;
+                <header className="flex h-16 shrink-0 items-center w-full justify-between gap-2 border-b px-4">
+                    <div className="flex items-center gap-2">
+                        <SidebarTrigger className="-ml-1" />
+                        {breadcrumbItems.length > 0 && (
+                            <>
+                                <Separator orientation="vertical" className="mr-2 h-4" />
+                                <Breadcrumb>
+                                    <BreadcrumbList>
+                                        {breadcrumbItems.map((item, index) => {
+                                            const isLast = index === breadcrumbItems.length - 1;
 
-                                        return (
-                                            <Fragment key={index}>
-                                                <BreadcrumbItem>
-                                                    {isLast ? (
-                                                        <BreadcrumbPage>{item.title}</BreadcrumbPage>
-                                                    ) : (
-                                                        <BreadcrumbLink href={item.href}>
-                                                            {item.title}
-                                                        </BreadcrumbLink>
+                                            return (
+                                                <Fragment key={index}>
+                                                    <BreadcrumbItem>
+                                                        {isLast ? (
+                                                            <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                                                        ) : (
+                                                            <BreadcrumbLink href={item.href}>
+                                                                {item.title}
+                                                            </BreadcrumbLink>
+                                                        )}
+                                                    </BreadcrumbItem>
+                                                    {!isLast && (
+                                                        <BreadcrumbSeparator />
                                                     )}
-                                                </BreadcrumbItem>
-                                                {!isLast && (
-                                                    <BreadcrumbSeparator />
-                                                )}
-                                            </Fragment>
-                                        );
-                                    })}
-                                </BreadcrumbList>
-                            </Breadcrumb>
-                        </>
-                    )}
+                                                </Fragment>
+                                            );
+                                        })}
+                                    </BreadcrumbList>
+                                </Breadcrumb>
+                            </>
+                        )}
+                    </div>
+                    <AppearanceToggle className="opacity-40 hover:opacity-100" />
                 </header>
                 {children}
             </SidebarInset>
