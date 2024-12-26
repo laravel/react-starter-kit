@@ -40,7 +40,7 @@ export default function Register() {
     return (
         <AuthLayout 
             title="Create an account"
-            description="Enter your name, email and password below."
+            description="Enter your name, email, and password below."
         >
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
