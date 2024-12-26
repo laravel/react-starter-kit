@@ -117,7 +117,7 @@ npx shadcn@latest add button
 You'll now have a button component in your `resources/js/Components/ui` folder. You can then use the button component inside of any page.
 
 ```tsx
-import { Button } from "@/components/ui/button"
+import { Button } from "@/Components/ui/button"
 
 export default function Home() {
     return (

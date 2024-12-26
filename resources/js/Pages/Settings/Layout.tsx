@@ -33,6 +33,10 @@ const sidebarNavItems: NavItem[] = [
         href: "/settings/password",
     },
     {
+        title: "Appearance",
+        href: "/settings/appearance"
+    },
+    {
         title: "Account Removal",
         href: "/settings/delete",
     }

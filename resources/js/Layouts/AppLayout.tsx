@@ -1,5 +1,4 @@
-import { Fragment } from 'react'
-import AppearanceToggle from '@/Components/AppearanceToggle';
+import { Fragment, useState } from 'react'
 import { AppSidebar } from "@/Components/AppSidebar"
 import {
     Breadcrumb,
@@ -30,8 +29,26 @@ export default function App({
     children,
     breadcrumbItems = [],
 }: AppLayoutProps) {
+
+    const [isOpen, setIsOpen] = useState(() => 
+        typeof window !== 'undefined' ? 
+            localStorage.getItem('sidebar') === 'true' : 
+            true
+    );
+
+    const handleSidebarChange = (open: boolean) => {
+        setIsOpen(open);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('sidebar', String(open));
+        }
+    };
+
     return (
-        <SidebarProvider>
+        <SidebarProvider 
+            defaultOpen={isOpen} 
+            open={isOpen}
+            onOpenChange={handleSidebarChange}
+        >  
             <AppSidebar />
             <SidebarInset>
                 <header className="flex h-16 shrink-0 items-center w-full justify-between gap-2 border-b px-4">
@@ -67,7 +84,6 @@ export default function App({
                             </>
                         )}
                     </div>
-                    <AppearanceToggle className="opacity-40 hover:opacity-100" />
                 </header>
                 {children}
             </SidebarInset>

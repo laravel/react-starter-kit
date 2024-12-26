@@ -30,6 +30,10 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
 
+    Route::get('settings/appearance', function(){
+        return Inertia::render('Settings/Appearance');
+    })->name('appearance');
+
     Route::get('settings/delete', [DeleteController::class, 'edit'])->name('delete.edit');
     Route::delete('settings/delete', [DeleteController::class, 'destroy'])->name('delete.destroy');
 
