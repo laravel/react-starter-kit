@@ -5,8 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
-
-        <!-- Scripts -->
+        
         @routes
         @viteReactRefresh
         @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])

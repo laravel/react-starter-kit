@@ -10,7 +10,7 @@ export function useAppearance() {
 
   const applyTheme = (mode: Appearance) => {
     const isDark = mode === 'dark' || (mode === 'system' && prefersDark());
-    document.body.classList.toggle('dark', isDark);
+    document.documentElement.classList.toggle('dark', isDark);
   };
 
   const updateAppearance = (mode: Appearance) => {

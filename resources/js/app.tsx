@@ -14,20 +14,23 @@ import {
 const appName =
     import.meta.env.VITE_APP_NAME || 'Laravel';
 
-// window.appearance = 'system';
 
-// // Initialize appearance
-// if (typeof window !== 'undefined') {
-//     const appearance = localStorage.getItem('appearance') || 'system';
-//     window.appearance = appearance;
+/*
+*  Dark/Light Mode Initialization
+*  - This needs to be added to every page so that way the correct appearance is loaded
+*/
+(function() {
+    const savedAppearance = localStorage.getItem('appearance') || 'system';
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     
-//     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-//     const shouldBeDark = appearance === 'dark' || (appearance === 'system' && prefersDark);
+    const isDark = 
+        savedAppearance === 'dark' || 
+        (savedAppearance === 'system' && prefersDark);
     
-//     if (shouldBeDark) {
-//         document.body.classList.add('dark');
-//     }
-// }
+    if (isDark) {
+        document.documentElement.classList.add('dark');
+    }
+})();
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
