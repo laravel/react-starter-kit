@@ -1,4 +1,3 @@
-import AppearanceDropdown from '@/Components/AppearanceDropdown';
 import { PageProps } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 
@@ -44,7 +43,6 @@ export default function Welcome({
                                 </svg>
                             </div>
                             <nav className="-mx-3 flex flex-1 justify-end">
-                                <AppearanceDropdown class="mr-2 translate-y-0.5" />
                                 {auth.user ? (
                                     <Link
                                         href={route('dashboard')}

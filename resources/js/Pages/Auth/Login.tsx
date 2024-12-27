@@ -45,7 +45,7 @@ export default function Login({
 
     return (
         <AuthLayout 
-            title="Login to your account"
+            title="Log in to your account"
             description="Enter your email and password below to login"
         >
             <Head title="Log in" />
@@ -101,7 +101,7 @@ export default function Login({
                         {processing && (
                             <LoaderCircle className="h-4 w-4 animate-spin" />
                         )}
-                        Login
+                        Log in
                     </Button>
 
                     <hr />

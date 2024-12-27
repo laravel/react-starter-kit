@@ -55,7 +55,7 @@ In the components folder is where all your React components will live. Inside th
 
 ### Pages
 
-Most of your application pages will live in this folder. Here you will find the Page templates for Login, Register, Dashboard, etc. These pages are rendered via Inertia. Here's an example, located inside of `routes/web.php`, of how the dashboard page is rendered:
+Most of your application pages will live in this folder. Here you will find the Page templates for Log in, Register, Dashboard, etc. These pages are rendered via Inertia. Here's an example, located inside of `routes/web.php`, of how the dashboard page is rendered:
 
 ```php
 Route::get('/dashboard', function () {
