@@ -2,6 +2,7 @@ import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 
 import AppearanceTabs from '@/Components/AppearanceTabs';
+import SettingsHeading from "@/Components/Settings/Heading";
 import { Label } from "@/Components/ui/label";
 
 import AppLayout from '@/Layouts/AppLayout'
@@ -31,13 +32,16 @@ export default function Appearance() {
         >
             <Head title="Appearance Settings" />
 
-            <SettingsLayout
-                title="Appearance Settings"
-                description="Update your account's appearance settings."
-            >   
-                <div className="flex flex-col gap-4 items-start">
-                    <Label>Appearance</Label>
-                    <AppearanceTabs />
+            <SettingsLayout>   
+                <div>
+                    <SettingsHeading 
+                        title="Appearance Settings"
+                        description="Update your account's appearance settings"
+                    />
+                    <div className="flex flex-col gap-4 items-start">
+                        <Label>Appearance</Label>
+                        <AppearanceTabs />
+                    </div>
                 </div>
             </SettingsLayout>
         </AppLayout>

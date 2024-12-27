@@ -1,21 +1,12 @@
 import { Link } from "@inertiajs/react"
 import { Button } from "@/Components/ui/button"
-import { Label } from "@/Components/ui/label"
-import {
-    Select,
-    SelectContent,
-    SelectGroup,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from "@/Components/ui/select"
-import { Separator } from "@/Components/ui/separator"
+import Heading from "@/Components/Heading";
 import { cn } from "@/lib/utils"
+
+import { Separator } from "@/Components/ui/separator"
 
 interface LayoutProps {
     children: React.ReactNode
-    title?: string
-    description?: string
 }
 
 interface NavItem {
@@ -35,61 +26,26 @@ const sidebarNavItems: NavItem[] = [
     {
         title: "Appearance",
         href: "/settings/appearance"
-    },
-    {
-        title: "Account Removal",
-        href: "/settings/delete",
     }
 ]
 
 export default function SettingsLayout({ 
-    children,
-    title,
-    description 
+    children
 }: LayoutProps) {
     const currentPath = window.location.pathname
     const currentItem = sidebarNavItems.find(item => currentPath === item.href)
 
     return (
-        <div className="p-10 pb-16">
-            <div className="block lg:hidden w-full [&>button]:w-full pb-2 space-y-2">
-                <Label>Settings Menu</Label>
-                <Select 
-                    className="w-full" 
-                    onValueChange={(href) => window.location.href = href} 
-                    value={currentPath}
-                >
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder={currentItem?.title || "Settings Menu"} />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectGroup>
-                            {sidebarNavItems.map((item) => (
-                                <SelectItem 
-                                    key={item.href} 
-                                    value={item.href}
-                                    selected={currentPath === item.href}
-                                >
-                                    {item.title}
-                                </SelectItem>
-                            ))}
-                        </SelectGroup>
-                    </SelectContent>
-                </Select>
-            </div>
+        <div className="p-5 sm:p-8 md:p-10">
 
-            <div className="space-y-0.5 lg:block hidden">
-                <h2 className="text-2xl font-bold tracking-tight">Settings</h2>
-                <p className="text-muted-foreground">
-                    Manage your profile and account settings
-                </p>
-            </div>
+            <Heading 
+                title="Settings"
+                description="Manage your profile and account settings"
+            />
 
-            <Separator className="my-6" />
-
-            <div className="flex flex-col space-y-8 lg:flex-row lg:space-x-12 lg:space-y-0">
-                <aside className="lg:w-1/5">
-                    <nav className="hidden flex-col space-x-0 space-y-1 lg:flex">
+            <div className="flex flex-col space-y-8 md:flex-row md:space-x-12 md:space-y-0">
+                <aside className="md:w-1/3 lg:w-1/4 xl:w-1/5 w-full">
+                    <nav className="flex-col space-x-0 space-y-1 flex">
                         {sidebarNavItems.map((item) => (
                             <Button 
                                 key={item.href}
@@ -97,7 +53,7 @@ export default function SettingsLayout({
                                 variant="ghost" 
                                 asChild
                                 className={cn(
-                                    "w-full justify-center md:justify-start",
+                                    "w-full justify-center justify-start",
                                     currentPath === item.href ? "bg-muted" : "hover:underline"
                                 )}
                             > 
@@ -109,18 +65,11 @@ export default function SettingsLayout({
                     </nav>
                 </aside>
 
-                <div className="flex-1 lg:max-w-2xl">
-                    <section className="max-w-xl">
-                        <div className="space-y-6">
-                            <header>
-                                <h3 className="text-lg font-medium">{title}</h3>
-                                <p className="text-sm text-muted-foreground">
-                                    {description}
-                                </p>
-                            </header>
-                            <Separator />
-                            {children}
-                        </div>
+                <Separator className="md:hidden my-6" />
+
+                <div className="flex-1 md:max-w-2xl">
+                    <section className="max-w-xl space-y-12">
+                        {children}
                     </section>
                 </div>
             </div>

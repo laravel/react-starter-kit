@@ -2,12 +2,17 @@ import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 import { Transition } from '@headlessui/react'
 
+
+import DeleteUser from '@/Components/Settings/DeleteUser';
+
 import InputError from '@/Components/InputError'
 import { Button } from "@/Components/ui/button"
 import { Input } from "@/Components/ui/input"
 import { Label } from "@/Components/ui/label"
 import AppLayout from '@/Layouts/AppLayout'
 import SettingsLayout from './Layout'
+import { Separator } from "@/Components/ui/separator"
+import SettingsHeading from "@/Components/Settings/Heading";
 
 interface BreadcrumbItem {
     title: string
@@ -55,11 +60,15 @@ export default function Profile({
         >
             <Head title="Profile Settings" />
 
-            <SettingsLayout
-                title="Profile Information"
-                description="Update your account's profile information and email address."
-            >
-                    <form onSubmit={submit} className="mt-6 space-y-6">
+            <SettingsLayout>
+
+                <div class="flex flex-col">
+                    <SettingsHeading 
+                        title="Profile Information"
+                        description="Update your account's profile information and email address."
+                    />
+
+                    <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
@@ -130,6 +139,9 @@ export default function Profile({
                             </Transition>
                         </div>
                     </form>
+                </div>
+
+                    <DeleteUser />
             </SettingsLayout>
         </AppLayout>
     );
