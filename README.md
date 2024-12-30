@@ -37,7 +37,7 @@ This Starter Kit includes the following features:
 
  - **User Authentication** (login, register, password reset, email verify, and password confirmation)
  - **Dashboard Page** (Auth Protected User Dashboard Page)
- - **Settings Page** (Profile Update, Password Update, Delete Account)
+ - **Settings Page** (Profile Update/Delete, Password Update, Appearance)
  
 
 
