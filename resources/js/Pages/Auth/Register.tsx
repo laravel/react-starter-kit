@@ -120,7 +120,7 @@ export default function Register() {
                         href={route("login")} 
                         className="underline underline-offset-4"
                     >
-                        Sign in
+                        Log in
                     </Link>
                 </div>
             </form>
