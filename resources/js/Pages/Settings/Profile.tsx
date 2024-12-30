@@ -65,7 +65,7 @@ export default function Profile({
                 <div class="flex flex-col">
                     <SettingsHeading 
                         title="Profile Information"
-                        description="Update your account's profile information and email address."
+                        description="Update your name and email address"
                     />
 
                     <form onSubmit={submit} className="space-y-6">

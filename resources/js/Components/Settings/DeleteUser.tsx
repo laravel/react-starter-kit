@@ -46,18 +46,18 @@ export default function DeleteUser() {
         <div>
             <SettingsHeading 
                 title="Delete Account"
-                description="Remove your account and all of its resources"
+                description="Delete your account and all of its resources"
             />
             <Dialog>
                 <DialogTrigger asChild>
                     <Button variant="destructive">Delete Account</Button>
                 </DialogTrigger>
                 <DialogContent>
-                    <form className="space-y-4" onSubmit={deleteUser}>
+                    <form className="space-y-6" onSubmit={deleteUser}>
                         <DialogHeader className="space-y-3">
                             <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                             <DialogDescription>
-                                Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.
+                                Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.
                             </DialogDescription>
                         </DialogHeader>
                         <div className="grid gap-2">
@@ -94,17 +94,6 @@ export default function DeleteUser() {
                     </form>
                 </DialogContent>
             </Dialog>
-
-            <Alert variant="destructive" className="mt-4">
-                <TriangleAlert className="h-4 w-4" />
-                <AlertTitle>Warning</AlertTitle>
-                <AlertDescription>
-                    Once your account is deleted, all of its resources and data
-                    will be permanently removed. Before deleting your account,
-                    please download any data or information that you wish to
-                    retain.
-                </AlertDescription>
-            </Alert>
         </div>
     );
 }
