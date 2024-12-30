@@ -12,10 +12,6 @@ import SettingsHeading from "@/Components/Settings/Heading";
 
 const breadcrumbItems = [
     {
-        title: 'Dashboard',
-        href: '/dashboard'
-    },
-    {
         title: 'Password Settings',
         href: '/settings/password'
     }

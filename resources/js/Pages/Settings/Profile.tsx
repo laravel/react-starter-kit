@@ -137,7 +137,7 @@ export default function Profile({
                     </form>
                 </div>
 
-                    <DeleteUser />
+                <DeleteUser />
             </SettingsLayout>
         </AppLayout>
     );

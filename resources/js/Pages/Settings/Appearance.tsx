@@ -15,10 +15,6 @@ interface BreadcrumbItem {
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard'
-    },
-    {
         title: 'Appearance',
         href: '/settings/appearance'
     }
