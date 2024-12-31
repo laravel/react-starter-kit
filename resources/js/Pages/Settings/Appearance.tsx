@@ -15,7 +15,7 @@ interface BreadcrumbItem {
 
 const breadcrumbItems: BreadcrumbItem[] = [
     {
-        title: 'Appearance',
+        title: 'Appearance Settings',
         href: '/settings/appearance'
     }
 ]
