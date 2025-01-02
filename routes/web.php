@@ -16,16 +16,17 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::middleware('auth')->group(function () {
+Route::get('dashboard', function(){
+    return Inertia::render('Dashboard');
+})->middleware(['auth', 'verified'])->name('dashboard');
 
-    Route::get('/dashboard', function () {
-        return Inertia::render('Dashboard');
-    })->name('dashboard');
+Route::middleware('auth')->group(function () {
 
     Route::redirect('settings', 'settings/profile');
 
     Route::get('settings/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('settings/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/password', [PasswordController::class, 'edit'])->name('password.edit');
     Route::put('settings/password', [PasswordController::class, 'update'])->name('password.update');
@@ -33,11 +34,6 @@ Route::middleware('auth')->group(function () {
     Route::get('settings/appearance', function () {
         return Inertia::render('Settings/Appearance');
     })->name('appearance');
-
-    Route::get('settings/delete', [DeleteController::class, 'edit'])->name('delete.edit');
-    Route::delete('settings/delete', [DeleteController::class, 'destroy'])->name('delete.destroy');
-
-    //Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
 require __DIR__.'/auth.php';
