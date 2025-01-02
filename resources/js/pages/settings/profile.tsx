@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label"
 import AppLayout from '@/layouts/app-layout'
 import SettingsLayout from './layout'
 import { Separator } from "@/components/ui/separator"
-import SettingsHeading from "@/components/settings/Heading";
+import SettingsHeading from "@/components/settings/heading";
 
 interface BreadcrumbItem {
     title: string

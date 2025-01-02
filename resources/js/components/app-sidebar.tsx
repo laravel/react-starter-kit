@@ -1,7 +1,7 @@
 import { Github, BookOpenText } from "lucide-react"
-import { NavMain } from "@/components/NavMain"
-import { NavFooter } from "@/components/NavFooter"
-import { NavUser } from "@/components/NavUser"
+import { NavMain } from "@/components/nav-main"
+import { NavFooter } from "@/components/nav-footer"
+import { NavUser } from "@/components/nav-user"
 import {
     Sidebar,
     SidebarContent,
@@ -11,7 +11,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import ApplicationLogo from "./ApplicationLogo"
+import ApplicationLogo from "./application-logo"
 
 interface NavItem {
     title: string

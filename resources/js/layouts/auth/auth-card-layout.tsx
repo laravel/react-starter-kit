@@ -1,5 +1,5 @@
 import { Link, usePage } from "@inertiajs/react"
-import ApplicationLogo from "@/components/ApplicationLogo"
+import ApplicationLogo from "@/components/application-logo"
 import {
     Card,
     CardContent,

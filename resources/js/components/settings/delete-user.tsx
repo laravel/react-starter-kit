@@ -2,14 +2,14 @@ import { FormEventHandler, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 
 // Components
-import InputError from "@/components/InputErrorr";
+import InputError from "@/components/input-error";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlert } from 'lucide-react';
 
-import SettingsHeading from "@/components/settings/Heading";
+import SettingsHeading from "@/components/settings/heading";
 
 import {
     Dialog,

@@ -8,7 +8,7 @@ import { FormEventHandler, useRef } from 'react';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import SettingsHeading from "@/components/settings/Heading";
+import SettingsHeading from "@/components/settings/heading";
 
 const breadcrumbItems = [
     {

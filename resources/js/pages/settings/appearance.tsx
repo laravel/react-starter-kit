@@ -2,7 +2,7 @@ import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 
 import AppearanceTabs from '@/components/appearance-tabs';
-import SettingsHeading from "@/components/settings/Heading";
+import SettingsHeading from "@/components/settings/heading";
 import { Label } from "@/components/ui/label";
 
 import AppLayout from '@/layouts/app-layout'

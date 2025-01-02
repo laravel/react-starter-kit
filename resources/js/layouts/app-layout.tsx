@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { AppSidebar } from "@/components/AppSidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
