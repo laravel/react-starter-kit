@@ -1,5 +1,5 @@
 import { Head } from '@inertiajs/react'
-import AppLayout from "@/Layouts/AppLayout"
+import AppLayout from "@/layouts/app-layout"
 
 interface BreadcrumbItem {
     title: string

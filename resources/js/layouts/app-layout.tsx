@@ -1,5 +1,5 @@
 import { Fragment, useState } from 'react'
-import { AppSidebar } from "@/Components/AppSidebar"
+import { AppSidebar } from "@/components/app-sidebar"
 import {
     Breadcrumb,
     BreadcrumbItem,
@@ -7,13 +7,13 @@ import {
     BreadcrumbList,
     BreadcrumbPage,
     BreadcrumbSeparator,
-} from "@/Components/ui/breadcrumb"
-import { Separator } from "@/Components/ui/separator"
+} from "@/components/ui/breadcrumb"
+import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
     SidebarProvider,
     SidebarTrigger,
-} from "@/Components/ui/sidebar"
+} from "@/components/ui/sidebar"
 
 interface BreadcrumbItemType {
     title: string

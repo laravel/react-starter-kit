@@ -3,16 +3,16 @@ import { Head, Link, useForm, usePage } from '@inertiajs/react'
 import { Transition } from '@headlessui/react'
 
 
-import DeleteUser from '@/Components/Settings/DeleteUser';
+import DeleteUser from '@/components/settings/delete-user';
 
-import InputError from '@/Components/InputError'
-import { Button } from "@/Components/ui/button"
-import { Input } from "@/Components/ui/input"
-import { Label } from "@/Components/ui/label"
-import AppLayout from '@/Layouts/AppLayout'
-import SettingsLayout from './Layout'
-import { Separator } from "@/Components/ui/separator"
-import SettingsHeading from "@/Components/Settings/Heading";
+import InputError from '@/components/input-error'
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import AppLayout from '@/layouts/app-layout'
+import SettingsLayout from './layout'
+import { Separator } from "@/components/ui/separator"
+import SettingsHeading from "@/components/settings/heading";
 
 interface BreadcrumbItem {
     title: string

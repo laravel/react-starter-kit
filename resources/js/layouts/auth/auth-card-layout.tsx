@@ -1,12 +1,12 @@
 import { Link, usePage } from "@inertiajs/react"
-import ApplicationLogo from "@/Components/ApplicationLogo"
+import ApplicationLogo from "@/components/application-logo"
 import {
     Card,
     CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
-} from "@/Components/ui/card"
+} from "@/components/ui/card"
 
 interface AuthLayoutProps {
     children: React.ReactNode

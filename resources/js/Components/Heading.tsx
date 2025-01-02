@@ -1,4 +1,4 @@
-import { Separator } from "@/Components/ui/separator"
+import { Separator } from "@/components/ui/separator"
 
 interface HeadingProps {
     title: string;

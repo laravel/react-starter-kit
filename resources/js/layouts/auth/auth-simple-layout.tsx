@@ -1,5 +1,5 @@
 import { Link, usePage } from "@inertiajs/react"
-import ApplicationLogo from "@/Components/ApplicationLogo"
+import ApplicationLogo from "@/components/application-logo"
 
 interface AuthLayoutProps {
     children: React.ReactNode

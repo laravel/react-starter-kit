@@ -59,22 +59,22 @@ Most of your application pages will live in this folder. Here you will find the 
 
 ```php
 Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
+    return Inertia::render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 ```
 
-This code will load the `resources/js/Pages/Dashboard.tsx` file.
+This code will load the `resources/js/pages/dashboard.tsx` file.
 
 ### Layouts
 
-All your pages will utilize a layout as the structure for each page. These layout files are located in the `resources/js/Layouts` folder. Currently, there will be two layouts. An `App` layout and an `Auth` layout.
+All your pages will utilize a layout as the structure for each page. These layout files are located in the `resources/js/layouts` folder. Currently, there will be two layouts. An `app` layout and an `auth` layout.
 
-1. **AppLayout** - This layout will be used for all authenticated users.
-2. **Auth\AuthBase** - This is the main layout for your authentication pages, more info below.
+1. **app-layout** - This layout will be used for all authenticated users.
+2. **auth\auth-base** - This is the main layout for your authentication pages, more info below.
 
 ### Authentication Layouts
 
-The Authentication layouts are used specifically for all the Authentication views. You'll notice that there are a few different layouts in the `resources/js/Layouts/Auth` folder. This is because we provide you with three layouts to choose from.
+The Authentication layouts are used specifically for all the Authentication views. You'll notice that there are a few different layouts in the `resources/js/layouts/auth` folder. This is because we provide you with three layouts to choose from.
 
 #### AuthSimpleLayout.tsx
 
@@ -99,14 +99,14 @@ A split view authentication layout screen
 To change the Layout you would like to use, simply change the Layout file that is imported in the **AppBase.tsx**. As an example, to use the `AuthSplitLayout.tsx`, the first line would be modified to look like the following:
 
 ```tsx
-import AuthLayoutTemplate from "@/Layouts/Auth/AuthSplitLayout";
+import AuthLayoutTemplate from "@/layouts/auth/auth-split-layout";
 ```
 
 ---
 
 ## ShadCN UI
 
-All the ShadCN components will be installed inside of the `resources/js/Components/ui` folder.
+All the ShadCN components will be installed inside of the `resources/js/components/ui` folder.
 
 When you install a UI component, such as the button component:
 
@@ -114,10 +114,10 @@ When you install a UI component, such as the button component:
 npx shadcn@latest add button
 ```
 
-You'll now have a button component in your `resources/js/Components/ui` folder. You can then use the button component inside of any page.
+You'll now have a button component in your `resources/js/components/ui` folder. You can then use the button component inside of any page.
 
 ```tsx
-import { Button } from "@/Components/ui/button"
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
     return (

@@ -1,12 +1,12 @@
 import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 
-import AppearanceTabs from '@/Components/AppearanceTabs';
-import SettingsHeading from "@/Components/Settings/Heading";
-import { Label } from "@/Components/ui/label";
+import AppearanceTabs from '@/components/appearance-tabs';
+import SettingsHeading from "@/components/settings/heading";
+import { Label } from "@/components/ui/label";
 
-import AppLayout from '@/Layouts/AppLayout'
-import SettingsLayout from './Layout'
+import AppLayout from '@/layouts/app-layout'
+import SettingsLayout from './layout'
 
 interface BreadcrumbItem {
     title: string
