@@ -1,9 +1,9 @@
 import { Link } from "@inertiajs/react"
-import { Button } from "@/components/ui/button"
-import Heading from "@/components/heading";
+import { Button } from "@/Components/ui/button"
+import Heading from "@/Components/Heading";
 import { cn } from "@/lib/utils"
 
-import { Separator } from "@/components/ui/separator"
+import { Separator } from "@/Components/ui/separator"
 
 interface LayoutProps {
     children: React.ReactNode

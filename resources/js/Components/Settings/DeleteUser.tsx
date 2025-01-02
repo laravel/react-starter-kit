@@ -2,14 +2,14 @@ import { FormEventHandler, useRef } from 'react';
 import { useForm } from '@inertiajs/react';
 
 // Components
-import InputError from "@/components/input-error";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import InputError from "@/Components/InputError";
+import { Button } from "@/Components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/Components/ui/alert"
+import { Input } from "@/Components/ui/input";
+import { Label } from "@/Components/ui/label";
 import { TriangleAlert } from 'lucide-react';
 
-import SettingsHeading from "@/components/settings/heading";
+import SettingsHeading from "@/Components/Settings/Heading";
 
 import {
     Dialog,
@@ -20,7 +20,7 @@ import {
     DialogTrigger,
     DialogFooter,
     DialogClose
-} from "@/components/ui/dialog"
+} from "@/Components/ui/dialog"
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);

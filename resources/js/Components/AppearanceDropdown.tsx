@@ -1,11 +1,11 @@
 import { HTMLAttributes } from 'react';
-import { Button } from "@/components/ui/button";
+import { Button } from "@/Components/ui/button";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/Components/ui/dropdown-menu";
 import { Sun, Moon, Monitor } from 'lucide-react';
 import { useAppearance } from '@/hooks/use-appearance';
 
