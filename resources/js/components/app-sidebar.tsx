@@ -1,4 +1,5 @@
 import { Github, BookOpenText } from "lucide-react"
+import { Link } from "@inertiajs/react"
 import { NavMain } from "@/components/nav-main"
 import { NavFooter } from "@/components/nav-footer"
 import { NavUser } from "@/components/nav-user"
@@ -39,7 +40,7 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <a href="#" className="flex items-center gap-3">
+                            <Link href="/dashboard" className="flex items-center gap-3" prefetch>
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
                                     <ApplicationLogo className="size-5 text-white fill-current" />
                                 </div>
@@ -47,7 +48,7 @@ export function AppSidebar() {
                                     <span className="truncate font-semibold">Laravel</span>
                                     <span className="truncate text-xs">Starter Kit</span>
                                 </div>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>

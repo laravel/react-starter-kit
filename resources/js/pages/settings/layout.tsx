@@ -57,7 +57,7 @@ export default function SettingsLayout({
                                     currentPath === item.href ? "bg-muted" : "hover:underline"
                                 )}
                             > 
-                                <Link href={item.href}>
+                                <Link href={item.href} prefetch>
                                     {item.title}
                                 </Link>
                             </Button>
