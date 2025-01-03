@@ -41,7 +41,7 @@ This Starter Kit includes the following features:
 
 ## Front-end App Structure
 
-The majority of the front-end code is located in the `resources/js` folder. In a React application, the most-common file/folder structure is to use **Kebab-Case**. Below is an example of how the `resources/js` folder is structured:
+The majority of the front-end code is located in the `resources/js` folder. In a React app, the most-common file/folder structure is to use **kebab-case**. Below is an example of how this folder is structured:
 
 **Folders**
 ```
