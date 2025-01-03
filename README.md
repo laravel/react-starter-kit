@@ -38,16 +38,34 @@ This Starter Kit includes the following features:
  - **User Authentication** (login, register, password reset, email verify, and password confirmation)
  - **Dashboard Page** (Auth Protected User Dashboard Page)
  - **Settings Page** (Profile Update/Delete, Password Update, Appearance)
- 
-
 
 ## Front-end App Structure
 
-The majority of the front-end code is located in the `resources/js` folder. Specifically you'll want to note the following folders:
+The majority of the front-end code is located in the `resources/js` folder. In a React application, the most-common file/folder structure is to use **Kebab-Case**. Below is an example of how the `resources/js` folder is structured:
 
-1. **Components** - All your React components are located here
-2. **Pages** - All your Pages are here, including Login.tsx, Register.tsx, Dashboard.tsx, etc
-3. **Layouts** - All the Layouts for you app will live here.
+**Folders**
+```
+resources/js/
+├── components/    # Reusable React components
+├── hooks/         # Custom React hooks
+├── layouts/       # Application layouts
+├── lib/           # Utility functions and configurations
+└── pages/         # Page components
+```
+
+**Components**
+```
+components/
+└── appearance-tabs.tsx
+└── navigation-menu.tsx
+```
+
+**Hooks/Utilities**
+```
+hooks/
+└── use-auth.tsx
+└── use-mobile.tsx
+```
 
 ### Components
 
@@ -124,4 +142,3 @@ export default function Home() {
         <Button>Button</Button>
     )
 }
-```
