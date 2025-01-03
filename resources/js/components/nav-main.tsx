@@ -26,7 +26,7 @@ export function NavMain({ items = [] }: NavMainProps) {
             <SidebarMenu>
                 <SidebarMenuItem>
                     <SidebarMenuButton asChild isActive>
-                        <Link href={route('dashboard')}>
+                        <Link href={route('dashboard')} prefetch>
                             <LayoutDashboard />
                             <span>Dashboard</span>
                         </Link>
@@ -35,7 +35,7 @@ export function NavMain({ items = [] }: NavMainProps) {
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild isActive={item.isActive}>
-                            <Link href={item.url}>
+                            <Link href={item.url} prefetch>
                                 <item.icon />
                                 <span>{item.title}</span>
                             </Link>

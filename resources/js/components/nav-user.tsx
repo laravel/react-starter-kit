@@ -97,6 +97,7 @@ export function NavUser() {
                                     className="block w-full"
                                     href={route('profile.edit')}
                                     as="button"
+                                    prefetch
                                 >
                                     <Settings className="mr-2" />
                                     Settings
