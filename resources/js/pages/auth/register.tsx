@@ -52,6 +52,7 @@ export default function Register() {
                             type="text"
                             required
                             autoFocus
+                            tabIndex={1}
                             value={data.name}
                             onChange={(e) => setData("name", e.target.value)}
                             disabled={processing}
@@ -65,6 +66,7 @@ export default function Register() {
                             id="email"
                             type="email"
                             required
+                            tabIndex={2}
                             value={data.email}
                             onChange={(e) => setData("email", e.target.value)}
                             disabled={processing}
@@ -78,6 +80,7 @@ export default function Register() {
                             id="password"
                             type="password"
                             required
+                            tabIndex={3}
                             value={data.password}
                             onChange={(e) => setData("password", e.target.value)}
                             disabled={processing}
@@ -93,6 +96,7 @@ export default function Register() {
                             id="password_confirmation"
                             type="password"
                             required
+                            tabIndex={4}
                             value={data.password_confirmation}
                             onChange={(e) => setData("password_confirmation", e.target.value)}
                             disabled={processing}
@@ -103,6 +107,7 @@ export default function Register() {
                     <Button 
                         type="submit" 
                         className="w-full" 
+                        tabIndex={5}
                         disabled={processing}
                     >
                         {processing && (
@@ -119,6 +124,7 @@ export default function Register() {
                     <Link 
                         href={route("login")} 
                         className="underline underline-offset-4"
+                        tabIndex={6}
                     >
                         Log in
                     </Link>

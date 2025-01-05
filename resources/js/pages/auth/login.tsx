@@ -65,6 +65,7 @@ export default function Login({
                             type="email"
                             required
                             autoFocus
+                            tabIndex={1}
                             value={data.email}
                             onChange={(e) => setData("email", e.target.value)}
                         />
@@ -78,6 +79,7 @@ export default function Login({
                                 <Link
                                     href={route("password.request")}
                                     className="ml-auto text-sm underline-offset-4 hover:underline"
+                                    tabIndex={5}
                                 >
                                     Forgot your password?
                                 </Link>
@@ -87,6 +89,7 @@ export default function Login({
                             id="password"
                             type="password"
                             required
+                            tabIndex={2}
                             value={data.password}
                             onChange={(e) => setData("password", e.target.value)}
                         />
@@ -96,6 +99,7 @@ export default function Login({
                     <Button 
                         type="submit" 
                         className="w-full" 
+                        tabIndex={3}
                         disabled={processing}
                     >
                         {processing && (
@@ -112,6 +116,7 @@ export default function Login({
                     <Link 
                         href={route("register")} 
                         className="underline underline-offset-4"
+                        tabIndex={4}
                     >
                         Sign up
                     </Link>

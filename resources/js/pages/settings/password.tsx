@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SettingsHeading from "@/components/settings/heading";
 
-const breadcrumbItems = [
+const breadcrumbs = [
     {
         title: 'Password Settings',
         href: '/settings/password'
@@ -63,7 +63,7 @@ export default function Password({
 
     return (
         <AppLayout
-            breadcrumbItems={breadcrumbItems}
+            breadcrumbs={breadcrumbs}
         >
             <Head title="Profile Settings" />
 

@@ -19,7 +19,7 @@ interface BreadcrumbItem {
     href: string
 }
 
-const breadcrumbItems: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile Settings',
         href: '/settings/profile'
@@ -52,7 +52,7 @@ export default function Profile({
 
     return (
         <AppLayout
-            breadcrumbItems={breadcrumbItems}
+            breadcrumbs={breadcrumbs}
         >
             <Head title="Profile Settings" />
 

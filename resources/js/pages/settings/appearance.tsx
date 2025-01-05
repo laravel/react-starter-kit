@@ -13,7 +13,7 @@ interface BreadcrumbItem {
     href: string
 }
 
-const breadcrumbItems: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Appearance Settings',
         href: '/settings/appearance'
@@ -24,7 +24,7 @@ export default function Appearance() {
 
     return (
         <AppLayout
-            breadcrumbItems={breadcrumbItems}
+            breadcrumbs={breadcrumbs}
         >
             <Head title="Appearance Settings" />
 

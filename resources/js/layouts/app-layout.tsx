@@ -22,17 +22,17 @@ interface BreadcrumbItemType {
 
 interface AppLayoutProps {
     children: React.ReactNode
-    breadcrumbItems?: BreadcrumbItemType[]
+    breadcrumbs?: BreadcrumbItemType[]
 }
 
 export default function App({ 
     children,
-    breadcrumbItems = [],
+    breadcrumbs = [],
 }: AppLayoutProps) {
 
     const [isOpen, setIsOpen] = useState(() => 
         typeof window !== 'undefined' ? 
-            localStorage.getItem('sidebar') === 'true' : 
+            localStorage.getItem('sidebar') !== 'false' : 
             true
     );
 
@@ -54,13 +54,13 @@ export default function App({
                 <header className="flex h-16 shrink-0 items-center w-full justify-between gap-2 border-b px-4">
                     <div className="flex items-center gap-2">
                         <SidebarTrigger className="-ml-1" />
-                        {breadcrumbItems.length > 0 && (
+                        {breadcrumbs.length > 0 && (
                             <>
                                 <Separator orientation="vertical" className="mr-2 h-4" />
                                 <Breadcrumb>
                                     <BreadcrumbList>
-                                        {breadcrumbItems.map((item, index) => {
-                                            const isLast = index === breadcrumbItems.length - 1;
+                                        {breadcrumbs.map((item, index) => {
+                                            const isLast = index === breadcrumbs.length - 1;
 
                                             return (
                                                 <Fragment key={index}>
