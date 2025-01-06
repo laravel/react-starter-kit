@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/react"
 import { NavMain } from "@/components/nav-main"
 import { NavFooter } from "@/components/nav-footer"
 import { NavUser } from "@/components/nav-user"
-import { type NavItemType } from '@/types/navigation'
+import { type NavItemType } from '@/types'
 import {
     Sidebar,
     SidebarContent,

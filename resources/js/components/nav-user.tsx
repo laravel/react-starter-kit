@@ -1,5 +1,3 @@
-"use client"
-
 import { type UserType } from '@/types'
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
 import { Link, usePage } from '@inertiajs/react'

@@ -1,6 +1,4 @@
-"use client"
-
-import { type NavItemType } from '@/types/navigation'
+import { type NavItemType } from '@/types'
 import { Link } from "@inertiajs/react"
 import {
     SidebarGroup,
