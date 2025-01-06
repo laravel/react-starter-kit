@@ -1,5 +1,6 @@
 "use client"
 
+import { type UserType } from '@/types'
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
 import { Link, usePage } from '@inertiajs/react'
 import {
@@ -30,7 +31,7 @@ interface User {
 
 interface PageProps {
     auth: {
-        user: User
+        user: UserType
     }
 }
 
@@ -41,7 +42,7 @@ function getInitials(fullName: string): string {
     return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase()
 }
 
-function UserInfo({ user }: { user: User }) {
+function UserInfo({ user }: { user: UserType }) {
     return (
         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-md">
@@ -57,7 +58,7 @@ function UserInfo({ user }: { user: User }) {
 }
 
 export function NavUser() {
-    const { auth: { user } } = usePage().props
+    const { auth: { UserType } } = usePage().props
 
     return (
         <SidebarMenu>
@@ -69,14 +70,14 @@ export function NavUser() {
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <Avatar className="h-8 w-8 rounded-md">
-                                <AvatarImage src={user.avatar} alt={user.name} />
+                                <AvatarImage src={UserType.avatar} alt={auth.user.name} />
                                 <AvatarFallback className="rounded-md">
-                                    {getInitials(user.name)}
+                                    {getInitials(auth.user.name)}
                                 </AvatarFallback>
                             </Avatar>
                             <div className="grid flex-1 text-left text-sm leading-tight">
-                                <span className="truncate font-semibold">{user.name}</span>
-                                <span className="truncate text-xs">{user.email}</span>
+                                <span className="truncate font-semibold">{auth.user.name}</span>
+                                <span className="truncate text-xs">{auth.user.email}</span>
                             </div>
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
@@ -88,7 +89,7 @@ export function NavUser() {
                         sideOffset={4}
                     >
                         <DropdownMenuLabel className="p-0 font-normal">
-                            <UserInfo user={user} />
+                            <UserInfo user={auth.user} />
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>

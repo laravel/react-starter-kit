@@ -1,10 +1,12 @@
 import { Head, Link } from '@inertiajs/react';
+import { type UserType } from '@/types'
 
 export default function Welcome({
     auth,
     laravelVersion,
     phpVersion,
-}: { auth: any; laravelVersion: string; phpVersion: string }) {
+}: { auth: { user: UserType }; laravelVersion: string; phpVersion: string }) {
+    console.log('Auth object:', auth)
     const handleImageError = () => {
         document
             .getElementById('screenshot-container')
