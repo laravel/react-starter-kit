@@ -51,9 +51,9 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             id="email"
                             type="email"
                             name="email"
+                            autoComplete="email"
                             value={data.email}
                             className="mt-1 block w-full"
-                            autoComplete="username"
                             readOnly
                             onChange={(e) => setData('email', e.target.value)}
                         />
@@ -66,9 +66,9 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             id="password"
                             type="password"
                             name="password"
+                            autoComplete="new-password"
                             value={data.password}
                             className="mt-1 block w-full"
-                            autoComplete="new-password"
                             autoFocus
                             onChange={(e) => setData('password', e.target.value)}
                         />
@@ -83,9 +83,9 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             id="password_confirmation"
                             type="password"
                             name="password_confirmation"
+                            autoComplete="new-password"
                             value={data.password_confirmation}
                             className="mt-1 block w-full"
-                            autoComplete="new-password"
                             onChange={(e) => setData('password_confirmation', e.target.value)}
                         />
                         <InputError message={errors.password_confirmation} className="mt-2" />

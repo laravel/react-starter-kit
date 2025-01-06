@@ -36,6 +36,7 @@ export default function ConfirmPassword() {
                             type="password"
                             name="password"
                             placeholder="Password"
+                            autoComplete="current-password"
                             value={data.password}
                             autoFocus
                             onChange={(e) => setData('password', e.target.value)}

@@ -66,6 +66,7 @@ export default function Login({
                             required
                             autoFocus
                             tabIndex={1}
+                            autoComplete="email"
                             value={data.email}
                             onChange={(e) => setData("email", e.target.value)}
                         />
@@ -90,6 +91,7 @@ export default function Login({
                             type="password"
                             required
                             tabIndex={2}
+                            autoComplete="current-password"
                             value={data.password}
                             onChange={(e) => setData("password", e.target.value)}
                         />
