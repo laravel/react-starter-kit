@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react"
-import { type NavItemType } from '@/types/navigation'
+import { type NavItemType } from '@/types'
 import {
     SidebarGroup,
     SidebarGroupContent,

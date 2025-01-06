@@ -2,13 +2,8 @@ import { Link } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import Heading from "@/components/heading";
 import { cn } from "@/lib/utils"
-import { type NavItemType } from '@/types/navigation'
-
+import { type NavItemType } from '@/types'
 import { Separator } from "@/components/ui/separator"
-
-interface LayoutProps {
-    children: React.ReactNode
-}
 
 const sidebarNavItems: NavItemType[] = [
     {
@@ -30,7 +25,9 @@ const sidebarNavItems: NavItemType[] = [
 
 export default function SettingsLayout({ 
     children
-}: LayoutProps) {
+}: {
+    children: React.ReactNode
+}) {
     const currentPath = window.location.pathname
     const currentItem = sidebarNavItems.find(item => currentPath === item.url)
 
