@@ -1,4 +1,4 @@
-import { Github, BookOpenText } from "lucide-react"
+import { BookOpenText, FolderGit2, LayoutDashboard, type LucideIcon } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { NavMain } from "@/components/nav-main"
 import { NavFooter } from "@/components/nav-footer"
@@ -17,14 +17,23 @@ import ApplicationLogo from "./application-logo"
 interface NavItem {
     title: string
     url: string
-    icon: React.ComponentType
+    icon: LucideIcon
+    isActive?: boolean
 }
+
+const mainNavItems: NavItem[] = [
+    {
+        title: "Dashboard",
+        url: "/dashboard",
+        icon: LayoutDashboard,
+    },
+]
 
 const footerNavItems: NavItem[] = [
     {
-        title: "Github Repo",
+        title: "Repository",
         url: "https://github.com/laravel/react-starter-kit",
-        icon: Github,
+        icon: FolderGit2,
     },
     {
         title: "Documentation",
@@ -55,7 +64,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain />
+                <NavMain items={mainNavItems} />
             </SidebarContent>
 
             <SidebarFooter>

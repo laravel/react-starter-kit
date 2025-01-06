@@ -12,4 +12,7 @@ export default defineConfig({
         }),
         react(),
     ],
+    esbuild: {
+        jsx: 'automatic'
+    }
 });

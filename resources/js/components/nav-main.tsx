@@ -1,6 +1,6 @@
 "use client"
 
-import { LayoutDashboard, type LucideIcon } from "lucide-react"
+import { type LucideIcon } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import {
     SidebarGroup,
@@ -24,14 +24,6 @@ export function NavMain({ items = [] }: NavMainProps) {
     return (
         <SidebarGroup>
             <SidebarMenu>
-                <SidebarMenuItem>
-                    <SidebarMenuButton asChild isActive>
-                        <Link href={route('dashboard')} prefetch>
-                            <LayoutDashboard />
-                            <span>Dashboard</span>
-                        </Link>
-                    </SidebarMenuButton>
-                </SidebarMenuItem>
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton asChild isActive={item.isActive}>
