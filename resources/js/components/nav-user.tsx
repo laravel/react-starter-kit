@@ -56,7 +56,7 @@ function UserInfo({ user }: { user: UserType }) {
 }
 
 export function NavUser() {
-    const { auth: { UserType } } = usePage().props
+    const { auth } = usePage().props
 
     return (
         <SidebarMenu>
@@ -68,7 +68,7 @@ export function NavUser() {
                             className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
                         >
                             <Avatar className="h-8 w-8 rounded-md">
-                                <AvatarImage src={UserType.avatar} alt={auth.user.name} />
+                                <AvatarImage src={auth.user.avatar} alt={auth.user.name} />
                                 <AvatarFallback className="rounded-md">
                                     {getInitials(auth.user.name)}
                                 </AvatarFallback>
