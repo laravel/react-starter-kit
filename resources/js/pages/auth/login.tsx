@@ -114,7 +114,7 @@ export default function Login({
                 </div>
 
                 <div className="text-center text-sm">
-                    Don&apos;t have an account?{" "}
+                    Don't have an account?{" "}
                     <Link 
                         href={route("register")} 
                         className="underline underline-offset-4"

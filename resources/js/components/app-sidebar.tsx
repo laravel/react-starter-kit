@@ -1,4 +1,4 @@
-import { BookOpenText, FolderGit2, LayoutDashboard, type LucideIcon } from "lucide-react"
+import { BookOpenText, FolderGit2, LayoutDashboard } from "lucide-react"
 import { Link } from "@inertiajs/react"
 import { NavMain } from "@/components/nav-main"
 import { NavFooter } from "@/components/nav-footer"
