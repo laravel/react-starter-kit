@@ -2,6 +2,7 @@ import { Link } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import Heading from "@/components/heading";
 import { cn } from "@/lib/utils"
+import { type NavItemType } from '@/types/navigation'
 
 import { Separator } from "@/components/ui/separator"
 
@@ -9,23 +10,21 @@ interface LayoutProps {
     children: React.ReactNode
 }
 
-interface NavItem {
-    title: string
-    href: string
-}
-
-const sidebarNavItems: NavItem[] = [
+const sidebarNavItems: NavItemType[] = [
     {
         title: "Profile",
-        href: "/settings/profile",
+        url: "/settings/profile",
+        icon: null
     },
     {
         title: "Password",
-        href: "/settings/password",
+        url: "/settings/password",
+        icon: null
     },
     {
         title: "Appearance",
-        href: "/settings/appearance"
+        url: "/settings/appearance",
+        icon: null
     }
 ]
 
@@ -33,7 +32,7 @@ export default function SettingsLayout({
     children
 }: LayoutProps) {
     const currentPath = window.location.pathname
-    const currentItem = sidebarNavItems.find(item => currentPath === item.href)
+    const currentItem = sidebarNavItems.find(item => currentPath === item.url)
 
     return (
         <div className="p-5 sm:p-8 md:p-10">
@@ -48,16 +47,16 @@ export default function SettingsLayout({
                     <nav className="flex-col space-x-0 space-y-1 flex">
                         {sidebarNavItems.map((item) => (
                             <Button 
-                                key={item.href}
+                                key={item.url}
                                 size="sm" 
                                 variant="ghost" 
                                 asChild
                                 className={cn(
                                     "w-full justify-center justify-start",
-                                    currentPath === item.href ? "bg-muted" : "hover:underline"
+                                    currentPath === item.url ? "bg-muted" : "hover:underline"
                                 )}
                             > 
-                                <Link href={item.href} prefetch>
+                                <Link href={item.url} prefetch>
                                     {item.title}
                                 </Link>
                             </Button>

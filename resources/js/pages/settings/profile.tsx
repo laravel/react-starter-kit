@@ -1,10 +1,9 @@
 import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 import { Transition } from '@headlessui/react'
-
+import { type BreadcrumbItemType } from '@/types'
 
 import DeleteUser from '@/components/settings/delete-user';
-
 import InputError from '@/components/input-error'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -14,12 +13,7 @@ import SettingsLayout from './layout'
 import { Separator } from "@/components/ui/separator"
 import SettingsHeading from "@/components/settings/heading";
 
-interface BreadcrumbItem {
-    title: string
-    href: string
-}
-
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItemType[] = [
     {
         title: 'Profile Settings',
         href: '/settings/profile'

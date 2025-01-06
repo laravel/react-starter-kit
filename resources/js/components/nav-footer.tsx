@@ -1,4 +1,5 @@
-import { type LucideIcon, ExternalLink } from "lucide-react"
+import { ExternalLink } from "lucide-react"
+import { type NavItemType } from '@/types/navigation'
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -8,18 +9,12 @@ import {
     SidebarMenuAction
 } from "@/components/ui/sidebar"
 
-interface NavItem {
-    title: string
-    url: string
-    icon: LucideIcon
-}
-
 export function NavFooter({ 
     items, 
     className,
     ...props 
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup> & { 
-    items: NavItem[] 
+    items: NavItemType[] 
 }) {
     return (
         <SidebarGroup 

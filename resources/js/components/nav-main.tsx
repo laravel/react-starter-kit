@@ -1,6 +1,6 @@
 "use client"
 
-import { type LucideIcon } from "lucide-react"
+import { type NavItemType } from '@/types/navigation'
 import { Link } from "@inertiajs/react"
 import {
     SidebarGroup,
@@ -9,18 +9,9 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-interface NavItem {
-    title: string
-    url: string
-    icon: LucideIcon
-    isActive?: boolean
-}
-
-interface NavMainProps {
-    items?: NavItem[]
-}
-
-export function NavMain({ items = [] }: NavMainProps) {
+export function NavMain({ items = [] }: { 
+    items: NavItemType[] 
+}) {
     return (
         <SidebarGroup>
             <SidebarMenu>

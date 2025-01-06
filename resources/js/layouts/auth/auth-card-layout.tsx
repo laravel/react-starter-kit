@@ -8,18 +8,16 @@ import {
     CardTitle,
 } from "@/components/ui/card"
 
-interface AuthLayoutProps {
-    children: React.ReactNode
-    name?: string
-    title?: string
-    description?: string
-}
-
 export default function AuthCardLayout({
     children,
     title,
     description
-}: AuthLayoutProps) {
+}: {
+    children: React.ReactNode
+    name?: string
+    title?: string
+    description?: string
+}) {
     const name = usePage().props.name;
     const quote = usePage().props.quote;
 

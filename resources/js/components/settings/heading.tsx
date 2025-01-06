@@ -1,11 +1,9 @@
 import { Separator } from "@/components/ui/separator"
 
-interface HeadingProps {
+export default function Heading({ title, description }: {
     title: string;
     description?: string;
-}
-
-export default function Heading({ title, description }: HeadingProps) {
+}) {
     return (
         <div>
             <header>

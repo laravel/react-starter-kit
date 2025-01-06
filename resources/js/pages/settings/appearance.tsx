@@ -2,18 +2,14 @@ import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 
 import AppearanceTabs from '@/components/appearance-tabs';
+import { type BreadcrumbItemType } from '@/types'
 import SettingsHeading from "@/components/settings/heading";
 import { Label } from "@/components/ui/label";
 
 import AppLayout from '@/layouts/app-layout'
 import SettingsLayout from './layout'
 
-interface BreadcrumbItem {
-    title: string
-    href: string
-}
-
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItemType[] = [
     {
         title: 'Appearance Settings',
         href: '/settings/appearance'

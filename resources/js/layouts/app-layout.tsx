@@ -8,6 +8,7 @@ import {
     BreadcrumbPage,
     BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { type BreadcrumbItemType } from '@/types'
 import { Separator } from "@/components/ui/separator"
 import {
     SidebarInset,
@@ -15,20 +16,13 @@ import {
     SidebarTrigger,
 } from "@/components/ui/sidebar"
 
-interface BreadcrumbItemType {
-    title: string
-    href: string
-}
-
-interface AppLayoutProps {
-    children: React.ReactNode
-    breadcrumbs?: BreadcrumbItemType[]
-}
-
 export default function App({ 
     children,
     breadcrumbs = [],
-}: AppLayoutProps) {
+}: {
+    children: React.ReactNode
+    breadcrumbs?: BreadcrumbItemType[]
+}) {
 
     const [isOpen, setIsOpen] = useState(() => 
         typeof window !== 'undefined' ? 

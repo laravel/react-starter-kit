@@ -3,6 +3,7 @@ import { Link } from "@inertiajs/react"
 import { NavMain } from "@/components/nav-main"
 import { NavFooter } from "@/components/nav-footer"
 import { NavUser } from "@/components/nav-user"
+import { type NavItemType } from '@/types/navigation'
 import {
     Sidebar,
     SidebarContent,
@@ -14,14 +15,7 @@ import {
 } from "@/components/ui/sidebar"
 import ApplicationLogo from "./application-logo"
 
-interface NavItem {
-    title: string
-    url: string
-    icon: LucideIcon
-    isActive?: boolean
-}
-
-const mainNavItems: NavItem[] = [
+const mainNavItems: NavItemType[] = [
     {
         title: "Dashboard",
         url: "/dashboard",
@@ -29,7 +23,7 @@ const mainNavItems: NavItem[] = [
     },
 ]
 
-const footerNavItems: NavItem[] = [
+const footerNavItems: NavItemType[] = [
     {
         title: "Repository",
         url: "https://github.com/laravel/react-starter-kit",

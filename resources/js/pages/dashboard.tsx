@@ -1,12 +1,8 @@
-import { Head } from '@inertiajs/react'
 import AppLayout from "@/layouts/app-layout"
+import { type BreadcrumbItemType } from '@/types'
+import { Head } from '@inertiajs/react'
 
-interface BreadcrumbItem {
-    title: string
-    href: string
-}
-
-const breadcrumbs: BreadcrumbItem[] = [
+const breadcrumbs: BreadcrumbItemType[] = [
     {
         title: 'Dashboard',
         href: '/dashboard'
