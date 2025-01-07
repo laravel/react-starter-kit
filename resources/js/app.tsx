@@ -1,5 +1,4 @@
 import '../css/app.css';
-import './bootstrap';
 
 import {
     createInertiaApp
@@ -10,27 +9,9 @@ import {
 import {
     createRoot
 } from 'react-dom/client';
+import { initializeTheme } from './hooks/use-appearance';
 
-const appName =
-    import.meta.env.VITE_APP_NAME || 'Laravel';
-
-
-/*
-*  Dark/Light Mode Initialization
-*  - This needs to be added to every page so that way the correct appearance is loaded
-*/
-(function() {
-    const savedAppearance = localStorage.getItem('appearance') || 'system';
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    const isDark = 
-        savedAppearance === 'dark' || 
-        (savedAppearance === 'system' && prefersDark);
-    
-    if (isDark) {
-        document.documentElement.classList.add('dark');
-    }
-})();
+const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
@@ -39,11 +20,7 @@ createInertiaApp({
             `./pages/${name}.tsx`,
             import.meta.glob('./pages/**/*.tsx'),
         ),
-    setup({
-        el,
-        App,
-        props
-    }) {
+    setup({ el, App, props }) {
         const root = createRoot(el);
 
         root.render(<App {
@@ -55,3 +32,6 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
+
+// This will set dark/light mode on load
+initializeTheme();

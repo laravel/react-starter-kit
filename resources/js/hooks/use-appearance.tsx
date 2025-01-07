@@ -2,35 +2,43 @@ import { useState, useEffect } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
-export function useAppearance() {
-  const [appearance, setAppearance] = useState<Appearance>('system');
-
-  const prefersDark = () =>
+const prefersDark = () =>
     window.matchMedia('(prefers-color-scheme: dark)').matches;
 
-  const applyTheme = (mode: Appearance) => {
-    const isDark = mode === 'dark' || (mode === 'system' && prefersDark());
+const applyTheme = (appearance: Appearance) => {
+    const isDark = 
+        appearance === 'dark' || 
+        (appearance === 'system' && prefersDark());
+    
     document.documentElement.classList.toggle('dark', isDark);
-  };
+}
 
-  const updateAppearance = (mode: Appearance) => {
-    setAppearance(mode);
-    localStorage.setItem('appearance', mode);
-    applyTheme(mode);
-  };
+export function initializeTheme() {
+    const savedAppearance = localStorage.getItem('appearance') as Appearance || 'system';
+    applyTheme(savedAppearance);
+}
 
-  useEffect(() => {
-    const savedAppearance = localStorage.getItem('appearance') as Appearance;
-    updateAppearance(savedAppearance || 'system');
+export function useAppearance() {
+    const [appearance, setAppearance] = useState<Appearance>('system');
 
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => {
-      if (appearance === 'system') applyTheme('system');
+    const updateAppearance = (mode: Appearance) => {
+        setAppearance(mode);
+        localStorage.setItem('appearance', mode);
+        applyTheme(mode);
     };
 
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
+    useEffect(() => {
+        const savedAppearance = localStorage.getItem('appearance') as Appearance;
+        updateAppearance(savedAppearance || 'system');
 
-  return { appearance, updateAppearance };
+        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        const handleChange = () => {
+            if (appearance === 'system') applyTheme('system');
+        };
+
+        mediaQuery.addEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleChange);
+    }, []);
+
+    return { appearance, updateAppearance };
 }
