@@ -47,7 +47,7 @@ export default function DeleteUser() {
                 title="Delete Account"
                 description="Delete your account and all of its resources"
             />
-            <div className="border border-red-500 p-3 rounded-lg flex items-center bg-red-50">
+            <div className="border border-red-100 dark:border-red-950 p-3 rounded-lg flex items-center bg-red-50 dark:bg-red-500/20">
                 <Dialog>
                     <DialogTrigger asChild>
                         <Button variant="destructive">Delete Account</Button>
@@ -94,7 +94,7 @@ export default function DeleteUser() {
                         </form>
                     </DialogContent>
                 </Dialog>
-                <div className="relative text-red-600 ml-3">
+                <div className="relative text-red-600 dark:text-red-100 ml-3">
                     <p className="font-medium leading-none mb-1 text-sm">Warning</p>
                     <p className="leading-none text-xs">Please proceed with caution, this cannot be undone</p>
                 </div>
