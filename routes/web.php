@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Settings\DeleteController;
 use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use Illuminate\Foundation\Application;
@@ -16,7 +15,7 @@ Route::get('/', function () {
     ]);
 })->name('home');
 
-Route::get('dashboard', function(){
+Route::get('dashboard', function () {
     return Inertia::render('dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
