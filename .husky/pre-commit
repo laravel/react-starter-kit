@@ -1,2 +1,2 @@
-# ./vendor/bin/pint
-# ./vendor/bin/phpstan analyse ./app
+./vendor/bin/pint
+./vendor/bin/phpstan analyse ./app
