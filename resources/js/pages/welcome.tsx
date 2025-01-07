@@ -6,7 +6,6 @@ export default function Welcome({
     laravelVersion,
     phpVersion,
 }: { auth: { user: UserType }; laravelVersion: string; phpVersion: string }) {
-    console.log('Auth object:', auth)
     const handleImageError = () => {
         document
             .getElementById('screenshot-container')
