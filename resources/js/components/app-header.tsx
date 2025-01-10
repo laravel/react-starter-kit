@@ -1,19 +1,12 @@
-import { Fragment } from 'react'
-import {
-    Breadcrumb,
-    BreadcrumbItem,
-    BreadcrumbLink,
-    BreadcrumbList,
-    BreadcrumbPage,
-    BreadcrumbSeparator,
-} from "@/components/ui/breadcrumb"
-import { type BreadcrumbItem as BreadcrumbItemType } from '@/types'
-import { Separator } from "@/components/ui/separator"
-import { SidebarTrigger } from "@/components/ui/sidebar"
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { Separator } from '@/components/ui/separator';
+import { SidebarTrigger } from '@/components/ui/sidebar';
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+import { Fragment } from 'react';
 
 export function AppHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemType[] }) {
     return (
-        <header className="flex h-16 shrink-0 items-center w-full justify-between gap-2 border-b px-4">
+        <header className="flex h-16 w-full shrink-0 items-center justify-between gap-2 border-b px-4">
             <div className="flex items-center gap-2">
                 <SidebarTrigger className="-ml-1" />
                 {breadcrumbs.length > 0 && (
@@ -30,14 +23,10 @@ export function AppHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemTy
                                                 {isLast ? (
                                                     <BreadcrumbPage>{item.title}</BreadcrumbPage>
                                                 ) : (
-                                                    <BreadcrumbLink href={item.href}>
-                                                        {item.title}
-                                                    </BreadcrumbLink>
+                                                    <BreadcrumbLink href={item.href}>{item.title}</BreadcrumbLink>
                                                 )}
                                             </BreadcrumbItem>
-                                            {!isLast && (
-                                                <BreadcrumbSeparator />
-                                            )}
+                                            {!isLast && <BreadcrumbSeparator />}
                                         </Fragment>
                                     );
                                 })}
@@ -47,5 +36,5 @@ export function AppHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemTy
                 )}
             </div>
         </header>
-    )
+    );
 }

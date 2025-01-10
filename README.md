@@ -35,15 +35,16 @@ This shell file will run the following commands, which you may wish to run manua
 
 This Starter Kit includes the following features:
 
- - **User Authentication** (login, register, password reset, email verify, and password confirmation)
- - **Dashboard Page** (Auth Protected User Dashboard Page)
- - **Settings Page** (Profile Update/Delete, Password Update, Appearance)
+- **User Authentication** (login, register, password reset, email verify, and password confirmation)
+- **Dashboard Page** (Auth Protected User Dashboard Page)
+- **Settings Page** (Profile Update/Delete, Password Update, Appearance)
 
 ## Front-end App Structure
 
 The majority of the front-end code is located in the `resources/js` folder. In this folder we'll be using **kebab-case** throughout. You may wish to change this to any other convention if you perfer. Below is an example of how this folder is structured:
 
 **Folders**
+
 ```
 resources/js/
 ├── components/    # Reusable React components
@@ -54,6 +55,7 @@ resources/js/
 ```
 
 **Components**
+
 ```
 components/
 └── appearance-tabs.tsx
@@ -61,6 +63,7 @@ components/
 ```
 
 **Hooks/Utilities**
+
 ```
 hooks/
 └── use-auth.tsx
@@ -117,7 +120,7 @@ A split view authentication layout screen
 To change the Layout you would like to use, simply change the Layout file that is imported in the **AppBase.tsx**. As an example, to use the `AuthSplitLayout.tsx`, the first line would be modified to look like the following:
 
 ```tsx
-import AuthLayoutTemplate from "@/layouts/auth/auth-split-layout";
+import AuthLayoutTemplate from '@/layouts/auth/auth-split-layout';
 ```
 
 ---
@@ -135,10 +138,9 @@ npx shadcn@latest add button
 You'll now have a button component in your `resources/js/components/ui` folder. You can then use the button component inside of any page.
 
 ```tsx
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 
 export default function Home() {
-    return (
-        <Button>Button</Button>
-    )
+    return <Button>Button</Button>;
 }
+```

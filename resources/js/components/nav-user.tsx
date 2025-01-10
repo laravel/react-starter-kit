@@ -1,11 +1,4 @@
-import { type Auth, type User } from '@/types'
-import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
-import { Link, usePage } from '@inertiajs/react'
-import {
-    Avatar,
-    AvatarFallback,
-    AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -14,23 +7,22 @@ import {
     DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import {
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-} from "@/components/ui/sidebar"
+} from '@/components/ui/dropdown-menu';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { type Auth, type User } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
+import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
 
 interface PageProps {
-    auth: Auth,
-    [key: string]: any
+    auth: Auth;
+    [key: string]: any;
 }
 
 function getInitials(fullName: string): string {
-    const names = fullName.trim().split(' ')
-    if (names.length === 0) return ''
-    if (names.length === 1) return names[0].charAt(0).toUpperCase()
-    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase()
+    const names = fullName.trim().split(' ');
+    if (names.length === 0) return '';
+    if (names.length === 1) return names[0].charAt(0).toUpperCase();
+    return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase();
 }
 
 function UserInfo({ user }: { user: User }) {
@@ -45,21 +37,18 @@ function UserInfo({ user }: { user: User }) {
                 <span className="truncate text-xs">{user.email}</span>
             </div>
         </>
-    )
+    );
 }
 
 export function NavUser() {
-    const { auth } = usePage<PageProps>().props
+    const { auth } = usePage<PageProps>().props;
 
     return (
         <SidebarMenu>
             <SidebarMenuItem>
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton
-                            size="lg"
-                            className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-                        >
+                        <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                             <UserInfo user={auth.user} />
                             <ChevronsUpDown className="ml-auto size-4" />
                         </SidebarMenuButton>
@@ -78,12 +67,7 @@ export function NavUser() {
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                             <DropdownMenuItem asChild>
-                                <Link
-                                    className="block w-full"
-                                    href={route('profile.edit')}
-                                    as="button"
-                                    prefetch
-                                >
+                                <Link className="block w-full" href={route('profile.edit')} as="button" prefetch>
                                     <Settings className="mr-2" />
                                     Settings
                                 </Link>
@@ -91,12 +75,7 @@ export function NavUser() {
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
-                            <Link
-                                className="block w-full"
-                                method="post"
-                                href={route('logout')}
-                                as="button"
-                            >
+                            <Link className="block w-full" method="post" href={route('logout')} as="button">
                                 <LogOut className="mr-2" />
                                 Log out
                             </Link>
@@ -105,5 +84,5 @@ export function NavUser() {
                 </DropdownMenu>
             </SidebarMenuItem>
         </SidebarMenu>
-    )
+    );
 }

@@ -1,36 +1,22 @@
-import { ExternalLink } from "lucide-react"
-import { type NavItem } from '@/types'
-import {
-    SidebarGroup,
-    SidebarGroupContent,
-    SidebarMenu,
-    SidebarMenuButton,
-    SidebarMenuItem,
-    SidebarMenuAction
-} from "@/components/ui/sidebar"
+import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuAction, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import { type NavItem } from '@/types';
+import { ExternalLink } from 'lucide-react';
 
-export function NavFooter({ 
-    items, 
+export function NavFooter({
+    items,
     className,
-    ...props 
-}: React.ComponentPropsWithoutRef<typeof SidebarGroup> & { 
-    items: NavItem[] 
+    ...props
+}: React.ComponentPropsWithoutRef<typeof SidebarGroup> & {
+    items: NavItem[];
 }) {
     return (
-        <SidebarGroup 
-            {...props} 
-            className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}
-        >
+        <SidebarGroup {...props} className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
                             <SidebarMenuButton asChild>
-                                <a 
-                                    href={item.url} 
-                                    target="_blank" 
-                                    rel="noopener noreferrer"
-                                >
+                                <a href={item.url} target="_blank" rel="noopener noreferrer">
                                     <item.icon />
                                     <span>{item.title}</span>
                                 </a>
@@ -43,5 +29,5 @@ export function NavFooter({
                 </SidebarMenu>
             </SidebarGroupContent>
         </SidebarGroup>
-    )
+    );
 }

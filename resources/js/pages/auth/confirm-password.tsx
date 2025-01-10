@@ -1,12 +1,12 @@
 // Components
-import { FormEventHandler } from 'react'
-import { Head, useForm } from '@inertiajs/react'
-import { LoaderCircle } from "lucide-react"
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
-import InputError from "@/components/input-error"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import AuthLayout from "@/layouts/auth/auth-base"
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import AuthLayout from '@/layouts/auth/auth-base';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -22,17 +22,15 @@ export default function ConfirmPassword() {
     };
 
     return (
-        <AuthLayout 
-            title="Confirm Your Password" 
+        <AuthLayout
+            title="Confirm Your Password"
             description="This is a secure area of the application. Please confirm your password before continuing"
         >
             <Head title="Confirm Password" />
 
-
             <form onSubmit={submit}>
                 <div class="space-y-6">
                     <div className="grid gap-2">
-
                         <Input
                             id="password"
                             type="password"

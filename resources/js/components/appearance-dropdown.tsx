@@ -1,13 +1,8 @@
-import { HTMLAttributes } from 'react';
-import { Button } from "@/components/ui/button";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Sun, Moon, Monitor } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useAppearance } from '@/hooks/use-appearance';
+import { Monitor, Moon, Sun } from 'lucide-react';
+import { HTMLAttributes } from 'react';
 
 interface AppearanceToggleDropdownProps extends HTMLAttributes<HTMLDivElement> {}
 
@@ -16,9 +11,12 @@ export default function AppearanceToggleDropdown({ className = '', ...props }: A
 
     const getCurrentIcon = () => {
         switch (appearance) {
-            case 'dark': return <Moon className="h-5 w-5" />;
-            case 'light': return <Sun className="h-5 w-5" />;
-            default: return <Monitor className="h-5 w-5" />;
+            case 'dark':
+                return <Moon className="h-5 w-5" />;
+            case 'light':
+                return <Sun className="h-5 w-5" />;
+            default:
+                return <Monitor className="h-5 w-5" />;
         }
     };
 

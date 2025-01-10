@@ -1,27 +1,26 @@
-import { FormEventHandler } from 'react'
-import { Head, useForm } from '@inertiajs/react'
-import { LoaderCircle } from "lucide-react"
+import { Head, useForm } from '@inertiajs/react';
+import { LoaderCircle } from 'lucide-react';
+import { FormEventHandler } from 'react';
 
-import InputError from "@/components/input-error"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import AuthLayout from "@/layouts/auth/auth-base"
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AuthLayout from '@/layouts/auth/auth-base';
 
 interface ResetPasswordProps {
-    token: string
-    email: string
+    token: string;
+    email: string;
 }
 
 interface ResetPasswordForm {
-    token: string
-    email: string
-    password: string
-    password_confirmation: string
+    token: string;
+    email: string;
+    password: string;
+    password_confirmation: string;
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    
     const { data, setData, post, processing, errors, reset } = useForm({
         token: token,
         email: email,
@@ -30,17 +29,14 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
     });
 
     const submit: FormEventHandler = (e) => {
-        e.preventDefault()
+        e.preventDefault();
         post(route('password.store'), {
             onFinish: () => reset('password', 'password_confirmation'),
-        })
-    }
+        });
+    };
 
     return (
-        <AuthLayout
-            title="Reset Password"
-            description="Please enter your new password below"
-        >
+        <AuthLayout title="Reset Password" description="Please enter your new password below">
             <Head title="Reset Password" />
 
             <form onSubmit={submit}>
@@ -76,9 +72,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">
-                            Confirm Password
-                        </Label>
+                        <Label htmlFor="password_confirmation">Confirm Password</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -91,18 +85,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         <InputError message={errors.password_confirmation} className="mt-2" />
                     </div>
 
-                    <Button 
-                        type="submit"
-                        className="w-full" 
-                        disabled={processing}
-                    >
-                        {processing && (
-                            <LoaderCircle className="h-4 w-4 animate-spin" />
-                        )}
+                    <Button type="submit" className="w-full" disabled={processing}>
+                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Reset Password
                     </Button>
                 </div>
             </form>
         </AuthLayout>
-    )
+    );
 }

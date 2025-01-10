@@ -1,50 +1,46 @@
-import { BookOpenText, FolderGit2, LayoutDashboard } from "lucide-react"
-import { Link } from "@inertiajs/react"
-import { NavMain } from "@/components/nav-main"
-import { NavFooter } from "@/components/nav-footer"
-import { NavUser } from "@/components/nav-user"
-import { type NavItem } from '@/types'
+import { NavFooter } from '@/components/nav-footer';
+import { NavMain } from '@/components/nav-main';
+import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
     SidebarFooter,
     SidebarHeader,
+    SidebarInset,
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
     SidebarProvider,
-    SidebarInset,
-} from "@/components/ui/sidebar"
-import ApplicationLogo from "./application-logo"
-import { useState } from "react"
+} from '@/components/ui/sidebar';
+import { type NavItem } from '@/types';
+import { Link } from '@inertiajs/react';
+import { BookOpenText, FolderGit2, LayoutDashboard } from 'lucide-react';
+import { useState } from 'react';
+import ApplicationLogo from './application-logo';
 
 const mainNavItems: NavItem[] = [
     {
-        title: "Dashboard",
-        url: "/dashboard",
+        title: 'Dashboard',
+        url: '/dashboard',
         icon: LayoutDashboard,
     },
-]
+];
 
 const footerNavItems: NavItem[] = [
     {
-        title: "Repository",
-        url: "https://github.com/laravel/react-starter-kit",
+        title: 'Repository',
+        url: 'https://github.com/laravel/react-starter-kit',
         icon: FolderGit2,
     },
     {
-        title: "Documentation",
-        url: "https://laravel.com/docs/starter-kits",
+        title: 'Documentation',
+        url: 'https://laravel.com/docs/starter-kits',
         icon: BookOpenText,
     },
-]
+];
 
 export function AppSidebar({ children }: { children: React.ReactNode }) {
-    const [isOpen, setIsOpen] = useState(() => 
-        typeof window !== 'undefined' ? 
-            localStorage.getItem('sidebar') !== 'false' : 
-            true
-    );
+    const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
 
     const handleSidebarChange = (open: boolean) => {
         setIsOpen(open);
@@ -54,11 +50,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
     };
 
     return (
-        <SidebarProvider 
-            defaultOpen={isOpen} 
-            open={isOpen}
-            onOpenChange={handleSidebarChange}
-        >
+        <SidebarProvider defaultOpen={isOpen} open={isOpen} onOpenChange={handleSidebarChange}>
             <Sidebar collapsible="icon">
                 <SidebarHeader>
                     <SidebarMenu>
@@ -66,7 +58,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                             <SidebarMenuButton size="lg" asChild>
                                 <Link href="/dashboard" className="flex items-center gap-3" prefetch>
                                     <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                                        <ApplicationLogo className="size-5 text-white fill-current" />
+                                        <ApplicationLogo className="size-5 fill-current text-white" />
                                     </div>
                                     <div className="grid flex-1 text-left text-sm leading-tight">
                                         <span className="truncate font-semibold">Laravel</span>
@@ -87,9 +79,7 @@ export function AppSidebar({ children }: { children: React.ReactNode }) {
                     <NavUser />
                 </SidebarFooter>
             </Sidebar>
-            <SidebarInset>
-                {children}
-            </SidebarInset>
+            <SidebarInset>{children}</SidebarInset>
         </SidebarProvider>
-    )
+    );
 }

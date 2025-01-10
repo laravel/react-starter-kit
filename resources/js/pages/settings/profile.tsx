@@ -1,47 +1,36 @@
-import { FormEventHandler } from 'react'
-import { Head, Link, useForm, usePage } from '@inertiajs/react'
-import { Transition } from '@headlessui/react'
-import { type Auth, type BreadcrumbItem } from '@/types'
+import { type Auth, type BreadcrumbItem } from '@/types';
+import { Transition } from '@headlessui/react';
+import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { FormEventHandler } from 'react';
 
+import InputError from '@/components/input-error';
 import DeleteUser from '@/components/settings/delete-user';
-import InputError from '@/components/input-error'
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import AppLayout from '@/layouts/app-layout'
-import SettingsLayout from './layout'
-import { Separator } from "@/components/ui/separator"
-import SettingsHeading from "@/components/settings/heading";
+import SettingsHeading from '@/components/settings/heading';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import AppLayout from '@/layouts/app-layout';
+import SettingsLayout from './layout';
 
 interface PageProps {
-    auth: Auth,
-    [key: string]: any
+    auth: Auth;
+    [key: string]: any;
 }
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile Settings',
-        href: '/settings/profile'
-    }
-]
+        href: '/settings/profile',
+    },
+];
 
-export default function Profile({
-    mustVerifyEmail,
-    status,
-    className = '',
-}: {
-    mustVerifyEmail: boolean;
-    status?: string;
-    className?: string;
-}) {
+export default function Profile({ mustVerifyEmail, status, className = '' }: { mustVerifyEmail: boolean; status?: string; className?: string }) {
+    const { auth } = usePage<PageProps>().props;
 
-    const { auth } = usePage<PageProps>().props
-
-    const { data, setData, patch, errors, processing, recentlySuccessful } =
-        useForm({
-            name: auth.user.name,
-            email: auth.user.email,
-        });
+    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
+        name: auth.user.name,
+        email: auth.user.email,
+    });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -50,18 +39,12 @@ export default function Profile({
     };
 
     return (
-        <AppLayout
-            breadcrumbs={breadcrumbs}
-        >
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile Settings" />
 
             <SettingsLayout>
-
                 <div>
-                    <SettingsHeading 
-                        title="Profile Information"
-                        description="Update your name and email address"
-                    />
+                    <SettingsHeading title="Profile Information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
@@ -111,8 +94,7 @@ export default function Profile({
 
                                 {status === 'verification-link-sent' && (
                                     <div className="mt-2 text-sm font-medium text-green-600">
-                                        A new verification link has been sent to your
-                                        email address.
+                                        A new verification link has been sent to your email address.
                                     </div>
                                 )}
                             </div>
@@ -128,9 +110,7 @@ export default function Profile({
                                 leave="transition ease-in-out"
                                 leaveTo="opacity-0"
                             >
-                                <p className="text-sm text-gray-600">
-                                    Saved.
-                                </p>
+                                <p className="text-sm text-gray-600">Saved.</p>
                             </Transition>
                         </div>
                     </form>
