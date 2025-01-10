@@ -12,8 +12,7 @@ export default function AuthSplitLayout({
     title,
     description
 }: AuthLayoutProps) {
-    const quote = usePage().props.quote;
-    const name = usePage().props.name;
+    const { name, quote } = usePage().props
 
     return (
         <div className="px-8 sm:px-0 relative h-dvh flex-col items-center justify-center grid lg:max-w-none lg:grid-cols-2 lg:px-0">

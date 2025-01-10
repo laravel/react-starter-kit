@@ -1,4 +1,4 @@
-import { type UserType } from '@/types'
+import { type User } from '@/types'
 import { ChevronsUpDown, LogOut, Settings } from "lucide-react"
 import { Link, usePage } from '@inertiajs/react'
 import {
@@ -21,16 +21,11 @@ import {
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
 
-interface User {
-    name: string
-    email: string
-    avatar?: string
-}
-
 interface PageProps {
     auth: {
-        user: UserType
+        user: User
     }
+    [key: string]: any;
 }
 
 function getInitials(fullName: string): string {
@@ -40,7 +35,7 @@ function getInitials(fullName: string): string {
     return `${names[0].charAt(0)}${names[names.length - 1].charAt(0)}`.toUpperCase()
 }
 
-function UserInfo({ user }: { user: UserType }) {
+function UserInfo({ user }: { user: User }) {
     return (
         <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
             <Avatar className="h-8 w-8 rounded-md">
@@ -56,7 +51,7 @@ function UserInfo({ user }: { user: UserType }) {
 }
 
 export function NavUser() {
-    const { auth } = usePage().props
+    const { auth } = usePage<PageProps>().props
 
     return (
         <SidebarMenu>

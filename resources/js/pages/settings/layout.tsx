@@ -2,10 +2,10 @@ import { Link } from "@inertiajs/react"
 import { Button } from "@/components/ui/button"
 import Heading from "@/components/heading";
 import { cn } from "@/lib/utils"
-import { type NavItemType } from '@/types'
+import { type NavItem } from '@/types'
 import { Separator } from "@/components/ui/separator"
 
-const sidebarNavItems: NavItemType[] = [
+const sidebarNavItems: NavItem[] = [
     {
         title: "Profile",
         url: "/settings/profile",
@@ -49,7 +49,7 @@ export default function SettingsLayout({
                                 variant="ghost" 
                                 asChild
                                 className={cn(
-                                    "w-full justify-center justify-start",
+                                    "w-full justify-start",
                                     currentPath === item.url ? "bg-muted" : "hover:underline"
                                 )}
                             > 

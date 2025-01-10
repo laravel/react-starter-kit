@@ -1,7 +1,7 @@
 import { FormEventHandler } from 'react'
 import { Head, Link, useForm, usePage } from '@inertiajs/react'
 import { Transition } from '@headlessui/react'
-import { type BreadcrumbItemType } from '@/types'
+import { type BreadcrumbItem } from '@/types'
 
 import DeleteUser from '@/components/settings/delete-user';
 import InputError from '@/components/input-error'
@@ -13,7 +13,7 @@ import SettingsLayout from './layout'
 import { Separator } from "@/components/ui/separator"
 import SettingsHeading from "@/components/settings/heading";
 
-const breadcrumbs: BreadcrumbItemType[] = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile Settings',
         href: '/settings/profile'
@@ -30,12 +30,12 @@ export default function Profile({
     className?: string;
 }) {
 
-    const user = usePage().props.auth.user;
+    const { auth } = usePage().props
 
     const { data, setData, patch, errors, processing, recentlySuccessful } =
         useForm({
-            name: user.name,
-            email: user.email,
+            name: auth.user.name,
+            email: auth.user.email,
         });
 
     const submit: FormEventHandler = (e) => {
@@ -90,7 +90,7 @@ export default function Profile({
                             <InputError className="mt-2" message={errors.email} />
                         </div>
 
-                        {mustVerifyEmail && user.email_verified_at === null && (
+                        {mustVerifyEmail && auth.user.email_verified_at === null && (
                             <div>
                                 <p className="mt-2 text-sm text-gray-800">
                                     Your email address is unverified.

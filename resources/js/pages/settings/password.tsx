@@ -4,13 +4,14 @@ import InputError from '@/components/input-error';
 import { Transition } from '@headlessui/react';
 import { useForm, Head } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
+import { type BreadcrumbItem } from '@/types'
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import SettingsHeading from "@/components/settings/heading";
 
-const breadcrumbs = [
+const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Password Settings',
         href: '/settings/password'

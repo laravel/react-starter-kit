@@ -1,5 +1,5 @@
 import { ExternalLink } from "lucide-react"
-import { type NavItemType } from '@/types'
+import { type NavItem } from '@/types'
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -14,7 +14,7 @@ export function NavFooter({
     className,
     ...props 
 }: React.ComponentPropsWithoutRef<typeof SidebarGroup> & { 
-    items: NavItemType[] 
+    items: NavItem[] 
 }) {
     return (
         <SidebarGroup 

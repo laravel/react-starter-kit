@@ -1,4 +1,4 @@
-import { type NavItemType } from '@/types'
+import { type NavItem } from '@/types'
 import { Link, usePage } from "@inertiajs/react"
 import {
     SidebarGroup,
@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/sidebar"
 
 export function NavMain({ items = [] }: { 
-    items: NavItemType[] 
+    items: NavItem[] 
 }) {
     const page = usePage();    
     return (

@@ -18,12 +18,10 @@ export default function AuthCardLayout({
     title?: string
     description?: string
 }) {
-    const name = usePage().props.name;
-    const quote = usePage().props.quote;
 
     return (
         <div className="flex min-h-svh flex-col items-center justify-center gap-6 bg-muted p-6 md:p-10">
-            <div className="flex w-full max-w-sm flex-col gap-6">
+            <div className="flex w-full max-w-md flex-col gap-6">
                 <a href="#" className="flex items-center gap-2 self-center font-medium">
                     <div className="flex h-10 w-10 items-center justify-center">
                         <ApplicationLogo className="size-10 fill-current text-black" />
@@ -32,13 +30,13 @@ export default function AuthCardLayout({
 
                 <div className="flex flex-col gap-6">
                     <Card>
-                        <CardHeader className="text-center">
+                        <CardHeader className="text-center p-10 pb-0">
                             <CardTitle className="text-xl">{title}</CardTitle>
                             <CardDescription>
                             {description}
                             </CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="p-10">
                             {children}
                         </CardContent>
                     </Card>
