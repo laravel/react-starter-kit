@@ -3,6 +3,7 @@
     "type": "module",
     "scripts": {
         "build": "vite build",
+        "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "prepare": "husky install",
         "lint": "prettier --write .",
