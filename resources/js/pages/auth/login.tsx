@@ -81,8 +81,6 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log In
                     </Button>
-
-                    <hr />
                 </div>
 
                 <div className="text-center text-sm">

@@ -49,8 +49,6 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             Email Password Reset Link
                         </Button>
                     </div>
-
-                    <hr />
                 </form>
                 <div className="space-x-1 text-center text-sm">
                     <span>Or, return to the</span>

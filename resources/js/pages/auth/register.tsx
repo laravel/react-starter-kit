@@ -52,7 +52,7 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email Address</Label>
+                        <Label htmlFor="email">Email address</Label>
                         <Input
                             id="email"
                             type="email"
@@ -82,7 +82,7 @@ export default function Register() {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm Password</Label>
+                        <Label htmlFor="password_confirmation">Confirm password</Label>
                         <Input
                             id="password_confirmation"
                             type="password"
@@ -100,8 +100,6 @@ export default function Register() {
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Register
                     </Button>
-
-                    <hr />
                 </div>
 
                 <div className="text-center text-sm">
