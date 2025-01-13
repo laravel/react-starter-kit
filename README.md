@@ -51,7 +51,8 @@ resources/js/
 ├── hooks/         # Custom React hooks
 ├── layouts/       # Application layouts
 ├── lib/           # Utility functions and configurations
-└── pages/         # Page components
+├── pages/         # Page components
+└── types/         # Typescript definitions and interfaces
 ```
 
 **Components**
