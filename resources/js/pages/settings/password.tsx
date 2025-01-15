@@ -6,7 +6,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 import SettingsLayout from './layout';
 
-import SettingsHeading from '@/components/heading-small';
+import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -54,7 +54,7 @@ export default function Password({ className = '' }: { className?: string }) {
 
             <SettingsLayout>
                 <div>
-                    <SettingsHeading title="Update Password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall title="Update Password" description="Ensure your account is using a long, random password to stay secure" />
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">

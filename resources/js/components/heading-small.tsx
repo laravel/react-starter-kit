@@ -1,6 +1,6 @@
 import { Separator } from '@/components/ui/separator';
 
-export default function Heading({ title, description }: { title: string; description?: string }) {
+export default function HeadingSmall({ title, description }: { title: string; description?: string }) {
     return (
         <div>
             <header>

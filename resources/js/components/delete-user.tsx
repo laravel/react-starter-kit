@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import SettingsHeading from '@/components/heading-small';
+import HeadingSmall from '@/components/heading-small';
 
 import {
     Dialog,
@@ -42,7 +42,7 @@ export default function DeleteUser() {
 
     return (
         <div>
-            <SettingsHeading title="Delete Account" description="Delete your account and all of its resources" />
+            <HeadingSmall title="Delete Account" description="Delete your account and all of its resources" />
             <div className="flex items-center rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-950 dark:bg-red-500/20">
                 <Dialog>
                     <DialogTrigger asChild>

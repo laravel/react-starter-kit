@@ -1,7 +1,7 @@
 import { Head } from '@inertiajs/react';
 
 import AppearanceTabs from '@/components/appearance-tabs';
-import SettingsHeading from '@/components/heading-small';
+import HeadingSmall from '@/components/heading-small';
 import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
 
@@ -22,7 +22,7 @@ export default function Appearance() {
 
             <SettingsLayout>
                 <div>
-                    <SettingsHeading title="Appearance Settings" description="Update your account's appearance settings" />
+                    <HeadingSmall title="Appearance Settings" description="Update your account's appearance settings" />
                     <div className="flex flex-col items-start gap-4">
                         <Label>Appearance</Label>
                         <AppearanceTabs />

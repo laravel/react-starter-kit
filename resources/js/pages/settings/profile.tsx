@@ -5,7 +5,7 @@ import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
 import DeleteUser from '@/components/delete-user';
-import SettingsHeading from '@/components/heading-small';
+import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -39,7 +39,7 @@ export default function Profile({ mustVerifyEmail, status, className = '' }: { m
 
             <SettingsLayout>
                 <div>
-                    <SettingsHeading title="Profile Information" description="Update your name and email address" />
+                    <HeadingSmall title="Profile Information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
