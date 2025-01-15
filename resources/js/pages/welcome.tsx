@@ -1,6 +1,5 @@
-import { type SharedData, type User } from '@/types';
+import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-
 
 export default function Welcome() {
     const { auth, laravelVersion, phpVersion } = usePage<SharedData>().props;
