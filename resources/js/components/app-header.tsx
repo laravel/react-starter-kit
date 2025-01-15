@@ -1,5 +1,4 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
-import { Separator } from '@/components/ui/separator';
 import { SidebarTrigger } from '@/components/ui/sidebar';
 import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
 import { Fragment } from 'react';
@@ -11,7 +10,6 @@ export function AppHeader({ breadcrumbs = [] }: { breadcrumbs?: BreadcrumbItemTy
                 <SidebarTrigger className="-ml-1" />
                 {breadcrumbs.length > 0 && (
                     <>
-                        <Separator orientation="vertical" className="mr-2 h-4" />
                         <Breadcrumb>
                             <BreadcrumbList>
                                 {breadcrumbs.map((item, index) => {
