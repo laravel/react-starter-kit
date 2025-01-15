@@ -1,7 +1,7 @@
 /* prettier-ignore */
 import {
 createInertiaApp
-} from '@inertiajs/react'
+} from '@inertiajs/react';
 import createServer from '@inertiajs/react/server';
 import ReactDOMServer from 'react-dom/server';
 
