@@ -4,7 +4,7 @@ import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import { Button } from '@/components/ui/button';
-import AuthLayout from '@/layouts/auth/auth-base';
+import AuthLayout from '@/layouts/auth-layout';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});

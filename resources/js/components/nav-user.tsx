@@ -9,14 +9,9 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type Auth, type User } from '@/types';
+import { type SharedData, type User } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
-
-interface PageProps {
-    auth: Auth;
-    [key: string]: any;
-}
 
 function getInitials(fullName: string): string {
     const names = fullName.trim().split(' ');
@@ -41,7 +36,7 @@ function UserInfo({ user }: { user: User }) {
 }
 
 export function NavUser() {
-    const { auth } = usePage<PageProps>().props;
+    const { auth } = usePage<SharedData>().props;
 
     return (
         <SidebarMenu>

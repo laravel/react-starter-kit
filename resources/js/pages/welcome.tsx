@@ -1,17 +1,9 @@
-import { type User } from '@/types';
+import { type SharedData, type User } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-interface PageProps {
-    auth: {
-        user: User;
-    };
-    laravelVersion: string;
-    phpVersion: string;
-    [key: string]: any;
-}
 
 export default function Welcome() {
-    const { auth, laravelVersion, phpVersion } = usePage<PageProps>().props;
+    const { auth, laravelVersion, phpVersion } = usePage<SharedData>().props;
 
     const handleImageError = () => {
         document.getElementById('screenshot-container')?.classList.add('!hidden');

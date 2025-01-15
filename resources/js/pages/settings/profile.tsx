@@ -1,21 +1,16 @@
-import { type Auth, type BreadcrumbItem } from '@/types';
+import { type Auth, type SharedData, type BreadcrumbItem } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
-import DeleteUser from '@/components/settings/delete-user';
-import SettingsHeading from '@/components/settings/heading';
+import DeleteUser from '@/components/delete-user';
+import SettingsHeading from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from './layout';
-
-interface PageProps {
-    auth: Auth;
-    [key: string]: any;
-}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -25,7 +20,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function Profile({ mustVerifyEmail, status, className = '' }: { mustVerifyEmail: boolean; status?: string; className?: string }) {
-    const { auth } = usePage<PageProps>().props;
+    const { auth } = usePage<SharedData>().props;
 
     const { data, setData, patch, errors, processing, recentlySuccessful } = useForm({
         name: auth.user.name,

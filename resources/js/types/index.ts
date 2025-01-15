@@ -16,6 +16,13 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+export interface SharedData {
+    auth: Auth;
+    name: string;
+    quote: { message: string; author: string };
+    [key: string]: any;
+}
+
 export interface User {
     id: number;
     name: string;

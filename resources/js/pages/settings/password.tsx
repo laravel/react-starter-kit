@@ -6,7 +6,7 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 import SettingsLayout from './layout';
 
-import SettingsHeading from '@/components/settings/heading';
+import SettingsHeading from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
