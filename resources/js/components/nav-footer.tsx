@@ -15,14 +15,17 @@ export function NavFooter({
                 <SidebarMenu>
                     {items.map((item) => (
                         <SidebarMenuItem key={item.title}>
-                            <SidebarMenuButton asChild>
+                            <SidebarMenuButton
+                                asChild
+                                className="text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100"
+                            >
                                 <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                    <item.icon />
+                                    <item.icon className="" />
                                     <span>{item.title}</span>
                                 </a>
                             </SidebarMenuButton>
                             <SidebarMenuAction showOnHover>
-                                <ExternalLink />
+                                <ExternalLink className="text-neutral-600 dark:text-neutral-300" />
                             </SidebarMenuAction>
                         </SidebarMenuItem>
                     ))}

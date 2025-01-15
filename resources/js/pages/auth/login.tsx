@@ -1,8 +1,9 @@
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -60,9 +61,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
                             {canResetPassword && (
-                                <Link href={route('password.request')} className="ml-auto text-sm underline-offset-4 hover:underline" tabIndex={5}>
+                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
                                     Forgot your password?
-                                </Link>
+                                </TextLink>
                             )}
                         </div>
                         <Input
@@ -85,9 +86,9 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                 <div className="text-center text-sm">
                     Don't have an account?{' '}
-                    <Link href={route('register')} className="underline underline-offset-4" tabIndex={4}>
+                    <TextLink href={route('register')} tabIndex={4}>
                         Sign up
-                    </Link>
+                    </TextLink>
                 </div>
             </form>
         </AuthLayout>
