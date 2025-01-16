@@ -16,7 +16,6 @@ import {
     ChevronRight,
     ChevronsUpDown,
     Circle,
-    ExternalLink,
     FolderGit2,
     LayoutDashboard,
     LoaderCircle,
@@ -34,7 +33,9 @@ import ReactDOMServer from 'react-dom/server';
 import { Fragment, jsx, jsxs } from 'react/jsx-runtime';
 import { twMerge } from 'tailwind-merge';
 function InputError({ message, className = '', ...props }) {
-    return message ? /* @__PURE__ */ jsx('p', { ...props, className: 'text-sm text-red-600 ' + className, children: message }) : null;
+    return message
+        ? /* @__PURE__ */ jsx('p', { ...props, className: 'text-sm text-red-600 dark:text-red-400 ' + className, children: message })
+        : null;
 }
 function cn(...inputs) {
     return twMerge(clsx(inputs));
@@ -195,6 +196,13 @@ const __vite_glob_0_0 = /* @__PURE__ */ Object.freeze(
         { value: 'Module' },
     ),
 );
+function TextLink({ className = '', children, ...props }) {
+    return /* @__PURE__ */ jsx(Link, {
+        className: `underline decoration-neutral-400 underline-offset-2 duration-300 ease-out hover:decoration-neutral-700 ${className}`,
+        ...props,
+        children,
+    });
+}
 const labelVariants = cva('text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70');
 const Label = React.forwardRef(({ className, ...props }, ref) =>
     /* @__PURE__ */ jsx(LabelPrimitive.Root, { ref, className: cn(labelVariants(), className), ...props }),
@@ -247,14 +255,13 @@ function ForgotPassword({ status }) {
                                     ],
                                 }),
                             }),
-                            /* @__PURE__ */ jsx('hr', {}),
                         ],
                     }),
                     /* @__PURE__ */ jsxs('div', {
                         className: 'space-x-1 text-center text-sm',
                         children: [
                             /* @__PURE__ */ jsx('span', { children: 'Or, return to the' }),
-                            /* @__PURE__ */ jsx(Link, { href: route('login'), className: 'underline underline-offset-4', children: 'login page' }),
+                            /* @__PURE__ */ jsx(TextLink, { href: route('login'), children: 'login page' }),
                         ],
                     }),
                 ],
@@ -322,9 +329,9 @@ function Login({ status, canResetPassword }) {
                                         children: [
                                             /* @__PURE__ */ jsx(Label, { htmlFor: 'password', children: 'Password' }),
                                             canResetPassword &&
-                                                /* @__PURE__ */ jsx(Link, {
+                                                /* @__PURE__ */ jsx(TextLink, {
                                                     href: route('password.request'),
-                                                    className: 'ml-auto text-sm underline-offset-4 hover:underline',
+                                                    className: 'ml-auto text-sm',
                                                     tabIndex: 5,
                                                     children: 'Forgot your password?',
                                                 }),
@@ -349,7 +356,6 @@ function Login({ status, canResetPassword }) {
                                 disabled: processing,
                                 children: [processing && /* @__PURE__ */ jsx(LoaderCircle, { className: 'h-4 w-4 animate-spin' }), 'Log In'],
                             }),
-                            /* @__PURE__ */ jsx('hr', {}),
                         ],
                     }),
                     /* @__PURE__ */ jsxs('div', {
@@ -357,12 +363,7 @@ function Login({ status, canResetPassword }) {
                         children: [
                             "Don't have an account?",
                             ' ',
-                            /* @__PURE__ */ jsx(Link, {
-                                href: route('register'),
-                                className: 'underline underline-offset-4',
-                                tabIndex: 4,
-                                children: 'Sign up',
-                            }),
+                            /* @__PURE__ */ jsx(TextLink, { href: route('register'), tabIndex: 4, children: 'Sign up' }),
                         ],
                     }),
                 ],
@@ -395,7 +396,7 @@ function Register() {
     };
     return /* @__PURE__ */ jsxs(AuthLayout, {
         title: 'Create an account',
-        description: 'Enter your name, email, and password below',
+        description: 'Enter your information below to create your account',
         children: [
             /* @__PURE__ */ jsx(Head, { title: 'Register' }),
             /* @__PURE__ */ jsxs('form', {
@@ -426,7 +427,7 @@ function Register() {
                             /* @__PURE__ */ jsxs('div', {
                                 className: 'grid gap-2',
                                 children: [
-                                    /* @__PURE__ */ jsx(Label, { htmlFor: 'email', children: 'Email Address' }),
+                                    /* @__PURE__ */ jsx(Label, { htmlFor: 'email', children: 'Email address' }),
                                     /* @__PURE__ */ jsx(Input, {
                                         id: 'email',
                                         type: 'email',
@@ -460,7 +461,7 @@ function Register() {
                             /* @__PURE__ */ jsxs('div', {
                                 className: 'grid gap-2',
                                 children: [
-                                    /* @__PURE__ */ jsx(Label, { htmlFor: 'password_confirmation', children: 'Confirm Password' }),
+                                    /* @__PURE__ */ jsx(Label, { htmlFor: 'password_confirmation', children: 'Confirm password' }),
                                     /* @__PURE__ */ jsx(Input, {
                                         id: 'password_confirmation',
                                         type: 'password',
@@ -479,9 +480,8 @@ function Register() {
                                 className: 'w-full',
                                 tabIndex: 5,
                                 disabled: processing,
-                                children: [processing && /* @__PURE__ */ jsx(LoaderCircle, { className: 'h-4 w-4 animate-spin' }), 'Register'],
+                                children: [processing && /* @__PURE__ */ jsx(LoaderCircle, { className: 'h-4 w-4 animate-spin' }), 'Create Account'],
                             }),
-                            /* @__PURE__ */ jsx('hr', {}),
                         ],
                     }),
                     /* @__PURE__ */ jsxs('div', {
@@ -489,12 +489,7 @@ function Register() {
                         children: [
                             'Already have an account?',
                             ' ',
-                            /* @__PURE__ */ jsx(Link, {
-                                href: route('login'),
-                                className: 'underline underline-offset-4',
-                                tabIndex: 6,
-                                children: 'Log in',
-                            }),
+                            /* @__PURE__ */ jsx(TextLink, { href: route('login'), tabIndex: 6, children: 'Log in' }),
                         ],
                     }),
                 ],
@@ -1229,41 +1224,49 @@ const SidebarMenuSubButton = React.forwardRef(({ asChild = false, size = 'md', i
 SidebarMenuSubButton.displayName = 'SidebarMenuSubButton';
 function AppHeader({ breadcrumbs: breadcrumbs2 = [] }) {
     return /* @__PURE__ */ jsx('header', {
-        className: 'flex h-16 w-full shrink-0 items-center justify-between gap-2 border-b px-4',
+        className:
+            'flex h-16 shrink-0 items-center gap-2 px-4 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12',
         children: /* @__PURE__ */ jsxs('div', {
             className: 'flex items-center gap-2',
             children: [
                 /* @__PURE__ */ jsx(SidebarTrigger, { className: '-ml-1' }),
                 breadcrumbs2.length > 0 &&
-                    /* @__PURE__ */ jsxs(Fragment, {
-                        children: [
-                            /* @__PURE__ */ jsx(Separator, { orientation: 'vertical', className: 'mr-2 h-4' }),
-                            /* @__PURE__ */ jsx(Breadcrumb, {
-                                children: /* @__PURE__ */ jsx(BreadcrumbList, {
-                                    children: breadcrumbs2.map((item, index) => {
-                                        const isLast = index === breadcrumbs2.length - 1;
-                                        return /* @__PURE__ */ jsxs(
-                                            Fragment$1,
-                                            {
-                                                children: [
-                                                    /* @__PURE__ */ jsx(BreadcrumbItem, {
-                                                        children: isLast
-                                                            ? /* @__PURE__ */ jsx(BreadcrumbPage, { children: item.title })
-                                                            : /* @__PURE__ */ jsx(BreadcrumbLink, { href: item.href, children: item.title }),
-                                                    }),
-                                                    !isLast && /* @__PURE__ */ jsx(BreadcrumbSeparator, {}),
-                                                ],
-                                            },
-                                            index,
-                                        );
-                                    }),
+                    /* @__PURE__ */ jsx(Fragment, {
+                        children: /* @__PURE__ */ jsx(Breadcrumb, {
+                            children: /* @__PURE__ */ jsx(BreadcrumbList, {
+                                children: breadcrumbs2.map((item, index) => {
+                                    const isLast = index === breadcrumbs2.length - 1;
+                                    return /* @__PURE__ */ jsxs(
+                                        Fragment$1,
+                                        {
+                                            children: [
+                                                /* @__PURE__ */ jsx(BreadcrumbItem, {
+                                                    children: isLast
+                                                        ? /* @__PURE__ */ jsx(BreadcrumbPage, { children: item.title })
+                                                        : /* @__PURE__ */ jsx(BreadcrumbLink, { href: item.href, children: item.title }),
+                                                }),
+                                                !isLast && /* @__PURE__ */ jsx(BreadcrumbSeparator, {}),
+                                            ],
+                                        },
+                                        index,
+                                    );
                                 }),
                             }),
-                        ],
+                        }),
                     }),
             ],
         }),
     });
+}
+function AppShell({ children }) {
+    const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
+    const handleSidebarChange = (open) => {
+        setIsOpen(open);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('sidebar', String(open));
+        }
+    };
+    return /* @__PURE__ */ jsx(SidebarProvider, { defaultOpen: isOpen, open: isOpen, onOpenChange: handleSidebarChange, children });
 }
 function NavFooter({ items, className, ...props }) {
     return /* @__PURE__ */ jsx(SidebarGroup, {
@@ -1272,21 +1275,22 @@ function NavFooter({ items, className, ...props }) {
         children: /* @__PURE__ */ jsx(SidebarGroupContent, {
             children: /* @__PURE__ */ jsx(SidebarMenu, {
                 children: items.map((item) =>
-                    /* @__PURE__ */ jsxs(
+                    /* @__PURE__ */ jsx(
                         SidebarMenuItem,
                         {
-                            children: [
-                                /* @__PURE__ */ jsx(SidebarMenuButton, {
-                                    asChild: true,
-                                    children: /* @__PURE__ */ jsxs('a', {
-                                        href: item.url,
-                                        target: '_blank',
-                                        rel: 'noopener noreferrer',
-                                        children: [/* @__PURE__ */ jsx(item.icon, {}), /* @__PURE__ */ jsx('span', { children: item.title })],
-                                    }),
+                            children: /* @__PURE__ */ jsx(SidebarMenuButton, {
+                                asChild: true,
+                                className: 'text-neutral-600 hover:text-neutral-800 dark:text-neutral-300 dark:hover:text-neutral-100',
+                                children: /* @__PURE__ */ jsxs('a', {
+                                    href: item.url,
+                                    target: '_blank',
+                                    rel: 'noopener noreferrer',
+                                    children: [
+                                        /* @__PURE__ */ jsx(item.icon, { className: '' }),
+                                        /* @__PURE__ */ jsx('span', { children: item.title }),
+                                    ],
                                 }),
-                                /* @__PURE__ */ jsx(SidebarMenuAction, { showOnHover: true, children: /* @__PURE__ */ jsx(ExternalLink, {}) }),
-                            ],
+                            }),
                         },
                         item.title,
                     ),
@@ -1297,26 +1301,30 @@ function NavFooter({ items, className, ...props }) {
 }
 function NavMain({ items = [] }) {
     const page = usePage();
-    return /* @__PURE__ */ jsx(SidebarGroup, {
-        children: /* @__PURE__ */ jsx(SidebarMenu, {
-            children: items.map((item) =>
-                /* @__PURE__ */ jsx(
-                    SidebarMenuItem,
-                    {
-                        children: /* @__PURE__ */ jsx(SidebarMenuButton, {
-                            asChild: true,
-                            isActive: item.url === page.url,
-                            children: /* @__PURE__ */ jsxs(Link, {
-                                href: item.url,
-                                prefetch: true,
-                                children: [/* @__PURE__ */ jsx(item.icon, {}), /* @__PURE__ */ jsx('span', { children: item.title })],
+    return /* @__PURE__ */ jsxs(SidebarGroup, {
+        className: 'px-2 py-0',
+        children: [
+            /* @__PURE__ */ jsx(SidebarGroupLabel, { children: 'Platform' }),
+            /* @__PURE__ */ jsx(SidebarMenu, {
+                children: items.map((item) =>
+                    /* @__PURE__ */ jsx(
+                        SidebarMenuItem,
+                        {
+                            children: /* @__PURE__ */ jsx(SidebarMenuButton, {
+                                asChild: true,
+                                isActive: item.url === page.url,
+                                children: /* @__PURE__ */ jsxs(Link, {
+                                    href: item.url,
+                                    prefetch: true,
+                                    children: [/* @__PURE__ */ jsx(item.icon, {}), /* @__PURE__ */ jsx('span', { children: item.title })],
+                                }),
                             }),
-                        }),
-                    },
-                    item.title,
+                        },
+                        item.title,
+                    ),
                 ),
-            ),
-        }),
+            }),
+        ],
     });
 }
 const Avatar = React.forwardRef(({ className, ...props }, ref) =>
@@ -1455,10 +1463,13 @@ function UserInfo({ user }) {
     return /* @__PURE__ */ jsxs(Fragment, {
         children: [
             /* @__PURE__ */ jsxs(Avatar, {
-                className: 'h-8 w-8 rounded-md',
+                className: 'h-8 w-8 overflow-hidden rounded-full',
                 children: [
                     /* @__PURE__ */ jsx(AvatarImage, { src: user.avatar, alt: user.name }),
-                    /* @__PURE__ */ jsx(AvatarFallback, { className: 'rounded-md', children: getInitials(user.name) }),
+                    /* @__PURE__ */ jsx(AvatarFallback, {
+                        className: 'rounded-full bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white',
+                        children: getInitials(user.name),
+                    }),
                 ],
             }),
             /* @__PURE__ */ jsxs('div', {
@@ -1481,7 +1492,7 @@ function NavUser() {
                         asChild: true,
                         children: /* @__PURE__ */ jsxs(SidebarMenuButton, {
                             size: 'lg',
-                            className: 'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground',
+                            className: 'group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent',
                             children: [
                                 /* @__PURE__ */ jsx(UserInfo, { user: auth.user }),
                                 /* @__PURE__ */ jsx(ChevronsUpDown, { className: 'ml-auto size-4' }),
@@ -1551,63 +1562,55 @@ const footerNavItems = [
         icon: BookOpenText,
     },
 ];
-function AppSidebar({ children }) {
-    const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
-    const handleSidebarChange = (open) => {
-        setIsOpen(open);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('sidebar', String(open));
-        }
-    };
-    return /* @__PURE__ */ jsxs(SidebarProvider, {
-        defaultOpen: isOpen,
-        open: isOpen,
-        onOpenChange: handleSidebarChange,
+function AppSidebar() {
+    return /* @__PURE__ */ jsxs(Sidebar, {
+        collapsible: 'icon',
+        variant: 'sidebar',
         children: [
-            /* @__PURE__ */ jsxs(Sidebar, {
-                collapsible: 'icon',
-                children: [
-                    /* @__PURE__ */ jsx(SidebarHeader, {
-                        children: /* @__PURE__ */ jsx(SidebarMenu, {
-                            children: /* @__PURE__ */ jsx(SidebarMenuItem, {
-                                children: /* @__PURE__ */ jsx(SidebarMenuButton, {
-                                    size: 'lg',
-                                    asChild: true,
-                                    children: /* @__PURE__ */ jsxs(Link, {
-                                        href: '/dashboard',
-                                        className: 'flex items-center gap-3',
-                                        prefetch: true,
+            /* @__PURE__ */ jsx(SidebarHeader, {
+                children: /* @__PURE__ */ jsx(SidebarMenu, {
+                    children: /* @__PURE__ */ jsx(SidebarMenuItem, {
+                        children: /* @__PURE__ */ jsx(SidebarMenuButton, {
+                            size: 'lg',
+                            asChild: true,
+                            children: /* @__PURE__ */ jsxs(Link, {
+                                href: '/dashboard',
+                                prefetch: true,
+                                children: [
+                                    /* @__PURE__ */ jsx('div', {
+                                        className:
+                                            'flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground',
+                                        children: /* @__PURE__ */ jsx(ApplicationLogo, {
+                                            className: 'size-5 fill-current text-white dark:text-black',
+                                        }),
+                                    }),
+                                    /* @__PURE__ */ jsxs('div', {
+                                        className: 'grid flex-1 text-left text-sm leading-tight',
                                         children: [
-                                            /* @__PURE__ */ jsx('div', {
-                                                className:
-                                                    'flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground',
-                                                children: /* @__PURE__ */ jsx(ApplicationLogo, { className: 'size-5 fill-current text-white' }),
-                                            }),
-                                            /* @__PURE__ */ jsxs('div', {
-                                                className: 'grid flex-1 text-left text-sm leading-tight',
-                                                children: [
-                                                    /* @__PURE__ */ jsx('span', { className: 'truncate font-semibold', children: 'Laravel' }),
-                                                    /* @__PURE__ */ jsx('span', { className: 'truncate text-xs', children: 'Starter Kit' }),
-                                                ],
-                                            }),
+                                            /* @__PURE__ */ jsx('span', { className: 'truncate font-semibold', children: 'Laravel' }),
+                                            /* @__PURE__ */ jsx('span', { className: 'truncate text-xs', children: 'Starter Kit' }),
                                         ],
                                     }),
-                                }),
+                                ],
                             }),
                         }),
                     }),
-                    /* @__PURE__ */ jsx(SidebarContent, { children: /* @__PURE__ */ jsx(NavMain, { items: mainNavItems }) }),
-                    /* @__PURE__ */ jsxs(SidebarFooter, {
-                        children: [/* @__PURE__ */ jsx(NavFooter, { items: footerNavItems, className: 'mt-auto' }), /* @__PURE__ */ jsx(NavUser, {})],
-                    }),
-                ],
+                }),
             }),
-            /* @__PURE__ */ jsx(SidebarInset, { children }),
+            /* @__PURE__ */ jsx(SidebarContent, { children: /* @__PURE__ */ jsx(NavMain, { items: mainNavItems }) }),
+            /* @__PURE__ */ jsxs(SidebarFooter, {
+                children: [/* @__PURE__ */ jsx(NavFooter, { items: footerNavItems, className: 'mt-auto' }), /* @__PURE__ */ jsx(NavUser, {})],
+            }),
         ],
     });
 }
 function App({ children, breadcrumbs: breadcrumbs2 = [] }) {
-    return /* @__PURE__ */ jsxs(AppSidebar, { children: [/* @__PURE__ */ jsx(AppHeader, { breadcrumbs: breadcrumbs2 }), children] });
+    return /* @__PURE__ */ jsxs(AppShell, {
+        children: [
+            /* @__PURE__ */ jsx(AppSidebar, {}),
+            /* @__PURE__ */ jsxs(SidebarInset, { children: [/* @__PURE__ */ jsx(AppHeader, { breadcrumbs: breadcrumbs2 }), children] }),
+        ],
+    });
 }
 const breadcrumbs$3 = [
     {
@@ -1621,17 +1624,100 @@ function Dashboard() {
         children: [
             /* @__PURE__ */ jsx(Head, { title: 'Dashboard' }),
             /* @__PURE__ */ jsxs('div', {
-                className: 'flex flex-1 flex-col gap-4 p-4',
+                className: 'flex h-full flex-1 flex-col gap-4 rounded-xl p-4 pt-0',
                 children: [
                     /* @__PURE__ */ jsxs('div', {
                         className: 'grid auto-rows-min gap-4 md:grid-cols-3',
                         children: [
-                            /* @__PURE__ */ jsx('div', { className: 'aspect-video rounded-xl bg-muted/50' }),
-                            /* @__PURE__ */ jsx('div', { className: 'aspect-video rounded-xl bg-muted/50' }),
-                            /* @__PURE__ */ jsx('div', { className: 'aspect-video rounded-xl bg-muted/50' }),
+                            /* @__PURE__ */ jsx('div', {
+                                className:
+                                    'relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border',
+                                children: /* @__PURE__ */ jsxs('svg', {
+                                    className: 'absolute inset-0 size-full stroke-gray-900/10 dark:stroke-neutral-100/10',
+                                    fill: 'none',
+                                    children: [
+                                        /* @__PURE__ */ jsx('defs', {
+                                            children: /* @__PURE__ */ jsx('pattern', {
+                                                id: 'pattern-01',
+                                                x: '0',
+                                                y: '0',
+                                                width: '10',
+                                                height: '10',
+                                                patternUnits: 'userSpaceOnUse',
+                                                children: /* @__PURE__ */ jsx('path', { d: 'M-3 13 15-5M-5 5l18-18M-1 21 17 3' }),
+                                            }),
+                                        }),
+                                        /* @__PURE__ */ jsx('rect', { stroke: 'none', fill: 'url(#pattern-01)', width: '100%', height: '100%' }),
+                                    ],
+                                }),
+                            }),
+                            /* @__PURE__ */ jsx('div', {
+                                className:
+                                    'relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border',
+                                children: /* @__PURE__ */ jsxs('svg', {
+                                    className: 'absolute inset-0 size-full stroke-gray-900/10 dark:stroke-neutral-100/10',
+                                    fill: 'none',
+                                    children: [
+                                        /* @__PURE__ */ jsx('defs', {
+                                            children: /* @__PURE__ */ jsx('pattern', {
+                                                id: 'pattern-01',
+                                                x: '0',
+                                                y: '0',
+                                                width: '10',
+                                                height: '10',
+                                                patternUnits: 'userSpaceOnUse',
+                                                children: /* @__PURE__ */ jsx('path', { d: 'M-3 13 15-5M-5 5l18-18M-1 21 17 3' }),
+                                            }),
+                                        }),
+                                        /* @__PURE__ */ jsx('rect', { stroke: 'none', fill: 'url(#pattern-01)', width: '100%', height: '100%' }),
+                                    ],
+                                }),
+                            }),
+                            /* @__PURE__ */ jsx('div', {
+                                className:
+                                    'relative aspect-video overflow-hidden rounded-xl border border-sidebar-border/70 dark:border-sidebar-border',
+                                children: /* @__PURE__ */ jsxs('svg', {
+                                    className: 'absolute inset-0 size-full stroke-gray-900/10 dark:stroke-neutral-100/10',
+                                    fill: 'none',
+                                    children: [
+                                        /* @__PURE__ */ jsx('defs', {
+                                            children: /* @__PURE__ */ jsx('pattern', {
+                                                id: 'pattern-01',
+                                                x: '0',
+                                                y: '0',
+                                                width: '10',
+                                                height: '10',
+                                                patternUnits: 'userSpaceOnUse',
+                                                children: /* @__PURE__ */ jsx('path', { d: 'M-3 13 15-5M-5 5l18-18M-1 21 17 3' }),
+                                            }),
+                                        }),
+                                        /* @__PURE__ */ jsx('rect', { stroke: 'none', fill: 'url(#pattern-01)', width: '100%', height: '100%' }),
+                                    ],
+                                }),
+                            }),
                         ],
                     }),
-                    /* @__PURE__ */ jsx('div', { className: 'min-h-[100vh] flex-1 rounded-xl bg-muted/50 md:min-h-min' }),
+                    /* @__PURE__ */ jsx('div', {
+                        className: 'relative min-h-[100vh] flex-1 rounded-xl border border-sidebar-border/70 dark:border-sidebar-border md:min-h-min',
+                        children: /* @__PURE__ */ jsxs('svg', {
+                            className: 'absolute inset-0 size-full stroke-gray-900/10 dark:stroke-neutral-100/10',
+                            fill: 'none',
+                            children: [
+                                /* @__PURE__ */ jsx('defs', {
+                                    children: /* @__PURE__ */ jsx('pattern', {
+                                        id: 'pattern-01',
+                                        x: '0',
+                                        y: '0',
+                                        width: '10',
+                                        height: '10',
+                                        patternUnits: 'userSpaceOnUse',
+                                        children: /* @__PURE__ */ jsx('path', { d: 'M-3 13 15-5M-5 5l18-18M-1 21 17 3' }),
+                                    }),
+                                }),
+                                /* @__PURE__ */ jsx('rect', { stroke: 'none', fill: 'url(#pattern-01)', width: '100%', height: '100%' }),
+                            ],
+                        }),
+                    }),
                 ],
             }),
         ],
@@ -1652,6 +1738,11 @@ const applyTheme = (appearance) => {
     const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
     document.documentElement.classList.toggle('dark', isDark);
 };
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+const handleSystemThemeChange = () => {
+    const currentAppearance = localStorage.getItem('appearance');
+    applyTheme(currentAppearance || 'system');
+};
 function useAppearance() {
     const [appearance, setAppearance] = useState('system');
     const updateAppearance = (mode) => {
@@ -1662,12 +1753,7 @@ function useAppearance() {
     useEffect(() => {
         const savedAppearance = localStorage.getItem('appearance');
         updateAppearance(savedAppearance || 'system');
-        const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-        const handleChange = () => {
-            if (appearance === 'system') applyTheme('system');
-        };
-        mediaQuery.addEventListener('change', handleChange);
-        return () => mediaQuery.removeEventListener('change', handleChange);
+        return () => mediaQuery.removeEventListener('change', handleSystemThemeChange);
     }, []);
     return { appearance, updateAppearance };
 }
@@ -1697,16 +1783,11 @@ function AppearanceToggleTab({ className = '', ...props }) {
         ),
     });
 }
-function Heading$1({ title, description }) {
-    return /* @__PURE__ */ jsxs('div', {
+function HeadingSmall({ title, description }) {
+    return /* @__PURE__ */ jsxs('header', {
         children: [
-            /* @__PURE__ */ jsxs('header', {
-                children: [
-                    /* @__PURE__ */ jsx('h3', { className: 'mb-1 text-lg font-medium', children: title }),
-                    description && /* @__PURE__ */ jsx('p', { className: 'text-sm text-muted-foreground', children: description }),
-                ],
-            }),
-            /* @__PURE__ */ jsx(Separator, { className: 'my-6' }),
+            /* @__PURE__ */ jsx('h3', { class: 'mb-0.5 text-base font-medium', children: title }),
+            description && /* @__PURE__ */ jsx('p', { className: 'text-xs text-muted-foreground', children: description }),
         ],
     });
 }
@@ -1716,8 +1797,8 @@ function Heading({ title, description }) {
             /* @__PURE__ */ jsxs('div', {
                 className: 'space-y-0.5',
                 children: [
-                    /* @__PURE__ */ jsx('h2', { className: 'text-lg font-bold tracking-tight sm:text-xl md:text-2xl', children: title }),
-                    description && /* @__PURE__ */ jsx('p', { className: 'text-sm text-muted-foreground md:text-base', children: description }),
+                    /* @__PURE__ */ jsx('h2', { className: 'text-base font-semibold tracking-tight sm:text-lg lg:text-xl', children: title }),
+                    description && /* @__PURE__ */ jsx('p', { className: 'text-xs text-muted-foreground md:text-sm', children: description }),
                 ],
             }),
             /* @__PURE__ */ jsx(Separator, { className: 'my-6' }),
@@ -1745,7 +1826,7 @@ function SettingsLayout({ children }) {
     const currentPath = window.location.pathname;
     sidebarNavItems.find((item) => currentPath === item.url);
     return /* @__PURE__ */ jsxs('div', {
-        className: 'p-5 sm:p-8 md:p-10',
+        className: 'border-t border-sidebar-border/70 p-5 lg:p-7',
         children: [
             /* @__PURE__ */ jsx(Heading, { title: 'Settings', description: 'Manage your profile and account settings' }),
             /* @__PURE__ */ jsxs('div', {
@@ -1762,7 +1843,9 @@ function SettingsLayout({ children }) {
                                         size: 'sm',
                                         variant: 'ghost',
                                         asChild: true,
-                                        className: cn('w-full justify-start', currentPath === item.url ? 'bg-muted' : 'hover:underline'),
+                                        className: cn('w-full justify-start', {
+                                            'bg-muted': currentPath === item.url,
+                                        }),
                                         children: /* @__PURE__ */ jsx(Link, { href: item.url, prefetch: true, children: item.title }),
                                     },
                                     item.url,
@@ -1780,19 +1863,9 @@ function SettingsLayout({ children }) {
         ],
     });
 }
-const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(
-    /* @__PURE__ */ Object.defineProperty(
-        {
-            __proto__: null,
-            default: SettingsLayout,
-        },
-        Symbol.toStringTag,
-        { value: 'Module' },
-    ),
-);
 const breadcrumbs$2 = [
     {
-        title: 'Appearance Settings',
+        title: 'Appearance settings',
         href: '/settings/appearance',
     },
 ];
@@ -1800,15 +1873,13 @@ function Appearance() {
     return /* @__PURE__ */ jsxs(App, {
         breadcrumbs: breadcrumbs$2,
         children: [
-            /* @__PURE__ */ jsx(Head, { title: 'Appearance Settings' }),
+            /* @__PURE__ */ jsx(Head, { title: 'Appearance settings' }),
             /* @__PURE__ */ jsx(SettingsLayout, {
                 children: /* @__PURE__ */ jsxs('div', {
+                    className: 'space-y-6',
                     children: [
-                        /* @__PURE__ */ jsx(Heading$1, { title: 'Appearance Settings', description: "Update your account's appearance settings" }),
-                        /* @__PURE__ */ jsxs('div', {
-                            className: 'flex flex-col items-start gap-4',
-                            children: [/* @__PURE__ */ jsx(Label, { children: 'Appearance' }), /* @__PURE__ */ jsx(AppearanceToggleTab, {})],
-                        }),
+                        /* @__PURE__ */ jsx(HeadingSmall, { title: 'Appearance settings', description: "Update your account's appearance settings" }),
+                        /* @__PURE__ */ jsx(AppearanceToggleTab, {}),
                     ],
                 }),
             }),
@@ -1863,9 +1934,10 @@ function Password({ className = '' }) {
             /* @__PURE__ */ jsx(Head, { title: 'Profile Settings' }),
             /* @__PURE__ */ jsx(SettingsLayout, {
                 children: /* @__PURE__ */ jsxs('div', {
+                    className: 'space-y-6',
                     children: [
-                        /* @__PURE__ */ jsx(Heading$1, {
-                            title: 'Update Password',
+                        /* @__PURE__ */ jsx(HeadingSmall, {
+                            title: 'Update password',
                             description: 'Ensure your account is using a long, random password to stay secure',
                         }),
                         /* @__PURE__ */ jsxs('form', {
@@ -1875,7 +1947,7 @@ function Password({ className = '' }) {
                                 /* @__PURE__ */ jsxs('div', {
                                     className: 'grid gap-2',
                                     children: [
-                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'current_password', children: 'Current Password' }),
+                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'current_password', children: 'Current password' }),
                                         /* @__PURE__ */ jsx(Input, {
                                             id: 'current_password',
                                             ref: currentPasswordInput,
@@ -1891,7 +1963,7 @@ function Password({ className = '' }) {
                                 /* @__PURE__ */ jsxs('div', {
                                     className: 'grid gap-2',
                                     children: [
-                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'password', children: 'New Password' }),
+                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'password', children: 'New password' }),
                                         /* @__PURE__ */ jsx(Input, {
                                             id: 'password',
                                             ref: passwordInput,
@@ -1907,7 +1979,7 @@ function Password({ className = '' }) {
                                 /* @__PURE__ */ jsxs('div', {
                                     className: 'grid gap-2',
                                     children: [
-                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'password_confirmation', children: 'Confirm Password' }),
+                                        /* @__PURE__ */ jsx(Label, { htmlFor: 'password_confirmation', children: 'Confirm password' }),
                                         /* @__PURE__ */ jsx(Input, {
                                             id: 'password_confirmation',
                                             value: data.password_confirmation,
@@ -1922,7 +1994,7 @@ function Password({ className = '' }) {
                                 /* @__PURE__ */ jsxs('div', {
                                     className: 'flex items-center gap-4',
                                     children: [
-                                        /* @__PURE__ */ jsx(Button, { disabled: processing, children: 'Save' }),
+                                        /* @__PURE__ */ jsx(Button, { disabled: processing, children: 'Save password' }),
                                         /* @__PURE__ */ jsx(Transition, {
                                             show: recentlySuccessful,
                                             enter: 'transition ease-in-out',
@@ -1941,7 +2013,7 @@ function Password({ className = '' }) {
         ],
     });
 }
-const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(
+const __vite_glob_0_8 = /* @__PURE__ */ Object.freeze(
     /* @__PURE__ */ Object.defineProperty(
         {
             __proto__: null,
@@ -2027,16 +2099,17 @@ function DeleteUser() {
         reset();
     };
     return /* @__PURE__ */ jsxs('div', {
+        className: 'space-y-6',
         children: [
-            /* @__PURE__ */ jsx(Heading$1, { title: 'Delete Account', description: 'Delete your account and all of its resources' }),
+            /* @__PURE__ */ jsx(HeadingSmall, { title: 'Delete account', description: 'Delete your account and all of its resources' }),
             /* @__PURE__ */ jsxs('div', {
-                className: 'flex items-center rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-950 dark:bg-red-500/20',
+                className: 'flex items-center rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-950 dark:bg-red-700/10',
                 children: [
                     /* @__PURE__ */ jsxs(Dialog, {
                         children: [
                             /* @__PURE__ */ jsx(DialogTrigger, {
                                 asChild: true,
-                                children: /* @__PURE__ */ jsx(Button, { variant: 'destructive', children: 'Delete Account' }),
+                                children: /* @__PURE__ */ jsx(Button, { variant: 'destructive', children: 'Delete account' }),
                             }),
                             /* @__PURE__ */ jsx(DialogContent, {
                                 children: /* @__PURE__ */ jsxs('form', {
@@ -2083,7 +2156,7 @@ function DeleteUser() {
                                                     variant: 'destructive',
                                                     disabled: processing,
                                                     asChild: true,
-                                                    children: /* @__PURE__ */ jsx('button', { type: 'submit', children: 'Delete Account' }),
+                                                    children: /* @__PURE__ */ jsx('button', { type: 'submit', children: 'Delete account' }),
                                                 }),
                                             ],
                                         }),
@@ -2130,8 +2203,9 @@ function Profile({ mustVerifyEmail, status, className = '' }) {
             /* @__PURE__ */ jsxs(SettingsLayout, {
                 children: [
                     /* @__PURE__ */ jsxs('div', {
+                        className: 'space-y-6',
                         children: [
-                            /* @__PURE__ */ jsx(Heading$1, { title: 'Profile Information', description: 'Update your name and email address' }),
+                            /* @__PURE__ */ jsx(HeadingSmall, { title: 'Profile Information', description: 'Update your name and email address' }),
                             /* @__PURE__ */ jsxs('form', {
                                 onSubmit: submit,
                                 className: 'space-y-6',
@@ -2216,7 +2290,7 @@ function Profile({ mustVerifyEmail, status, className = '' }) {
         ],
     });
 }
-const __vite_glob_0_10 = /* @__PURE__ */ Object.freeze(
+const __vite_glob_0_9 = /* @__PURE__ */ Object.freeze(
     /* @__PURE__ */ Object.defineProperty(
         {
             __proto__: null,
@@ -2635,7 +2709,7 @@ function Welcome() {
         ],
     });
 }
-const __vite_glob_0_11 = /* @__PURE__ */ Object.freeze(
+const __vite_glob_0_10 = /* @__PURE__ */ Object.freeze(
     /* @__PURE__ */ Object.defineProperty(
         {
             __proto__: null,
@@ -2659,10 +2733,9 @@ createServer((page) =>
                 './pages/auth/verify-email.tsx': __vite_glob_0_5,
                 './pages/dashboard.tsx': __vite_glob_0_6,
                 './pages/settings/appearance.tsx': __vite_glob_0_7,
-                './pages/settings/layout.tsx': __vite_glob_0_8,
-                './pages/settings/password.tsx': __vite_glob_0_9,
-                './pages/settings/profile.tsx': __vite_glob_0_10,
-                './pages/welcome.tsx': __vite_glob_0_11,
+                './pages/settings/password.tsx': __vite_glob_0_8,
+                './pages/settings/profile.tsx': __vite_glob_0_9,
+                './pages/welcome.tsx': __vite_glob_0_10,
             });
             return pages[`./pages/${name}.tsx`];
         },

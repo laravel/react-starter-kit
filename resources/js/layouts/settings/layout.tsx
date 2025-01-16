@@ -28,7 +28,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     const currentItem = sidebarNavItems.find((item) => currentPath === item.url);
 
     return (
-        <div className="p-5 sm:p-8 md:p-10">
+        <div className="border-t border-sidebar-border/70 p-5 lg:p-7">
             <Heading title="Settings" description="Manage your profile and account settings" />
 
             <div className="flex flex-col space-y-8 md:flex-row md:space-x-12 md:space-y-0">
@@ -40,7 +40,9 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
                                 size="sm"
                                 variant="ghost"
                                 asChild
-                                className={cn('w-full justify-start', currentPath === item.url ? 'bg-muted' : 'hover:underline')}
+                                className={cn('w-full justify-start', {
+                                    'bg-muted': currentPath === item.url,
+                                })}
                             >
                                 <Link href={item.url} prefetch>
                                     {item.title}

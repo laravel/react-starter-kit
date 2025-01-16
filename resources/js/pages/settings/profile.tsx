@@ -38,7 +38,7 @@ export default function Profile({ mustVerifyEmail, status, className = '' }: { m
             <Head title="Profile Settings" />
 
             <SettingsLayout>
-                <div>
+                <div className="space-y-6">
                     <HeadingSmall title="Profile Information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">

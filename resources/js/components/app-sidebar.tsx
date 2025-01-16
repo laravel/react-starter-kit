@@ -35,9 +35,9 @@ export function AppSidebar() {
                 <SidebarMenu>
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
-                            <Link href="/dashboard" className="flex items-center gap-3" prefetch>
+                            <Link href="/dashboard" prefetch>
                                 <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <ApplicationLogo className="size-5 fill-current text-white" />
+                                    <ApplicationLogo className="size-5 fill-current text-white dark:text-black" />
                                 </div>
                                 <div className="grid flex-1 text-left text-sm leading-tight">
                                     <span className="truncate font-semibold">Laravel</span>

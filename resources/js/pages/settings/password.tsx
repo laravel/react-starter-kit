@@ -53,12 +53,12 @@ export default function Password({ className = '' }: { className?: string }) {
             <Head title="Profile Settings" />
 
             <SettingsLayout>
-                <div>
-                    <HeadingSmall title="Update Password" description="Ensure your account is using a long, random password to stay secure" />
+                <div className="space-y-6">
+                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current Password</Label>
+                            <Label htmlFor="current_password">Current password</Label>
 
                             <Input
                                 id="current_password"
@@ -74,7 +74,7 @@ export default function Password({ className = '' }: { className?: string }) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">New Password</Label>
+                            <Label htmlFor="password">New password</Label>
 
                             <Input
                                 id="password"
@@ -90,7 +90,7 @@ export default function Password({ className = '' }: { className?: string }) {
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm Password</Label>
+                            <Label htmlFor="password_confirmation">Confirm password</Label>
 
                             <Input
                                 id="password_confirmation"
@@ -105,7 +105,7 @@ export default function Password({ className = '' }: { className?: string }) {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <Button disabled={processing}>Save</Button>
+                            <Button disabled={processing}>Save password</Button>
 
                             <Transition
                                 show={recentlySuccessful}

@@ -41,12 +41,12 @@ export default function DeleteUser() {
     };
 
     return (
-        <div>
-            <HeadingSmall title="Delete Account" description="Delete your account and all of its resources" />
-            <div className="flex items-center rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-950 dark:bg-red-500/20">
+        <div className="space-y-6">
+            <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
+            <div className="flex items-center rounded-lg border border-red-100 bg-red-50 p-3 dark:border-red-950 dark:bg-red-700/10">
                 <Dialog>
                     <DialogTrigger asChild>
-                        <Button variant="destructive">Delete Account</Button>
+                        <Button variant="destructive">Delete account</Button>
                     </DialogTrigger>
                     <DialogContent>
                         <form className="space-y-6" onSubmit={deleteUser}>
@@ -83,7 +83,7 @@ export default function DeleteUser() {
                                 </DialogClose>
 
                                 <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete Account</button>
+                                    <button type="submit">Delete account</button>
                                 </Button>
                             </DialogFooter>
                         </form>
