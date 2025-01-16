@@ -24,9 +24,6 @@ export function NavFooter({
                                     <span>{item.title}</span>
                                 </a>
                             </SidebarMenuButton>
-                            <SidebarMenuAction showOnHover>
-                                <ExternalLink className="text-neutral-600 dark:text-neutral-300" />
-                            </SidebarMenuAction>
                         </SidebarMenuItem>
                     ))}
                 </SidebarMenu>
