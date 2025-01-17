@@ -4,14 +4,14 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpenText, FolderGit2, LayoutDashboard } from 'lucide-react';
-import ApplicationLogo from './application-logo';
+import { BookOpenText, FolderGit2, LayoutGrid } from 'lucide-react';
+import AppLogo from './app-logo';
 
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         url: '/dashboard',
-        icon: LayoutDashboard,
+        icon: LayoutGrid,
     },
 ];
 
@@ -36,13 +36,7 @@ export function AppSidebar() {
                     <SidebarMenuItem>
                         <SidebarMenuButton size="lg" asChild>
                             <Link href="/dashboard" prefetch>
-                                <div className="flex aspect-square size-8 items-center justify-center rounded-md bg-sidebar-primary text-sidebar-primary-foreground">
-                                    <ApplicationLogo className="size-5 fill-current text-white dark:text-black" />
-                                </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-semibold">Laravel</span>
-                                    <span className="truncate text-xs">Starter Kit</span>
-                                </div>
+                                <AppLogo />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>

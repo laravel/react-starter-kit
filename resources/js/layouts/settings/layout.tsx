@@ -28,7 +28,7 @@ export default function SettingsLayout({ children }: { children: React.ReactNode
     const currentItem = sidebarNavItems.find((item) => currentPath === item.url);
 
     return (
-        <div className="border-t border-sidebar-border/70 p-5 lg:p-7">
+        <div className="px-4 py-8">
             <Heading title="Settings" description="Manage your profile and account settings" />
 
             <div className="flex flex-col space-y-8 md:flex-row md:space-x-12 md:space-y-0">

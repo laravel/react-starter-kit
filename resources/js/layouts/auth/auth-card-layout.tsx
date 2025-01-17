@@ -1,4 +1,4 @@
-import ApplicationLogo from '@/components/application-logo';
+import AppLogoIcon from '@/components/app-logo-icon';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export default function AuthCardLayout({
@@ -16,7 +16,7 @@ export default function AuthCardLayout({
             <div className="flex w-full max-w-md flex-col gap-6">
                 <a href="#" className="flex items-center gap-2 self-center font-medium">
                     <div className="flex h-10 w-10 items-center justify-center">
-                        <ApplicationLogo className="size-10 fill-current text-black" />
+                        <AppLogoIcon className="size-10 fill-current text-black" />
                     </div>
                 </a>
 
