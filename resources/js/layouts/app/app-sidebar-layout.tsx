@@ -1,6 +1,6 @@
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
+import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { AppContent } from '@/components/app-content';
 import { type BreadcrumbItem } from '@/types';
 
@@ -10,9 +10,7 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: { child
             <AppSidebar />
             <AppContent variant="sidebar">
                 <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                <main className="border-t border-sidebar-border/50 h-full">
-                    {children}
-                </main>
+                {children}
             </AppContent>
         </AppShell>
     );

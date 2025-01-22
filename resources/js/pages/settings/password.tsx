@@ -13,6 +13,10 @@ import { Label } from '@/components/ui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
+        title: 'Dashboard',
+        href: '/dashboard',
+    },
+    {
         title: 'Password Settings',
         href: '/settings/password',
     },
