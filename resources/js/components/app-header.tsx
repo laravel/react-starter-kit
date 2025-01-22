@@ -69,7 +69,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const getInitials = useInitials();
     return (
         <>
-        <div className="border-b border-gray-200 ">
+        <div className="border-b border-sidebar-border/80 ">
             <div className="flex h-16 items-center px-4  md:max-w-7xl mx-auto">
                 {/* Mobile Menu */}
                 <div className="lg:hidden">
@@ -129,7 +129,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             {item.title}
                                         </NavigationMenuLink>
                                     </Link>
-                                    <div className="h-0.5 translate-y-px bg-black w-full absolute bottom-0 left-0"></div>
+                                    <div className="h-0.5 translate-y-px bg-black dark:bg-white w-full absolute bottom-0 left-0"></div>
                                 </NavigationMenuItem>
                             ))}
                         </NavigationMenuList>
