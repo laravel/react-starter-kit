@@ -1,19 +1,19 @@
-import { AppHeader } from '@/components/app-header';
+import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { AppShell } from '@/components/app-shell';
 import { AppSidebar } from '@/components/app-sidebar';
-import { SidebarInset } from '@/components/ui/sidebar';
+import { AppContent } from '@/components/app-content';
 import { type BreadcrumbItem } from '@/types';
 
-export default function App({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+export default function AppSidebarLayout({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
     return (
-        <AppShell>
+        <AppShell variant="sidebar">
             <AppSidebar />
-            <SidebarInset>
-                <AppHeader breadcrumbs={breadcrumbs} />
-                <div className="px-4 border-t border-sidebar-border/50 h-full">
+            <AppContent variant="sidebar">
+                <AppSidebarHeader breadcrumbs={breadcrumbs} />
+                <main className="border-t border-sidebar-border/50 h-full">
                     {children}
-                </div>
-            </SidebarInset>
+                </main>
+            </AppContent>
         </AppShell>
     );
 }

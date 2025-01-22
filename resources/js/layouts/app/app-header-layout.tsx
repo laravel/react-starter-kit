@@ -1,13 +1,14 @@
-import HeaderNav from '@/components/header-nav';
-import { type BreadcrumbItem } from '@/types';
+import { AppContent } from '@/components/app-content';
+import { AppHeader } from '@/components/app-header';
+import { AppShell } from '@/components/app-shell';
 
-export default function App({ children, breadcrumbs = [] }: { children: React.ReactNode; breadcrumbs?: BreadcrumbItem[] }) {
+export default function AppHeaderLayout({ children }: { children: React.ReactNode }) {
     return (
-        <div className="flex flex-col  min-h-screen w-full">
-            <HeaderNav />
-            <div className="flex h-full flex-1 flex-col gap-4 rounded-xl max-w-7xl mx-auto w-full">
+        <AppShell>
+            <AppHeader />
+            <AppContent>
                 {children}
-            </div>
-        </div>
+            </AppContent>
+        </AppShell>
     );
 }

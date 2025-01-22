@@ -1,4 +1,4 @@
-import AppLayoutTemplate from '@/layouts/app/app-header-layout';
+import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
 
 export default function AppLayout({
     children,
