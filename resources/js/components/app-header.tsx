@@ -180,11 +180,13 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                 </div>
             </div>
         </div>
-        <div className="w-full flex border-b border-sidebar-border/70">
-            <div className="flex h-12 items-center justify-start w-full px-4  md:max-w-7xl mx-auto text-neutral-500">
-                <Breadcrumbs breadcrumbs={breadcrumbs} />
+        {breadcrumbs.length > 1 && (
+            <div className="w-full flex border-b border-sidebar-border/70">
+                <div className="flex h-12 items-center justify-start w-full px-4  md:max-w-7xl mx-auto text-neutral-500">
+                    <Breadcrumbs breadcrumbs={breadcrumbs} />
+                </div>
             </div>
-        </div>
+        )}
     </>
     )
 }
