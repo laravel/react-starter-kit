@@ -72,7 +72,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                     </div>
 
                     <div className="grid gap-2">
-                        <Label htmlFor="password_confirmation">Confirm Password</Label>
+                        <Label htmlFor="password_confirmation">Confirm password</Label>
                         <Input
                             id="password_confirmation"
                             type="password"

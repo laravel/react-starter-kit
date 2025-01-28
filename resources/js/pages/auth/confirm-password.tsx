@@ -29,7 +29,7 @@ export default function ConfirmPassword() {
             <Head title="Confirm Password" />
 
             <form onSubmit={submit}>
-                <div class="space-y-6">
+                <div className="space-y-6">
                     <div className="grid gap-2">
                         <Input
                             id="password"

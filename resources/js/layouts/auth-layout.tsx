@@ -2,9 +2,13 @@ import AuthLayoutTemplate from '@/layouts/auth/auth-simple-layout';
 
 export default function AuthLayout({
     children,
-    ...props // Collect all other props passed to this component
+    title,
+    description,
+    ...props
 }: {
     children: React.ReactNode;
+    title: string;
+    description: string;
 }) {
-    return <AuthLayoutTemplate {...props}>{children}</AuthLayoutTemplate>;
+    return <AuthLayoutTemplate title={title} description={description} {...props}>{children}</AuthLayoutTemplate>;
 }
