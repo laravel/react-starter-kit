@@ -8,7 +8,7 @@
         "prepare": "husky install",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "lint": "eslint resources/js --ext .ts,.tsx"
+        "lint": "./node_modules/.bin/eslint resources/js --ext .js,.jsx,.ts,.tsx"
     },
     "devDependencies": {
         "@inertiajs/react": "^2.0.0",
