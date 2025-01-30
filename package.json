@@ -6,9 +6,9 @@
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
         "prepare": "husky install",
-        "lint": "prettier --write .",
-        "test:lint": "prettier --check .",
-        "test:types": "./node_modules/.bin/eslint resources/js --ext .js,.jsx"
+        "format": "prettier --write .",
+        "format:check": "prettier --check .",
+        "lint": "eslint resources/js --ext .ts,.tsx"
     },
     "devDependencies": {
         "@inertiajs/react": "^2.0.0",

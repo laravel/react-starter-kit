@@ -1,6 +1,6 @@
 import AppLogoIcon from '@/components/app-logo-icon';
-import { Link, usePage } from '@inertiajs/react';
 import { type SharedData } from '@/types';
+import { Link, usePage } from '@inertiajs/react';
 
 interface AuthLayoutProps {
     children: React.ReactNode;

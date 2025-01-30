@@ -12,9 +12,7 @@ export default function AppHeaderLayout({ children, breadcrumbs }: AppHeaderLayo
     return (
         <AppShell>
             <AppHeader breadcrumbs={breadcrumbs} />
-            <AppContent>
-                {children}
-            </AppContent>
+            <AppContent>{children}</AppContent>
         </AppShell>
     );
 }

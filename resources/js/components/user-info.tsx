@@ -4,7 +4,7 @@ import { type User } from '@/types';
 
 export function UserInfo({ user }: { user: User }) {
     const getInitials = useInitials();
-    
+
     return (
         <>
             <Avatar className="h-8 w-8 overflow-hidden rounded-lg">

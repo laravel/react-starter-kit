@@ -25,7 +25,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
         <AuthLayout title="Forgot Password" description="Enter your email to receive a password reset link">
             <Head title="Forgot Password" />
 
-            {status && <div className="mb-4 text-sm font-medium text-center text-green-600">{status}</div>}
+            {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
 
             <div className="space-y-6">
                 <form onSubmit={submit}>

@@ -8,8 +8,8 @@ export default function AppLogo(props: SVGAttributes<SVGElement>) {
                 <AppLogoIcon className="size-5 fill-current text-white dark:text-black" />
             </div>
             <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate mb-0.5 font-semibold leading-none">Laravel</span>
-                <span className="truncate text-[11px] tracking-tight opacity-80 leading-none">Starter Kit</span>
+                <span className="mb-0.5 truncate font-semibold leading-none">Laravel</span>
+                <span className="truncate text-[11px] leading-none tracking-tight opacity-80">Starter Kit</span>
             </div>
         </>
     );
