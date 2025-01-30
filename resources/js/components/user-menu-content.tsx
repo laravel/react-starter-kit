@@ -8,12 +8,15 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Settings, LogOut } from 'lucide-react';
 import { type User } from '@/types';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 
 interface UserMenuContentProps {
     user: User;
 }
 
 export function UserMenuContent({ user }: UserMenuContentProps) {
+    const cleanup = useMobileNavigation();
+
     return (
         <>
             <DropdownMenuLabel className="p-0 font-normal">
@@ -24,7 +27,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
                 <DropdownMenuItem asChild>
-                    <Link className="block w-full" href={route('profile.edit')} as="button" prefetch>
+                    <Link 
+                        className="block w-full" 
+                        href={route('profile.edit')} 
+                        as="button" 
+                        prefetch
+                        onClick={cleanup}
+                    >
                         <Settings className="mr-2" />
                         Settings
                     </Link>
@@ -32,7 +41,13 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link className="block w-full" method="post" href={route('logout')} as="button">
+                <Link 
+                    className="block w-full" 
+                    method="post" 
+                    href={route('logout')} 
+                    as="button"
+                    onClick={cleanup}
+                >
                     <LogOut className="mr-2" />
                     Log out
                 </Link>

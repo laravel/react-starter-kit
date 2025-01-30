@@ -6,7 +6,7 @@ import * as React from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { Sheet, SheetContent } from '@/components/ui/sheet';
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -74,6 +74,18 @@ const SidebarProvider = React.forwardRef<
     const toggleSidebar = React.useCallback(() => {
         return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open);
     }, [isMobile, setOpen, setOpenMobile]);
+
+    // Listen for mobile navigation events
+    React.useEffect(() => {
+        const handleMobileNavigation = () => {
+            if (isMobile) {
+                setOpenMobile(false);
+            }
+        };
+
+        window.addEventListener('mobile-navigation', handleMobileNavigation);
+        return () => window.removeEventListener('mobile-navigation', handleMobileNavigation);
+    }, [isMobile, setOpenMobile]);
 
     // Adds a keyboard shortcut to toggle the sidebar.
     React.useEffect(() => {
@@ -160,6 +172,7 @@ const Sidebar = React.forwardRef<
                     }
                     side={side}
                 >
+                    <SheetTitle className="sr-only">Sidebar Navigation</SheetTitle>
                     <div className="flex h-full w-full flex-col">{children}</div>
                 </SheetContent>
             </Sheet>

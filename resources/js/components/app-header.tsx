@@ -27,6 +27,7 @@ import {
     Sheet,
     SheetContent,
     SheetHeader,
+    SheetTitle,
     SheetTrigger,
 } from "@/components/ui/sheet"
 import { type SharedData } from '@/types';
@@ -80,6 +81,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="left" className="bg-neutral-50 h-full flex flex-col items-stretch w-64">
+                            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
                             <SheetHeader className="text-left flex justify-start">
                                 <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
                             </SheetHeader>

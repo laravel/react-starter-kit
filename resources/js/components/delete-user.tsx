@@ -49,14 +49,12 @@ export default function DeleteUser() {
                         <Button variant="destructive">Delete account</Button>
                     </DialogTrigger>
                     <DialogContent>
+                        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
+                        <DialogDescription>
+                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your
+                            password to confirm you would like to permanently delete your account.
+                        </DialogDescription>
                         <form className="space-y-6" onSubmit={deleteUser}>
-                            <DialogHeader className="space-y-3">
-                                <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-                                <DialogDescription>
-                                    Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your
-                                    password to confirm you would like to permanently delete your account.
-                                </DialogDescription>
-                            </DialogHeader>
                             <div className="grid gap-2">
                                 <Label htmlFor="password" className="sr-only">
                                     Password
@@ -70,6 +68,7 @@ export default function DeleteUser() {
                                     value={data.password}
                                     onChange={(e) => setData('password', e.target.value)}
                                     placeholder="Password"
+                                    autoComplete="current-password"
                                 />
 
                                 <InputError message={errors.password} />
