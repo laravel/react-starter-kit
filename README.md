@@ -118,7 +118,7 @@ A split view authentication layout screen
 
 ---
 
-To change the Layout you would like to use, simply change the Layout file that is imported in the **AppBase.tsx**. As an example, to use the `AuthSplitLayout.tsx`, the first line would be modified to look like the following:
+To change the Layout you would like to use, simply change the Layout file that is imported in either the `resources/js/layouts/auth-layout.tsx` or `resources/js/layouts/app-layout.tsx`. As an example, to use the `AuthSplitLayout.tsx`, the first line of `resources/js/layouts/auth-layout.tsx` would be modified to look like the following:
 
 ```tsx
 import AuthLayoutTemplate from '@/layouts/auth/auth-split-layout';
