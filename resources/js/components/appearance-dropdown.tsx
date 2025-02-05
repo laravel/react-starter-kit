@@ -4,9 +4,7 @@ import { useAppearance } from '@/hooks/use-appearance';
 import { Monitor, Moon, Sun } from 'lucide-react';
 import { HTMLAttributes } from 'react';
 
-interface AppearanceToggleDropdownProps extends HTMLAttributes<HTMLDivElement> {}
-
-export default function AppearanceToggleDropdown({ className = '', ...props }: AppearanceToggleDropdownProps) {
+export default function AppearanceToggleDropdown({ className = '', ...props }: HTMLAttributes<HTMLDivElement>) {
     const { appearance, updateAppearance } = useAppearance();
 
     const getCurrentIcon = () => {

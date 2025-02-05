@@ -25,7 +25,6 @@ const sidebarNavItems: NavItem[] = [
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
     const currentPath = window.location.pathname;
-    const currentItem = sidebarNavItems.find((item) => currentPath === item.url);
 
     return (
         <div className="px-4 py-6">

@@ -7,7 +7,7 @@ import { route as routeFn } from 'ziggy-js';
 import { initializeTheme } from './hooks/use-appearance';
 
 declare global {
-    var route: typeof routeFn;
+    const route: typeof routeFn;
 }
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
