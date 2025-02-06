@@ -1,4 +1,4 @@
-name: Code Quality
+name: linter
 
 on:
   push:
