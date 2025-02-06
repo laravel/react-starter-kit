@@ -26,14 +26,20 @@ jobs:
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
           npm install
 
-      - name: Pint CS Fixer
-        run: ./vendor/bin/pint --test
-
-      - name: PHPStan
-        run: ./vendor/bin/phpstan analyse ./app
+      - name: Run Pint
+        run: vendor/bin/pint
 
       - name: Frontend Format Check
         run: npm run format:check
 
       - name: Frontend Lint
         run: npm run lint
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: fix code style
+          commit_options: "--no-verify"
+
+      - name: PHPStan
+        run: ./vendor/bin/phpstan
