@@ -16,7 +16,10 @@ export default function VerifyEmail({ status }: { status?: string }) {
     };
 
     return (
-        <AuthLayout title="Verify Email" description="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another">
+        <AuthLayout
+            title="Verify Email"
+            description="Thanks for signing up! Before getting started, could you verify your email address by clicking on the link we just emailed to you? If you didn't receive the email, we will gladly send you another"
+        >
             <Head title="Email Verification" />
 
             {status === 'verification-link-sent' && (

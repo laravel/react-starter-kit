@@ -43,7 +43,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: fix code style
-          commit_options: "--no-verify"
+          commit_options: '--no-verify'
 
       # We need to run PHPStan after commiting changes as it does not auto-fix errors.
       - name: PHPStan
