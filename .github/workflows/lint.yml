@@ -30,13 +30,20 @@ jobs:
           npm install
 
       - name: Run Pint
-        run: vendor/bin/pint --test
+        run: vendor/bin/pint
 
       - name: Frontend Format Check
-        run: npm run format -- --check
+        run: npm run format
 
       - name: Frontend Lint
         run: npm run lint
 
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: fix code style
+          commit_options: "--no-verify"
+
+      # We need to run PHPStan after commiting changes as it does not auto-fix errors.
       - name: PHPStan
         run: ./vendor/bin/phpstan
