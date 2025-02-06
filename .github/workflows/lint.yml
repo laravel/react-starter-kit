@@ -10,10 +10,6 @@ on:
       - develop
       - main
 
-permissions:
-  contents: write
-  workflows: write
-
 jobs:
   quality:
     runs-on: ubuntu-latest
