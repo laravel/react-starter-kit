@@ -10,6 +10,9 @@ on:
       - develop
       - main
 
+permissions:
+  contents: write
+
 jobs:
   quality:
     runs-on: ubuntu-latest
@@ -27,19 +30,13 @@ jobs:
           npm install
 
       - name: Run Pint
-        run: vendor/bin/pint
+        run: vendor/bin/pint --test
 
-      - name: Frontend Format
-        run: npm run format
+      - name: Frontend Format Check
+        run: npm run format -- --check
 
       - name: Frontend Lint
         run: npm run lint
-
-      - name: Commit changes
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: fix code style
-          commit_options: "--no-verify"
 
       - name: PHPStan
         run: ./vendor/bin/phpstan
