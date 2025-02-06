@@ -1,7 +1,8 @@
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://cdn.devdojo.com/assets/svg/laravel-react-logo.svg" width="300" alt="Laravel Logo"></a></p>
 
 <p align="center">
-<a href="https://github.com/laravel/react-starter-kit/actions"><img src="https://github.com/laravel/react-starter-kit/workflows/tests/badge.svg" alt="Build Status"></a>
+<a href="https://github.com/laravel/react-starter-kit/actions"><img src="https://github.com/laravel/react-starter-kit/workflows/tests/badge.svg" alt="Test Status"></a>
+<a href="https://github.com/laravel/react-starter-kit/actions"><img src="https://github.com/laravel/react-starter-kit/workflows/lint/badge.svg" alt="Lint Status"></a>
 <a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
 </p>
 

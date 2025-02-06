@@ -283,7 +283,7 @@ export default function Welcome() {
                         </main>
 
                         <footer className="py-16 text-center text-sm text-black dark:text-white/70">
-                            Laravel v{laravelVersion} (PHP v{phpVersion})
+                            Laravel v{laravelVersion as string} (PHP v{phpVersion as string})
                         </footer>
                     </div>
                 </div>
