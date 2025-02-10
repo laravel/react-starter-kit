@@ -6,9 +6,9 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function cleanupMobileNavigation() {
-    // Remove pointer-events style from body
+    // Remove pointer-events style from body...
     document.body.style.removeProperty('pointer-events');
 
-    // Dispatch a custom event that the sidebar can listen to
+    // Dispatch a custom event that the sidebar can listen to...
     window.dispatchEvent(new CustomEvent('mobile-navigation'));
 }
