@@ -20,7 +20,7 @@ test('users can authenticate using the login screen', function () {
     $response->assertRedirect(route('dashboard', absolute: false));
 });
 
-test('users can not authenticate with invalid password', function () {
+test('users can not authenticate with an invalid password', function () {
     $user = User::factory()->create();
 
     $this->post('/login', [
