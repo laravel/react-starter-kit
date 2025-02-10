@@ -21,20 +21,20 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.2
+          php-version: 8.4
           tools: composer:v2
           coverage: xdebug
 
-      - name: Setup Node.js
+      - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
           cache: 'npm'
 
-      - name: Install Node dependencies
+      - name: Install Node Dependencies
         run: npm ci
 
-      - name: Build assets
+      - name: Build Assets
         run: npm run build
 
       - name: Create SQLite Database
