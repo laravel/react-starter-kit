@@ -14,7 +14,7 @@ use Inertia\Response;
 class AuthenticatedSessionController extends Controller
 {
     /**
-     * Display the login page.
+     * Show the login page.
      */
     public function create(): Response
     {
