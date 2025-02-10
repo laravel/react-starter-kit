@@ -5,6 +5,7 @@ import { FormEventHandler } from 'react';
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
@@ -77,6 +78,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         />
                         <InputError message={errors.password} />
                     </div>
+
+                    {/* Uncomment below to display 'remember me' checkbox */}
+                    {/* <div className="flex items-center space-x-1.5">   
+                        <Checkbox id="remember" name="remember" />
+                        <Label htmlFor="remember">Remember me</Label>
+                    </div> */}
 
                     <Button type="submit" className="w-full" tabIndex={3} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
