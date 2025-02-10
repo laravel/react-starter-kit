@@ -14,10 +14,10 @@ class PasswordResetLinkController extends Controller
     /**
      * Display the password reset link request view.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
         return Inertia::render('auth/forgot-password', [
-            'status' => session('status'),
+            'status' => $request->session()->get('status'),
         ]);
     }
 
@@ -32,13 +32,10 @@ class PasswordResetLinkController extends Controller
             'email' => 'required|email',
         ]);
 
-        // We will send the password reset link to this user if the email exists
         Password::sendResetLink(
             $request->only('email')
         );
 
-        // We want to always return a 200 response, even if the user is not found. This is a
-        // security measure to prevent email accounts from being discovered
-        return back()->with('status', __('If that email exists in our system, a reset link was sent.'));
+        return back()->with('status', __('If an account exists with that email, you’ll receive a reset link shortly.'));
     }
 }
