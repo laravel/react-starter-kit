@@ -15,7 +15,7 @@ use Inertia\Response;
 class ProfileController extends Controller
 {
     /**
-     * Display the user's profile settings form.
+     * Show the user's profile settings page.
      */
     public function edit(Request $request): Response
     {
