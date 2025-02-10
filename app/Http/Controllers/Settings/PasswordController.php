@@ -14,13 +14,13 @@ use Inertia\Response;
 class PasswordController extends Controller
 {
     /**
-     * Display the user's password form.
+     * Display the user's password settings form.
      */
     public function edit(Request $request): Response
     {
         return Inertia::render('settings/password', [
             'mustVerifyEmail' => $request->user() instanceof MustVerifyEmail,
-            'status' => session('status'),
+            'status' => $request->session()->get('status'),
         ]);
     }
 
