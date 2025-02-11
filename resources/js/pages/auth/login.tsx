@@ -79,13 +79,12 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <InputError message={errors.password} />
                     </div>
 
-                    {/* Uncomment below to display 'remember me' checkbox */}
-                    {/* <div className="flex items-center space-x-1.5">   
-                        <Checkbox id="remember" name="remember" />
+                    <div className="flex items-center space-x-1.5">
+                        <Checkbox id="remember" name="remember" tabIndex={3} />
                         <Label htmlFor="remember">Remember me</Label>
-                    </div> */}
+                    </div>
 
-                    <Button type="submit" className="w-full" tabIndex={3} disabled={processing}>
+                    <Button type="submit" className="w-full" tabIndex={4} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                         Log In
                     </Button>
@@ -93,7 +92,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                 <div className="text-center text-sm">
                     Don't have an account?{' '}
-                    <TextLink href={route('register')} tabIndex={4}>
+                    <TextLink href={route('register')} tabIndex={5}>
                         Sign up
                     </TextLink>
                 </div>
