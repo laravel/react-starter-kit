@@ -50,4 +50,4 @@ jobs:
         run: php artisan key:generate
 
       - name: Tests
-        run: ./vendor/bin/phpunit --ci
+        run: ./vendor/bin/phpunit
