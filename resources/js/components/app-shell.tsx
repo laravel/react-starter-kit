@@ -11,6 +11,7 @@ export function AppShell({ children, variant = 'header' }: AppShellProps) {
 
     const handleSidebarChange = (open: boolean) => {
         setIsOpen(open);
+
         if (typeof window !== 'undefined') {
             localStorage.setItem('sidebar', String(open));
         }

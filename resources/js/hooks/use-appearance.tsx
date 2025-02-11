@@ -11,6 +11,7 @@ const applyTheme = (appearance: Appearance) => {
 };
 
 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
 const handleSystemThemeChange = () => {
     const currentAppearance = localStorage.getItem('appearance') as Appearance;
     applyTheme(currentAppearance || 'system');
@@ -18,9 +19,10 @@ const handleSystemThemeChange = () => {
 
 export function initializeTheme() {
     const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
+
     applyTheme(savedAppearance);
 
-    // Add the event listener for system theme changes
+    // Add the event listener for system theme changes...
     mediaQuery.addEventListener('change', handleSystemThemeChange);
 }
 
