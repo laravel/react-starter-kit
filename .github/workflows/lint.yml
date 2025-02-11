@@ -10,6 +10,9 @@ on:
       - develop
       - main
 
+permissions:
+  contents: write
+
 jobs:
   quality:
     runs-on: ubuntu-latest
