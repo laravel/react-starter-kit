@@ -21,6 +21,7 @@ class VerifyEmailController extends Controller
         if ($request->user()->markEmailAsVerified()) {
             /** @var \Illuminate\Contracts\Auth\MustVerifyEmail $user */
             $user = $request->user();
+
             event(new Verified($user));
         }
 
