@@ -12,11 +12,6 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Password',
-        url: '/settings/password',
-        icon: null,
-    },
-    {
         title: 'Appearance',
         url: '/settings/appearance',
         icon: null,
