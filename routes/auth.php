@@ -1,56 +1,77 @@
 <?php
 
-use App\Http\Controllers\Auth\AuthenticatedSessionController;
-use App\Http\Controllers\Auth\ConfirmablePasswordController;
-use App\Http\Controllers\Auth\EmailVerificationNotificationController;
-use App\Http\Controllers\Auth\EmailVerificationPromptController;
-use App\Http\Controllers\Auth\NewPasswordController;
-use App\Http\Controllers\Auth\PasswordResetLinkController;
-use App\Http\Controllers\Auth\RegisteredUserController;
-use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Models\User;
+use App\Services\WorkOs;
+use Illuminate\Auth\Events\Registered;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
+use Inertia\Inertia;
+use WorkOS\UserManagement;
 
-Route::middleware('guest')->group(function () {
-    Route::get('register', [RegisteredUserController::class, 'create'])
-        ->name('register');
+Route::get('login', function (Request $request) {
+    $userManagement = new UserManagement;
 
-    Route::post('register', [RegisteredUserController::class, 'store']);
+    $url = $userManagement->getAuthorizationUrl(
+        config('services.workos.redirect_url'),
+        $state = Str::random(20),
+        'authkit',
+    );
 
-    Route::get('login', [AuthenticatedSessionController::class, 'create'])
-        ->name('login');
+    $request->session()->put('state', $state);
 
-    Route::post('login', [AuthenticatedSessionController::class, 'store']);
+    return Inertia::location($url);
+})->middleware(['guest'])->name('login');
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
+Route::get('workos', function (Request $request) {
+    $user = (new UserManagement)->authenticateWithCode(
+        config('services.workos.client_id'),
+        $request->query('code'),
+    );
 
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
+    [$user, $accessToken, $refreshToken] = [
+        $user->user,
+        $user->access_token,
+        $user->refresh_token,
+    ];
 
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
+    $existingUser = User::where('workos_id', $user->id)->first();
 
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    if (! $existingUser) {
+        $existingUser = User::create([
+            'workos_id' => $user->id,
+            'email' => $user->email,
+            'name' => $user->firstName.' '.$user->lastName,
+            'email_verified_at' => now(),
+        ]);
+
+        event(new Registered($existingUser));
+    }
+
+    Auth::login($existingUser);
+
+    $request->session()->put('workos_access_token', $accessToken);
+    $request->session()->put('workos_refresh_token', $refreshToken);
+
+    Session::regenerate();
+
+    return redirect('/dashboard');
 });
 
-Route::middleware('auth')->group(function () {
-    Route::get('verify-email', EmailVerificationPromptController::class)
-        ->name('verification.notice');
+Route::post('logout', function (Request $request) {
+    $workOsSession = WorkOs::decodeAccessToken($request);
 
-    Route::get('verify-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
+    Auth::logout();
 
-    Route::post('email/verification-notification', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
 
-    Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
-        ->name('password.confirm');
+    if (! $workOsSession) {
+        return redirect('/');
+    }
 
-    Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
-
-    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
-        ->name('logout');
-});
+    return Inertia::location((new UserManagement)->getLogoutUrl(
+        $workOsSession['sid'],
+    ));
+})->middleware(['auth'])->name('logout');
