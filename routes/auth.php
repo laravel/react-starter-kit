@@ -1,30 +1,21 @@
 <?php
 
 use App\Models\User;
-use App\Services\WorkOs;
 use Illuminate\Auth\Events\Registered;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Str;
-use Inertia\Inertia;
+use Laravel\WorkOS\Http\Requests\AuthKitAuthenticationRequest;
+use Laravel\WorkOS\Http\Requests\AuthKitLoginRequest;
+use Laravel\WorkOS\Http\Requests\AuthKitLogoutRequest;
 use WorkOS\UserManagement;
 
-Route::get('login', function (Request $request) {
-    $userManagement = new UserManagement;
-
-    $url = $userManagement->getAuthorizationUrl(
-        config('services.workos.redirect_url'),
-        $state = Str::random(20),
-        'authkit',
-    );
-
-    $request->session()->put('state', $state);
-
-    return Inertia::location($url);
+Route::get('login', function (AuthKitLoginRequest $request) {
+    return $request->redirect();
 })->middleware(['guest'])->name('login');
 
-Route::get('workos', function (Request $request) {
+Route::get('workos', function (AuthKitAuthenticationRequest $request) {
+    // $response = $request->authenticate();
+
     $user = (new UserManagement)->authenticateWithCode(
         config('services.workos.client_id'),
         $request->query('code'),
@@ -59,19 +50,6 @@ Route::get('workos', function (Request $request) {
     return redirect('/dashboard');
 });
 
-Route::post('logout', function (Request $request) {
-    $workOsSession = WorkOs::decodeAccessToken($request);
-
-    Auth::logout();
-
-    $request->session()->invalidate();
-    $request->session()->regenerateToken();
-
-    if (! $workOsSession) {
-        return redirect('/');
-    }
-
-    return Inertia::location((new UserManagement)->getLogoutUrl(
-        $workOsSession['sid'],
-    ));
+Route::post('logout', function (AuthKitLogoutRequest $request) {
+    return $request->logout();
 })->middleware(['auth'])->name('logout');
