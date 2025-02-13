@@ -1594,11 +1594,11 @@
         },
         {
             "name": "laravel/workos",
-            "version": "dev-main",
+            "version": "dev-master",
             "dist": {
                 "type": "path",
                 "url": "./../laravel-workos-helpers",
-                "reference": "bb1f68fa98854750444628eb15a8f99f8f348417"
+                "reference": "c960ea55b668bfccef71f7a947effe1c58385371"
             },
             "require": {
                 "firebase/php-jwt": "^6.11",
@@ -1619,9 +1619,7 @@
                     "dev-master": "1.x-dev"
                 },
                 "laravel": {
-                    "providers": [
-                        "Laravel\\WorkOS\\WorkOSServiceProvider"
-                    ]
+                    "providers": []
                 }
             },
             "autoload": {
