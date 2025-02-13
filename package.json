@@ -5,8 +5,8 @@
         "build": "vite build",
         "build:ssr": "vite build && vite build --ssr",
         "dev": "vite",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format": "prettier --write resources/",
+        "format:check": "prettier --check resources/",
         "lint": "eslint . --fix"
     },
     "devDependencies": {
