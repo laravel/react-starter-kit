@@ -61,7 +61,7 @@ export default function DeleteUser() {
                 </Dialog>
                 <div className="relative ml-3 text-red-600 dark:text-red-100">
                     <p className="mb-1 text-sm font-medium leading-none">Warning</p>
-                    <p className="text-xs leading-none">Please proceed with caution, this cannot be undone</p>
+                    <p className="text-xs leading-none">Please proceed with caution, this cannot be undone.</p>
                 </div>
             </div>
         </div>
