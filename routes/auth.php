@@ -11,7 +11,7 @@ Route::get('login', function (AuthKitLoginRequest $request) {
     return $request->redirect();
 })->middleware(['guest'])->name('login');
 
-Route::get('workos', function (AuthKitAuthenticationRequest $request) {
+Route::get('authenticate', function (AuthKitAuthenticationRequest $request) {
     $user = $request->authenticate(
         findUsing: function (string $id) {
             return User::where('workos_id', $id)->first();
