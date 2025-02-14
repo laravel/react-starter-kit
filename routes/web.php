@@ -16,7 +16,7 @@ Route::get('/', function () {
 
 Route::middleware([
     'auth',
-    ValidateSessionWithWorkOS::class
+    ValidateSessionWithWorkOS::class,
 ])->group(function () {
     Route::get('dashboard', function () {
         return Inertia::render('dashboard');
