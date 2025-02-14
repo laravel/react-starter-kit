@@ -87,10 +87,22 @@ export default function Welcome() {
                                     <div className="relative flex items-center gap-6 lg:items-end">
                                         <div id="docs-card-content" className="flex items-start gap-6 lg:flex-col">
                                             <div className="flex size-12 shrink-0 items-center justify-center rounded-full bg-[#FF2D20]/10 sm:size-16">
-                                                <svg className="size-5 sm:size-6 stroke-current text-[#FF2D20]" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                                                  <path stroke-linecap="round" stroke="currentColor" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
+                                                <svg
+                                                    className="size-5 stroke-current text-[#FF2D20] sm:size-6"
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    fill="none"
+                                                    viewBox="0 0 24 24"
+                                                    stroke-width="1.5"
+                                                    stroke="currentColor"
+                                                    class="size-6"
+                                                >
+                                                    <path
+                                                        stroke-linecap="round"
+                                                        stroke="currentColor"
+                                                        stroke-linejoin="round"
+                                                        d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25"
+                                                    />
                                                 </svg>
-
                                             </div>
 
                                             <div className="pt-3 sm:pt-5 lg:pt-0">
