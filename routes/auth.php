@@ -12,10 +12,10 @@ Route::get('login', function (AuthKitLoginRequest $request) {
 
 Route::get('workos', function (AuthKitAuthenticationRequest $request) {
     $user = $request->authenticate(
-        findUsersUsing: function (string $id) {
+        find: function (string $id) {
             return User::where('workos_id', $id)->first();
         },
-        createUsersUsing: function ($user) {
+        create: function ($user) {
             return User::create([
                 'name' => $user->firstName.' '.$user->lastName,
                 'email' => $user->email,
