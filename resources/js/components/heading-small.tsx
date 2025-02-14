@@ -2,7 +2,7 @@ export default function HeadingSmall({ title, description }: { title: string; de
     return (
         <header>
             <h3 className="mb-0.5 text-base font-medium">{title}</h3>
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
+            {description && <p className="text-muted-foreground text-xs">{description}</p>}
         </header>
     );
 }
