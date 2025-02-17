@@ -3,13 +3,7 @@ import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import {
-    NavigationMenu,
-    NavigationMenuItem,
-    NavigationMenuLink,
-    NavigationMenuList,
-    navigationMenuTriggerStyle,
-} from '@/components/ui/navigation-menu';
+import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from '@/components/ui/navigation-menu';
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
@@ -125,8 +119,8 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
 
                     <div className="ml-auto flex items-center space-x-2">
                         <div className="relative flex items-center space-x-1">
-                            <Button variant="ghost" size="icon" className="h-9 w-9 cursor-pointer group">
-                                <Search className="h-5 w-5 group-hover:opacity-100 opacity-80" />
+                            <Button variant="ghost" size="icon" className="group h-9 w-9 cursor-pointer">
+                                <Search className="h-5 w-5 opacity-80 group-hover:opacity-100" />
                             </Button>
                             <div className="hidden space-x-1 lg:flex">
                                 {rightNavItems.map((item) => (
@@ -137,10 +131,12 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     href={item.url}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
-                                                    className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium ring-offset-background text-accent-foreground transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 group focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                                                    className="group inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium text-accent-foreground ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
                                                 >
                                                     <span className="sr-only">{item.title}</span>
-                                                    {item.icon && <Icon iconNode={item.icon} className="h-4 w-4 opacity-80 group-hover:opacity-100" />}
+                                                    {item.icon && (
+                                                        <Icon iconNode={item.icon} className="h-4 w-4 opacity-80 group-hover:opacity-100" />
+                                                    )}
                                                 </a>
                                             </TooltipTrigger>
                                             <TooltipContent>
