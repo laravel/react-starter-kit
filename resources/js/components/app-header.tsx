@@ -109,13 +109,12 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <NavigationMenuList className="flex h-full items-stretch space-x-2">
                                 {mainNavItems.map((item, index) => (
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
-                                        <Link href={item.url}>
-                                            <NavigationMenuLink
-                                                className={cn(navigationMenuTriggerStyle(), activeItemStyles, 'h-9 cursor-pointer px-3')}
-                                            >
-                                                {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
-                                                {item.title}
-                                            </NavigationMenuLink>
+                                        <Link
+                                            href={item.url}
+                                            className={cn(navigationMenuTriggerStyle(), activeItemStyles, 'h-9 cursor-pointer px-3')}
+                                        >
+                                            {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
+                                            {item.title}
                                         </Link>
                                         <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                     </NavigationMenuItem>
@@ -131,15 +130,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             </Button>
                             <div className="hidden space-x-1 lg:flex">
                                 {rightNavItems.map((item) => (
-                                    <TooltipProvider delayDuration={0}>
+                                    <TooltipProvider key={item.title} delayDuration={0}>
                                         <Tooltip>
                                             <TooltipTrigger>
-                                                <Button key={item.title} variant="ghost" size="icon" asChild className="h-9 w-9 cursor-pointer">
-                                                    <a href={item.url} target="_blank" rel="noopener noreferrer">
-                                                        <span className="sr-only">{item.title}</span>
-                                                        {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
-                                                    </a>
-                                                </Button>
+                                                <a
+                                                    href={item.url}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer"
+                                                    className="inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium ring-offset-background transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+                                                >
+                                                    <span className="sr-only">{item.title}</span>
+                                                    {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
+                                                </a>
                                             </TooltipTrigger>
                                             <TooltipContent>
                                                 <p>{item.title}</p>
