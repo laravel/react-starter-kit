@@ -12,7 +12,6 @@
     "devDependencies": {
         "@eslint/js": "^9.19.0",
         "@inertiajs/react": "^2.0.0",
-        "@tailwindcss/postcss": "^4.0.0",
         "@types/react": "^19.0.3",
         "@types/react-dom": "^19.0.2",
         "@vitejs/plugin-react": "^4.3.4",
@@ -23,7 +22,6 @@
         "eslint-plugin-react-hooks": "^5.1.0",
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^1.0",
-        "postcss": "^8.4.49",
         "prettier": "^3.4.2",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
