@@ -43,7 +43,8 @@ interface AppHeaderProps {
 }
 
 export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-    const { auth } = usePage<SharedData>().props;
+    const page = usePage<SharedData>();
+    const { auth } = page.props;
     const getInitials = useInitials();
     return (
         <>
@@ -105,12 +106,18 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
                                             href={item.url}
-                                            className={cn(navigationMenuTriggerStyle(), activeItemStyles, 'h-9 cursor-pointer px-3')}
+                                            className={cn(
+                                                navigationMenuTriggerStyle(),
+                                                page.url === item.url && activeItemStyles,
+                                                'h-9 cursor-pointer px-3',
+                                            )}
                                         >
                                             {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                                             {item.title}
                                         </Link>
-                                        <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                        {page.url === item.url && (
+                                            <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
+                                        )}
                                     </NavigationMenuItem>
                                 ))}
                             </NavigationMenuList>
