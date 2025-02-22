@@ -43,7 +43,7 @@ export default function Welcome() {
                         <div className="rounded-br-lg rounded-bl-lg bg-white p-6 pb-12 text-[13px] leading-[20px] shadow-[inset_0px_0px_0px_1px_rgba(26,26,0,0.16)] lg:rounded-tl-lg lg:rounded-br-none lg:p-20 dark:bg-[#161615] dark:text-[#EDEDEC] dark:shadow-[inset_0px_0px_0px_1px_#fffaed2d]">
                             <h1 className="mb-1 font-medium">Let's get started</h1>
                             <p className="mb-2 text-[#706f6c] dark:text-[#A1A09A]">
-                                With so many options available to you we suggest you start with the following.
+                                Laravel has an incredibly rich ecosystem.<br />We suggest you start with the following.
                             </p>
                             <ul className="mb-4 flex flex-col lg:mb-6">
                                 <li className="relative flex items-center gap-4 py-2 before:absolute before:top-1/2 before:bottom-0 before:left-[0.4rem] before:border-l before:border-[#e3e3e0] dark:before:border-[#3E3E3A]">
@@ -117,15 +117,6 @@ export default function Welcome() {
                                         className="inline-block rounded-sm border border-black bg-[#1b1b18] px-5 py-1.5 text-sm leading-normal text-white hover:border-black hover:bg-black dark:border-[#eeeeec] dark:bg-[#eeeeec] dark:text-[#1C1C1A] dark:hover:border-white dark:hover:bg-white"
                                     >
                                         Deploy now
-                                    </a>
-                                </li>
-                                <li>
-                                    <a
-                                        href="https://nightwatch.laravel.com"
-                                        target="_blank"
-                                        className="dark:shadow-[0px_1px_2px_0px_#0000000f,0px_0px_1px_0px #00000008] inline-block rounded-sm px-5 py-1.5 text-sm leading-normal text-[#1b1b18] shadow-[0px_1px_2px_0px_#0000000f,0px_0px_1px_0px_#00000008,0px_0px_0px_1px_#1a1a0029] hover:shadow-[0px_1px_2px_0px_#0000000f,0px_0px_1px_0px_#00000008,0px_0px_0px_1px_#1a1a003d] dark:border dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                    >
-                                        Monitor your app
                                     </a>
                                 </li>
                             </ul>
