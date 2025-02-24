@@ -7,7 +7,11 @@ import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
-export default function VerifyEmail({ status }: { status?: string }) {
+interface IVerifyEmailProps {
+    status?: string;
+}
+
+export default function VerifyEmail({ status }: IVerifyEmailProps) {
     const { post, processing } = useForm({});
 
     const submit: FormEventHandler = (e) => {

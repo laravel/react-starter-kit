@@ -2,10 +2,14 @@ import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
-import { type NavItem } from '@/types';
+import { type INavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 
-const sidebarNavItems: NavItem[] = [
+interface ISettingsLayoutProps {
+    children: React.ReactNode;
+}
+
+const sidebarNavItems: INavItem[] = [
     {
         title: 'Profile',
         url: '/settings/profile',
@@ -23,7 +27,7 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-export default function SettingsLayout({ children }: { children: React.ReactNode }) {
+export default function SettingsLayout({ children }: ISettingsLayoutProps) {
     const currentPath = window.location.pathname;
 
     return (

@@ -1,16 +1,19 @@
 import { Icon } from '@/components/icon';
 import { SidebarGroup, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
-import { type NavItem } from '@/types';
+import { type INavItem } from '@/types';
+import { cn } from '../lib/utils';
+
+interface INavFooter extends React.ComponentPropsWithoutRef<typeof SidebarGroup>  {
+    items: INavItem[];
+}
 
 export function NavFooter({
     items,
     className,
     ...props
-}: React.ComponentPropsWithoutRef<typeof SidebarGroup> & {
-    items: NavItem[];
-}) {
+}: INavFooter) {
     return (
-        <SidebarGroup {...props} className={`group-data-[collapsible=icon]:p-0 ${className || ''}`}>
+        <SidebarGroup {...props} className={cn(`group-data-[collapsible=icon]:p-0`, className)}>
             <SidebarGroupContent>
                 <SidebarMenu>
                     {items.map((item) => (
