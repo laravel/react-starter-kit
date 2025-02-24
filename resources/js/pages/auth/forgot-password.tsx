@@ -51,7 +51,6 @@ export default function ForgotPassword({ status }: { status?: string }) {
                             Email password reset link
                         </Button>
                     </div>
-
                 </form>
 
                 <div className="text-muted-foreground space-x-1 text-center text-sm">
