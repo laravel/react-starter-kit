@@ -32,8 +32,8 @@ jobs:
       - name: Run Pint
         run: vendor/bin/pint
 
-      - name: Format Frontend
-        run: npm run format
+      - name: Check Frontend Formatting
+        run: npm run format:check
 
       - name: Lint Frontend
         run: npm run lint
