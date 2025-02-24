@@ -1,14 +1,14 @@
 import { AppContent } from '@/components/app-content';
 import { AppHeader } from '@/components/app-header';
 import { AppShell } from '@/components/app-shell';
-import { type BreadcrumbItem } from '@/types';
+import { type IBreadcrumbItem } from '@/types';
 
-interface AppHeaderLayoutProps {
+interface IAppHeaderLayoutProps {
     children: React.ReactNode;
-    breadcrumbs?: BreadcrumbItem[];
+    breadcrumbs?: IBreadcrumbItem[];
 }
 
-export default function AppHeaderLayout({ children, breadcrumbs }: AppHeaderLayoutProps) {
+export default function AppHeaderLayout({ children, breadcrumbs }: IAppHeaderLayoutProps) {
     return (
         <AppShell>
             <AppHeader breadcrumbs={breadcrumbs} />

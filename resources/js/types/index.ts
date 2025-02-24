@@ -1,34 +1,34 @@
 import { LucideIcon } from 'lucide-react';
 
-export interface Auth {
-    user: User;
+export interface IAuth {
+    user: IUser;
 }
 
-export interface BreadcrumbItem {
+export interface IBreadcrumbItem {
     title: string;
     href: string;
 }
 
-export interface NavGroup {
+export interface INavGroup {
     title: string;
-    items: NavItem[];
+    items: INavItem[];
 }
 
-export interface NavItem {
+export interface INavItem {
     title: string;
     url: string;
     icon?: LucideIcon | null;
     isActive?: boolean;
 }
 
-export interface SharedData {
+export interface ISharedData {
     name: string;
     quote: { message: string; author: string };
-    auth: Auth;
+    auth: IAuth;
     [key: string]: unknown;
 }
 
-export interface User {
+export interface IUser {
     id: number;
     name: string;
     email: string;

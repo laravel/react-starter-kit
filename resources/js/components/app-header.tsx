@@ -9,13 +9,13 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { UserMenuContent } from '@/components/user-menu-content';
 import { useInitials } from '@/hooks/use-initials';
 import { cn } from '@/lib/utils';
-import { type BreadcrumbItem, type NavItem, type SharedData } from '@/types';
+import { type IBreadcrumbItem, type INavItem, type ISharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-const mainNavItems: NavItem[] = [
+const mainNavItems: INavItem[] = [
     {
         title: 'Dashboard',
         url: '/dashboard',
@@ -23,7 +23,7 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const rightNavItems: NavItem[] = [
+const rightNavItems: INavItem[] = [
     {
         title: 'Repository',
         url: 'https://github.com/laravel/react-starter-kit',
@@ -38,12 +38,12 @@ const rightNavItems: NavItem[] = [
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-interface AppHeaderProps {
-    breadcrumbs?: BreadcrumbItem[];
+interface IAppHeaderProps {
+    breadcrumbs?: IBreadcrumbItem[];
 }
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
-    const page = usePage<SharedData>();
+export function AppHeader({ breadcrumbs = [] }: IAppHeaderProps) {
+    const page = usePage<ISharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
     return (

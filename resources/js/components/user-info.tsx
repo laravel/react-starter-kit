@@ -1,8 +1,13 @@
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useInitials } from '@/hooks/use-initials';
-import { type User } from '@/types';
+import { type IUser } from '@/types';
 
-export function UserInfo({ user, showEmail = false }: { user: User; showEmail?: boolean }) {
+interface IUserInfoProps {
+    user: IUser;
+    showEmail?: boolean;
+}
+
+export function UserInfo({ user, showEmail = false }: IUserInfoProps) {
     const getInitials = useInitials();
 
     return (
