@@ -2,8 +2,9 @@
     "private": true,
     "type": "module",
     "scripts": {
+        "prebuild": "tsc",
         "build": "vite build",
-        "build:ssr": "vite build && vite build --ssr",
+        "build:ssr": "npm run build && vite build --ssr",
         "dev": "vite",
         "format": "prettier --write resources/",
         "format:check": "prettier --check resources/",
