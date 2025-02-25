@@ -31,6 +31,10 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Install Composer Dependencies
+        run: |
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
       - name: Install Node Dependencies
         run: npm ci
 
