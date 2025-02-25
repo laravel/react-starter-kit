@@ -17,7 +17,7 @@ interface RegisterForm {
 }
 
 export default function Register() {
-    const { data, setData, post, processing, errors, reset } = useForm<RegisterForm>({
+    const { data, setData, post, processing, errors, reset } = useForm<Partial<RegisterForm>>({
         name: '',
         email: '',
         password: '',

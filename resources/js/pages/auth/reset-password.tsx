@@ -21,7 +21,7 @@ interface ResetPasswordForm {
 }
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<ResetPasswordForm>({
+    const { data, setData, post, processing, errors, reset } = useForm<Partial<ResetPasswordForm>>({
         token: token,
         email: email,
         password: '',
