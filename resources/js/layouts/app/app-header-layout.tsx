@@ -3,7 +3,7 @@ import { AppHeader } from '@/components/app-header';
 import { AppShell } from '@/components/app-shell';
 import { type BreadcrumbItem } from '@/types';
 
-interface AppHeaderLayoutProps {
+type AppHeaderLayoutProps = {
     children: React.ReactNode;
     breadcrumbs?: BreadcrumbItem[];
 }

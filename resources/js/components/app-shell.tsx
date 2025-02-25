@@ -1,7 +1,7 @@
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { useState } from 'react';
 
-interface AppShellProps {
+type AppShellProps = {
     children: React.ReactNode;
     variant?: 'header' | 'sidebar';
 }
