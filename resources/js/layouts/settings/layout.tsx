@@ -24,6 +24,11 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: { children: React.ReactNode }) {
+    // For SSR, we can't access the window location, so can only render the layout on the client
+    if (typeof window === 'undefined') {
+        return null;
+    }
+
     const currentPath = window.location.pathname;
 
     return (
