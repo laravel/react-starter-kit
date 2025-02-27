@@ -63,7 +63,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 <SheetHeader className="flex justify-start text-left">
                                     <AppLogoIcon className="h-6 w-6 fill-current text-black dark:text-white" />
                                 </SheetHeader>
-                                <div className="mt-6 flex h-full flex-1 flex-col space-y-4">
+                                <div className="p-4 flex h-full flex-1 flex-col space-y-4">
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {mainNavItems.map((item) => (
