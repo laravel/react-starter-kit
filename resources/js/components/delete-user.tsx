@@ -1,19 +1,21 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 // Components...
 import InputError from '@/components/input-error';
+import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import HeadingSmall from '@/components/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
+    const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
@@ -27,6 +29,7 @@ export default function DeleteUser() {
     };
 
     const closeModal = () => {
+        setIsOpen(false);
         clearErrors();
         reset();
     };
@@ -40,13 +43,14 @@ export default function DeleteUser() {
                     <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Delete account</Button>
-                    </DialogTrigger>
-                    <DialogContent>
+                <Button variant="destructive" onClick={() => setIsOpen(true)}>
+                    Delete account
+                </Button>
+
+                <ResponsiveModal open={isOpen} onOpenChange={setIsOpen}>
+                    <div className="p-4 sm:p-6">
                         <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className="mt-2 mb-4">
                             Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
                             to confirm you would like to permanently delete your account.
                         </DialogDescription>
@@ -71,19 +75,17 @@ export default function DeleteUser() {
                             </div>
 
                             <DialogFooter>
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
+                                <Button variant="secondary" onClick={closeModal}>
+                                    Cancel
+                                </Button>
 
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
+                                <Button variant="destructive" disabled={processing} type="submit">
+                                    Delete account
                                 </Button>
                             </DialogFooter>
                         </form>
-                    </DialogContent>
-                </Dialog>
+                    </div>
+                </ResponsiveModal>
             </div>
         </div>
     );
