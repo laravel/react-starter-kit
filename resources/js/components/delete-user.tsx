@@ -1,5 +1,5 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useCallback, useRef, useState } from 'react';
 
 import InputError from '@/components/input-error';
 import { ResponsiveModal } from '@/components/responsive-modal';
@@ -16,23 +16,30 @@ export default function DeleteUser() {
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
+    const handleModalClose = useCallback(() => {
+        setIsOpen(false);
+        clearErrors();
+        reset();
+    }, [clearErrors, reset]);
+
+    const handleOpenChange = useCallback(
+        (open: boolean) => {
+            if (!open) handleModalClose();
+            else setIsOpen(true);
+        },
+        [handleModalClose],
+    );
+
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
 
         destroy(route('profile.destroy'), {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => handleModalClose(),
             onError: () => passwordInput.current?.focus(),
             onFinish: () => reset(),
         });
     };
-
-    const closeModal = () => {
-        setIsOpen(false);
-        clearErrors();
-        reset();
-    };
-
     return (
         <div className="space-y-6">
             <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
@@ -46,7 +53,7 @@ export default function DeleteUser() {
                     Delete account
                 </Button>
 
-                <ResponsiveModal open={isOpen} onOpenChange={setIsOpen}>
+                <ResponsiveModal open={isOpen} onOpenChange={handleOpenChange}>
                     <div className="p-4 sm:p-6">
                         <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                         <DialogDescription className="mt-2 mb-4">
@@ -74,7 +81,7 @@ export default function DeleteUser() {
                             </div>
 
                             <DialogFooter className="gap-2">
-                                <Button variant="secondary" onClick={closeModal} type='button'>
+                                <Button variant="secondary" onClick={handleModalClose}>
                                     Cancel
                                 </Button>
 
