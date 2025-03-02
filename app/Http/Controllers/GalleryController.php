@@ -5,15 +5,23 @@ namespace App\Http\Controllers;
 use App\Models\gallery;
 use App\Http\Requests\StoregalleryRequest;
 use App\Http\Requests\UpdategalleryRequest;
-use Inertia\Inertia;
+use Illuminate\Support\Facades\DB;
+// use Inertia\Inertia;
 
 class GalleryController extends Controller
 {
+    protected function resetAutoIncrementIfEmpty()
+    {
+        if (gallery::count() === 0) {
+            DB::statement('ALTER TABLE galleries AUTO_INCREMENT = 1');
+        }
+    }
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
+
         try {
             $galleries = gallery::all();
             return response()->json($galleries);
@@ -121,6 +129,9 @@ class GalleryController extends Controller
         // Delete from database
         $gallery->delete();
 
+        $this->resetAutoIncrementIfEmpty();
+
         return response()->json(['message' => 'Image deleted successfully']);
     }
+
 }

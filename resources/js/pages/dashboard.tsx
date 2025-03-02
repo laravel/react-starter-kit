@@ -25,6 +25,8 @@ export default function Dashboard() {
     const [editingItem, setEditingItem] = useState<GalleryData | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [updateSuccess, setUpdateSuccess] = useState(false);
+    const [deleteSuccess, setDeleteSuccess] = useState(false);
+
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -32,10 +34,11 @@ export default function Dashboard() {
     });
 
     useEffect(() => {
+        
         GalleryService().then((res) => {
             setData(res);
         });
-    }, []);
+    }, [updateSuccess, deleteSuccess]);
 
     const handleEdit = (item: GalleryData) => {
         // Set the item being edited
@@ -51,6 +54,7 @@ export default function Dashboard() {
     };
 
     const handleDelete = (id: number) => {
+        setDeleteSuccess(false);
         if (confirm('Are you sure you want to delete this image?')) {
             router.delete(`/api/v1/gallery/${id}`, {
                 onSuccess: () => {
@@ -59,6 +63,7 @@ export default function Dashboard() {
                     });
                 },
             });
+            setDeleteSuccess(true);
         }
     };
 
@@ -136,9 +141,9 @@ export default function Dashboard() {
                         </TableRow>
                     </TableHeader>
                     <TableBody>
-                        {data?.map((item) => (
+                        {data?.map((item,index) => (
                             <TableRow key={item.id}>
-                                <TableCell className="font-medium">{item.id}</TableCell>
+                                <TableCell className="font-medium">{index + 1}</TableCell>
                                 <TableCell>{item.title}</TableCell>
                                 <TableCell>{item.description.split(' ').slice(0, 3).join(' ')}...</TableCell>
                                 <TableCell className="text-right">
