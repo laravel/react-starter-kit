@@ -24,7 +24,7 @@ class GalleryController extends Controller
 
         try {
             $galleries = gallery::all();
-            return response()->json($galleries);
+            return response()->json([$galleries]);
         } catch (\Exception $e) { 
             return response()->json(['message' => $e->getMessage()], 500);
         }
