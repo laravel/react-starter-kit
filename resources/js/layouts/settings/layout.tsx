@@ -4,6 +4,7 @@ import { Separator } from '@/components/ui/separator';
 import { cn } from '@/lib/utils';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
+import { type PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -23,8 +24,8 @@ const sidebarNavItems: NavItem[] = [
     },
 ];
 
-export default function SettingsLayout({ children }: { children: React.ReactNode }) {
-    // For SSR, we can't access the window location, so can only render the layout on the client
+export default function SettingsLayout({ children }: PropsWithChildren) {
+    // For SSR, we can't access the window location, so we only render the layout on the client
     if (typeof window === 'undefined') {
         return null;
     }

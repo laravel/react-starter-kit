@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
@@ -41,18 +41,18 @@ export function initializeTheme() {
 export function useAppearance() {
     const [appearance, setAppearance] = useState<Appearance>('system');
 
-    const updateAppearance = (mode: Appearance) => {
+    const updateAppearance = useCallback((mode: Appearance) => {
         setAppearance(mode);
         localStorage.setItem('appearance', mode);
         applyTheme(mode);
-    };
+    }, []);
 
     useEffect(() => {
         const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
         updateAppearance(savedAppearance || 'system');
 
         return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);
-    }, []);
+    }, [updateAppearance]);
 
-    return { appearance, updateAppearance };
+    return { appearance, updateAppearance } as const;
 }
