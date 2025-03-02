@@ -11,7 +11,7 @@ class StoregalleryRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,10 @@ class StoregalleryRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'image' => 'sometimes|image|max:5120',
+            'title' => 'sometimes|string|max:255',
+            'description' => 'sometimes|string',
+            'alt' => 'sometimes|string|max:255',
         ];
     }
 }

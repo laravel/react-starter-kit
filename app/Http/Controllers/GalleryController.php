@@ -35,7 +35,24 @@ class GalleryController extends Controller
      */
     public function store(StoregalleryRequest $request)
     {
-        //
+        $request->validate([
+            'image' => 'required|image|max:5120', // 5MB max
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'alt' => 'required|string|max:255',
+        ]);
+
+        $path = $request->file('image')->store('images', 'public');
+
+        $image = gallery::create([
+            'title' => $request->title,
+            'description' => $request->description,
+            'alt' => $request->alt,
+            'src' => $path,
+        
+        ]);
+
+        return redirect()->route('dashboard')->with('success', 'Image uploaded successfully');
     }
 
     /**
@@ -43,7 +60,7 @@ class GalleryController extends Controller
      */
     public function show(gallery $gallery)
     {
-      
+        return response()->json($gallery);
     }
 
     /**
@@ -59,7 +76,36 @@ class GalleryController extends Controller
      */
     public function update(UpdategalleryRequest $request, gallery $gallery)
     {
-        //
+        $request->validate([
+            'title' => 'sometimes|required|string|max:255',
+            'description' => 'sometimes|required|string',
+            'alt' => 'sometimes|required|string|max:255',
+        ]);
+
+        // Check if there's a new image
+        if ($request->hasFile('image')) {
+            // Validate the new image
+            $request->validate([
+                'image' => 'required|image|max:5120',
+            ]);
+
+            // Delete old image if it exists
+            if ($gallery->src && file_exists(storage_path('app/public/' . $gallery->src))) {
+                unlink(storage_path('app/public/' . $gallery->src));
+            }
+
+            // Store new image
+            $path = $request->file('image')->store('images', 'public');
+            $gallery->src = $path;
+        }
+
+        // Update other fields
+        $gallery->title = $request->title ?? $gallery->title;
+        $gallery->description = $request->description ?? $gallery->description;
+        $gallery->alt = $request->alt ?? $gallery->alt;
+        $gallery->save();
+
+        return response()->json($gallery);
     }
 
     /**
@@ -67,6 +113,14 @@ class GalleryController extends Controller
      */
     public function destroy(gallery $gallery)
     {
-        //
+        // Delete the image file from storage
+        if ($gallery->src && file_exists(storage_path('app/public/' . $gallery->src))) {
+            unlink(storage_path('app/public/' . $gallery->src));
+        }
+
+        // Delete from database
+        $gallery->delete();
+
+        return response()->json(['message' => 'Image deleted successfully']);
     }
 }

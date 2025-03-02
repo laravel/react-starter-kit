@@ -34,13 +34,13 @@ const MasonryGallery = ({ }) => {
                     onMouseLeave={() => setHoveredId(null)}
                 >
                     <img
-                        src={image.src || '/placeholder.svg'}
+                        src={`/storage/${image.src}`}
                         alt={image.alt}
                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                         style={{ aspectRatio: image.id % 2 === 0 ? '3/4' : '4/3' }}
                     />
                     {hoveredId === image.id && (
-                        <div className="opacity-70 absolute inset-0 flex flex-col justify-end bg-black p-4 text-white transition-all cursor-pointer">
+                        <div className="absolute inset-0 flex cursor-pointer flex-col justify-end bg-black p-4 text-white opacity-70 transition-all">
                             <h3 className="text-lg font-bold">{image.title}</h3>
                             <p className="text-sm">{image.description}</p>
                         </div>

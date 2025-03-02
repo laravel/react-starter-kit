@@ -10,7 +10,7 @@ class gallery extends Model
     /** @use HasFactory<\Database\Factories\GalleryFactory> */
     use HasFactory;
     protected $fillable = [
-            'src'.
+            'src',
             'alt',
             'title',
             'description',
