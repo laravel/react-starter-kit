@@ -8,7 +8,7 @@ import type React from 'react';
 // Navigation links
 const navLinks = [
     { name: 'Home', href: '/' },
-    { name: 'Gallery', href: '/gallery' },
+    { name: 'Gallery', href: '/dashboard' },
     { name: 'About', href: '/about' },
 ];
 

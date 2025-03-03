@@ -4,7 +4,7 @@ import type React from 'react';
 
 const Footer: React.FC<FooterProps> = ({ links = [], copyrightText }) => {
     return (
-        <footer className="bg-gray-900 py-8 text-white">
+        <footer className="bg-gray-900 py-8 text-white dark:bg-black">
             <div className="container mx-auto px-4">
                 {links.length > 0 && (
                     <div className="mb-4 flex flex-wrap justify-center gap-6">

@@ -14,8 +14,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 
-    Route::get('upload', function () {
-        return Inertia::render('upload');
+    Route::get('upload', function ()  {
+        return inertia::render('upload');
     })->name('upload');
 
     Route::get('gallery/{gallery}/edit', function (gallery $gallery) {

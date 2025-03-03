@@ -10,12 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class GalleryController extends Controller
 {
-    protected function resetAutoIncrementIfEmpty()
-    {
-        if (gallery::count() === 0) {
-            DB::statement('ALTER TABLE galleries AUTO_INCREMENT = 1');
-        }
-    }
+
     /**
      * Display a listing of the resource.
      */
@@ -129,7 +124,6 @@ class GalleryController extends Controller
         // Delete from database
         $gallery->delete();
 
-        $this->resetAutoIncrementIfEmpty();
 
         return response()->json(['message' => 'Image deleted successfully']);
     }
