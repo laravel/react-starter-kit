@@ -4,8 +4,8 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\View;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Support\Facades\Cookie;
 
 class HandleAppearance
 {
@@ -16,12 +16,8 @@ class HandleAppearance
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Get appearance preference from cookie (defaults to 'system')
-        $appearance = $request->cookie('appearance') ?? 'system';
-        
-        // Share the appearance with all views
-        view()->share('appearance', $appearance);
-        
+        View::share('appearance', $request->cookie('appearance') ?? 'system');
+
         return $next($request);
     }
 }
