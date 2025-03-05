@@ -31,9 +31,6 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Create SQLite Database
-        run: touch database/database.sqlite
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
