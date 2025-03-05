@@ -3,7 +3,7 @@
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        
+
         {{-- Inline script to detect system dark mode preference and apply it immediately --}}
         <script>
             (function() {
@@ -19,6 +19,18 @@
                 }
             })();
         </script>
+
+        {{-- Inline style to preemtively set the HTML background color based on our theme in app.css --}}
+        {{-- For best results, make sure to match these values based on the theme you have set for global styles --}}
+        <style>
+            html {
+                background-color: oklch(1 0 0);
+            }
+
+            html.dark {
+                background-color: oklch(0.145 0 0);
+            }
+        </style>
 
         <title inertia>{{ config('app.name', 'Laravel') }}</title>
 
