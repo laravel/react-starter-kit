@@ -13,7 +13,8 @@ import { DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/di
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm({ password: '' });
+
+    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
     const handleModalClose = useCallback(() => {

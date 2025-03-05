@@ -1,14 +1,14 @@
 import AppLogoIcon from '@/components/app-logo-icon';
 import { Link } from '@inertiajs/react';
+import { type PropsWithChildren } from 'react';
 
 interface AuthLayoutProps {
-    children: React.ReactNode;
     name?: string;
     title?: string;
     description?: string;
 }
 
-export default function AuthSimpleLayout({ children, title, description }: AuthLayoutProps) {
+export default function AuthSimpleLayout({ children, title, description }: PropsWithChildren<AuthLayoutProps>) {
     return (
         <div className="bg-background flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
             <div className="w-full max-w-sm">
