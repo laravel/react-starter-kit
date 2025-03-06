@@ -12,6 +12,8 @@ class EmailVerificationPromptController extends Controller
 {
     /**
      * Show the email verification prompt page.
+     * @param \Illuminate\Http\Request $request
+     * @return \Inertia\Response|\Illuminate\Http\RedirectResponse
      */
     public function __invoke(Request $request): Response|RedirectResponse
     {
