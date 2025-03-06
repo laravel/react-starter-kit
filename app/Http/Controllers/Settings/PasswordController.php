@@ -15,6 +15,9 @@ class PasswordController extends Controller
 {
     /**
      * Show the user's password settings page.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Inertia\Response
      */
     public function edit(Request $request): Response
     {
@@ -26,6 +29,9 @@ class PasswordController extends Controller
 
     /**
      * Update the user's password.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request): RedirectResponse
     {

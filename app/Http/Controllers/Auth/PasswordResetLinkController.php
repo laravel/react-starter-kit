@@ -13,6 +13,9 @@ class PasswordResetLinkController extends Controller
 {
     /**
      * Show the password reset link request page.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Inertia\Response
      */
     public function create(Request $request): Response
     {
@@ -24,6 +27,8 @@ class PasswordResetLinkController extends Controller
     /**
      * Handle an incoming password reset link request.
      *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse

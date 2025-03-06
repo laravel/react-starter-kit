@@ -17,6 +17,8 @@ class RegisteredUserController extends Controller
 {
     /**
      * Show the registration page.
+     *
+     * @return \Inertia\Response
      */
     public function create(): Response
     {
@@ -26,6 +28,8 @@ class RegisteredUserController extends Controller
     /**
      * Handle an incoming registration request.
      *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): RedirectResponse

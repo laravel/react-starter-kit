@@ -15,6 +15,9 @@ class ProfileController extends Controller
 {
     /**
      * Show the user's profile settings page.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Inertia\Response
      */
     public function edit(Request $request): Response
     {
@@ -26,6 +29,9 @@ class ProfileController extends Controller
 
     /**
      * Update the user's profile settings.
+     *
+     * @param \App\Http\Requests\Settings\ProfileUpdateRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
@@ -42,6 +48,9 @@ class ProfileController extends Controller
 
     /**
      * Delete the user's account.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy(Request $request): RedirectResponse
     {
