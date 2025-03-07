@@ -37,7 +37,7 @@ class User extends Authenticatable
     /**
      * The attributes that should be appended to the model's array form.
      *
-     * @var array<int, string>
+     * @var list<string>
      */
     protected $appends = [
         'avatar',
