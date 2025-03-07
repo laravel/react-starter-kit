@@ -18,7 +18,7 @@ import AppLogoIcon from './app-logo-icon';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        url: '/dashboard',
+        href: '/dashboard',
         icon: LayoutGrid,
     },
 ];
@@ -26,12 +26,12 @@ const mainNavItems: NavItem[] = [
 const rightNavItems: NavItem[] = [
     {
         title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/laravel/react-starter-kit',
         icon: Folder,
     },
     {
         title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
+        href: 'https://laravel.com/docs/starter-kits',
         icon: BookOpen,
     },
 ];
@@ -67,7 +67,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                     <div className="flex h-full flex-col justify-between text-sm">
                                         <div className="flex flex-col space-y-4">
                                             {mainNavItems.map((item) => (
-                                                <Link key={item.title} href={item.url} className="flex items-center space-x-2 font-medium">
+                                                <Link key={item.title} href={item.href} className="flex items-center space-x-2 font-medium">
                                                     {item.icon && <Icon iconNode={item.icon} className="h-5 w-5" />}
                                                     <span>{item.title}</span>
                                                 </Link>
@@ -78,7 +78,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             {rightNavItems.map((item) => (
                                                 <a
                                                     key={item.title}
-                                                    href={item.url}
+                                                    href={item.href}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="flex items-center space-x-2 font-medium"
@@ -105,17 +105,17 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                 {mainNavItems.map((item, index) => (
                                     <NavigationMenuItem key={index} className="relative flex h-full items-center">
                                         <Link
-                                            href={item.url}
+                                            href={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                page.url === item.url && activeItemStyles,
+                                                page.url === item.href && activeItemStyles,
                                                 'h-9 cursor-pointer px-3',
                                             )}
                                         >
                                             {item.icon && <Icon iconNode={item.icon} className="mr-2 h-4 w-4" />}
                                             {item.title}
                                         </Link>
-                                        {page.url === item.url && (
+                                        {page.url === item.href && (
                                             <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                         )}
                                     </NavigationMenuItem>
@@ -135,7 +135,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         <Tooltip>
                                             <TooltipTrigger>
                                                 <a
-                                                    href={item.url}
+                                                    href={item.href}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="group text-accent-foreground ring-offset-background hover:bg-accent hover:text-accent-foreground focus-visible:ring-ring ml-1 inline-flex h-9 w-9 items-center justify-center rounded-md bg-transparent p-0 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:pointer-events-none disabled:opacity-50"
