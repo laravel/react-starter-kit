@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use Inertia\Response;
+use Illuminate\Support\Facades\Storage;
 
 class ProfileController extends Controller
 {
@@ -29,20 +30,25 @@ class ProfileController extends Controller
      */
     public function update(ProfileUpdateRequest $request): RedirectResponse
     {
-        $request->user()->fill($request->validated());
+        $user = $request->user();
+        $user->fill($request->validated());
 
-        if ($request->user()->isDirty('email')) {
-            $request->user()->email_verified_at = null;
+        if ($user->isDirty('email')) {
+            $user->email_verified_at = null;
         }
 
-        if ($request->hasFile('avatar')) {
-            if ($request->user()->avatar && Storage::exists($request->user()->avatar)) {
-                Storage::delete($request->user()->avatar);
+        if ($request->hasFile('photo')) {
+            // Delete old photo if exists
+            if ($user->profile_photo_path) {
+                Storage::disk('public')->delete($user->profile_photo_path);
             }
-            $request->user()->avatar = $request->file('avatar')->store('avatars', 'public');
+
+            // Store new photo
+            $photoPath = $request->file('photo')->store('avatars', 'public');
+            $user->profile_photo_path = $photoPath;
         }
 
-        $request->user()->save();
+        $user->save();
 
         return to_route('profile.edit');
     }

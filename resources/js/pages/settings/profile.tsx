@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useState } from 'react';
+import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
+import { FormEventHandler, useRef, useState } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
@@ -22,36 +22,67 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 interface ProfileForm {
+    _method: string;
     name: string;
     email: string;
-    avatar?: File | null;
+    photo?: File | null;
 }
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
     const getInitials = useInitials();
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+    const photoInput = useRef<HTMLInputElement>(null);
+
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+        _method: 'patch',
         name: auth.user.name,
         email: auth.user.email,
-        avatar: null,
+        photo: null,
     });
 
-    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const selectNewPhoto = () => {
+        photoInput.current?.click();
+    };
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0]) {
-            const file = e.target.files[0];
-            setData('avatar', file);
-            setPreviewUrl(URL.createObjectURL(file));
+    const updatePhotoPreview = () => {
+        const photo = photoInput.current?.files?.[0];
+
+        if (!photo) return;
+
+        setData('photo', photo);
+
+        const reader = new FileReader();
+
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+            setPhotoPreview(e.target?.result as string);
+        };
+
+        reader.readAsDataURL(photo);
+    };
+
+    const deletePhoto = () => {
+        router.delete(route('profile-photo.destroy'), {
+            preserveScroll: true,
+            onSuccess: () => {
+                setPhotoPreview(null);
+                clearPhotoFileInput();
+            },
+        });
+    };
+
+    const clearPhotoFileInput = () => {
+        if (photoInput.current) {
+            photoInput.current.value = '';
         }
     };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-
-        patch(route('profile.update'), {
+        post(route('profile.update'), {
             preserveScroll: true,
+            onSuccess: () => clearPhotoFileInput(),
         });
     };
 
@@ -65,17 +96,27 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="avatar">Avatar</Label>
+                            <Label htmlFor="photo">Photo</Label>
 
-                            <Input type="file" id="avatar" className="hidden" onChange={handleFileChange} />
+                            <Input type="file" ref={photoInput} id="photo" className="hidden" onChange={updatePhotoPreview} accept="image/*" />
+
                             <div className="flex items-center gap-4">
                                 <Avatar className="h-20 w-20">
-                                    <AvatarImage src={previewUrl || auth.user.avatar} alt={auth.user.name} />
+                                    <AvatarImage src={photoPreview || auth.user.avatar} alt={auth.user.name} />
                                     <AvatarFallback>{getInitials(auth.user.name)}</AvatarFallback>
                                 </Avatar>
-                            </div>
 
-                            <InputError className="mt-2" message={errors.avatar} />
+                                <Button type="button" variant="outline" onClick={selectNewPhoto}>
+                                    Select New Photo
+                                </Button>
+
+                                {auth.user.avatar && (
+                                    <Button type="button" variant="outline" onClick={deletePhoto}>
+                                        Remove Photo
+                                    </Button>
+                                )}
+                            </div>
+                            <InputError className="mt-2" message={errors.photo} />
                         </div>
 
                         <div className="grid gap-2">
