@@ -14,8 +14,9 @@ class ProfilePhotoController extends Controller
      */
     public function destroy(Request $request): RedirectResponse
     {
-        if ($request->user()->profile_photo_path) {
-            Storage::disk('public')->delete($request->user()->profile_photo_path);
+        $path = $request->user()->profile_photo_path;
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
         }
 
         $request->user()->profile_photo_path = null;
