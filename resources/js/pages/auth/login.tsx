@@ -1,14 +1,9 @@
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { Button, Checkbox, PasswordInput, TextInput } from '@mantine/core';
 
 type LoginForm = {
     email: string;
@@ -42,11 +37,13 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
-                        <Label htmlFor="email">Email address</Label>
-                        <Input
+                        <TextInput
                             id="email"
                             type="email"
+                            label="Email Address"
+                            error={errors.email}
                             required
+                            withAsterisk={false}
                             autoFocus
                             tabIndex={1}
                             autoComplete="email"
@@ -54,44 +51,43 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             onChange={(e) => setData('email', e.target.value)}
                             placeholder="email@example.com"
                         />
-                        <InputError message={errors.email} />
                     </div>
 
                     <div className="grid gap-2">
-                        <div className="flex items-center">
-                            <Label htmlFor="password">Password</Label>
-                            {canResetPassword && (
-                                <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
-                                    Forgot password?
-                                </TextLink>
-                            )}
-                        </div>
-                        <Input
+                        <PasswordInput
                             id="password"
                             type="password"
                             required
+                            withAsterisk={false}
+                            label="Password"
+                            description={
+                                canResetPassword && (
+                                    <TextLink href={route('password.request')} className="ml-auto text-sm" tabIndex={5}>
+                                        Forgot password?
+                                    </TextLink>
+                                )
+                            }
+                            inputWrapperOrder={['label', 'input', 'description', 'error']}
                             tabIndex={2}
                             autoComplete="current-password"
                             value={data.password}
                             onChange={(e) => setData('password', e.target.value)}
                             placeholder="Password"
                         />
-                        <InputError message={errors.password} />
                     </div>
 
                     <div className="flex items-center space-x-3">
                         <Checkbox
                             id="remember"
                             name="remember"
+                            label="Remember me"
                             checked={data.remember}
-                            onClick={() => setData('remember', !data.remember)}
+                            onChange={() => setData('remember', !data.remember)}
                             tabIndex={3}
                         />
-                        <Label htmlFor="remember">Remember me</Label>
                     </div>
 
-                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing}>
-                        {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                    <Button type="submit" className="mt-4 w-full" tabIndex={4} disabled={processing} loading={processing}>
                         Log in
                     </Button>
                 </div>

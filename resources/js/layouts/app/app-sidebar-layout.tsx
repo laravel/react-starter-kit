@@ -1,18 +1,44 @@
-import { AppContent } from '@/components/app-content';
-import { AppShell } from '@/components/app-shell';
-import { AppSidebar } from '@/components/app-sidebar';
-import { AppSidebarHeader } from '@/components/app-sidebar-header';
-import { type BreadcrumbItem } from '@/types';
-import { type PropsWithChildren } from 'react';
+import { AppShell } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
-export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+
+import { AppContent } from '@/components/app-content';
+import { AppHeader } from '@/components/app-header';
+import { AppSidebar } from '@/components/app-sidebar';
+
+interface AppShellProps {
+    children: React.ReactNode;
+    variant?: 'header' | 'sidebar';
+    breadcrumbs?: BreadcrumbItemType[];
+}
+
+const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
+    const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+
     return (
-        <AppShell variant="sidebar">
-            <AppSidebar />
-            <AppContent variant="sidebar">
-                <AppSidebarHeader breadcrumbs={breadcrumbs} />
-                {children}
-            </AppContent>
+        <AppShell
+            padding="md"
+            layout="alt"
+            header={{ height: 60 }}
+            navbar={{
+                width: 260,
+                breakpoint: 'sm',
+                collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+            }}
+        >
+            <AppShell.Header>
+                <AppHeader breadcrumbs={breadcrumbs} toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
+            </AppShell.Header>
+            <AppShell.Navbar>
+                <AppSidebar />
+            </AppShell.Navbar>
+            <AppShell.Main className="bg-background flex h-full w-full flex-col rounded-xl">
+                <AppContent>{children}</AppContent>
+            </AppShell.Main>
         </AppShell>
     );
-}
+};
+
+export default Shell;

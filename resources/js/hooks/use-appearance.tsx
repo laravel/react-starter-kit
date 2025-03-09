@@ -1,3 +1,4 @@
+import { useMantineColorScheme } from '@mantine/core';
 import { useCallback, useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
@@ -50,8 +51,12 @@ export function initializeTheme() {
 export function useAppearance() {
     const [appearance, setAppearance] = useState<Appearance>('system');
 
+    const { setColorScheme } = useMantineColorScheme();
+
     const updateAppearance = useCallback((mode: Appearance) => {
         setAppearance(mode);
+
+        setColorScheme(mode === 'system' ? 'auto' : mode);
 
         // Store in localStorage for client-side persistence...
         localStorage.setItem('appearance', mode);

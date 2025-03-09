@@ -1,4 +1,3 @@
-import InputError from '@/components/input-error';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { type BreadcrumbItem } from '@/types';
@@ -7,9 +6,8 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
+import { Button, PasswordInput } from '@mantine/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -58,11 +56,11 @@ export default function Password() {
 
                     <form onSubmit={updatePassword} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="current_password">Current password</Label>
-
-                            <Input
+                            <PasswordInput
                                 id="current_password"
                                 ref={currentPasswordInput}
+                                label="New password"
+                                error={errors.password}
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 type="password"
@@ -70,16 +68,14 @@ export default function Password() {
                                 autoComplete="current-password"
                                 placeholder="Current password"
                             />
-
-                            <InputError message={errors.current_password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password">New password</Label>
-
-                            <Input
+                            <PasswordInput
                                 id="password"
                                 ref={passwordInput}
+                                label="New password"
+                                error={errors.password}
                                 value={data.password}
                                 onChange={(e) => setData('password', e.target.value)}
                                 type="password"
@@ -87,24 +83,20 @@ export default function Password() {
                                 autoComplete="new-password"
                                 placeholder="New password"
                             />
-
-                            <InputError message={errors.password} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="password_confirmation">Confirm password</Label>
-
-                            <Input
+                            <PasswordInput
                                 id="password_confirmation"
                                 value={data.password_confirmation}
+                                label="Confirm password"
+                                error={errors.password_confirmation}
                                 onChange={(e) => setData('password_confirmation', e.target.value)}
                                 type="password"
                                 className="mt-1 block w-full"
                                 autoComplete="new-password"
                                 placeholder="Confirm password"
                             />
-
-                            <InputError message={errors.password_confirmation} />
                         </div>
 
                         <div className="flex items-center gap-4">

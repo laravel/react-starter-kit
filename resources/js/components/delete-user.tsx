@@ -1,18 +1,16 @@
 import { useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-
 import HeadingSmall from '@/components/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Button, Modal, PasswordInput } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
+
+    const [opened, { toggle, close }] = useDisclosure(false);
 
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
@@ -28,6 +26,7 @@ export default function DeleteUser() {
     const closeModal = () => {
         clearErrors();
         reset();
+        close();
     };
 
     return (
@@ -38,51 +37,49 @@ export default function DeleteUser() {
                     <p className="font-medium">Warning</p>
                     <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
                 </div>
+                <Button color="red" onClick={() => toggle()}>
+                    Delete account
+                </Button>
+                <Modal
+                    opened={opened}
+                    withCloseButton
+                    onClose={close}
+                    centered
+                    classNames={{ body: 'bg-background!', header: 'bg-background!', content: 'border', overlay: 'bg-black/80' }}
+                    size="lg"
+                    radius="md"
+                    title={<div className="text-lg font-bold">Are you sure you want to delete your account?</div>}
+                >
+                    <div>
+                        Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to
+                        confirm you would like to permanently delete your account.
+                    </div>
+                    <form className="space-y-6" onSubmit={deleteUser}>
+                        <div className="mt-4">
+                            <PasswordInput
+                                id="password"
+                                type="password"
+                                name="password"
+                                error={errors.password}
+                                ref={passwordInput}
+                                value={data.password}
+                                onChange={(e) => setData('password', e.target.value)}
+                                placeholder="Password"
+                                autoComplete="current-password"
+                            />
+                        </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Delete account</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-                        <DialogDescription>
-                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
-                            to confirm you would like to permanently delete your account.
-                        </DialogDescription>
-                        <form className="space-y-6" onSubmit={deleteUser}>
-                            <div className="grid gap-2">
-                                <Label htmlFor="password" className="sr-only">
-                                    Password
-                                </Label>
+                        <div className="flex justify-end gap-2">
+                            <Button variant="outline" onClick={closeModal}>
+                                Cancel
+                            </Button>
 
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    ref={passwordInput}
-                                    value={data.password}
-                                    onChange={(e) => setData('password', e.target.value)}
-                                    placeholder="Password"
-                                    autoComplete="current-password"
-                                />
-
-                                <InputError message={errors.password} />
-                            </div>
-
-                            <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
-
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
-                                </Button>
-                            </DialogFooter>
-                        </form>
-                    </DialogContent>
-                </Dialog>
+                            <Button color="red" type="submit" disabled={processing}>
+                                Delete account
+                            </Button>
+                        </div>
+                    </form>
+                </Modal>
             </div>
         </div>
     );

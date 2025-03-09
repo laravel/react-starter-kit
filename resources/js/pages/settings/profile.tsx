@@ -5,12 +5,10 @@ import { FormEventHandler } from 'react';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
-import InputError from '@/components/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { Button, TextInput } from '@mantine/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -50,36 +48,32 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid gap-2">
-                            <Label htmlFor="name">Name</Label>
-
-                            <Input
+                            <TextInput
                                 id="name"
                                 className="mt-1 block w-full"
+                                label="Name"
                                 value={data.name}
+                                error={errors.name}
                                 onChange={(e) => setData('name', e.target.value)}
                                 required
                                 autoComplete="name"
                                 placeholder="Full name"
                             />
-
-                            <InputError className="mt-2" message={errors.name} />
                         </div>
 
                         <div className="grid gap-2">
-                            <Label htmlFor="email">Email address</Label>
-
-                            <Input
+                            <TextInput
                                 id="email"
                                 type="email"
                                 className="mt-1 block w-full"
                                 value={data.email}
+                                label="Email address"
+                                error={errors.email}
                                 onChange={(e) => setData('email', e.target.value)}
                                 required
                                 autoComplete="username"
                                 placeholder="Email address"
                             />
-
-                            <InputError className="mt-2" message={errors.email} />
                         </div>
 
                         {mustVerifyEmail && auth.user.email_verified_at === null && (

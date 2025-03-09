@@ -1,11 +1,11 @@
 // Components
 import { Head, useForm } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
+
 import AuthLayout from '@/layouts/auth-layout';
+import { Button } from '@mantine/core';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
@@ -27,8 +27,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             )}
 
             <form onSubmit={submit} className="space-y-6 text-center">
-                <Button disabled={processing} variant="secondary">
-                    {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                <Button disabled={processing} variant="outline" loading={processing}>
                     Resend verification email
                 </Button>
 

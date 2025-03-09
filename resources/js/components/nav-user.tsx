@@ -1,36 +1,58 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { Link, router } from '@inertiajs/react';
+import { Button, Menu } from '@mantine/core';
+import { IconLogout, IconSelector, IconSettings } from '@tabler/icons-react';
+
 import { UserInfo } from '@/components/user-info';
-import { UserMenuContent } from '@/components/user-menu-content';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import { ChevronsUpDown } from 'lucide-react';
 
-export function NavUser() {
+export function NavUser({ variant }: { variant: 'header' | 'sidebar' }) {
     const { auth } = usePage<SharedData>().props;
-    const { state } = useSidebar();
-    const isMobile = useIsMobile();
 
     return (
-        <SidebarMenu>
-            <SidebarMenuItem>
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <SidebarMenuButton size="lg" className="text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent group">
-                            <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
-                        </SidebarMenuButton>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                        className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-                        align="end"
-                        side={isMobile ? 'bottom' : state === 'collapsed' ? 'left' : 'bottom'}
+        <>
+            <Menu shadow="md" width={230} position={variant === 'header' ? 'bottom-end' : 'top-start'}>
+                <Menu.Target>
+                    <Button
+                        color="gray"
+                        variant="subtle"
+                        styles={{
+                            root: {
+                                backgroundColor: 'transparent',
+                                ...(variant == 'header' && { padding: '0' }),
+                            },
+                        }}
+                        size="md"
+                        justify="between"
+                        rightSection={variant == 'sidebar' && <IconSelector color="var(--foreground)" size={20} />}
                     >
-                        <UserMenuContent user={auth.user} />
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </SidebarMenuItem>
-        </SidebarMenu>
+                        <UserInfo user={auth.user} showName={variant == 'sidebar'} />
+                    </Button>
+                </Menu.Target>
+
+                <Menu.Dropdown className="border-border border-2">
+                    <Menu.Label>
+                        <UserInfo user={auth.user} showEmail={true} />
+                    </Menu.Label>
+
+                    <Menu.Divider />
+
+                    <Menu.Item component={Link} href={route('profile.edit')} leftSection={<IconSettings color="gray" size={20} />}>
+                        Settings
+                    </Menu.Item>
+                    <Menu.Divider />
+                    <form
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            router.post(route('logout'));
+                        }}
+                    >
+                        <Menu.Item leftSection={<IconLogout color="gray" />} type="submit">
+                            Log Out
+                        </Menu.Item>
+                    </form>
+                </Menu.Dropdown>
+            </Menu>
+        </>
     );
 }

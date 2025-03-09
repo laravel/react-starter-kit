@@ -1,29 +1,44 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { useState } from 'react';
+import { AppShell } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+
+import { type BreadcrumbItem as BreadcrumbItemType } from '@/types';
+
+import { AppContent } from './app-content';
+import { AppHeader } from './app-header';
+import { AppSidebar } from './app-sidebar';
 
 interface AppShellProps {
     children: React.ReactNode;
     variant?: 'header' | 'sidebar';
+    breadcrumbs?: BreadcrumbItemType[];
 }
 
-export function AppShell({ children, variant = 'header' }: AppShellProps) {
-    const [isOpen, setIsOpen] = useState(() => (typeof window !== 'undefined' ? localStorage.getItem('sidebar') !== 'false' : true));
-
-    const handleSidebarChange = (open: boolean) => {
-        setIsOpen(open);
-
-        if (typeof window !== 'undefined') {
-            localStorage.setItem('sidebar', String(open));
-        }
-    };
-
-    if (variant === 'header') {
-        return <div className="flex min-h-screen w-full flex-col">{children}</div>;
-    }
+const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
+    const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
     return (
-        <SidebarProvider defaultOpen={isOpen} open={isOpen} onOpenChange={handleSidebarChange}>
-            {children}
-        </SidebarProvider>
+        <AppShell
+            padding="md"
+            layout="alt"
+            header={{ height: 60 }}
+            navbar={{
+                width: 260,
+                breakpoint: 'sm',
+                collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+            }}
+        >
+            <AppShell.Header>
+                <AppHeader breadcrumbs={breadcrumbs} toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
+            </AppShell.Header>
+            <AppShell.Navbar>
+                <AppSidebar />
+            </AppShell.Navbar>
+            <AppShell.Main className="bg-background flex h-full w-full flex-col rounded-xl">
+                <AppContent>{children}</AppContent>
+            </AppShell.Main>
+        </AppShell>
     );
-}
+};
+
+export { Shell as AppShell };

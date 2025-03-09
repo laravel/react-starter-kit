@@ -1,6 +1,7 @@
 import AppLogoIcon from '@/components/app-logo-icon';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Link } from '@inertiajs/react';
+import { Card } from '@mantine/core';
 import { type PropsWithChildren } from 'react';
 
 export default function AuthCardLayout({
@@ -22,12 +23,12 @@ export default function AuthCardLayout({
                 </Link>
 
                 <div className="flex flex-col gap-6">
-                    <Card className="rounded-xl">
-                        <CardHeader className="px-10 pt-8 pb-0 text-center">
-                            <CardTitle className="text-xl">{title}</CardTitle>
-                            <CardDescription>{description}</CardDescription>
-                        </CardHeader>
-                        <CardContent className="px-10 py-8">{children}</CardContent>
+                    <Card className="bg-background! rounded-xl">
+                        <Card.Section className="flex! flex-col gap-y-3! px-10 py-12 pb-4 text-center">
+                            <div className="text-xl leading-none font-semibold">{title}</div>
+                            <div className="text-muted-foreground text-sm">{description}</div>
+                        </Card.Section>
+                        <div className="px-10 py-8">{children}</div>
                     </Card>
                 </div>
             </div>
