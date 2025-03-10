@@ -2,6 +2,7 @@ import { AppContent } from '@/components/app-content';
 import AppLogo from '@/components/app-logo';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { NavUser } from '@/components/nav-user';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { NavItem, type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { AppShell, Burger, Button, Group } from '@mantine/core';
@@ -32,6 +33,7 @@ const footerNavItems: (NavItem & { icon: Icon })[] = [
 
 export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const [opened, { toggle }] = useDisclosure();
+    const isMobile = useIsMobile();
 
     const currentPath = window.location.pathname;
     return (
@@ -104,7 +106,7 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                 )}
             </AppShell.Header>
 
-            <AppShell.Navbar py="md" px={4} className="w-full! sm:w-56!">
+            <AppShell.Navbar py="md" px={4}>
                 <div className="flex h-full flex-col justify-between">
                     <div className="flex flex-col gap-y-2">
                         {mainNavItems.map((item) => (

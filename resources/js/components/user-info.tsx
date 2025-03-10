@@ -8,13 +8,12 @@ export function UserInfo({ user, showName = false, showEmail = false }: { user: 
     return (
         <div className="text-foreground flex items-center gap-x-2">
             <Avatar name={getInitials(user.name)} size="md" radius="xl" imageProps={{ src: user.avatar, alt: user.name }} />
-            {showName ||
-                (showEmail && (
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                        {showName && <span className="text-foreground truncate text-sm font-medium">{user.name}</span>}
-                        {showEmail && <span className="text-muted-foreground truncate text-xs font-light">{user.email}</span>}
-                    </div>
-                ))}
+            {(showName || showEmail) && (
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                    {showName && <span className="text-foreground truncate text-sm font-medium">{user.name}</span>}
+                    {showEmail && <span className="text-muted-foreground truncate text-xs font-light">{user.email}</span>}
+                </div>
+            )}
         </div>
     );
 }

@@ -33,7 +33,7 @@ export function AppHeader({ breadcrumbs, toggleDesktop, toggleMobile }: AppHeade
                 onClick={toggleMobile}
                 hiddenFrom="sm"
             >
-                <IconLayoutSidebar size={80} stroke={1.5} color="var(--mantine-color-blue-filled)" />
+                <IconLayoutSidebar size={20} color="var(--foreground)" />
             </Button>
 
             {breadcrumbs && breadcrumbs.length > 0 && <Breadcrumbs breadcrumbs={breadcrumbs} />}
