@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
