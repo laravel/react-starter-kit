@@ -19,6 +19,10 @@ composer run post-degit
 composer run dev
 ```
 
+## Documentation
+
+Documentation for Official Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits). This project is not an official Laravel starter kit, but most of the documentation for the React starter kit should apply to this project as well.
+
 ## License
 
 The Laravel + React (Mantine) starter kit is open-sourced software licensed under the MIT license.
