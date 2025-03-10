@@ -1,6 +1,7 @@
 import { AppContent } from '@/components/app-content';
 import AppLogo from '@/components/app-logo';
 import { Breadcrumbs } from '@/components/breadcrumbs';
+import HeaderMenuButton from '@/components/header-menu-button';
 import { NavUser } from '@/components/nav-user';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { NavItem, type BreadcrumbItem } from '@/types';
@@ -42,58 +43,42 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                 <div className="md:mx-w-7xl flex h-full items-center justify-between px-6 md:px-4">
                     <Group h="100%">
                         <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-                        <Group justify="space-between" style={{ flex: 1 }}>
-                            <AppLogo />
-                            <Group ml="xl" gap={0} visibleFrom="sm">
+                        <Group h="100%" justify="space-between" style={{ flex: 1 }}>
+                            <HeaderMenuButton component={Link} prefetch href={route('dashboard')} className="bg-transparent! px-2!">
+                                <AppLogo />
+                            </HeaderMenuButton>
+                            <Group h="100%" ml="xl" gap={0} visibleFrom="sm">
                                 {mainNavItems.map((item) => (
-                                    <Button
+                                    <HeaderMenuButton
                                         key={item.url}
                                         component={Link}
                                         href={item.url}
-                                        size="sm"
+                                        isActive={currentPath === item.url}
                                         leftSection={item.icon && <item.icon size={20} />}
-                                        classNames={{
-                                            root: 'bg-transparent! hover:bg-muted!',
-                                        }}
                                     >
                                         {item.title}
-                                    </Button>
+                                    </HeaderMenuButton>
                                 ))}
                             </Group>
                         </Group>
                     </Group>
-                    <div className="flex h-full items-center gap-x-4">
+                    <div className="flex h-full items-center gap-x-2">
                         <Button variant="subtle" className="group h-9 w-9 cursor-pointer px-0!">
                             <IconSearch color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
                         </Button>
-                        {footerNavItems.map((item) =>
-                            item.url.indexOf('://') > -1 ? (
-                                <Button
-                                    key={item.url}
-                                    component={'a'}
-                                    href={item.url}
-                                    size="sm"
-                                    classNames={{
-                                        root: 'bg-transparent! hover:bg-muted! px-0! hidden! md:block!',
-                                    }}
-                                >
-                                    {item.icon && <item.icon size={20} />}
-                                </Button>
-                            ) : (
-                                <Button
-                                    key={item.url}
-                                    component={Link}
-                                    href={item.url}
-                                    size="sm"
-                                    leftSection={item.icon && <item.icon size={20} />}
-                                    classNames={{
-                                        root: 'bg-transparent! hover:bg-muted! px-0! hidden! md:block!',
-                                    }}
-                                >
-                                    {item.icon && <item.icon size={20} />}
-                                </Button>
-                            ),
-                        )}
+                        {footerNavItems.map((item) => (
+                            <HeaderMenuButton
+                                key={item.url}
+                                component={item.url.indexOf('://') > -1 ? 'a' : Link}
+                                href={item.url}
+                                tooltip={item.title}
+                                classNames={{
+                                    root: 'bg-transparent! hover:bg-muted! px-1! hidden! md:block!',
+                                }}
+                            >
+                                {item.icon && <item.icon size={20} />}
+                            </HeaderMenuButton>
+                        ))}
                         <NavUser variant="header" />
                     </div>
                 </div>
