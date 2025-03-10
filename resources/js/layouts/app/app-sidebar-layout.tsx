@@ -37,7 +37,7 @@ const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
             <AppShell.Header>
                 <AppHeader breadcrumbs={breadcrumbs} toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
             </AppShell.Header>
-            <AppShell.Navbar style={{ transition: 'width 0.2s ease' }}>
+            <AppShell.Navbar style={{ ...(!isMobile && { transition: 'width 0.2s ease' }) }}>
                 <AppSidebar toggleMobile={toggleMobile} className="group peer" collapsed={collapsed} />
             </AppShell.Navbar>
             <AppShell.Main className="flex h-full w-full flex-col">
