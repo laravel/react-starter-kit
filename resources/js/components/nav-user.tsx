@@ -6,7 +6,7 @@ import { UserInfo } from '@/components/user-info';
 import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
-import SidebarMenuButton from './sidebar-nav-link';
+import SidebarMenuButton from './sidebar-menu-button';
 
 export function NavUser({ variant, collapsed = false }: { variant: 'header' | 'sidebar'; collapsed?: boolean }) {
     const { auth } = usePage<SharedData>().props;
@@ -17,8 +17,10 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                 <Menu.Target>
                     <SidebarMenuButton
                         component="button"
-                        className={cn(variant == 'header' ? 'p-0!' : 'h-12!', collapsed && 'p-1!')}
-                        justify="between"
+                        className={cn('h-12! p-0.5! px-1!', collapsed && 'p-1!')}
+                        classNames={{
+                            inner: 'items-stretch! justify-between!',
+                        }}
                         rightSection={variant == 'sidebar' && !collapsed && <IconSelector color="var(--foreground)" size={20} />}
                     >
                         <UserInfo user={auth.user} showName={variant == 'sidebar' && !collapsed} />

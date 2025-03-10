@@ -24,14 +24,11 @@ export default function SidebarMenuButton<T extends React.ElementType>({
         // @ts-ignore - Mantine types are incorrect
         <Button
             component={Link}
-            href={route('dashboard')}
-            prefetch
             size="md"
             color="gray"
             variant="subtle"
             leftSection={icon}
             justify={iconOnly ? 'center' : 'start'}
-            selected={true}
             className={cn('text-foreground h-8! w-full transition-none', className, iconOnly && 'p-2!')}
             styles={{
                 ...(styles || {}),

@@ -8,7 +8,7 @@ import { Link } from '@inertiajs/react';
 import { Button } from '@mantine/core';
 import AppLogo from './app-logo';
 import { NavUser } from './nav-user';
-import SidebarMenuButton from './sidebar-nav-link';
+import SidebarMenuButton from './sidebar-menu-button';
 
 const mainNavItems: NavItem[] = [
     {
