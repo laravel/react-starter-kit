@@ -2,7 +2,7 @@
     "$schema": "https://getcomposer.org/schema.json",
     "name": "adrum/laravel-react-mantine-starter-kit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "A starter kit for the Laravel framework using Inertia.js, React, and Mantine.",
     "keywords": [
         "laravel",
         "framework"
