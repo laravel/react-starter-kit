@@ -11,12 +11,7 @@ This React starter kit utilizes React 19, TypeScript, Tailwind, and the [Mantine
 ## Getting Started
 
 ```bash
-npx degit adrum/laravel-react-mantine-starter-kit my-app
-cd my-app
-npm install
-composer install
-composer run post-degit
-composer run dev
+laravel new --using=adrum/laravel-react-mantine-starter-kit
 ```
 
 ## Documentation
