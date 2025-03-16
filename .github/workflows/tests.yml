@@ -43,6 +43,9 @@ jobs:
       - name: Install Node Dependencies
         run: npm ci
 
+      - name: Validate typescript
+        run: npm run type:check
+
       - name: Build Assets
         run: npm run build
 
