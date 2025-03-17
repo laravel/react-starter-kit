@@ -11,7 +11,7 @@ const MasonryGallery = ({ }) => {
         GalleryService().then((res) => {
             setData(res);
         });
-    }, []);
+    }, [data]);
     const [hoveredId, setHoveredId] = useState<number | null>(null);
 
     // Function to determine the span classes for each image
