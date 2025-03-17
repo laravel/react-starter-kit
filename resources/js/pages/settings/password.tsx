@@ -59,8 +59,8 @@ export default function Password() {
                             <PasswordInput
                                 id="current_password"
                                 ref={currentPasswordInput}
-                                label="New password"
-                                error={errors.password}
+                                label="Current password"
+                                error={errors.current_password}
                                 value={data.current_password}
                                 onChange={(e) => setData('current_password', e.target.value)}
                                 type="password"
