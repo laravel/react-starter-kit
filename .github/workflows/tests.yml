@@ -31,12 +31,6 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Install Node Dependencies
-        run: npm ci
-
-      - name: Build Assets
-        run: npm run build
-
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
 
@@ -45,6 +39,15 @@ jobs:
 
       - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Validate typescript
+        run: npm run type:check
+
+      - name: Build Assets
+        run: npm run build
 
       - name: Tests
         run: ./vendor/bin/phpunit
