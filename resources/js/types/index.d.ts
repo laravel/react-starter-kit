@@ -22,6 +22,11 @@ export interface NavItem {
     isActive?: boolean;
 }
 
+interface SettingsSidebarNavItem {
+    title: string;
+    route: string;
+}
+
 export interface SharedData {
     name: string;
     quote: { message: string; author: string };
