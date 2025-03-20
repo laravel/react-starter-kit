@@ -6,13 +6,13 @@ import { FormEventHandler, useRef, useState } from 'react';
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
 import InputError from '@/components/input-error';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useInitials } from '@/hooks/use-initials';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { useInitials } from '@/hooks/use-initials';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -21,7 +21,7 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-interface ProfileForm {
+type ProfileForm = {
     _method: string;
     name: string;
     email: string;
@@ -33,7 +33,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const getInitials = useInitials();
 
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
-    const photoInput = useRef<HTMLInputElement>(null);
+    const photoInput = useRef<HTMLInputElement | null>(null);
 
     const { data, setData, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
         _method: 'patch',
@@ -80,6 +80,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('profile.update'), {
             preserveScroll: true,
             onSuccess: () => clearPhotoFileInput(),
