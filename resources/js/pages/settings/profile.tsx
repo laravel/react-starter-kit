@@ -16,6 +16,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { useInitials } from '@/hooks/use-initials';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Crop as IconCrop, Trash2 } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -283,10 +284,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
 
                             <div className="flex justify-end gap-2 w-full">
                                 <Button variant="outline" onClick={cancelCrop}>
-                                    Cancel
+                                    <Trash2 /> Cancel
                                 </Button>
                                 <Button onClick={completeCrop}>
-                                    Crop & Save
+                                    <IconCrop /> Crop
                                 </Button>
                             </div>
                         </div>
