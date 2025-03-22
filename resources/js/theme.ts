@@ -121,7 +121,7 @@ const theme = createTheme({
             defaultProps: {
                 size: 'sm',
                 classNames: {
-                    input: 'bg-[#2F758E] border-0',
+                    input: 'border-0',
                     pill: 'border border-gray-800',
                 },
             },
