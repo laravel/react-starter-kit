@@ -7,6 +7,7 @@ import { AppContent } from '@/components/app-content';
 import { AppHeader } from '@/components/app-header';
 import { AppSidebar } from '@/components/app-sidebar';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useSideBar } from '@/hooks/use-sidebar';
 
 interface AppShellProps {
     children: React.ReactNode;
@@ -15,10 +16,10 @@ interface AppShellProps {
 }
 
 const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
+    const { state: desktopOpened, toggle: toggleDesktop } = useSideBar();
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
 
     const isMobile = useIsMobile();
-    const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
     const collapsed = isMobile ? false : !desktopOpened;
 
