@@ -13,7 +13,7 @@ import SidebarMenuButton from './sidebar-menu-button';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        url: '/dashboard',
+        href: '/dashboard',
         icon: IconGridDots,
     },
 ];
@@ -21,12 +21,12 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: NavItem[] = [
     {
         title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/laravel/react-starter-kit',
         icon: IconFolder,
     },
     {
         title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
+        href: 'https://laravel.com/docs/starter-kits',
         icon: IconBook,
     },
 ];
@@ -69,8 +69,8 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                 {mainNavItems.map((item) => (
                     <SidebarMenuButton
                         key={item.title}
-                        href={item.url}
-                        isActive={pathname === item.url}
+                        href={item.href}
+                        isActive={pathname === item.href}
                         icon={item.icon && <item.icon size={16} />}
                         iconOnly={collapsed}
                     >
@@ -84,7 +84,7 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                         <SidebarMenuButton
                             key={item.title}
                             component="a"
-                            href={item.url}
+                            href={item.href}
                             className={cn('font-light!')}
                             icon={item.icon && <item.icon size={20} />}
                             iconOnly={collapsed}

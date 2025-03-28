@@ -50,10 +50,10 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                             <Group h="100%" ml="xl" gap={0} visibleFrom="sm">
                                 {mainNavItems.map((item) => (
                                     <HeaderMenuButton
-                                        key={item.url}
+                                        key={item.href}
                                         component={Link}
-                                        href={item.url}
-                                        isActive={currentPath === item.url}
+                                        href={item.href}
+                                        isActive={currentPath === item.href}
                                         leftSection={item.icon && <item.icon size={20} />}
                                     >
                                         {item.title}
@@ -68,9 +68,9 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                         </Button>
                         {footerNavItems.map((item) => (
                             <HeaderMenuButton
-                                key={item.url}
-                                component={item.url.indexOf('://') > -1 ? 'a' : Link}
-                                href={item.url}
+                                key={item.href}
+                                component={item.href.indexOf('://') > -1 ? 'a' : Link}
+                                href={item.href}
                                 tooltip={item.title}
                                 classNames={{
                                     root: 'bg-transparent! hover:bg-muted! px-1! hidden! md:block!',
@@ -96,9 +96,9 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                     <div className="flex flex-col gap-y-2">
                         {mainNavItems.map((item) => (
                             <Button
-                                key={item.url}
+                                key={item.href}
                                 component={Link}
-                                href={item.url}
+                                href={item.href}
                                 justify="start"
                                 size="sm"
                                 leftSection={item.icon && <item.icon size={20} />}
@@ -113,9 +113,9 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                     <div className="flex flex-col gap-y-2">
                         {footerNavItems.map((item) => (
                             <Button
-                                key={item.url}
+                                key={item.href}
                                 component={Link}
-                                href={item.url}
+                                href={item.href}
                                 justify="start"
                                 size="sm"
                                 leftSection={item.icon && <item.icon size={20} />}

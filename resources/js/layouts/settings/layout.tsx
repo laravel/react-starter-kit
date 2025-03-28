@@ -8,17 +8,17 @@ import { type PropsWithChildren } from 'react';
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        url: '/settings/profile',
+        href: '/settings/profile',
         icon: null,
     },
     {
         title: 'Password',
-        url: '/settings/password',
+        href: '/settings/password',
         icon: null,
     },
     {
         title: 'Appearance',
-        url: '/settings/appearance',
+        href: '/settings/appearance',
         icon: null,
     },
 ];
@@ -40,8 +40,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item) => (
                             <Button
-                                key={item.url}
-                                href={item.url}
+                                key={item.href}
+                                href={item.href}
                                 component={Link}
                                 prefetch
                                 size="sm"
@@ -50,7 +50,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 variant="subtle"
                                 styles={{
                                     root: {
-                                        ...(currentPath === item.url && {
+                                        ...(currentPath === item.href && {
                                             backgroundColor: 'var(--color-muted)',
                                         }),
                                     },
