@@ -6,8 +6,8 @@ import React from 'react';
 type Props<T extends React.ElementType> = {
     component?: T;
     icon?: React.ReactNode | null;
-    tooltip?: string;
     iconOnly?: boolean;
+    tooltip?: string;
     isActive?: boolean;
 } & ButtonProps &
     React.ComponentPropsWithoutRef<T>;

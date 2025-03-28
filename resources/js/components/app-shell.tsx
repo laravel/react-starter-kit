@@ -32,7 +32,7 @@ const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
                 <AppHeader breadcrumbs={breadcrumbs} toggleDesktop={toggleDesktop} toggleMobile={toggleMobile} />
             </AppShell.Header>
             <AppShell.Navbar>
-                <AppSidebar />
+                <AppSidebar collapsed={desktopOpened} toggleMobile={toggleMobile} />
             </AppShell.Navbar>
             <AppShell.Main className="bg-background flex h-full w-full flex-col rounded-xl">
                 <AppContent>{children}</AppContent>

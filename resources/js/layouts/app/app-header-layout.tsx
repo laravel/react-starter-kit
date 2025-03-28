@@ -3,7 +3,6 @@ import AppLogo from '@/components/app-logo';
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import HeaderMenuButton from '@/components/header-menu-button';
 import { NavUser } from '@/components/nav-user';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { NavItem, type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { AppShell, Burger, Button, Group } from '@mantine/core';
@@ -14,7 +13,7 @@ import type { PropsWithChildren } from 'react';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        url: '/dashboard',
+        href: '/dashboard',
         icon: IconLayoutGrid,
     },
 ];
@@ -22,19 +21,18 @@ const mainNavItems: NavItem[] = [
 const footerNavItems: (NavItem & { icon: Icon })[] = [
     {
         title: 'Repository',
-        url: 'https://github.com/laravel/react-starter-kit',
+        href: 'https://github.com/laravel/react-starter-kit',
         icon: IconFolder,
     },
     {
         title: 'Documentation',
-        url: 'https://laravel.com/docs/starter-kits',
+        href: 'https://laravel.com/docs/starter-kits',
         icon: IconBook,
     },
 ];
 
 export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const [opened, { toggle }] = useDisclosure();
-    const isMobile = useIsMobile();
 
     const currentPath = window.location.pathname;
     return (
@@ -63,7 +61,13 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                         </Group>
                     </Group>
                     <div className="flex h-full items-center gap-x-2">
-                        <Button variant="subtle" className="group h-9 w-9 cursor-pointer px-0!">
+                        <Button
+                            variant="subtle"
+                            className="group h-9 w-9 cursor-pointer px-0!"
+                            classNames={{
+                                root: 'bg-transparent! hover:bg-muted! px-1! hidden! md:block!',
+                            }}
+                        >
                             <IconSearch color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
                         </Button>
                         {footerNavItems.map((item) => (

@@ -38,6 +38,7 @@ const theme = createTheme({
     components: {
         Anchor: Anchor.extend({
             defaultProps: {
+                // @ts-expect-error - Component is not defined in the Mantine core props
                 component: Link,
                 underline: 'always',
                 classNames: {
