@@ -70,6 +70,9 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                     <SidebarMenuButton
                         key={item.title}
                         href={item.href}
+                        tooltip={item.title}
+                        size="sm"
+                        className={cn('font-medium!')}
                         isActive={pathname === item.href}
                         icon={item.icon && <item.icon size={16} />}
                         iconOnly={collapsed}
@@ -86,6 +89,7 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                             component="a"
                             href={item.href}
                             className={cn('font-light!')}
+                            tooltip={item.title}
                             icon={item.icon && <item.icon size={20} />}
                             iconOnly={collapsed}
                             styles={{
