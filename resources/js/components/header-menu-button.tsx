@@ -1,5 +1,4 @@
 import { cn } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
 import { Button, ButtonProps, Tooltip } from '@mantine/core';
 import React from 'react';
 
@@ -40,7 +39,6 @@ export default function HeaderMenuButton<T extends React.ElementType>({
             {/* eslint-disable-next-line @typescript-eslint/ban-ts-comment*/}
             {/* @ts-ignore - Mantine types are incorrect */}
             <Button
-                component={Link}
                 size="sm"
                 color="gray"
                 variant="subtle"
@@ -54,7 +52,7 @@ export default function HeaderMenuButton<T extends React.ElementType>({
                         ...(isActive && { backgroundColor: 'var(--muted)' }),
                         ...(props.styles?.root || {}),
                     },
-                    // @ts-ignore - types are incorrect
+                    // @ts-expect-error - types are incorrect
                     ...(iconOnly && { section: { marginRight: 0, ...(styles?.section || {}) } }),
                 }}
                 {...props}

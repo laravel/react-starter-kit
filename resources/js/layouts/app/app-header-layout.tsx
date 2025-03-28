@@ -61,15 +61,14 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                         </Group>
                     </Group>
                     <div className="flex h-full items-center gap-x-2">
-                        <Button
-                            variant="subtle"
-                            className="group h-9 w-9 cursor-pointer px-0!"
+                        <HeaderMenuButton
+                            tooltip="Search"
                             classNames={{
-                                root: 'bg-transparent! hover:bg-muted! px-1! hidden! md:block!',
+                                root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',
                             }}
                         >
                             <IconSearch color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
-                        </Button>
+                        </HeaderMenuButton>
                         {footerNavItems.map((item) => (
                             <HeaderMenuButton
                                 key={item.href}
@@ -77,7 +76,7 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                                 href={item.href}
                                 tooltip={item.title}
                                 classNames={{
-                                    root: 'bg-transparent! hover:bg-muted! px-1! hidden! md:block!',
+                                    root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',
                                 }}
                             >
                                 {item.icon && <item.icon size={20} />}
