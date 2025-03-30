@@ -19,13 +19,24 @@ return new class extends Migration
             $table->text('description');
             $table->timestamps();
         });
+        Schema::table('galleries', function (Blueprint $table) {
+            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+        });
     }
+    
+
+    /**
+     * Reverse the migrations.
+     */
+  
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('galleries');
+        Schema::table('galleries', function (Blueprint $table) {
+            $table->dropConstrainedForeignId('user_id');
+        });
     }
 };

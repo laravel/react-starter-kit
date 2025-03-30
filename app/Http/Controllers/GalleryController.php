@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\gallery;
 use App\Http\Requests\StoregalleryRequest;
 use App\Http\Requests\UpdategalleryRequest;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 // use Inertia\Inertia;
 
@@ -45,14 +46,13 @@ class GalleryController extends Controller
             'alt' => 'required|string|max:255',
         ]);
 
-        $path = $request->file('image')->store('images', 'public');
 
         $image = gallery::create([
             'title' => $request->title,
             'description' => $request->description,
             'alt' => $request->alt,
-            'src' => $path,
-        
+            'src' => $request->image_url,
+            'user_id' => User::where('email', $request->user()->email)->first()->id,
         ]);
 
         return redirect()->route('dashboard')->with('success', 'Image uploaded successfully');

@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import AppLayout from '@/layouts/app-layout';
+import supabase, { supabaseUrl } from '@/service/bucket';
 import { type BreadcrumbItem } from '@/types';
 import { Head, router } from '@inertiajs/react';
 import { Check, Upload, X } from 'lucide-react';
@@ -21,6 +22,8 @@ export default function Dashboard() {
     const [preview, setPreview] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
     const [uploadSuccess, setUploadSuccess] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    // const [data, setData] = useState();
     const [formData, setFormData] = useState({
         title: '',
         description: '',
@@ -29,13 +32,16 @@ export default function Dashboard() {
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            setFile(selectedFile);
+        const maxSize = 5 * 1024 * 1024; // 2MB dalam byte
+        if (selectedFile!.size > maxSize) {
+            setError('File size is too large. Max 5MB allowed.');
+        } else {
+            setFile(selectedFile!);
             const reader = new FileReader();
             reader.onload = () => {
                 setPreview(reader.result as string);
             };
-            reader.readAsDataURL(selectedFile);
+            reader.readAsDataURL(selectedFile!);
         }
     };
 
@@ -53,38 +59,63 @@ export default function Dashboard() {
 
         setUploading(true);
 
-        // Create form data for file upload
-        const formDataToSend = new FormData();
-        formDataToSend.append('image', file);
-        formDataToSend.append('title', formData.title);
-        formDataToSend.append('description', formData.description);
-        formDataToSend.append('alt', formData.alt);
+        try {
+            let { data: users } = await supabase.from('users').select('id').single();
 
-        // Use Inertia to submit the form
-        router.post('/upload', formDataToSend, {
-            onSuccess: () => {
-                setUploading(false);
-                setUploadSuccess(true);
 
-                // Reset success message after 3 seconds
-                setTimeout(() => {
-                    setUploadSuccess(false);
-                    resetForm();
-                }, 3000);
-            },
-            onError: (errors) => {
-                setUploading(false);
-                console.error('Upload failed:', errors);
-                // Here you could handle errors, show messages, etc.
-            },
-            // This is important for file uploads
-            forceFormData: true,
-        });
+            // Pastikan userId memiliki nilai yang benar
+            const userId = await users?.id || 'anonymous';
+
+            const fileName = `${Date.now()}_${file.name}`;
+
+            // 2. Upload file ke Supabase Storage
+            const { data, error } = await supabase.storage
+                .from('gallery') // Sesuaikan dengan nama bucket di Supabase
+                .upload(`${userId}/${fileName}`, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                });
+
+            if (error) throw error;
+
+            // 3. Generate URL dari gambar yang diunggah
+            const imageUrl = `${supabaseUrl}/storage/v1/object/public/gallery/${userId.toString()}/${fileName}`;
+
+            // 4. Kirim metadata ke Laravel via Inertia
+            const formDataToSend = {
+                image: file,
+                title: formData.title,
+                description: formData.description,
+                alt: formData.alt,
+                image_url: imageUrl, // Simpan URL gambar di database Laravel
+            };
+            console.log('cuman sampe sini');
+
+            router.post('/upload', formDataToSend, {
+                onSuccess: () => {
+                    console.log('sampe sini');
+                    setUploading(false);
+                    setUploadSuccess(true);
+                    setTimeout(() => {
+                        setUploadSuccess(false);
+                        resetForm();
+                    }, 3000);
+                },
+                onError: (errors) => {
+                    setUploading(false);
+                    console.error('Upload failed:', errors);
+                },
+            });
+        } catch (error) {
+            console.error('Error uploading file:', error);
+            setUploading(false);
+        }
     };
 
     const resetForm = () => {
         setFile(null);
         setPreview(null);
+        setError(null);
         setFormData({
             title: '',
             description: '',
@@ -111,6 +142,7 @@ export default function Dashboard() {
                                                 <Upload className="mb-2 h-10 w-10 text-gray-400" />
                                                 <p className="mb-2 text-sm text-gray-500">Drag and drop your image here or click to browse</p>
                                                 <p className="text-xs text-gray-400">Supports: JPG, PNG, GIF (Max 5MB)</p>
+                                                {error && <p style={{ color: 'red' }}>{error}</p>}
                                                 <Input
                                                     type="file"
                                                     className="absolute inset-0 h-full w-full cursor-pointer opacity-0"

@@ -34,7 +34,7 @@ const MasonryGallery = ({ }) => {
                     onMouseLeave={() => setHoveredId(null)}
                 >
                     <img
-                        src={`/storage/${image.src}`}
+                        src={`${image.src}`}
                         alt={image.alt}
                         className="h-full w-full object-cover transition-transform duration-500 hover:scale-110"
                         style={{ aspectRatio: image.id % 2 === 0 ? '3/4' : '4/3' }}
