@@ -1,9 +1,11 @@
 import type React from 'react';
 import { Library } from 'lucide-react';
 import { NavbarProps } from '@/pages/type';
+import {userRole} from '@/service/bucket';
 
 
-const Navbar: React.FC<NavbarProps> = ({ logo, navLinks = [] }) => {
+const  Navbar: React.FC<NavbarProps> = ({ logo, navLinks = [] }) => {
+    
     return (
         <nav className="fixed top-0 right-0 left-0 z-50 bg-white shadow-md dark:bg-black">
             <div className="container mx-auto flex items-center justify-between px-4 py-3">
@@ -24,9 +26,12 @@ const Navbar: React.FC<NavbarProps> = ({ logo, navLinks = [] }) => {
                 )}
 
                 <div>
-                    <a href="/login" className="bg-primary hover:bg-primary-dark rounded-md px-4 py-1 text-white  transition-colors duration-300 dark:text-neutral-900">
-                        Admin
-                    </a>
+                    
+                  {userRole === 'admin' && (
+                        <a href="/dashboard" className="bg-primary hover:bg-primary-dark rounded-md px-4 py-1 text-white transition-colors duration-300 dark:text-neutral-900">
+                            Admin
+                        </a>
+                    )}
                 </div>
             </div>
         </nav>

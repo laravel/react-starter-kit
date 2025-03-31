@@ -7,7 +7,7 @@ import type React from 'react';
 
 // Navigation links
 const navLinks = [
-    { name: 'Home', href: '/' },
+    { name: 'login', href: '/' },
     { name: 'Gallery', href: '/dashboard' },
     { name: 'About', href: '/about' },
 ];
