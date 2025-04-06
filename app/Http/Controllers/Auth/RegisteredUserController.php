@@ -18,9 +18,11 @@ class RegisteredUserController extends Controller
     /**
      * Show the registration page.
      */
-    public function create(): Response
+    public function create(Request $request): Response
     {
-        return Inertia::render('auth/register');
+        return Inertia::render('auth/register-social', [
+            'providersConfig' => $request->attributes->get('providersConfig'),
+        ]);
     }
 
     /**
