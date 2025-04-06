@@ -56,24 +56,24 @@ return [
             'redirect' => env('FACEBOOK_REDIRECT'),
         ],
 
-        // 'github' => [
-        //     'active' => true,
-        //     'branded' => false,
-        //     'name' => 'GitHub',
-        //     'icon' => 'GitHubIcon',
-        //     'client_id' => env('GITHUB_CLIENT_ID'),
-        //     'client_secret' => env('GITHUB_CLIENT_SECRET'),
-        //     'redirect' => env('GITHUB_REDIRECT'),
-        // ],
+        'github' => [
+            'active' => false,
+            'branded' => false,
+            'name' => 'GitHub',
+            'icon' => 'GitHubIcon',
+            'client_id' => env('GITHUB_CLIENT_ID'),
+            'client_secret' => env('GITHUB_CLIENT_SECRET'),
+            'redirect' => env('GITHUB_REDIRECT'),
+        ],
 
-        // 'linkedin' => [
-        //     'active' => true,
-        //     'branded' => false,
-        //     'name' => 'LinkedIn',
-        //     'icon' => 'LinkedInIcon',
-        //     'client_id' => env('LINKEDIN_CLIENT_ID'),
-        //     'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
-        //     'redirect' => env('LINKEDIN_REDIRECT'),
-        // ],
+        'linkedin' => [
+            'active' => false,
+            'branded' => false,
+            'name' => 'LinkedIn',
+            'icon' => 'LinkedInIcon',
+            'client_id' => env('LINKEDIN_CLIENT_ID'),
+            'client_secret' => env('LINKEDIN_CLIENT_SECRET'),
+            'redirect' => env('LINKEDIN_REDIRECT'),
+        ],
     ],
 ];
