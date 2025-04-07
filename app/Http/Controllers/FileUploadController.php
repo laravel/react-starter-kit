@@ -72,7 +72,7 @@ class FileUploadController extends Controller
         }
 
         // Check if the file exists
-        if (!Storage::exists($fileUpload->path)) {
+        if (! Storage::exists($fileUpload->path)) {
             abort(404, 'File not found.');
         }
 

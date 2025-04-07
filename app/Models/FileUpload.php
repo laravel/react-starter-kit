@@ -35,8 +35,6 @@ class FileUpload extends Model
 
     /**
      * Get the file's download URL.
-     *
-     * @return string
      */
     public function getUrlAttribute(): string
     {
