@@ -38,10 +38,27 @@ class FileUploadController extends Controller
 
         $file = $request->file('file');
         $originalFilename = $file->getClientOriginalName();
-        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
+        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
 
-        // Store the file in the storage/app/uploads directory (private)
-        $path = $file->storeAs('uploads', $filename);
+        // Ensure the uploads directory exists
+        if (!Storage::exists('uploads')) {
+            Storage::makeDirectory('uploads');
+            Log::info('Created uploads directory on default disk');
+        }
+
+        // Store the file in the private/uploads directory
+        $path = Storage::putFileAs('uploads', $file, $filename);
+
+        // Log file storage details
+        Log::info('File stored', [
+            'original_filename' => $originalFilename,
+            'generated_filename' => $filename,
+            'storage_path' => $path,
+            'full_path' => Storage::path($path),
+            'exists' => Storage::exists($path) ? 'Yes' : 'No',
+            'default_disk' => config('filesystems.default'),
+            'disk_root' => config('filesystems.disks.' . config('filesystems.default') . '.root'),
+        ]);
 
         // Create a new file upload record
         $fileUpload = FileUpload::create([
@@ -71,20 +88,63 @@ class FileUploadController extends Controller
             abort(403, 'You do not have permission to access this file.');
         }
 
+        // Log the download attempt
+        Log::info('File download requested', [
+            'file_id' => $fileUpload->id,
+            'filename' => $fileUpload->original_filename,
+            'path' => $fileUpload->path,
+            'user_id' => Auth::id(),
+            'exists' => Storage::exists($fileUpload->path) ? 'Yes' : 'No',
+            'default_disk' => config('filesystems.default'),
+        ]);
+
         // Check if the file exists
-        if (! Storage::exists($fileUpload->path)) {
-            abort(404, 'File not found.');
+        if (!Storage::exists($fileUpload->path)) {
+            // Try to check where the file might be
+            $alternativePaths = [
+                'uploads/' . $fileUpload->filename,
+                'private/uploads/' . $fileUpload->filename,
+                'app/uploads/' . $fileUpload->filename,
+                'app/private/uploads/' . $fileUpload->filename,
+            ];
+
+            $foundAlternative = false;
+            foreach ($alternativePaths as $altPath) {
+                if (Storage::exists($altPath)) {
+                    Log::info('Found file at alternative path', ['path' => $altPath]);
+                    $fileUpload->path = $altPath;
+                    $fileUpload->save();
+                    $foundAlternative = true;
+                    break;
+                }
+            }
+
+            if (!$foundAlternative) {
+                Log::error('File not found for download', [
+                    'file_id' => $fileUpload->id,
+                    'path' => $fileUpload->path,
+                    'checked_alternatives' => $alternativePaths,
+                ]);
+
+                abort(404, 'File not found. It may have been moved or deleted.');
+            }
         }
 
-        // Debugging information
-        Log::info('Download requested by User: '.Auth::id().' for File: '.$fileUpload->id.' Path: '.$fileUpload->path);
+        try {
+            // Return the file as a download
+            return Storage::download(
+                $fileUpload->path,
+                $fileUpload->original_filename,
+                ['Content-Type' => $fileUpload->mime_type]
+            );
+        } catch (\Exception $e) {
+            Log::error('Error downloading file', [
+                'file_id' => $fileUpload->id,
+                'error' => $e->getMessage(),
+            ]);
 
-        // Force download the file
-        return response()->download(
-            storage_path('app/'.$fileUpload->path),
-            $fileUpload->original_filename,
-            ['Content-Type' => $fileUpload->mime_type]
-        );
+            abort(500, 'Error downloading file. Please try again later.');
+        }
     }
 
     /**

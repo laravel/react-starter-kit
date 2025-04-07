@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Facades\Log;
 
 class FileUpload extends Model
 {
@@ -26,6 +27,13 @@ class FileUpload extends Model
     ];
 
     /**
+     * The accessors to append to the model's array form.
+     *
+     * @var array
+     */
+    protected $appends = ['url'];
+
+    /**
      * Get the user that owns the file upload.
      */
     public function user(): BelongsTo
@@ -38,6 +46,8 @@ class FileUpload extends Model
      */
     public function getUrlAttribute(): string
     {
-        return route('content.download', $this->id);
+        $url = route('content.download', $this->id);
+
+        return $url;
     }
 }
