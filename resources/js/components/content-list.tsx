@@ -235,7 +235,11 @@ export function ContentList() {
                     <Button outline onClick={() => setShowDeleteAlert(false)}>
                         Cancel
                     </Button>
-                    <Button color="red" onClick={handleDelete}>
+                    <Button
+                        color="red"
+                        onClick={handleDelete}
+                        data-testid="confirm-delete-button"
+                    >
                         Delete
                     </Button>
                 </AlertActions>

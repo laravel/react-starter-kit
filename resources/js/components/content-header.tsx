@@ -68,7 +68,10 @@ export function ContentHeader() {
             </div>
             <div className="mt-5 flex lg:mt-0 lg:ml-4">
                 <span className="sm:ml-3">
-                    <Button onClick={() => setIsModalOpen(true)}>
+                    <Button
+                        onClick={() => setIsModalOpen(true)}
+                        data-testid="upload-button"
+                    >
                         <ArrowUpCircleIcon className="mr-1.5 -ml-0.5 size-5" />
                         Upload
                     </Button>
@@ -146,12 +149,14 @@ export function ContentHeader() {
                                     type="button"
                                     onClick={() => setIsModalOpen(false)}
                                     color="white"
+                                    data-testid="cancel-upload-button"
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     type="submit"
                                     disabled={processing || !data.file}
+                                    data-testid="upload-submit-button"
                                 >
                                     Upload
                                 </Button>

@@ -38,10 +38,10 @@ class FileUploadController extends Controller
 
         $file = $request->file('file');
         $originalFilename = $file->getClientOriginalName();
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
 
         // Ensure the uploads directory exists
-        if (!Storage::exists('uploads')) {
+        if (! Storage::exists('uploads')) {
             Storage::makeDirectory('uploads');
             Log::info('Created uploads directory on default disk');
         }
@@ -57,7 +57,7 @@ class FileUploadController extends Controller
             'full_path' => Storage::path($path),
             'exists' => Storage::exists($path) ? 'Yes' : 'No',
             'default_disk' => config('filesystems.default'),
-            'disk_root' => config('filesystems.disks.' . config('filesystems.default') . '.root'),
+            'disk_root' => config('filesystems.disks.'.config('filesystems.default').'.root'),
         ]);
 
         // Create a new file upload record
@@ -99,13 +99,13 @@ class FileUploadController extends Controller
         ]);
 
         // Check if the file exists
-        if (!Storage::exists($fileUpload->path)) {
+        if (! Storage::exists($fileUpload->path)) {
             // Try to check where the file might be
             $alternativePaths = [
-                'uploads/' . $fileUpload->filename,
-                'private/uploads/' . $fileUpload->filename,
-                'app/uploads/' . $fileUpload->filename,
-                'app/private/uploads/' . $fileUpload->filename,
+                'uploads/'.$fileUpload->filename,
+                'private/uploads/'.$fileUpload->filename,
+                'app/uploads/'.$fileUpload->filename,
+                'app/private/uploads/'.$fileUpload->filename,
             ];
 
             $foundAlternative = false;
@@ -119,7 +119,7 @@ class FileUploadController extends Controller
                 }
             }
 
-            if (!$foundAlternative) {
+            if (! $foundAlternative) {
                 Log::error('File not found for download', [
                     'file_id' => $fileUpload->id,
                     'path' => $fileUpload->path,
