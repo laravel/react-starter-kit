@@ -1,8 +1,12 @@
-import { SVGAttributes } from 'react';
+import { SVGAttributes } from "react";
 
 export default function GoogleIcon(props: SVGAttributes<SVGElement>) {
     return (
-        <svg {...props} xmlns="http://www.w3.org/2000/svg" viewBox="0 0 488 512">
+        <svg
+            {...props}
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 488 512"
+        >
             <path
                 fill="currentColor"
                 fillRule="evenodd"

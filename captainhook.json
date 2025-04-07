@@ -3,6 +3,23 @@
         "enabled": true,
         "actions": [
             {
+                "action": "npx prettier . --write ",
+                "options": {
+                    "label": "Running Prettier"
+                }
+            },
+            {
+                "action": "php artisan dusk",
+                "options": {
+                    "label": "Running Laravel Dusk Tests"
+                }
+            }
+        ]
+    },
+    "pre-push": {
+        "enabled": true,
+        "actions": [
+            {
                 "action": "php artisan test",
                 "options": {
                     "label": "Running PHPUnit Tests"
@@ -15,10 +32,6 @@
                 }
             }
         ]
-    },
-    "pre-push": {
-        "enabled": false,
-        "actions": []
     },
     "prepare-commit-msg": {
         "enabled": false,
@@ -40,4 +53,4 @@
         "enabled": false,
         "actions": []
     }
-} 
+}
