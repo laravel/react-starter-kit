@@ -9,7 +9,7 @@
                 }
             },
             {
-                "action": "./vendor/bin/pintk",
+                "action": "./vendor/bin/pint",
                 "options": {
                     "label": "Ruinning Pint"
                 }

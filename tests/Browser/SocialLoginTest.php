@@ -3,8 +3,8 @@
 namespace Tests\Browser;
 
 use Laravel\Dusk\Browser;
-use Tests\DuskTestCase;
 use PHPUnit\Framework\Assert;
+use Tests\DuskTestCase;
 
 class SocialLoginTest extends DuskTestCase
 {
@@ -13,7 +13,7 @@ class SocialLoginTest extends DuskTestCase
      *
      * @return void
      */
-    public function testGoogleLogin()
+    public function test_google_login()
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')
@@ -31,7 +31,7 @@ class SocialLoginTest extends DuskTestCase
      *
      * @return void
      */
-    public function testFacebookLogin()
+    public function test_facebook_login()
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/login')

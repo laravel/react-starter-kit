@@ -25,7 +25,7 @@ return [
     | branded: true or false, if true, the button will be branded with the provider's color
     |
     | name: the name of the provider
-    |   
+    |
     | icon: the icon of the provider located in the components/icons folder
     |
     | client_id: the client id of the provider
