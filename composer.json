@@ -12,6 +12,7 @@
         "php": "^8.2",
         "blaspsoft/socialiteplus": "^1.0",
         "inertiajs/inertia-laravel": "^2.0",
+        "laravel/cashier": "^15.6",
         "laravel/framework": "^12.0",
         "laravel/octane": "^2.8",
         "laravel/socialite": "^5.0",
