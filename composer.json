@@ -19,7 +19,10 @@
         "tightenco/ziggy": "^2.4"
     },
     "require-dev": {
+        "captainhook/captainhook": "^5.25",
+        "captainhook/plugin-composer": "^5.3",
         "fakerphp/faker": "^1.23",
+        "laravel/dusk": "^8.3",
         "laravel/pail": "^1.2.2",
         "laravel/pint": "^1.18",
         "laravel/sail": "^1.41",
@@ -45,7 +48,11 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
+            "vendor/bin/captainhook install -f"
+        ],
+        "post-install-cmd": [
+            "vendor/bin/captainhook install -f"
         ],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
@@ -68,6 +75,9 @@
     "extra": {
         "laravel": {
             "dont-discover": []
+        },
+        "captainhook": {
+            "config": "captainhook.json"
         }
     },
     "config": {
@@ -76,7 +86,8 @@
         "sort-packages": true,
         "allow-plugins": {
             "pestphp/pest-plugin": true,
-            "php-http/discovery": true
+            "php-http/discovery": true,
+            "captainhook/plugin-composer": true
         }
     },
     "minimum-stability": "stable",
