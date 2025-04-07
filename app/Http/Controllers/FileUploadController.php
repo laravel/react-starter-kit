@@ -38,7 +38,7 @@ class FileUploadController extends Controller
 
         $file = $request->file('file');
         $originalFilename = $file->getClientOriginalName();
-        $filename = Str::uuid() . '.' . $file->getClientOriginalExtension();
+        $filename = Str::uuid().'.'.$file->getClientOriginalExtension();
 
         // Store the file in the storage/app/uploads directory (private)
         $path = $file->storeAs('uploads', $filename);
@@ -77,11 +77,11 @@ class FileUploadController extends Controller
         }
 
         // Debugging information
-        Log::info('Download requested by User: ' . Auth::id() . ' for File: ' . $fileUpload->id . ' Path: ' . $fileUpload->path);
+        Log::info('Download requested by User: '.Auth::id().' for File: '.$fileUpload->id.' Path: '.$fileUpload->path);
 
         // Force download the file
         return response()->download(
-            storage_path('app/' . $fileUpload->path),
+            storage_path('app/'.$fileUpload->path),
             $fileUpload->original_filename,
             ['Content-Type' => $fileUpload->mime_type]
         );
