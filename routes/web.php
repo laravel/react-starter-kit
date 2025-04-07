@@ -4,6 +4,7 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\ContentController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\FileUploadController;
 use App\Http\Controllers\StripeWebhookController;
 use App\Http\Middleware\HandleSocialitePlusProviders;
 use Illuminate\Http\Request;
@@ -16,7 +17,13 @@ Route::get('/', function () {
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('content', [ContentController::class, 'index'])->name('content');
+
+    // Content and file uploads
+    Route::get('content', [ContentController::class, 'index'])->name('content.index');
+    Route::post('content/upload', [FileUploadController::class, 'store'])->name('content.upload');
+    Route::get('content/{fileUpload}/download', [FileUploadController::class, 'download'])->name('content.download');
+    Route::patch('content/{fileUpload}/status', [FileUploadController::class, 'updateStatus'])->name('content.update-status');
+    Route::delete('content/{fileUpload}', [FileUploadController::class, 'destroy'])->name('content.destroy');
 });
 
 // Custom Stripe webhook route - this will override Laravel Cashier's built-in route
@@ -43,5 +50,5 @@ Route::get('login', [AuthenticatedSessionController::class, 'create'])
     ->middleware(HandleSocialitePlusProviders::class)
     ->name('login');
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';

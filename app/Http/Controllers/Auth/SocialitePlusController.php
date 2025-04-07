@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers\Auth;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
-use Blaspsoft\SocialitePlus\SocialitePlusFactory;
 use Illuminate\Http\Request;
+use Blaspsoft\SocialitePlus\SocialitePlusFactory;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Controller;
 
 class SocialitePlusController extends Controller
 {
@@ -19,6 +19,8 @@ class SocialitePlusController extends Controller
 
     /**
      * Create a new SocialLoginController instance.
+     *
+     * @param SocialitePlusFactory $socialitePlus
      */
     public function __construct(SocialitePlusFactory $socialitePlus)
     {
@@ -28,12 +30,14 @@ class SocialitePlusController extends Controller
     /**
      * Redirect to the social login page
      *
+     * @param string $provider
      * @return \Illuminate\Http\RedirectResponse
      */
     public function redirect(string $provider)
     {
         try {
             return $this->socialitePlus->build($provider)->redirect();
+
         } catch (\Exception $e) {
 
             return redirect()->route('login')->with('error', $e->getMessage());
@@ -43,13 +47,13 @@ class SocialitePlusController extends Controller
     /**
      * Handle the social login callback
      *
+     * @param string $provider
+     * @param Request $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function callback(string $provider, Request $request)
     {
-        if (! $request->has('code')) {
-            return redirect()->route('login')->with('error', 'Invalid request');
-        }
+        if (!$request->has('code')) return redirect()->route('login')->with('error', 'Invalid request');
 
         $user = $this->socialitePlus->build($provider)->user();
 
@@ -57,7 +61,6 @@ class SocialitePlusController extends Controller
 
         if ($existingUser) {
             Auth::login($existingUser);
-
             return redirect()->intended('/dashboard');
         }
 
