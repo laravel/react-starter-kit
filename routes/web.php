@@ -22,7 +22,7 @@ Route::post('stripe/webhook', [StripeWebhookController::class, 'handleWebhook'])
 
 Route::get('/subscription-checkout', function (Request $request) {
     return $request->user()
-        ->newSubscription('default', 'price_1R7a4FIWRSe7TYLFAjJ1tuXS')
+        ->newSubscription('default', env('STRIPE_PRODUCT_ID'))
         ->checkout([
             'success_url' => route('dashboard'),
             'cancel_url' => route('dashboard'),

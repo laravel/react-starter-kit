@@ -49,12 +49,9 @@
             "@php artisan package:discover --ansi"
         ],
         "post-update-cmd": [
-            "@php artisan vendor:publish --tag=laravel-assets --ansi --force",
-            "vendor/bin/captainhook install -f"
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
         ],
-        "post-install-cmd": [
-            "vendor/bin/captainhook install -f"
-        ],
+        "post-install-cmd": [],
         "post-root-package-install": [
             "@php -r \"file_exists('.env') || copy('.env.example', '.env');\""
         ],
