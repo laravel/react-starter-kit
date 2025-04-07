@@ -9,9 +9,9 @@
                 }
             },
             {
-                "action": "php artisan dusk",
+                "action": "./vendor/bin/pintk",
                 "options": {
-                    "label": "Running Laravel Dusk Tests"
+                    "label": "Ruinning Pint"
                 }
             }
         ]

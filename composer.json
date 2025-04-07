@@ -24,7 +24,7 @@
         "fakerphp/faker": "^1.23",
         "laravel/dusk": "^8.3",
         "laravel/pail": "^1.2.2",
-        "laravel/pint": "^1.18",
+        "laravel/pint": "^1.21",
         "laravel/sail": "^1.41",
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.6",
