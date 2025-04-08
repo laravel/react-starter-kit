@@ -51,6 +51,14 @@ jobs:
       - name: Generate Application Key
         run: php artisan key:generate
 
+        # Install the Chrome binaries required for Dusk to run tests
+      - name: Install Chrome binaries
+        run: php artisan dusk:chrome-driver --detect
+
+      # Start the Chrome driver so we're able to run browser tests with Chrome
+      - name: Start Chrome Driver
+        run: ./vendor/laravel/dusk/bin/chromedriver-linux &
+
       - name: Run Migrations
         run: php artisan migrate
 

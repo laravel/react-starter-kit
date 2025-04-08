@@ -57,6 +57,7 @@ export default function SocialitePlus({ providersConfig }: SocialitePlusProps) {
                         <Button
                             key={provider.name}
                             type="button"
+                            dusk={`${provider.name}-login-button`}
                             variant="outline"
                             className={getProviderClasses(provider)}
                             tabIndex={5}
