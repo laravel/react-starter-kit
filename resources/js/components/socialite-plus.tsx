@@ -21,12 +21,10 @@ const getProviderClasses = (provider: Provider) => {
     if (!provider.branded) return;
 
     const styles: Record<string, string> = {
-        Google: "bg-red-500 hover:bg-red-600 hover:text-white text-white dark:bg-red-600 dark:hover:bg-red-700",
-        Facebook:
-            "bg-blue-600 hover:bg-blue-700 hover:text-white text-white dark:bg-blue-700 dark:hover:bg-blue-800",
-        GitHub: "bg-gray-900 hover:bg-gray-700 hover:text-white text-white dark:border-white dark:bg-transparent dark:hover:bg-gray-900",
-        LinkedIn:
-            "bg-blue-700 hover:bg-blue-800 hover:text-white text-white dark:bg-blue-800 dark:hover:bg-blue-900",
+        Google: "bg-red-500 hover:bg-red-600 hover:text-white text-white",
+        Facebook: "bg-blue-600 hover:bg-blue-700 hover:text-white text-white",
+        GitHub: "bg-gray-900 hover:bg-gray-700 hover:text-white text-white",
+        LinkedIn: "bg-blue-700 hover:bg-blue-800 hover:text-white text-white",
     };
 
     return styles[provider.name] || "";
@@ -58,7 +56,6 @@ export default function SocialitePlus({ providersConfig }: SocialitePlusProps) {
                     return (
                         <Button
                             key={provider.name}
-                            dusk={`${provider.name}-login-button`}
                             type="button"
                             variant="outline"
                             className={getProviderClasses(provider)}

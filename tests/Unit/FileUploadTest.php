@@ -33,7 +33,7 @@ class FileUploadTest extends TestCase
     /** @test */
     public function it_has_correct_fillable_attributes()
     {
-        $fileUpload = new FileUpload();
+        $fileUpload = new FileUpload;
 
         $this->assertContains('user_id', $fileUpload->getFillable());
         $this->assertContains('filename', $fileUpload->getFillable());

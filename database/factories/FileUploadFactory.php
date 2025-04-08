@@ -18,13 +18,13 @@ class FileUploadFactory extends Factory
      */
     public function definition(): array
     {
-        $filename = Str::uuid() . '.pdf';
+        $filename = Str::uuid().'.pdf';
 
         return [
             'user_id' => User::factory(),
             'filename' => $filename,
-            'original_filename' => $this->faker->word() . '.pdf',
-            'path' => 'uploads/' . $filename,
+            'original_filename' => $this->faker->word().'.pdf',
+            'path' => 'uploads/'.$filename,
             'mime_type' => 'application/pdf',
             'size' => $this->faker->numberBetween(1000, 5000000),
             'status' => $this->faker->randomElement(['uploaded', 'processing', 'processed']),

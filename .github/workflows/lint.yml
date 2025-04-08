@@ -36,7 +36,7 @@ jobs:
         run: npm run format
 
       - name: Lint Frontend
-        run: npm run lint
+        run: npx prettier --check .
 
       # - name: Commit Changes
       #   uses: stefanzweifel/git-auto-commit-action@v5

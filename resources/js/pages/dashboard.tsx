@@ -20,7 +20,7 @@ export default function Dashboard({ subscribed }: DashboardProps) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Dashboard" />
             <div className="flex flex-col gap-4 rounded-xl p-4">
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
+                <div className="border-sidebar-border/70 relative overflow-hidden rounded-xl border">
                     {!subscribed && (
                         <div className="bg-rajah-50 border-l-4 border-rajah-400 p-6">
                             <div className="flex flex-col md:flex-row md:items-center justify-between">
@@ -74,20 +74,20 @@ export default function Dashboard({ subscribed }: DashboardProps) {
                     )}
                 </div>
                 <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="border-sidebar-border/70 relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20" />
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="border-sidebar-border/70 relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20" />
                     </div>
-                    <div className="border-sidebar-border/70 dark:border-sidebar-border relative aspect-video overflow-hidden rounded-xl border">
-                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                    <div className="border-sidebar-border/70 relative aspect-video overflow-hidden rounded-xl border">
+                        <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20" />
                     </div>
                 </div>
-                <div className="border-sidebar-border/70 dark:border-sidebar-border relative overflow-hidden rounded-xl border">
-                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20 dark:stroke-neutral-100/20" />
+                <div className="border-sidebar-border/70 relative overflow-hidden rounded-xl border">
+                    <PlaceholderPattern className="absolute inset-0 size-full stroke-neutral-900/20" />
                     <div className="p-6 min-h-[240px] flex items-center justify-center">
-                        <p className="text-gray-500 dark:text-gray-400">
+                        <p className="text-gray-500">
                             Additional dashboard content will appear here
                         </p>
                     </div>

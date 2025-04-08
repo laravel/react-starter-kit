@@ -1,14 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 
-export type Appearance = "light" | "dark" | "system";
-
-const prefersDark = () => {
-    if (typeof window === "undefined") {
-        return false;
-    }
-
-    return window.matchMedia("(prefers-color-scheme: dark)").matches;
-};
+export type Appearance = "light";
 
 const setCookie = (name: string, value: string, days = 365) => {
     if (typeof document === "undefined") {
@@ -19,38 +11,12 @@ const setCookie = (name: string, value: string, days = 365) => {
     document.cookie = `${name}=${value};path=/;max-age=${maxAge};SameSite=Lax`;
 };
 
-const applyTheme = (appearance: Appearance) => {
-    const isDark =
-        appearance === "dark" || (appearance === "system" && prefersDark());
-
-    document.documentElement.classList.toggle("dark", isDark);
-};
-
-const mediaQuery = () => {
-    if (typeof window === "undefined") {
-        return null;
-    }
-
-    return window.matchMedia("(prefers-color-scheme: dark)");
-};
-
-const handleSystemThemeChange = () => {
-    const currentAppearance = localStorage.getItem("appearance") as Appearance;
-    applyTheme(currentAppearance || "system");
-};
-
 export function initializeTheme() {
-    const savedAppearance =
-        (localStorage.getItem("appearance") as Appearance) || "system";
-
-    applyTheme(savedAppearance);
-
-    // Add the event listener for system theme changes...
-    mediaQuery()?.addEventListener("change", handleSystemThemeChange);
+    // Removed dark mode logic
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>("system");
+    const [appearance, setAppearance] = useState<Appearance>("light");
 
     const updateAppearance = useCallback((mode: Appearance) => {
         setAppearance(mode);
@@ -61,20 +27,16 @@ export function useAppearance() {
         // Store in cookie for SSR...
         setCookie("appearance", mode);
 
-        applyTheme(mode);
+        // Removed applyTheme call
     }, []);
 
     useEffect(() => {
         const savedAppearance = localStorage.getItem(
             "appearance",
         ) as Appearance | null;
-        updateAppearance(savedAppearance || "system");
+        updateAppearance(savedAppearance || "light");
 
-        return () =>
-            mediaQuery()?.removeEventListener(
-                "change",
-                handleSystemThemeChange,
-            );
+        // Removed event listener logic
     }, [updateAppearance]);
 
     return { appearance, updateAppearance } as const;
