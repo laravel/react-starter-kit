@@ -37,6 +37,10 @@ class ProfileController extends Controller
 
         $request->user()->save();
 
+        if ($request->hasFile('photo')) {
+            $request->user()->updateProfilePhoto($request->validated('photo'));
+        }
+
         return to_route('profile.edit');
     }
 
@@ -53,6 +57,8 @@ class ProfileController extends Controller
 
         Auth::logout();
 
+        $user->deleteProfilePhoto();
+        
         $user->delete();
 
         $request->session()->invalidate();
