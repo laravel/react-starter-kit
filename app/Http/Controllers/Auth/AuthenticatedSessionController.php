@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -29,8 +30,18 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
-        $request->authenticate();
+        // Find user by email
+        $user = User::where('email', $request->email)->first();
 
+        // If user exists, password is correct, and 2FA is enabled, redirect to challenge
+        if ($user && $user->two_factor_confirmed_at && \Illuminate\Support\Facades\Hash::check($request->password, $user->password)) {
+            $request->session()->put('login.id', $user->getKey());
+            // Optionally clear any previous errors
+            return redirect()->route('two-factor.challenge');
+        }
+
+        // Proceed with normal authentication (this will handle errors and login)
+        $request->authenticate();
         $request->session()->regenerate();
 
         return redirect()->intended(route('dashboard', absolute: false));
