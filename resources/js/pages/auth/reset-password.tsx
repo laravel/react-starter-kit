@@ -22,14 +22,15 @@ type ResetPasswordForm = {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
-        token: token,
-        email: email,
+        token,
+        email,
         password: '',
         password_confirmation: '',
     });
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
+
         post(route('password.store'), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
