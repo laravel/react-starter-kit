@@ -11,9 +11,7 @@ createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => resolvePageComponent(`./pages/${name}.tsx`, import.meta.glob('./pages/**/*.tsx')),
     setup({ el, App, props }) {
-        const shouldHydrate = el.hasChildNodes();
-
-        if (shouldHydrate) {
+        if (el.hasChildNodes()) {
             hydrateRoot(el, <App {...props} />);
         } else {
             createRoot(el).render(<App {...props} />);
