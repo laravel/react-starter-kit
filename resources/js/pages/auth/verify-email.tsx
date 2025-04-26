@@ -1,19 +1,26 @@
 // Components
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router, useForm } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
-
-import TextLink from '@/components/text-link';
 
 import AuthLayout from '@/layouts/auth-layout';
 import { Button } from '@mantine/core';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     const { post, processing } = useForm({});
+
+    const cleanup = useMobileNavigation();
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
         post(route('verification.send'));
+    };
+
+    const handleLogout = () => {
+        cleanup();
+        router.flushAll();
+        router.post(route('logout'));
     };
 
     return (
@@ -26,14 +33,14 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-6 text-center">
-                <Button disabled={processing} variant="outline" loading={processing}>
+            <form onSubmit={submit} className="space-y-6 text-center flex flex-col items-center">
+                <Button type='submit' disabled={processing} variant="outline" loading={processing}>
                     Resend verification email
                 </Button>
 
-                <TextLink href={route('logout')} method="post" className="mx-auto block text-sm">
+                <Button type='button' onClick={handleLogout} variant='subtle' className="cursor-pointer mx-auto block text-sm">
                     Log out
-                </TextLink>
+                </Button>
             </form>
         </AuthLayout>
     );

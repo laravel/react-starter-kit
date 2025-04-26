@@ -7,9 +7,18 @@ import { cn } from '@/lib/utils';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import SidebarMenuButton from './sidebar-menu-button';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 
 export function NavUser({ variant, collapsed = false }: { variant: 'header' | 'sidebar'; collapsed?: boolean }) {
     const { auth } = usePage<SharedData>().props;
+
+    const cleanup = useMobileNavigation();
+
+    const handleLogout = () => {
+        cleanup();
+        router.flushAll();
+        router.post(route('logout'));
+    };
 
     return (
         <>
@@ -41,7 +50,7 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                     <form
                         onSubmit={(e) => {
                             e.preventDefault();
-                            router.post(route('logout'));
+                            handleLogout();
                         }}
                     >
                         <Menu.Item leftSection={<IconLogout color="gray" />} type="submit">
