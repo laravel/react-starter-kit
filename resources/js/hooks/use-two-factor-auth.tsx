@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import axios, { AxiosError } from 'axios';
 
 interface EnableResponse {
   qrCode: string;
@@ -16,15 +17,6 @@ interface RecoveryCodesResponse {
 }
 
 export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes: string[]) {
-  const csrfToken =
-    document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
-
-  const headers = {
-    'Content-Type': 'application/json',
-    Accept: 'application/json',
-    'X-CSRF-TOKEN': csrfToken,
-    'X-Requested-With': 'XMLHttpRequest',
-  };
 
   const [confirmed, setConfirmed] = useState(initialConfirmed);
   const [qrCodeSvg, setQrCodeSvg] = useState('');
@@ -46,20 +38,19 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
 
   const enable = async () => {
     try {
-      const response = await fetch(route('two-factor.enable'), {
-        method: 'POST',
-        headers,
-      });
+      const response = await axios.post(route('two-factor.enable'));
 
-      if (response.ok) {
-        const data: EnableResponse = await response.json();
-        setQrCodeSvg(data.qrCode);
+      const data: EnableResponse = response.data;
+      setQrCodeSvg(data.qrCode);
         setSecretKey(data.secret);
-      } else {
-        console.error('Error enabling 2FA:', response.statusText);
-      }
     } catch (error) {
       console.error('Error enabling 2FA:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data;
+        console.error('Verification error:', errorData.message);
+        setError(errorData.message || 'Invalid verification code');
+        setPasscode('');
+      }
     }
   };
 
@@ -69,71 +60,64 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
     const formattedCode = passcode.replace(/\s+/g, '').trim();
 
     try {
-      const response = await fetch(route('two-factor.confirm'), {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({ code: formattedCode }),
-      });
+      const response = await axios.post(route('two-factor.confirm'), { code: formattedCode });
 
-      if (response.ok) {
-        const responseData: ConfirmResponse = await response.json();
-        if (responseData.recovery_codes) {
-          setRecoveryCodesList(responseData.recovery_codes);
-        }
+      const responseData: ConfirmResponse = response.data;
+      if (responseData.recovery_codes) {
+        setRecoveryCodesList(responseData.recovery_codes);
+      }
 
-        setConfirmed(true);
-        setVerifyStep(false);
-        setShowModal(false);
-        setShowingRecoveryCodes(true);
-        setPasscode('');
-        setError('');
-      } else {
-        const errorData = await response.json();
+      setConfirmed(true);
+      setVerifyStep(false);
+      setShowModal(false);
+      setShowingRecoveryCodes(true);
+      setPasscode('');
+      setError('');
+
+    } catch (error) {
+      console.error('Error confirming 2FA:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data;
         console.error('Verification error:', errorData.message);
         setError(errorData.message || 'Invalid verification code');
         setPasscode('');
+        return;
       }
-    } catch (error) {
-      console.error('Error confirming 2FA:', error);
       setError('An error occurred while confirming 2FA');
     }
   };
 
   const regenerateRecoveryCodes = async () => {
     try {
-      const response = await fetch(route('two-factor.regenerate-recovery-codes'), {
-        method: 'POST',
-        headers,
-      });
-
-      if (response.ok) {
-        const data: RecoveryCodesResponse = await response.json();
-        if (data.recovery_codes) {
-          setRecoveryCodesList(data.recovery_codes);
-        }
-      } else {
-        console.error('Error regenerating codes:', response.statusText);
+      const response = await axios.post(route('two-factor.regenerate-recovery-codes'));
+      const data: RecoveryCodesResponse = await response.data;
+      if (data.recovery_codes) {
+        setRecoveryCodesList(data.recovery_codes);
       }
     } catch (error) {
       console.error('Error regenerating codes:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data;
+        setError(errorData.message || 'Invalid verification code');
+      }
     }
   };
 
   const disable = async () => {
     try {
-      const response = await fetch(route('two-factor.disable'), { method: 'DELETE', headers });
+      await axios.delete(route('two-factor.disable'));
 
-      if (response.ok) {
-        setConfirmed(false);
-        setShowingRecoveryCodes(false);
-        setRecoveryCodesList([]);
-        setQrCodeSvg('');
-        setSecretKey('');
-      } else {
-        console.error('Error disabling 2FA:', response.statusText);
-      }
+      setConfirmed(false);
+      setShowingRecoveryCodes(false);
+      setRecoveryCodesList([]);
+      setQrCodeSvg('');
+      setSecretKey('');
     } catch (error) {
       console.error('Error disabling 2FA:', error);
+      if (error instanceof AxiosError && error.response?.data) {
+        const errorData = error.response.data;
+        setError(errorData.message || 'Invalid verification code');
+      }
     }
   };
 
