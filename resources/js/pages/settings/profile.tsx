@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { ProfilePhoto } from '@/components/profile-photo';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -20,22 +21,30 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 type ProfileForm = {
+    _method: string;
     name: string;
     email: string;
+    photo?: File | null;
 }
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { auth } = usePage<SharedData>().props;
 
-    const { data, setData, patch, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+    const { data, setData, post, errors, processing, recentlySuccessful } = useForm<Required<ProfileForm>>({
+        _method: 'patch',
         name: auth.user.name,
         email: auth.user.email,
+        photo: null,
     });
+    
+    const handlePhotoChange = (photo: File | null) => {
+        setData('photo', photo);
+    };
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
 
-        patch(route('profile.update'), {
+        post(route('profile.update'), {
             preserveScroll: true,
         });
     };
@@ -49,6 +58,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <form onSubmit={submit} className="space-y-6">
+                        <ProfilePhoto 
+                            userName={auth.user.name}
+                            userAvatar={auth.user.avatar}
+                            onPhotoChange={handlePhotoChange}
+                            error={errors.photo}
+                        />
+
                         <div className="grid gap-2">
                             <Label htmlFor="name">Name</Label>
 
@@ -121,6 +137,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                 </div>
 
                 <DeleteUser />
+
             </SettingsLayout>
         </AppLayout>
     );
