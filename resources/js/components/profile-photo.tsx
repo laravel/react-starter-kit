@@ -13,9 +13,9 @@ import { useInitials } from '@/hooks/use-initials';
 
 type ProfilePhotoProps = {
     userName: string;
-    userAvatar: string | null;
+    userAvatar: string | null | undefined;
     onPhotoChange: (photo: File | null) => void;
-    error?: string;
+    error?: string | undefined;
 };
 
 export function ProfilePhoto({ userName, userAvatar, onPhotoChange, error }: ProfilePhotoProps) {
