@@ -2,7 +2,7 @@ import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler, useRef, useState } from 'react';
-import ReactCrop, { type Crop } from 'react-image-crop';
+import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
 import DeleteUser from '@/components/delete-user';
@@ -93,6 +93,28 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
             photoInput.current.value = '';
         }
     };
+
+    const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+        const { naturalWidth: width, naturalHeight: height } = e.currentTarget
+
+        const crop = centerCrop(
+            makeAspectCrop(
+                {
+                    // You don't need to pass a complete crop into
+                    // makeAspectCrop or centerCrop.
+                    unit: '%',
+                    width: 100,
+                },
+                1 / 1,
+                width,
+                height
+            ),
+            width,
+            height
+        )
+
+        setCrop(crop)
+    }
 
     const completeCrop = async () => {
         if (!imageRef.current || !crop.width || !crop.height) return;
@@ -276,6 +298,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                     <img
                                         ref={imageRef}
                                         src={originalImage}
+                                        onLoad={onImageLoad}
                                         alt="Crop preview"
                                         className="max-h-96"
                                     />
