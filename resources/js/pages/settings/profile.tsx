@@ -1,7 +1,7 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Head, Link, router, useForm, usePage } from '@inertiajs/react';
-import { FormEventHandler, useRef, useState } from 'react';
+import { FormEventHandler, useCallback, useEffect, useRef, useState } from 'react';
 import ReactCrop, { centerCrop, makeAspectCrop, type Crop } from 'react-image-crop';
 import 'react-image-crop/dist/ReactCrop.css';
 
@@ -16,7 +16,7 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { useInitials } from '@/hooks/use-initials';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CropIcon, Trash2Icon } from 'lucide-react';
+import { CropIcon, Loader2, Trash2Icon, UploadIcon } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -39,6 +39,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
     const [photoPreview, setPhotoPreview] = useState<string | null>(null);
     const [originalImage, setOriginalImage] = useState<string | null>(null);
     const [isCropperOpen, setIsCropperOpen] = useState<boolean>(false);
+    const [isProcessing, setIsProcessing] = useState<boolean>(false);
     const [crop, setCrop] = useState<Crop>({
         unit: '%',
         width: 100,
@@ -46,7 +47,10 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         x: 0,
         y: 0,
     });
-
+    
+    // Default aspect ratio for profile photos
+    const ASPECT_RATIO = 1;
+    
     const photoInput = useRef<HTMLInputElement | null>(null);
     const imageRef = useRef<HTMLImageElement | null>(null);
 
@@ -65,6 +69,21 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         const photo = photoInput.current?.files?.[0];
 
         if (!photo) return;
+        
+        // Validate file type and size
+        if (!photo.type.startsWith('image/')) {
+            alert('Please select an image file');
+            clearPhotoFileInput();
+            return;
+        }
+        
+        // 5MB limit
+        const MAX_FILE_SIZE = 5 * 1024 * 1024;
+        if (photo.size > MAX_FILE_SIZE) {
+            alert('Image size should be less than 5MB');
+            clearPhotoFileInput();
+            return;
+        }
 
         const reader = new FileReader();
 
@@ -94,71 +113,104 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
         }
     };
 
-    const onImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
-        const { naturalWidth: width, naturalHeight: height } = e.currentTarget
+    // Create a centered crop with the specified aspect ratio
+    const onImageLoad = useCallback((e: React.SyntheticEvent<HTMLImageElement>) => {
+        const { naturalWidth: width, naturalHeight: height } = e.currentTarget;
 
         const crop = centerCrop(
             makeAspectCrop(
                 {
-                    // You don't need to pass a complete crop into
-                    // makeAspectCrop or centerCrop.
                     unit: '%',
-                    width: 100,
+                    width: 90, // Slightly smaller initial crop for better visibility
                 },
-                1 / 1,
+                ASPECT_RATIO,
                 width,
                 height
             ),
             width,
             height
-        )
-
-        setCrop(crop)
-    }
-
-    const completeCrop = async () => {
-        if (!imageRef.current || !crop.width || !crop.height) return;
-
-        const canvas = document.createElement('canvas');
-        const scaleX = imageRef.current.naturalWidth / imageRef.current.width;
-        const scaleY = imageRef.current.naturalHeight / imageRef.current.height;
-        const pixelRatio = window.devicePixelRatio;
-
-        canvas.width = crop.width * scaleX * pixelRatio;
-        canvas.height = crop.height * scaleY * pixelRatio;
-
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
-        ctx.imageSmoothingQuality = 'high';
-
-        ctx.drawImage(
-            imageRef.current,
-            crop.x * scaleX,
-            crop.y * scaleY,
-            crop.width * scaleX,
-            crop.height * scaleY,
-            0,
-            0,
-            crop.width * scaleX,
-            crop.height * scaleY
         );
 
-        // Convert canvas to blob
-        const croppedImageUrl = canvas.toDataURL('image/jpeg');
-        setPhotoPreview(croppedImageUrl);
-        setIsCropperOpen(false);
+        setCrop(crop);
+    }, []);
 
-        // Convert data URL to Blob
-        const response = await fetch(croppedImageUrl);
-        const blob = await response.blob();
-
-        // Create a File from Blob
-        const fileName = photoInput.current?.files?.[0]?.name || 'cropped-image.jpg';
-        const croppedFile = new File([blob], fileName, { type: 'image/jpeg' });
-
-        setData('photo', croppedFile);
+    // Process the cropped image and convert to a File object
+    const completeCrop = async () => {
+        if (!imageRef.current || !crop.width || !crop.height) return;
+        
+        try {
+            setIsProcessing(true);
+            
+            // Create a canvas with the crop dimensions
+            const canvas = document.createElement('canvas');
+            const scaleX = imageRef.current.naturalWidth / imageRef.current.width;
+            const scaleY = imageRef.current.naturalHeight / imageRef.current.height;
+            const pixelRatio = window.devicePixelRatio;
+            
+            // Set dimensions with a reasonable max size for profile photos (e.g., 500x500)
+            const MAX_SIZE = 500;
+            const cropWidth = crop.width * scaleX;
+            const cropHeight = crop.height * scaleY;
+            
+            // Calculate dimensions while maintaining aspect ratio
+            let targetWidth = cropWidth;
+            let targetHeight = cropHeight;
+            
+            if (cropWidth > MAX_SIZE || cropHeight > MAX_SIZE) {
+                if (cropWidth > cropHeight) {
+                    targetWidth = MAX_SIZE;
+                    targetHeight = (cropHeight / cropWidth) * MAX_SIZE;
+                } else {
+                    targetHeight = MAX_SIZE;
+                    targetWidth = (cropWidth / cropHeight) * MAX_SIZE;
+                }
+            }
+            
+            canvas.width = targetWidth * pixelRatio;
+            canvas.height = targetHeight * pixelRatio;
+            
+            const ctx = canvas.getContext('2d');
+            if (!ctx) {
+                throw new Error('Could not get canvas context');
+            }
+            
+            ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+            ctx.imageSmoothingQuality = 'high';
+            
+            // Draw the cropped image to the canvas
+            ctx.drawImage(
+                imageRef.current,
+                crop.x * scaleX,
+                crop.y * scaleY,
+                cropWidth,
+                cropHeight,
+                0,
+                0,
+                targetWidth,
+                targetHeight
+            );
+            
+            // Convert canvas to a compressed JPEG data URL
+            const croppedImageUrl = canvas.toDataURL('image/jpeg', 0.85); // 85% quality
+            setPhotoPreview(croppedImageUrl);
+            
+            // Convert data URL to Blob
+            const response = await fetch(croppedImageUrl);
+            const blob = await response.blob();
+            
+            // Create a File from Blob with a meaningful name
+            const originalFileName = photoInput.current?.files?.[0]?.name || 'profile-photo.jpg';
+            const fileNameBase = originalFileName.substring(0, originalFileName.lastIndexOf('.')) || 'profile-photo';
+            const croppedFile = new File([blob], `${fileNameBase}-cropped.jpg`, { type: 'image/jpeg' });
+            
+            setData('photo', croppedFile);
+            setIsCropperOpen(false);
+        } catch (error) {
+            console.error('Error processing cropped image:', error);
+            alert('There was an error processing your image. Please try again.');
+        } finally {
+            setIsProcessing(false);
+        }
     };
 
     const cancelCrop = () => {
@@ -196,11 +248,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                 </Avatar>
 
                                 <Button type="button" variant="outline" onClick={selectNewPhoto}>
+                                    <UploadIcon className="mr-0.5 h-4 w-4" />
                                     {auth.user.avatar ? 'Change Photo' : 'Upload Photo'}
                                 </Button>
 
                                 {(auth.user.avatar || photoPreview) && (
                                     <Button type="button" variant="outline" onClick={deletePhoto}>
+                                        <Trash2Icon className="mr-0.5 h-4 w-4" />
                                         Remove Photo
                                     </Button>
                                 )}
@@ -306,11 +360,16 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             )}
 
                             <div className="flex justify-end gap-2 w-full">
-                                <Button variant="outline" onClick={cancelCrop}>
-                                    <Trash2Icon /> Cancel
+                                <Button variant="outline" onClick={cancelCrop} disabled={isProcessing}>
+                                    <Trash2Icon className="mr-2 h-4 w-4" /> Cancel
                                 </Button>
-                                <Button onClick={completeCrop}>
-                                    <CropIcon /> Crop
+                                <Button onClick={completeCrop} disabled={isProcessing}>
+                                    {isProcessing ? (
+                                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                    ) : (
+                                        <CropIcon className="mr-2 h-4 w-4" />
+                                    )}
+                                    {isProcessing ? 'Processing...' : 'Crop'}
                                 </Button>
                             </div>
                         </div>
