@@ -14,6 +14,9 @@ export default defineConfig({
         react(),
         tailwindcss(),
     ],
+    server: {
+        cors: true,
+    },
     esbuild: {
         jsx: 'automatic',
     },
