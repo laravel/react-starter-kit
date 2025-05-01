@@ -111,6 +111,10 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /* Allows us to transition an element from a certain length to its intrinsic size */
+    /* Learn more here: https://css-tricks.com/almanac/properties/i/interpolate-size/  */
+    interpolate-size: allow-keywords;
 }
 
 .dark {
