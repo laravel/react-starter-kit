@@ -3,9 +3,11 @@ import { cn } from '@/lib/utils';
 import axios from 'axios';
 import { Lock } from 'lucide-react';
 import { PropsWithChildren, useRef, useState } from 'react';
-import InputError from './input-error';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
+
+import InputError from '@/components/input-error';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useForm } from '@inertiajs/react';
 
 interface Props {
     title?: string;
@@ -14,7 +16,7 @@ interface Props {
     onConfirm(): void;
 }
 
-export function ConfirmsPassword({
+export function ConfirmPassword({
     title = 'Confirm Password',
     content = 'For your security, please confirm your password to continue.',
     button = 'Confirm',
@@ -22,7 +24,7 @@ export function ConfirmsPassword({
     children,
 }: PropsWithChildren<Props>) {
     const [confirmingPassword, setConfirmingPassword] = useState(false);
-    const [form, setForm] = useState({
+    const form = useForm({
         password: '',
         error: '',
         processing: false,
@@ -42,29 +44,23 @@ export function ConfirmsPassword({
     }
 
     function confirmPassword() {
-        setForm({ ...form, processing: true });
-
         axios
             .post(route('password.confirm'), {
-                password: form.password,
+                password: form.data.password,
             })
             .then(() => {
                 closeModal();
                 setTimeout(() => onConfirm(), 250);
             })
             .catch((error) => {
-                setForm({
-                    ...form,
-                    processing: false,
-                    error: error.response.data.errors.password[0],
-                });
+                form.setError('password', error.response.data.errors.password[0]);
                 passwordRef.current?.focus();
             });
     }
 
     function closeModal() {
         setConfirmingPassword(false);
-        setForm({ processing: false, password: '', error: '' });
+        form.reset();
     }
 
     return (
@@ -91,10 +87,10 @@ export function ConfirmsPassword({
                                 type="password"
                                 className="mt-1 block w-full"
                                 placeholder="Password"
-                                value={form.password}
-                                onChange={(e) => setForm({ ...form, password: e.currentTarget.value })}
+                                value={form.data.password}
+                                onChange={(e) => form.setData('password', e.currentTarget.value)}
                             />
-                            <InputError message={form.error} className="mt-2" />
+                            <InputError message={form.errors.password} className="mt-2" />
                         </div>
                     </div>
                     <DialogFooter>
