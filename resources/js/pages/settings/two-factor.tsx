@@ -16,6 +16,7 @@ import {
 import { Check, Copy, Eye, EyeOff, Loader, ScanLine, LockKeyhole } from 'lucide-react';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import type { BreadcrumbItem } from '@/types';
+import { ConfirmPassword } from '@/components/confirm-password';
 
 interface TwoFactorProps {
     confirmed: boolean;
@@ -294,9 +295,13 @@ export default function TwoFactor({ confirmed: initialConfirmed, recoveryCodes }
                             </div>
 
                             <div className="inline relative">
-                                <Button variant="destructive" onClick={disable}>
-                                    Disable 2FA
-                                </Button>
+                                <ConfirmPassword
+                                    onConfirm={disable}
+                                >
+                                    <Button variant="destructive">
+                                        Disable 2FA
+                                    </Button>
+                                </ConfirmPassword>
                             </div>
                         </div>
                     )}

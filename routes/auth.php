@@ -50,6 +50,9 @@ Route::middleware('auth')->group(function () {
     Route::get('confirm-password', [ConfirmablePasswordController::class, 'show'])
         ->name('password.confirm');
 
+    Route::get('confirm-password/status', [ConfirmablePasswordController::class, 'status'])
+        ->name('password.confirmation');
+
     Route::post('confirm-password', [ConfirmablePasswordController::class, 'store']);
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
