@@ -45,12 +45,12 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
         setSecretKey(data.secret);
     } catch (error) {
       console.error('Error enabling 2FA:', error);
+      let errorMessage = 'Invalid verification code';
       if (error instanceof AxiosError && error.response?.data) {
-        const errorData = error.response.data;
-        console.error('Verification error:', errorData.message);
-        setError(errorData.message || 'Invalid verification code');
-        setPasscode('');
+        errorMessage = error.response.data.message || errorMessage;
       }
+      setPasscode('');
+      setError(errorMessage);
     }
   };
 
@@ -75,15 +75,12 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
       setError('');
 
     } catch (error) {
-      console.error('Error confirming 2FA:', error);
+      let errorMessage = 'An error occurred while confirming 2FA';
       if (error instanceof AxiosError && error.response?.data) {
-        const errorData = error.response.data;
-        console.error('Verification error:', errorData.message);
-        setError(errorData.message || 'Invalid verification code');
-        setPasscode('');
-        return;
+        errorMessage = error.response.data.message || errorMessage;
       }
-      setError('An error occurred while confirming 2FA');
+      setError(errorMessage);
+      setPasscode('');
     }
   };
 
@@ -96,10 +93,11 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
       }
     } catch (error) {
       console.error('Error regenerating codes:', error);
+      let errorMessage = 'An error occurred while regenerating recovery codes';
       if (error instanceof AxiosError && error.response?.data) {
-        const errorData = error.response.data;
-        setError(errorData.message || 'Invalid verification code');
+        errorMessage = error.response.data.message || errorMessage;
       }
+      setError(errorMessage);
     }
   };
 
@@ -114,10 +112,11 @@ export function useTwoFactorAuth(initialConfirmed: boolean, initialRecoveryCodes
       setSecretKey('');
     } catch (error) {
       console.error('Error disabling 2FA:', error);
+      let errorMessage = 'An error occurred while disabling 2FA';
       if (error instanceof AxiosError && error.response?.data) {
-        const errorData = error.response.data;
-        setError(errorData.message || 'Invalid verification code');
+        errorMessage = error.response.data.message || errorMessage;
       }
+      setError(errorMessage);
     }
   };
 
