@@ -5,21 +5,22 @@ import { Progress } from '@/components/ui/progress';
 import { Textarea } from '@/components/ui/textarea';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
 import { useState, useEffect, useMemo } from 'react';
 import {
     CheckCircle,
     XCircle,
     MinusCircle,
-    ArrowLeft,
-    ArrowRight,
     Upload,
     FileText,
     Globe,
-    Clock,
     Award,
-    BarChart3
+    BarChart3,
+    ChevronLeft,
+    ChevronRight,
+    Save,
+    AlertCircle,
+    Zap
 } from 'lucide-react';
 
 interface Criterion {
@@ -82,60 +83,7 @@ interface TakeProps {
     completionPercentage: number;
 }
 
-interface Translations {
-    en: {
-        assessment: string;
-        progress: string;
-        criteria: string;
-        yes: string;
-        no: string;
-        notApplicable: string;
-        selected: string;
-        additionalInfo: string;
-        notes: string;
-        notesPlaceholder: string;
-        requiredAttachment: string;
-        provideDocumentation: string;
-        supportedFormats: string;
-        supportingDocument: string;
-        optionalDocument: string;
-        assessmentComplete: string;
-        submitAssessment: string;
-        requiresAttachment: string;
-        submitting: string;
-        continue: string;
-        back: string;
-        next: string;
-        optional: string;
-    };
-    ar: {
-        assessment: string;
-        progress: string;
-        criteria: string;
-        yes: string;
-        no: string;
-        notApplicable: string;
-        selected: string;
-        additionalInfo: string;
-        notes: string;
-        notesPlaceholder: string;
-        requiredAttachment: string;
-        provideDocumentation: string;
-        supportedFormats: string;
-        supportingDocument: string;
-        optionalDocument: string;
-        assessmentComplete: string;
-        submitAssessment: string;
-        requiresAttachment: string;
-        submitting: string;
-        continue: string;
-        back: string;
-        next: string;
-        optional: string;
-    };
-}
-
-const translations: Translations = {
+const translations = {
     en: {
         assessment: "Assessment",
         progress: "Progress",
@@ -159,7 +107,11 @@ const translations: Translations = {
         continue: "Continue",
         back: "Back",
         next: "Next",
-        optional: "Optional"
+        optional: "Optional",
+        saveProgress: "Progress Saved",
+        question: "Question",
+        of: "of",
+        questionsCompleted: "Questions Completed"
     },
     ar: {
         assessment: "التقييم",
@@ -184,7 +136,11 @@ const translations: Translations = {
         continue: "متابعة",
         back: "رجوع",
         next: "التالي",
-        optional: "اختياري"
+        optional: "اختياري",
+        saveProgress: "تم حفظ التقدم",
+        question: "السؤال",
+        of: "من",
+        questionsCompleted: "الأسئلة المكتملة"
     }
 };
 
@@ -194,6 +150,8 @@ export default function Take({ assessment, tool, existingResponses, completionPe
     const [attachments, setAttachments] = useState<Record<number, File | null>>({});
     const [language, setLanguage] = useState<'en' | 'ar'>('en');
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [lastSaved, setLastSaved] = useState<Date | null>(null);
 
     // Initialize responses from existing data
     useEffect(() => {
@@ -209,7 +167,7 @@ export default function Take({ assessment, tool, existingResponses, completionPe
         setNotes(initialNotes);
     }, [existingResponses]);
 
-    // Flatten all criteria into a single array
+    // Flatten all criteria into a single array (hide domain/category structure)
     const allCriteria = useMemo(() => {
         const criteria: Criterion[] = [];
         tool.domains.forEach(domain => {
@@ -223,6 +181,7 @@ export default function Take({ assessment, tool, existingResponses, completionPe
     }, [tool]);
 
     const totalCriteria = allCriteria.length;
+    const currentCriterion = allCriteria[currentQuestionIndex];
 
     // Calculate real-time completion percentage
     const completionPercentage = useMemo(() => {
@@ -232,18 +191,15 @@ export default function Take({ assessment, tool, existingResponses, completionPe
 
     // Check if assessment is complete
     const isComplete = useMemo(() => {
-        // Check if all criteria have responses
         const allAnswered = allCriteria.every(criterion => responses[criterion.id]);
 
-        // Check if all required attachments are provided
         const requiredAttachmentsValid = allCriteria.every(criterion => {
-            // Only check for attachment if requires_attachment is 1 (true) and response is 'yes'
+            // Only check for attachment if requires_attachment is 1 and response is 'yes'
             if (criterion.requires_attachment === 1 && responses[criterion.id] === 'yes') {
                 return attachments[criterion.id] !== null && attachments[criterion.id] !== undefined;
             }
             return true;
         });
-
         return allAnswered && requiredAttachmentsValid;
     }, [responses, attachments, allCriteria]);
 
@@ -256,12 +212,10 @@ export default function Take({ assessment, tool, existingResponses, completionPe
         formData.append('criterion_id', criterionId.toString());
         formData.append('response', response);
 
-        // Add notes if exists
         if (notes[criterionId]) {
             formData.append('notes', notes[criterionId]);
         }
 
-        // Add attachment if exists
         if (attachments[criterionId]) {
             formData.append('attachment', attachments[criterionId]!);
         }
@@ -276,8 +230,8 @@ export default function Take({ assessment, tool, existingResponses, completionPe
             });
 
             const data = await result.json();
-            if (!data.success) {
-                console.error('Error saving response:', data.message);
+            if (data.success) {
+                setLastSaved(new Date());
             }
         } catch (error) {
             console.error('Error saving response:', error);
@@ -297,9 +251,7 @@ export default function Take({ assessment, tool, existingResponses, completionPe
 
         setIsSubmitting(true);
 
-        const submissionData = {
-            responses: {}
-        };
+        const submissionData = { responses: {} };
 
         Object.entries(responses).forEach(([criterionId, response]) => {
             submissionData.responses[criterionId] = {
@@ -340,20 +292,67 @@ export default function Take({ assessment, tool, existingResponses, completionPe
 
     const completedCriteria = Object.keys(responses).filter(id => responses[parseInt(id)]?.response).length;
 
+    const navigateToNext = () => {
+        if (currentQuestionIndex < totalCriteria - 1) {
+            setCurrentQuestionIndex(prev => prev + 1);
+        }
+    };
+
+    const navigateToPrev = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(prev => prev - 1);
+        }
+    };
+
+    const navigateToQuestion = (index: number) => {
+        setCurrentQuestionIndex(index);
+    };
+
+    if (!currentCriterion) {
+        return <div>Loading...</div>;
+    }
+
     return (
         <>
             <Head title={`${getLocalizedText(tool, 'name')} ${t.assessment}`} />
 
-            <div className={`min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                {/* Floating Progress Indicator */}
+                <div className="fixed top-4 right-4 z-50">
+                    <Card className="bg-white/90 backdrop-blur-sm shadow-lg border-0">
+                        <CardContent className="p-4">
+                            <div className="flex items-center space-x-3">
+                                <BarChart3 className="w-5 h-5 text-blue-600" />
+                                <div>
+                                    <div className="text-sm font-medium text-gray-900">
+                                        {Math.round(completionPercentage)}% {t.progress}
+                                    </div>
+                                    <Progress value={completionPercentage} className="w-24 h-2" />
+                                </div>
+                            </div>
+                        </CardContent>
+                    </Card>
+                </div>
+
                 {/* Header */}
-                <header className="bg-white shadow-sm border-b">
+                <header className="bg-white/80 backdrop-blur-md shadow-sm border-b border-white/20 sticky top-0 z-40">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <div className="flex justify-between items-center h-16">
                             <div className="flex items-center space-x-4">
-                                <h1 className="text-xl font-semibold text-gray-900">{getLocalizedText(tool, 'name')}</h1>
-                                <span className="text-sm text-gray-500">{t.assessment}</span>
+                                <div>
+                                    <h1 className="text-xl font-semibold text-gray-900">{getLocalizedText(tool, 'name')}</h1>
+                                    <div className="flex items-center space-x-2 text-sm text-gray-500">
+                                        <span>{t.question} {currentQuestionIndex + 1} {t.of} {totalCriteria}</span>
+                                    </div>
+                                </div>
                             </div>
                             <div className="flex items-center space-x-4">
+                                {lastSaved && (
+                                    <div className="flex items-center text-xs text-green-600 bg-green-50 px-2 py-1 rounded-full">
+                                        <Save className="w-3 h-3 mr-1" />
+                                        {t.saveProgress}
+                                    </div>
+                                )}
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -363,10 +362,6 @@ export default function Take({ assessment, tool, existingResponses, completionPe
                                     <Globe className="w-4 h-4" />
                                     <span>{language === 'en' ? 'عربي' : 'English'}</span>
                                 </Button>
-                                <div className="text-sm text-gray-600">
-                                    {t.progress}: {Math.round(completionPercentage)}%
-                                </div>
-                                <Progress value={completionPercentage} className="w-32" />
                             </div>
                         </div>
                     </div>
@@ -374,196 +369,350 @@ export default function Take({ assessment, tool, existingResponses, completionPe
 
                 <div className="py-8 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
-                        <div className="space-y-6">
-                            {tool.domains.map((domain) => (
-                                <div key={domain.id} className="space-y-6">
-                                    {domain.categories.map((category) => (
-                                        <div key={category.id} className="space-y-4">
-                                            {category.criteria.map((criterion) => (
-                                                <Card key={criterion.id}>
-                                                    <CardContent className="space-y-4 p-4 border rounded-lg bg-gray-50">
-                                                        <div className="space-y-2">
-                                                            <div className="flex items-start justify-between">
-                                                                <div className="flex-1">
-                                                                    <h4 className="font-medium text-base leading-tight">
-                                                                        {getLocalizedText(criterion, 'name')}
-                                                                    </h4>
-                                                                    {getLocalizedText(criterion, 'description') && (
-                                                                        <p className="text-sm text-gray-600 mt-1">
-                                                                            {getLocalizedText(criterion, 'description')}
-                                                                        </p>
-                                                                    )}
-                                                                    {criterion.requires_attachment === 1 && (
-                                                                        <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-2 mt-2">
-                                                                            <div className="flex items-center">
-                                                                                <Upload className="w-4 h-4 text-yellow-600 mr-2" />
-                                                                                <span className="text-xs text-yellow-800 font-medium">
-                                                                                        {t.requiresAttachment}
-                                                                                    </span>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-
-                                                                {responses[criterion.id] && (
-                                                                    <div className="flex items-center ml-4">
-                                                                        {responses[criterion.id] === 'yes' && (
-                                                                            <CheckCircle className="w-5 h-5 text-green-600" />
-                                                                        )}
-                                                                        {responses[criterion.id] === 'no' && (
-                                                                            <XCircle className="w-5 h-5 text-red-600" />
-                                                                        )}
-                                                                        {responses[criterion.id] === 'na' && (
-                                                                            <MinusCircle className="w-5 h-5 text-gray-600" />
-                                                                        )}
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        </div>
-
-                                                        {/* Response Buttons */}
-                                                        <div className="flex justify-center space-x-3">
-                                                            <Button
-                                                                variant={responses[criterion.id] === 'yes' ? 'default' : 'outline'}
-                                                                size="sm"
-                                                                onClick={() => handleResponseChange(criterion.id, 'yes')}
-                                                                className={responses[criterion.id] === 'yes' ? 'bg-green-600 hover:bg-green-700 text-white' : 'hover:bg-green-50 hover:border-green-300'}
-                                                            >
-                                                                <CheckCircle className="w-4 h-4 mr-1" />
-                                                                {t.yes}
-                                                            </Button>
-                                                            <Button
-                                                                variant={responses[criterion.id] === 'no' ? 'default' : 'outline'}
-                                                                size="sm"
-                                                                onClick={() => handleResponseChange(criterion.id, 'no')}
-                                                                className={responses[criterion.id] === 'no' ? 'bg-red-600 hover:bg-red-700 text-white' : 'hover:bg-red-50 hover:border-red-300'}
-                                                            >
-                                                                <XCircle className="w-4 h-4 mr-1" />
-                                                                {t.no}
-                                                            </Button>
-                                                            <Button
-                                                                variant={responses[criterion.id] === 'na' ? 'default' : 'outline'}
-                                                                size="sm"
-                                                                onClick={() => handleResponseChange(criterion.id, 'na')}
-                                                                className={responses[criterion.id] === 'na' ? 'bg-gray-600 hover:bg-gray-700 text-white' : 'hover:bg-gray-50 hover:border-gray-300'}
-                                                            >
-                                                                <MinusCircle className="w-4 h-4 mr-1" />
-                                                                {t.notApplicable}
-                                                            </Button>
-                                                        </div>
-
-                                                        {/* Selected Response Indicator */}
-                                                        {responses[criterion.id] && (
-                                                            <div className="text-center">
-                                                                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                                                                        {t.selected}: {responses[criterion.id].toUpperCase()}
-                                                                    </span>
-                                                            </div>
-                                                        )}
-
-                                                        {/* Notes and Attachment Section - Only show if there's a response */}
-                                                        {responses[criterion.id] && (
-                                                            <div className="space-y-4 pt-4 border-t">
-                                                                <div className="space-y-2">
-                                                                    <Label htmlFor={`notes_${criterion.id}`} className="flex items-center">
-                                                                        <FileText className="w-4 h-4 mr-2" />
-                                                                        {t.notes}
-                                                                    </Label>
-                                                                    <Textarea
-                                                                        id={`notes_${criterion.id}`}
-                                                                        value={notes[criterion.id] || ''}
-                                                                        onChange={(e) => handleNotesChange(criterion.id, e.target.value)}
-                                                                        placeholder={t.notesPlaceholder}
-                                                                        rows={2}
-                                                                    />
-                                                                </div>
-
-                                                                {/* Required attachment for "yes" responses ONLY when requires_attachment is 1/true */}
-                                                                {criterion.requires_attachment === 1 && responses[criterion.id] === 'yes' && (
-                                                                    <div className="border-2 border-dashed border-yellow-300 rounded-lg p-4 bg-yellow-50">
-                                                                        <Label htmlFor={`attachment_${criterion.id}`} className="text-yellow-800 font-medium">
-                                                                            {t.requiredAttachment}
-                                                                        </Label>
-                                                                        <p className="text-sm text-yellow-700 mb-2">
-                                                                            {t.provideDocumentation}
-                                                                        </p>
-                                                                        <Input
-                                                                            id={`attachment_${criterion.id}`}
-                                                                            type="file"
-                                                                            onChange={(e) => handleAttachmentChange(criterion.id, e.target.files?.[0] || null)}
-                                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                                                            className="bg-white"
-                                                                        />
-                                                                        <p className="text-xs text-yellow-600 mt-1">
-                                                                            {t.supportedFormats}
-                                                                        </p>
-                                                                    </div>
-                                                                )}
-
-                                                                {/* Optional attachment for other responses - Only show when requires_attachment is 0/false */}
-                                                                {criterion.requires_attachment !== 1 && (
-                                                                    <div className="space-y-2">
-                                                                        <Label htmlFor={`attachment_${criterion.id}`} className="flex items-center">
-                                                                            <Upload className="w-4 h-4 mr-2" />
-                                                                            {t.supportingDocument} ({t.optional})
-                                                                        </Label>
-                                                                        <Input
-                                                                            id={`attachment_${criterion.id}`}
-                                                                            type="file"
-                                                                            onChange={(e) => handleAttachmentChange(criterion.id, e.target.files?.[0] || null)}
-                                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                                                        />
-                                                                        <p className="text-sm text-gray-500">
-                                                                            {t.optionalDocument}
-                                                                        </p>
-                                                                    </div>
-                                                                )}
-                                                            </div>
-                                                        )}
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
+                        {/* Question Progress Overview */}
+                        <Card className="mb-6 border-0 shadow-xl bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex-1">
+                                        <div className="flex items-center space-x-2 mb-2">
+                                            <FileText className="w-5 h-5" />
+                                            <span className="text-sm opacity-90">{t.question} {currentQuestionIndex + 1} {t.of} {totalCriteria}</span>
                                         </div>
-                                    ))}
+                                        <h2 className="text-2xl font-bold mb-2">{t.questionsCompleted}</h2>
+                                        <p className="text-blue-100">{completedCriteria} out of {totalCriteria} questions answered</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <div className="text-3xl font-bold">
+                                            {Math.round(completionPercentage)}%
+                                        </div>
+                                        <div className="text-sm opacity-90">Complete</div>
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
+                                <Progress
+                                    value={completionPercentage}
+                                    className="mt-4 bg-white/20"
+                                />
+                            </CardContent>
+                        </Card>
 
-                        {/* Submit Assessment */}
-                        <Card className="mt-6">
-                            <CardContent className="pt-6">
-                                <div className="text-center space-y-4">
-                                    <div className="space-y-2">
-                                        <div className="text-lg font-medium">
-                                            {completedCriteria} / {totalCriteria} {t.criteria} completed
+                        {/* Current Question */}
+                        <Card className="border-0 shadow-2xl">
+                            <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center space-x-3">
+                                        <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-lg font-bold">
+                                            {currentQuestionIndex + 1}
                                         </div>
-                                        <Progress value={completionPercentage} className="max-w-md mx-auto" />
+                                        <div>
+                                            <CardTitle className="text-xl">{getLocalizedText(currentCriterion, 'name')}</CardTitle>
+                                            {getLocalizedText(currentCriterion, 'description') && (
+                                                <CardDescription className="mt-1 text-base">
+                                                    {getLocalizedText(currentCriterion, 'description')}
+                                                </CardDescription>
+                                            )}
+                                        </div>
+                                    </div>
+                                    {responses[currentCriterion.id] && (
+                                        <div className="flex items-center">
+                                            {responses[currentCriterion.id] === 'yes' && (
+                                                <CheckCircle className="w-8 h-8 text-green-600" />
+                                            )}
+                                            {responses[currentCriterion.id] === 'no' && (
+                                                <XCircle className="w-8 h-8 text-red-600" />
+                                            )}
+                                            {responses[currentCriterion.id] === 'na' && (
+                                                <MinusCircle className="w-8 h-8 text-gray-600" />
+                                            )}
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Attachment Requirement Warning */}
+                                {currentCriterion.requires_attachment === 1 && (
+                                    <div className="mt-4 bg-amber-50 border border-amber-200 rounded-lg p-3">
+                                        <div className="flex items-center">
+                                            <AlertCircle className="w-4 h-4 text-amber-600 mr-2" />
+                                            <span className="text-sm text-amber-800 font-medium">
+                                                {t.requiresAttachment}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+                            </CardHeader>
+
+                            <CardContent className="p-8">
+                                {/* Response Buttons */}
+                                <div className="space-y-6">
+                                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                        <Button
+                                            variant={responses[currentCriterion.id] === 'yes' ? 'default' : 'outline'}
+                                            size="lg"
+                                            onClick={() => handleResponseChange(currentCriterion.id, 'yes')}
+                                            className={`h-16 transition-all duration-200 ${
+                                                responses[currentCriterion.id] === 'yes'
+                                                    ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg scale-105'
+                                                    : 'hover:bg-green-50 hover:border-green-300 hover:scale-105'
+                                            }`}
+                                        >
+                                            <CheckCircle className="w-6 h-6 mr-3" />
+                                            <span className="text-lg">{t.yes}</span>
+                                        </Button>
+                                        <Button
+                                            variant={responses[currentCriterion.id] === 'no' ? 'default' : 'outline'}
+                                            size="lg"
+                                            onClick={() => handleResponseChange(currentCriterion.id, 'no')}
+                                            className={`h-16 transition-all duration-200 ${
+                                                responses[currentCriterion.id] === 'no'
+                                                    ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg scale-105'
+                                                    : 'hover:bg-red-50 hover:border-red-300 hover:scale-105'
+                                            }`}
+                                        >
+                                            <XCircle className="w-6 h-6 mr-3" />
+                                            <span className="text-lg">{t.no}</span>
+                                        </Button>
+                                        <Button
+                                            variant={responses[currentCriterion.id] === 'na' ? 'default' : 'outline'}
+                                            size="lg"
+                                            onClick={() => handleResponseChange(currentCriterion.id, 'na')}
+                                            className={`h-16 transition-all duration-200 ${
+                                                responses[currentCriterion.id] === 'na'
+                                                    ? 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg scale-105'
+                                                    : 'hover:bg-gray-50 hover:border-gray-300 hover:scale-105'
+                                            }`}
+                                        >
+                                            <MinusCircle className="w-6 h-6 mr-3" />
+                                            <span className="text-lg">{t.notApplicable}</span>
+                                        </Button>
                                     </div>
 
-                                    {isComplete ? (
-                                        <div className="space-y-2">
-                                            <div className="text-green-600 font-medium flex items-center justify-center">
-                                                <CheckCircle className="w-5 h-5 mr-2" />
-                                                {t.assessmentComplete}
-                                            </div>
-                                            <Button
-                                                onClick={submitAssessment}
-                                                size="lg"
-                                                disabled={isSubmitting}
-                                                className="bg-green-600 hover:bg-green-700 px-8"
-                                            >
-                                                <Award className="w-5 h-5 mr-2" />
-                                                {isSubmitting ? t.submitting : t.submitAssessment}
-                                            </Button>
+                                    {/* Selected Response Indicator */}
+                                    {responses[currentCriterion.id] && (
+                                        <div className="text-center">
+                                            <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-lg py-2 px-4">
+                                                {t.selected}: {responses[currentCriterion.id].toUpperCase()}
+                                            </Badge>
                                         </div>
-                                    ) : (
-                                        <div className="text-gray-600">
-                                            Complete all criteria to submit your assessment
+                                    )}
+
+                                    {/* Notes and Attachment Section - Only show if there's a response */}
+                                    {responses[currentCriterion.id] && (
+                                        <div className="space-y-6 p-6 bg-gray-50 rounded-lg border">
+                                            <div className="space-y-3">
+                                                <Label htmlFor={`notes_${currentCriterion.id}`} className="flex items-center text-base font-medium">
+                                                    <FileText className="w-5 h-5 mr-2" />
+                                                    {t.notes}
+                                                </Label>
+                                                <Textarea
+                                                    id={`notes_${currentCriterion.id}`}
+                                                    value={notes[currentCriterion.id] || ''}
+                                                    onChange={(e) => handleNotesChange(currentCriterion.id, e.target.value)}
+                                                    placeholder={t.notesPlaceholder}
+                                                    rows={4}
+                                                    className="resize-none text-base"
+                                                />
+                                            </div>
+
+                                            {/* Required attachment - Only show if requires_attachment === 1 AND response is 'yes' */}
+                                            {currentCriterion.requires_attachment === 1 && responses[currentCriterion.id] === 'yes' && (
+                                                <div className="border-2 border-dashed border-amber-300 rounded-lg p-6 bg-amber-50">
+                                                    <Label htmlFor={`attachment_${currentCriterion.id}`} className="text-amber-800 font-medium flex items-center text-base">
+                                                        <Upload className="w-5 h-5 mr-2" />
+                                                        {t.requiredAttachment}
+                                                    </Label>
+                                                    <p className="text-sm text-amber-700 mb-3 mt-1">
+                                                        {t.provideDocumentation}
+                                                    </p>
+                                                    <Input
+                                                        id={`attachment_${currentCriterion.id}`}
+                                                        type="file"
+                                                        onChange={(e) => handleAttachmentChange(currentCriterion.id, e.target.files?.[0] || null)}
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                        className="bg-white border-amber-300 text-base h-12"
+                                                    />
+                                                    <p className="text-xs text-amber-600 mt-2">
+                                                        {t.supportedFormats}
+                                                    </p>
+                                                </div>
+                                            )}
+
+                                            { console.log(currentCriterion.requires_attachment, currentCriterion)}
+                                            {currentCriterion.requires_attachment !== 0 && (
+
+                                                <div className="space-y-3">
+                                                    <Label htmlFor={`attachment_${currentCriterion.id}`} className="flex items-center text-base">
+                                                        <Upload className="w-5 h-5 mr-2" />
+                                                        {t.supportingDocument} ({t.optional})
+                                                    </Label>
+                                                    <Input
+                                                        id={`attachment_${currentCriterion.id}`}
+                                                        type="file"
+                                                        onChange={(e) => handleAttachmentChange(currentCriterion.id, e.target.files?.[0] || null)}
+                                                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                        className="bg-white text-base h-12"
+                                                    />
+                                                    <p className="text-sm text-gray-500">
+                                                        {t.optionalDocument}
+                                                    </p>
+                                                </div>
+
+                                            )}
+
                                         </div>
                                     )}
                                 </div>
                             </CardContent>
                         </Card>
+
+                        {/* Navigation */}
+                        <Card className="mt-8 border-0 shadow-lg">
+                            <CardContent className="p-6">
+                                <div className="flex items-center justify-between">
+                                    <Button
+                                        variant="outline"
+                                        size="lg"
+                                        onClick={navigateToPrev}
+                                        disabled={currentQuestionIndex === 0}
+                                        className="flex items-center space-x-2"
+                                    >
+                                        <ChevronLeft className="w-5 h-5" />
+                                        <span>{t.back}</span>
+                                    </Button>
+
+                                    <div className="text-center">
+                                        <div className="text-sm text-gray-600 mb-1">
+                                            {t.question} {currentQuestionIndex + 1} {t.of} {totalCriteria}
+                                        </div>
+                                        <Progress
+                                            value={((currentQuestionIndex + 1) / totalCriteria) * 100}
+                                            className="w-32"
+                                        />
+                                    </div>
+
+                                    {currentQuestionIndex < totalCriteria - 1 ? (
+                                        <Button
+                                            variant="default"
+                                            size="lg"
+                                            onClick={navigateToNext}
+                                            className="flex items-center space-x-2 bg-blue-600 hover:bg-blue-700"
+                                        >
+                                            <span>{t.next}</span>
+                                            <ChevronRight className="w-5 h-5" />
+                                        </Button>
+                                    ) : (
+                                        <div className="w-20"></div>
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Question Grid Navigation */}
+                        <Card className="mt-6 border-0 shadow-lg">
+                            <CardContent className="p-6">
+                                <h3 className="text-lg font-semibold mb-4">Quick Navigation</h3>
+                                <div className="grid grid-cols-10 gap-2 max-h-40 overflow-y-auto">
+                                    {allCriteria.map((criterion, index) => (
+                                        <Button
+                                            key={criterion.id}
+                                            variant={index === currentQuestionIndex ? "default" : "outline"}
+                                            size="sm"
+                                            onClick={() => navigateToQuestion(index)}
+                                            className={`h-10 w-10 p-0 ${
+                                                responses[criterion.id] ? 'bg-green-100 border-green-300' : ''
+                                            } ${index === currentQuestionIndex ? 'ring-2 ring-blue-500' : ''}`}
+                                        >
+                                            {index + 1}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Submit Assessment - Only show when complete */}
+                        {isComplete && (
+                            <Card className="mt-8 border-0 shadow-2xl bg-gradient-to-r from-green-600 to-emerald-600 text-white">
+                                <CardContent className="p-8 text-center">
+                                    <div className="space-y-6">
+                                        <div className="flex items-center justify-center">
+                                            <div className="w-16 h-16 bg-white/20 rounded-full flex items-center justify-center mb-4">
+                                                <Award className="w-8 h-8" />
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <h3 className="text-2xl font-bold mb-2">{t.assessmentComplete}</h3>
+                                            <p className="text-green-100 mb-6">
+                                                You have successfully completed all {totalCriteria} questions.
+                                            </p>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-4 mb-6">
+                                            <div className="text-center">
+                                                <div className="text-3xl font-bold">{totalCriteria}</div>
+                                                <div className="text-sm text-green-100">Total Questions</div>
+                                            </div>
+                                            <div className="text-center">
+                                                <div className="text-3xl font-bold">100%</div>
+                                                <div className="text-sm text-green-100">Complete</div>
+                                            </div>
+                                        </div>
+
+                                        <Button
+                                            onClick={submitAssessment}
+                                            size="lg"
+                                            disabled={isSubmitting}
+                                            className="bg-white text-green-600 hover:bg-gray-100 px-8 py-4 text-lg font-semibold shadow-lg"
+                                        >
+                                            {isSubmitting ? (
+                                                <>
+                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-green-600 mr-3"></div>
+                                                    {t.submitting}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <Zap className="w-5 h-5 mr-2" />
+                                                    {t.submitAssessment}
+                                                </>
+                                            )}
+                                        </Button>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Progress Summary - Always visible */}
+                        {!isComplete && (
+                            <Card className="mt-8 border-0 shadow-lg">
+                                <CardContent className="p-6">
+                                    <div className="text-center space-y-4">
+                                        <div className="flex items-center justify-center space-x-2 mb-4">
+                                            <BarChart3 className="w-6 h-6 text-blue-600" />
+                                            <h3 className="text-xl font-semibold">{t.progress} Overview</h3>
+                                        </div>
+
+                                        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-6">
+                                            <div className="text-center p-4 bg-blue-50 rounded-lg">
+                                                <div className="text-2xl font-bold text-blue-600">{completedCriteria}</div>
+                                                <div className="text-sm text-blue-800">Completed</div>
+                                            </div>
+                                            <div className="text-center p-4 bg-gray-50 rounded-lg">
+                                                <div className="text-2xl font-bold text-gray-600">{totalCriteria - completedCriteria}</div>
+                                                <div className="text-sm text-gray-800">Remaining</div>
+                                            </div>
+                                            <div className="text-center p-4 bg-green-50 rounded-lg">
+                                                <div className="text-2xl font-bold text-green-600">{Math.round(completionPercentage)}%</div>
+                                                <div className="text-sm text-green-800">Progress</div>
+                                            </div>
+                                        </div>
+
+                                        <Progress value={completionPercentage} className="h-3" />
+
+                                        <p className="text-gray-600 mt-4">
+                                            Complete all questions to submit your assessment and receive detailed results.
+                                        </p>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
                     </div>
                 </div>
             </div>

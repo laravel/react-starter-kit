@@ -78,6 +78,7 @@ class AssessmentToolsController extends Controller
                 'description_en' => $tool->description_en,
                 'description_ar' => $tool->description_ar,
                 'image' => $tool->image ? asset('storage/' . $tool->image) : null,
+
             ],
             'domains' => $domains->map(function ($domain) {
                 return [
@@ -103,6 +104,7 @@ class AssessmentToolsController extends Controller
                                     'description_en' => $criterion->description_en,
                                     'description_ar' => $criterion->description_ar,
                                     'order' => $criterion->order,
+                                    'requires_attachment' => $criterion->requires_attachment,
                                 ];
                             }),
                         ];
