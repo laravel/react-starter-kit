@@ -28,7 +28,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Start assessment for authenticated users (redirects to start.tsx)
     Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
         ->name('assessment.start');
-
     // Submit assessment for authenticated users
     Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
         ->name('assessment.submit');
@@ -40,6 +39,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // List all user's assessments
     Route::get('/assessments', [AssessmentController::class, 'index'])
         ->name('assessments.index');
+
+    // Admin analytics (if user has admin permissions)
+    Route::get('/admin/guest-analytics', [GuestAssessmentController::class, 'getAnalytics'])
+        ->name('admin.guest-analytics');
 });
 
 // Guest routes (for non-authenticated users)
@@ -66,6 +69,24 @@ Route::post('/assessment/{assessment}/update-details', [GuestAssessmentControlle
 Route::post('/assessment/{assessment}/submit', [GuestAssessmentController::class, 'submit'])
     ->name('guest.assessment.submit');
 
-// Guest results (Results.tsx with capital R)
+// Guest results (GuestResults.tsx - limited view)
 Route::get('/guest/assessment/{assessment}/results', [GuestAssessmentController::class, 'results'])
     ->name('guest.assessment.results');
+
+// Guest email functionality
+Route::post('/guest/assessment/{assessment}/send-email', [GuestAssessmentController::class, 'sendEmail'])
+    ->name('guest.assessment.send-email');
+
+// Guest session tracking
+Route::post('/guest/session/{assessment}/update', [GuestAssessmentController::class, 'updateSession'])
+    ->name('guest.session.update');
+
+// Enhanced registration route with prefilled data
+Route::get('/register', function(\Illuminate\Http\Request $request) {
+    return Inertia::render('auth/register', [
+        'prefillData' => [
+            'name' => $request->query('name'),
+            'email' => $request->query('email'),
+        ]
+    ]);
+})->middleware('guest')->name('register');

@@ -1,33 +1,82 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- Inline script to detect system dark mode preference and apply it immediately --}}
+    {{-- Enhanced theme detection and application --}}
     <script>
         (function() {
-            const appearance = '{{ $appearance ?? "system" }}';
-
-            if (appearance === 'system') {
-                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                if (prefersDark) {
-                    document.documentElement.classList.add('dark');
+            // Function to get stored appearance preference
+            function getStoredAppearance() {
+                // Check localStorage first
+                const stored = localStorage.getItem('appearance');
+                if (stored && ['light', 'dark', 'system'].includes(stored)) {
+                    return stored;
                 }
+
+                // Check cookie as fallback
+                const cookies = document.cookie.split(';');
+                const appearanceCookie = cookies.find(cookie => cookie.trim().startsWith('appearance='));
+                if (appearanceCookie) {
+                    const value = appearanceCookie.split('=')[1];
+                    if (['light', 'dark', 'system'].includes(value)) {
+                        return value;
+                    }
+                }
+
+                // Default to light mode
+                return 'light';
+            }
+
+            // Function to apply theme
+            function applyTheme(appearance) {
+                const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+                const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark);
+
+                if (isDark) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+            }
+
+            // Get and apply the theme immediately
+            const appearance = getStoredAppearance();
+            applyTheme(appearance);
+
+            // Listen for system theme changes if using system preference
+            if (appearance === 'system') {
+                const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+                mediaQuery.addEventListener('change', () => applyTheme('system'));
+            }
+
+            // Store default preference if none exists
+            if (!localStorage.getItem('appearance') && !document.cookie.includes('appearance=')) {
+                localStorage.setItem('appearance', 'light');
+                document.cookie = 'appearance=light;path=/;max-age=31536000;SameSite=Lax';
             }
         })();
     </script>
 
-    {{-- Inline style to set the HTML background color based on our theme in app.css --}}
+    {{-- CSS custom properties for themes --}}
     <style>
         html {
             background-color: oklch(1 0 0);
+            transition: background-color 0.3s ease;
         }
 
         html.dark {
             background-color: oklch(0.145 0 0);
+        }
+
+        /* Prevent flash of unstyled content */
+        body {
+            visibility: hidden;
+        }
+
+        body.loaded {
+            visibility: visible;
         }
     </style>
 
@@ -47,5 +96,10 @@
 </head>
 <body class="font-sans antialiased">
 @inertia
+
+{{-- Show body after theme is applied --}}
+<script>
+    document.body.classList.add('loaded');
+</script>
 </body>
 </html>

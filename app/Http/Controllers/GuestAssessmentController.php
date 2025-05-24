@@ -5,10 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Assessment;
 use App\Models\Tool;
 use App\Models\AssessmentResponse;
+use App\Models\GuestSession;
+use App\Mail\GuestAssessmentCompleted;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Inertia\Inertia;
 
@@ -56,6 +59,9 @@ class GuestAssessmentController extends Controller
             'status' => 'in_progress',
             'started_at' => now(),
         ]);
+
+        // Create guest session tracking
+        GuestSession::createFromRequest($request, $assessment);
 
         return redirect()->route('assessment.take', ['assessment' => $assessment->id]);
     }
@@ -165,7 +171,7 @@ class GuestAssessmentController extends Controller
     }
 
     /**
-     * Show assessment results
+     * Show limited assessment results for guests
      */
     public function results(Assessment $assessment)
     {
@@ -182,8 +188,23 @@ class GuestAssessmentController extends Controller
         // Load necessary relationships
         $assessment->load(['tool', 'results.domain', 'results.category']);
 
-        // Get results
-        $results = $assessment->getResults();
+        // Get basic results (limited for guests)
+        $results = $assessment->results()->with(['domain', 'category'])->get();
+        $domainResults = $results->where('category_id', null);
+
+        // Get guest session data
+        $guestSession = GuestSession::where('assessment_id', $assessment->id)->first();
+
+        // Format basic results for guests (limited information)
+        $basicResults = [
+            'overall_percentage' => (float) $domainResults->avg('score_percentage') ?? 0,
+            'total_criteria' => $domainResults->sum('total_criteria'),
+            'applicable_criteria' => $domainResults->sum('applicable_criteria'),
+            'yes_count' => $domainResults->sum('yes_count'),
+            'no_count' => $domainResults->sum('no_count'),
+            'na_count' => $domainResults->sum('na_count'),
+            'domain_count' => $domainResults->count(),
+        ];
 
         // Format assessment data for frontend
         $assessmentData = [
@@ -201,68 +222,98 @@ class GuestAssessmentController extends Controller
             ]
         ];
 
-        // Format results data with proper domain and category names
-        $formattedResults = [
-            'overall_percentage' => (float) $results['overall_percentage'],
-            'total_criteria' => $results['total_criteria'],
-            'applicable_criteria' => $results['applicable_criteria'],
-            'yes_count' => $results['yes_count'],
-            'no_count' => $results['no_count'],
-            'na_count' => $results['na_count'],
-            'domain_results' => $results['domain_results']->map(function ($domainResult) {
-                return [
-                    'domain_id' => $domainResult->domain_id,
-                    'domain_name' => $domainResult->domain->name_en, // Use consistent field name
-                    'score_percentage' => (float) $domainResult->score_percentage,
-                    'total_criteria' => $domainResult->total_criteria,
-                    'applicable_criteria' => $domainResult->applicable_criteria,
-                    'yes_count' => $domainResult->yes_count,
-                    'no_count' => $domainResult->no_count,
-                    'na_count' => $domainResult->na_count,
-                    'weighted_score' => $domainResult->weighted_score ? (float) $domainResult->weighted_score : null,
-                ];
-            })->toArray(),
-            'category_results' => $results['category_results']->mapWithKeys(function ($categoryResults, $domainId) {
-                return [
-                    $domainId => $categoryResults->map(function ($categoryResult) {
-                        return [
-                            'category_id' => $categoryResult->category_id,
-                            'category_name' => $categoryResult->category->name_en, // Use consistent field name
-                            'score_percentage' => (float) $categoryResult->score_percentage,
-                            'applicable_criteria' => $categoryResult->applicable_criteria,
-                            'yes_count' => $categoryResult->yes_count,
-                            'no_count' => $categoryResult->no_count,
-                            'na_count' => $categoryResult->na_count,
-                            'weight_percentage' => $categoryResult->weight_percentage ? (float) $categoryResult->weight_percentage : null,
-                        ];
-                    })->toArray()
-                ];
-            })->toArray(),
-        ];
+        // Format session data
+        $sessionData = null;
+        if ($guestSession) {
+            $sessionData = [
+                'device_type' => $guestSession->device_type,
+                'browser' => $guestSession->browser,
+                'operating_system' => $guestSession->operating_system,
+                'location' => $guestSession->location,
+                'ip_address' => $guestSession->ip_address,
+            ];
+        }
 
-        return Inertia::render('assessment/Results', [
+        return Inertia::render('assessment/GuestResults', [
             'assessment' => $assessmentData,
-            'results' => $formattedResults,
+            'results' => $basicResults,
+            'sessionData' => $sessionData,
         ]);
     }
 
-    public function getResults(): array
+    /**
+     * Send email with results to guest
+     */
+    public function sendEmail(Assessment $assessment)
     {
-        $results = $this->results()->with(['domain', 'category'])->get();
+        try {
+            // Generate limited results
+            $results = $assessment->results()->with(['domain'])->get();
+            $domainResults = $results->where('category_id', null);
 
-        $domainResults = $results->where('category_id', null);
-        $categoryResults = $results->where('category_id', '!=', null)->groupBy('domain_id');
+            $basicResults = [
+                'overall_percentage' => (float) $domainResults->avg('score_percentage') ?? 0,
+                'total_criteria' => $domainResults->sum('total_criteria'),
+                'applicable_criteria' => $domainResults->sum('applicable_criteria'),
+                'yes_count' => $domainResults->sum('yes_count'),
+                'no_count' => $domainResults->sum('no_count'),
+                'na_count' => $domainResults->sum('na_count'),
+            ];
 
-        return [
-            'domain_results' => $domainResults,
-            'category_results' => $categoryResults,
-            'overall_percentage' => $domainResults->avg('score_percentage') ?? 0,
-            'total_criteria' => $domainResults->sum('total_criteria'),
-            'applicable_criteria' => $domainResults->sum('applicable_criteria'),
-            'yes_count' => $domainResults->sum('yes_count'),
-            'no_count' => $domainResults->sum('no_count'),
-            'na_count' => $domainResults->sum('na_count'),
-        ];
+            // Generate results URL
+            $resultsUrl = route('guest.assessment.results', $assessment->id);
+
+            // Send email
+            Mail::to($assessment->email)->send(
+                new GuestAssessmentCompleted($assessment, $resultsUrl, $basicResults)
+            );
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            Log::error('Error sending guest assessment email', [
+                'assessment_id' => $assessment->id,
+                'email' => $assessment->email,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['error' => 'Failed to send email'], 500);
+        }
+    }
+
+    /**
+     * Update guest session with additional device information
+     */
+    public function updateSession(Request $request, Assessment $assessment)
+    {
+        try {
+            $guestSession = GuestSession::where('assessment_id', $assessment->id)->first();
+
+            if ($guestSession) {
+                $sessionData = $guestSession->session_data ?? [];
+                $sessionData = array_merge($sessionData, [
+                    'device_info' => $request->input('device_info'),
+                    'completed_at' => $request->input('completed_at'),
+                    'updated_at' => now(),
+                ]);
+
+                $guestSession->update([
+                    'session_data' => $sessionData,
+                    'completed_at' => $request->input('completed_at') ?
+                        \Carbon\Carbon::parse($request->input('completed_at')) : now(),
+                ]);
+            }
+
+            return response()->json(['success' => true]);
+
+        } catch (\Exception $e) {
+            Log::error('Error updating guest session', [
+                'assessment_id' => $assessment->id,
+                'error' => $e->getMessage()
+            ]);
+
+            return response()->json(['error' => 'Failed to update session'], 500);
+        }
     }
 
     /**
@@ -271,7 +322,6 @@ class GuestAssessmentController extends Controller
     public function create(Tool $tool)
     {
         $user = Auth::user();
-
 
         return Inertia::render('assessment/Create', [
             'tool' => $tool->load(['domains.categories']),
@@ -319,9 +369,6 @@ class GuestAssessmentController extends Controller
     /**
      * Submit assessment
      */
-    /**
-     * Submit assessment
-     */
     public function submit(Request $request, Assessment $assessment)
     {
         // Check if user can access this assessment
@@ -357,14 +404,14 @@ class GuestAssessmentController extends Controller
                         'assessment_id' => $assessment->id,
                         'criterion_id' => $criterionId,
                         'response' => $response,
-                        'notes' => $notes,        // This goes to assessment_responses table
+                        'notes' => $notes,
                     ];
 
                     // Handle file upload if present
                     if ($attachment && $attachment instanceof \Illuminate\Http\UploadedFile) {
                         $filename = time() . '_' . $criterionId . '_' . $attachment->getClientOriginalName();
                         $path = $attachment->storeAs('assessment_attachments', $filename, 'public');
-                        $data['attachment'] = $path;  // This goes to assessment_responses table
+                        $data['attachment'] = $path;
                     }
 
                     // Update or create response
@@ -381,9 +428,16 @@ class GuestAssessmentController extends Controller
             // Mark assessment as completed
             $assessment->markAsCompleted();
 
+            // Update guest session completion
+            $guestSession = GuestSession::where('assessment_id', $assessment->id)->first();
+            if ($guestSession) {
+                $guestSession->update(['completed_at' => now()]);
+            }
+
             DB::commit();
 
-            return redirect()->route('assessment.results', $assessment)
+            // Redirect to guest results page (limited view)
+            return redirect()->route('guest.assessment.results', $assessment)
                 ->with('success', 'Assessment submitted successfully!');
 
         } catch (\Exception $e) {
@@ -399,37 +453,42 @@ class GuestAssessmentController extends Controller
         }
     }
 
-//    public function submit(Assessment $assessment)
-//    {
-//        // Check if user can access this assessment
-////        if (Auth::check() && $assessment->user_id && $assessment->user_id !== Auth::id()) {
-////            abort(403);
-////        }
-//
-//        dd($assessment->markAsCompleted());
-//
-//        if (!$assessment->isComplete()) {
-//            return back()->withErrors(['assessment' => 'Assessment is not complete']);
-//        }
-//
-//        $assessment->markAsCompleted();
-//        return response()->json(['success' => true]);
-//
-//    }
+    /**
+     * Get analytics data for admin dashboard
+     */
+    public function getAnalytics(Request $request)
+    {
+        // Only allow authenticated admin users
+        if (!Auth::check() || !Auth::user()->is_admin) {
+            abort(403);
+        }
 
-//        if (!$assessment->isComplete()) {
-//            return response()->json(['error' => 'Assessment is not complete'], 400);
-//        }
-//
-//        $assessment->update([
-//            'status' => 'completed',
-//            'completed_at' => now(),
-//        ]);
-//
-//        // Calculate and save results
-//        $assessment->calculateResults();
-//
-////        return redirect()->route('assessment.results', $assessment);
-//
-//    }
+        $startDate = $request->input('start_date', now()->subDays(30));
+        $endDate = $request->input('end_date', now());
+
+        $guestSessions = GuestSession::with(['assessment.tool'])
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->get();
+
+        $analytics = [
+            'total_sessions' => $guestSessions->count(),
+            'unique_emails' => $guestSessions->unique('email')->count(),
+            'completed_assessments' => $guestSessions->whereNotNull('completed_at')->count(),
+            'device_breakdown' => $guestSessions->groupBy('device_type')->map->count(),
+            'browser_breakdown' => $guestSessions->groupBy('browser')->map->count(),
+            'country_breakdown' => $guestSessions->groupBy('country')->map->count(),
+            'top_locations' => $guestSessions->groupBy('city')
+                ->map->count()
+                ->sortDesc()
+                ->take(10),
+            'conversion_rate' => $guestSessions->count() > 0 ?
+                ($guestSessions->whereNotNull('completed_at')->count() / $guestSessions->count()) * 100 : 0,
+            'popular_tools' => $guestSessions->groupBy('assessment.tool.name_en')
+                ->map->count()
+                ->sortDesc()
+                ->take(5),
+        ];
+
+        return response()->json($analytics);
+    }
 }

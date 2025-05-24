@@ -399,9 +399,10 @@ export default function AssessmentTools({ tools, locale }: AssessmentToolsProps)
                                                 )}
                                             </div>
 
-                                            <Link href={route('assessment.start.form', tool.id)}>
-                                                <Button className="w-full mt-4">
-                                                    Start Assessment
+                                            <Link href={route('assessment.start', tool.id)}>
+                                                <Button className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                    <Play className="w-4 h-4 mr-2" />
+                                                    {t.startAssessment}
                                                 </Button>
                                             </Link>
                                         </CardContent>
@@ -584,9 +585,10 @@ export default function AssessmentTools({ tools, locale }: AssessmentToolsProps)
                                                 </div>
                                             </div>
 
-                                            <Link href={route('assessment.start.form', tool.id)}>
-                                                <Button className="w-full mt-4">
-                                                    Start Assessment
+                                            <Link href={route('assessment.start', tool.id)}>
+                                                <Button className="w-full mt-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
+                                                    <Play className="w-4 h-4 mr-2" />
+                                                    {t.startAssessment}
                                                 </Button>
                                             </Link>
                                         </CardContent>

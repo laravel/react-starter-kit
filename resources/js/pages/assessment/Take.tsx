@@ -266,7 +266,7 @@ export default function Take({ assessment, tool, existingResponses, completionPe
         });
 
         // Use Inertia's router.post method
-        router.post(route('assessment.submit', assessment.id), submissionData, {
+        router.post(route('guest.assessment.submit', assessment.id), submissionData, {
             onSuccess: () => {
                 // Will be redirected to results page automatically
             },

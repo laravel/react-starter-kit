@@ -21,5 +21,14 @@ createInertiaApp({
     },
 });
 
-// This will set light / dark mode on load...
-initializeTheme();
+// Initialize theme immediately when the app loads
+// This ensures consistent theme handling across all pages
+if (typeof window !== 'undefined') {
+    // Set default to light mode if no preference is stored
+    if (!localStorage.getItem('appearance') && !document.cookie.includes('appearance=')) {
+        localStorage.setItem('appearance', 'light');
+        document.cookie = 'appearance=light;path=/;max-age=31536000;SameSite=Lax';
+    }
+
+    initializeTheme();
+}

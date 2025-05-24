@@ -1051,7 +1051,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                         </Button>
                                     </div>
 
-                                    { console.log(currentCriterion.requires_attachment , currentResponse?.response , currentCriterion)}
+
                                     {currentCriterion.requires_attachment && currentResponse?.response === 'yes' && (
 
                                         <Card className="border-amber-200 bg-amber-50">

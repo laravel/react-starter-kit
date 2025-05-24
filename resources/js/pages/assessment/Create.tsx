@@ -63,7 +63,7 @@ export default function Create({ tool, prefillData }: CreateProps) {
         e.preventDefault();
 
         // Use Inertia's post method
-        post(route('assessment.start'), {
+        post(route('guest.assessment.start'), {
             onSuccess: () => {
                 // Will be redirected automatically
             },

@@ -6,6 +6,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, ClipboardCheck, FileText} from 'lucide-react';
 import AppLogo from './app-logo';
+import ThemeToggle from './theme-toggle';
 
 const mainNavItems: NavItem[] = [
     {
@@ -59,6 +60,12 @@ export function AppSidebar() {
 
             <SidebarFooter>
                 <NavFooter items={footerNavItems} className="mt-auto" />
+
+                {/* Theme Toggle in Sidebar */}
+                <div className="px-2 py-1">
+                    <ThemeToggle variant="button" size="sm" showLabel />
+                </div>
+
                 <NavUser />
             </SidebarFooter>
         </Sidebar>
