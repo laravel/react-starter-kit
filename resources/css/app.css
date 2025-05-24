@@ -94,8 +94,8 @@
     --accent-foreground: var(--color-neutral-900);
     --destructive: var(--color-red-600);
     --destructive-foreground: var(--color-red-600);
-    --border:var(--color-neutral-200);
-    --input:var(--color-neutral-200);
+    --border: var(--color-neutral-200);
+    --input: var(--color-neutral-200);
     --ring: var(--color-neutral-300);
     --chart-1: var(--color-orange-600);
     --chart-2: var(--color-teal-600);
@@ -109,7 +109,7 @@
     --sidebar-primary-foreground: var(--color-neutral-50);
     --sidebar-accent: var(--color-neutral-100);
     --sidebar-accent-foreground: var(--color-neutral-900);
-    --sidebar-border:var(--color-neutral-200);
+    --sidebar-border: var(--color-neutral-200);
     --sidebar-ring: var(--color-neutral-300);
 }
 
