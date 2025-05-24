@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -22,18 +22,23 @@ import {
     Building
 } from 'lucide-react';
 
+// Dynamic import for ApexCharts to avoid SSR issues
+let ApexCharts: any;
+let Chart: any;
+
 interface AssessmentResult {
     id: number;
-    title_en: string;
-    title_ar: string;
+    name: string;
+    email: string;
+    organization?: string;
+    status: string;
+    completed_at?: string;
+    created_at: string;
     tool: {
         id: number;
         name_en: string;
         name_ar: string;
     };
-    guest_name: string;
-    organization?: string;
-    created_at: string;
 }
 
 interface DomainResult {
@@ -76,18 +81,175 @@ interface AssessmentResultsProps {
     locale?: string;
 }
 
-// Bar Chart Component
-interface BarChartProps {
+// ApexChart Bar Chart Component
+interface ApexBarChartProps {
     data: Array<{
         name: string;
         value: number;
         color: string;
+        details?: {
+            yes: number;
+            no: number;
+            na: number;
+            total: number;
+        };
     }>;
     height?: number;
-    showValues?: boolean;
+    isArabic?: boolean;
 }
 
-const BarChart: React.FC<BarChartProps> = ({ data, height = 300, showValues = true }) => {
+const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabic = false }) => {
+    const [chartLoaded, setChartLoaded] = useState(false);
+    const chartRef = React.useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const loadApexCharts = async () => {
+            if (typeof window !== 'undefined' && !ApexCharts) {
+                try {
+                    // Try to import from CDN or installed package
+                    const apexModule = await import('apexcharts');
+                    ApexCharts = apexModule.default;
+                    setChartLoaded(true);
+                } catch (error) {
+                    console.error('Failed to load ApexCharts:', error);
+                }
+            } else if (ApexCharts) {
+                setChartLoaded(true);
+            }
+        };
+
+        loadApexCharts();
+    }, []);
+
+    useEffect(() => {
+        if (chartLoaded && ApexCharts && chartRef.current) {
+            const chartOptions = {
+                chart: {
+                    type: 'bar',
+                    height: height,
+                    toolbar: {
+                        show: false,
+                    },
+                    animations: {
+                        enabled: true,
+                        easing: 'easeinout',
+                        speed: 800,
+                    },
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded',
+                        borderRadius: 4,
+                    },
+                },
+                dataLabels: {
+                    enabled: true,
+                    formatter: function (val: number) {
+                        return Math.round(val) + '%';
+                    },
+                    style: {
+                        fontSize: '12px',
+                        fontWeight: 'bold',
+                        colors: ['#ffffff'],
+                    },
+                },
+                stroke: {
+                    show: true,
+                    width: 2,
+                    colors: ['transparent'],
+                },
+                xaxis: {
+                    categories: data.map(item => item.name),
+                    labels: {
+                        style: {
+                            fontSize: '12px',
+                            fontWeight: '500',
+                        },
+                        maxHeight: 60,
+                    },
+                },
+                yaxis: {
+                    title: {
+                        text: isArabic ? 'النسبة المئوية' : 'Percentage (%)',
+                        style: {
+                            fontSize: '14px',
+                            fontWeight: '600',
+                        },
+                    },
+                    min: 0,
+                    max: 100,
+                    labels: {
+                        formatter: function (val: number) {
+                            return Math.round(val) + '%';
+                        },
+                    },
+                },
+                fill: {
+                    colors: data.map(item => item.color),
+                    opacity: 0.9,
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val: number, { dataPointIndex }: { dataPointIndex: number }) {
+                            const item = data[dataPointIndex];
+                            let tooltip = `Score: ${Math.round(val)}%`;
+                            if (item.details) {
+                                tooltip += `<br/>✓ ${item.details.yes} Yes<br/>✗ ${item.details.no} No<br/>○ ${item.details.na} N/A`;
+                            }
+                            return tooltip;
+                        },
+                    },
+                    style: {
+                        fontSize: '12px',
+                    },
+                },
+                grid: {
+                    borderColor: '#f1f5f9',
+                    strokeDashArray: 4,
+                },
+                theme: {
+                    mode: 'light',
+                },
+            };
+
+            const series = [{
+                name: isArabic ? 'النتيجة' : 'Score',
+                data: data.map(item => Math.round(item.value)),
+            }];
+
+            const chart = new ApexCharts(chartRef.current, {
+                ...chartOptions,
+                series: series,
+            });
+
+            chart.render();
+
+            return () => {
+                if (chart) {
+                    chart.destroy();
+                }
+            };
+        }
+    }, [chartLoaded, data, height, isArabic]);
+
+    if (!chartLoaded) {
+        return (
+            <div className="w-full flex items-center justify-center" style={{ height: `${height}px` }}>
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading chart...</p>
+                </div>
+            </div>
+        );
+    }
+
+    return <div ref={chartRef} className="w-full" />;
+};
+
+// Fallback Simple Bar Chart Component (if ApexCharts fails to load)
+const SimpleBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400 }) => {
     const maxValue = Math.max(...data.map(d => d.value));
 
     return (
@@ -96,11 +258,9 @@ const BarChart: React.FC<BarChartProps> = ({ data, height = 300, showValues = tr
                 {data.map((item, index) => (
                     <div key={index} className="flex flex-col items-center flex-1">
                         {/* Value label */}
-                        {showValues && (
-                            <div className="text-sm font-medium text-gray-900 mb-2">
-                                {item.value}%
-                            </div>
-                        )}
+                        <div className="text-sm font-medium text-gray-900 mb-2">
+                            {Math.round(item.value)}%
+                        </div>
 
                         {/* Bar */}
                         <div
@@ -113,7 +273,12 @@ const BarChart: React.FC<BarChartProps> = ({ data, height = 300, showValues = tr
                         >
                             {/* Hover tooltip */}
                             <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                                {item.name}: {item.value}%
+                                {item.name}: {Math.round(item.value)}%
+                                {item.details && (
+                                    <div className="text-xs mt-1">
+                                        ✓{item.details.yes} ✗{item.details.no} ○{item.details.na}
+                                    </div>
+                                )}
                             </div>
                         </div>
 
@@ -145,14 +310,14 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ label, value, maxValue, c
     const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
 
     return (
-        <div className="space-y-2">
+        <div className="space-y-3">
             <div className="flex justify-between items-center">
-                <span className="text-sm font-medium text-gray-900">{label}</span>
-                <span className="text-sm font-bold" style={{ color }}>{value}%</span>
+                <span className="text-sm font-semibold text-gray-900">{label}</span>
+                <span className="text-lg font-bold" style={{ color }}>{Math.round(value)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-3">
+            <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
                 <div
-                    className="h-3 rounded-full transition-all duration-500 ease-out"
+                    className="h-4 rounded-full transition-all duration-700 ease-out shadow-sm"
                     style={{
                         width: `${percentage}%`,
                         backgroundColor: color
@@ -160,10 +325,19 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ label, value, maxValue, c
                 />
             </div>
             {details && (
-                <div className="flex justify-between text-xs text-gray-500">
-                    <span>✓ {details.yes} Yes</span>
-                    <span>✗ {details.no} No</span>
-                    <span>○ {details.na} N/A</span>
+                <div className="flex justify-between text-sm text-gray-600 bg-gray-50 rounded px-3 py-2">
+                    <span className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
+                        {details.yes} Yes
+                    </span>
+                    <span className="flex items-center">
+                        <XCircle className="w-4 h-4 text-red-600 mr-1" />
+                        {details.no} No
+                    </span>
+                    <span className="flex items-center">
+                        <MinusCircle className="w-4 h-4 text-gray-600 mr-1" />
+                        {details.na} N/A
+                    </span>
                 </div>
             )}
         </div>
@@ -172,6 +346,7 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ label, value, maxValue, c
 
 export default function AssessmentResults({ assessment, results, locale = 'en' }: AssessmentResultsProps) {
     const isArabic = locale === 'ar';
+    const [useApexCharts, setUseApexCharts] = useState(true);
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -180,7 +355,7 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
         },
         {
             title: isArabic ? 'النتائج' : 'Results',
-            href: `/assessment/results/${assessment.id}`,
+            href: `/assessment/${assessment.id}/results`,
         },
     ];
 
@@ -228,8 +403,14 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
         name: domain.domain_name.length > 15 ?
             domain.domain_name.substring(0, 15) + '...' :
             domain.domain_name,
-        value: Math.round(domain.score_percentage),
-        color: getScoreColor(domain.score_percentage)
+        value: domain.score_percentage,
+        color: getScoreColor(domain.score_percentage),
+        details: {
+            yes: domain.yes_count,
+            no: domain.no_count,
+            na: domain.na_count,
+            total: domain.total_criteria
+        }
     }));
 
     const formatDate = (dateString: string): string => {
@@ -239,6 +420,13 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
             month: 'long',
             day: 'numeric'
         });
+    };
+
+    const getCompletionText = (): string => {
+        if (assessment.completed_at) {
+            return isArabic ? `اكتمل في ${formatDate(assessment.completed_at)}` : `Completed on ${formatDate(assessment.completed_at)}`;
+        }
+        return isArabic ? `تم الإنشاء في ${formatDate(assessment.created_at)}` : `Created on ${formatDate(assessment.created_at)}`;
     };
 
     return (
@@ -258,7 +446,7 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                             <div className="flex items-center gap-1">
                                 <User className="h-4 w-4" />
-                                {assessment.guest_name}
+                                {assessment.name}
                             </div>
                             {assessment.organization && (
                                 <div className="flex items-center gap-1">
@@ -268,8 +456,11 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                             )}
                             <div className="flex items-center gap-1">
                                 <Calendar className="h-4 w-4" />
-                                {formatDate(assessment.created_at)}
+                                {getCompletionText()}
                             </div>
+                            <Badge className={`${assessment.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                {assessment.status === 'completed' ? (isArabic ? 'مكتمل' : 'Completed') : (isArabic ? 'قيد المعالجة' : 'Processing')}
+                            </Badge>
                         </div>
                     </div>
 
@@ -289,12 +480,22 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                 <Card className="border-green-200 bg-green-50">
                     <CardContent className="flex items-center gap-3 p-4">
                         <CheckCircle className="h-5 w-5 text-green-600" />
-                        <p className="text-green-800 font-medium">
-                            {isArabic
-                                ? 'تم إرسال التقييم بنجاح! يمكنك مراجعة النتائج أدناه.'
-                                : 'Assessment submitted successfully! You can review your results below.'
-                            }
-                        </p>
+                        <div className="flex-1">
+                            <p className="text-green-800 font-medium">
+                                {isArabic
+                                    ? 'تم إرسال التقييم بنجاح! يمكنك مراجعة النتائج أدناه.'
+                                    : 'Assessment submitted successfully! You can review your results below.'
+                                }
+                            </p>
+                            {assessment.completed_at && (
+                                <p className="text-green-700 text-sm mt-1">
+                                    {isArabic
+                                        ? `تم الانتهاء في ${formatDate(assessment.completed_at)}`
+                                        : `Completed on ${formatDate(assessment.completed_at)}`
+                                    }
+                                </p>
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -369,16 +570,29 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                     </CardContent>
                 </Card>
 
-                {/* Domain Results Bar Chart */}
+                {/* Domain Results Chart */}
                 <Card>
                     <CardHeader>
-                        <CardTitle className="flex items-center gap-2">
-                            <BarChart3 className="h-5 w-5 text-blue-600" />
-                            {isArabic ? 'أداء المجالات' : 'Domain Performance'}
+                        <CardTitle className="flex items-center gap-2 justify-between">
+                            <div className="flex items-center gap-2">
+                                <BarChart3 className="h-5 w-5 text-blue-600" />
+                                {isArabic ? 'أداء المجالات' : 'Domain Performance'}
+                            </div>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setUseApexCharts(!useApexCharts)}
+                            >
+                                {useApexCharts ? 'Simple Chart' : 'Advanced Chart'}
+                            </Button>
                         </CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <BarChart data={domainChartData} height={350} />
+                        {useApexCharts ? (
+                            <ApexBarChart data={domainChartData} height={350} isArabic={isArabic} />
+                        ) : (
+                            <SimpleBarChart data={domainChartData} height={350} isArabic={isArabic} />
+                        )}
                     </CardContent>
                 </Card>
 
@@ -437,7 +651,7 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                                                 <div key={category.category_id} className="p-4 border border-gray-200 rounded-lg bg-white">
                                                     <HorizontalBar
                                                         label={category.category_name}
-                                                        value={Math.round(category.score_percentage)}
+                                                        value={category.score_percentage}
                                                         maxValue={100}
                                                         color={getScoreColor(category.score_percentage)}
                                                         details={{

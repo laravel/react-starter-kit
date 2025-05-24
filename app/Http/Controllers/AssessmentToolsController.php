@@ -19,7 +19,6 @@ class AssessmentToolsController extends Controller
         $tools = Tool::where('status', 'active')
             ->orderBy('name_en')
             ->get()
-
             ->map(function ($tool) {
                 return [
                     'id' => $tool->id,
@@ -32,7 +31,6 @@ class AssessmentToolsController extends Controller
                 ];
             });
 
-
         return Inertia::render('assessment-tools', [
             'tools' => $tools,
             'locale' => $locale,
@@ -40,7 +38,7 @@ class AssessmentToolsController extends Controller
     }
 
     /**
-     * Start an assessment with a specific tool
+     * Render the assessment start form - this shows the form page
      */
     public function start(Request $request, Tool $tool): Response
     {
@@ -78,7 +76,6 @@ class AssessmentToolsController extends Controller
                 'description_en' => $tool->description_en,
                 'description_ar' => $tool->description_ar,
                 'image' => $tool->image ? asset('storage/' . $tool->image) : null,
-
             ],
             'domains' => $domains->map(function ($domain) {
                 return [
@@ -113,9 +110,19 @@ class AssessmentToolsController extends Controller
             }),
         ];
 
+        // Get user data for prefilling if authenticated
+        $prefillData = null;
+        if (auth()->check()) {
+            $prefillData = [
+                'name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+            ];
+        }
+
         return Inertia::render('assessment/start', [
             'assessmentData' => $assessmentData,
             'locale' => $locale,
+            'prefillData' => $prefillData,  // Add this for authenticated users
         ]);
     }
 }

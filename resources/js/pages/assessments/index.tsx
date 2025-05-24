@@ -55,11 +55,19 @@ interface Assessment {
     updated_at: string;
     overall_score?: number;
     completion_percentage?: number;
+    user_id?: number; // Add this to distinguish between guest and user assessments
 }
 
 interface AssessmentsIndexProps {
     assessments: Assessment[];
     locale: string;
+    auth: {
+        user: {
+            id: number;
+            name: string;
+            email: string;
+        };
+    };
 }
 
 interface Translations {
@@ -256,7 +264,7 @@ const translations: Translations = {
     }
 };
 
-export default function AssessmentsIndex({ assessments, locale }: AssessmentsIndexProps) {
+export default function AssessmentsIndex({ assessments, locale, auth }: AssessmentsIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [sortBy, setSortBy] = useState('newest');
@@ -306,6 +314,33 @@ export default function AssessmentsIndex({ assessments, locale }: AssessmentsInd
             case 'draft': return <FileText className="w-4 h-4" />;
             case 'pending': return <Clock className="w-4 h-4" />;
             default: return <FileText className="w-4 h-4" />;
+        }
+    };
+
+    // Helper function to determine if assessment belongs to current user
+    const isUserAssessment = (assessment: Assessment): boolean => {
+        return assessment.user_id === auth.user.id;
+    };
+
+    // Helper function to get the correct continue URL
+    const getContinueUrl = (assessment: Assessment): string => {
+        if (isUserAssessment(assessment)) {
+            // For authenticated user assessments, use the authenticated flow
+            return route('assessment.start', assessment.tool.id);
+        } else {
+            // For guest assessments, use the guest flow
+            return route('assessment.take', assessment.id);
+        }
+    };
+
+    // Helper function to get the correct results URL
+    const getResultsUrl = (assessment: Assessment): string => {
+        if (isUserAssessment(assessment)) {
+            // For authenticated user assessments, use the authenticated results page
+            return route('assessment.results', assessment.id);
+        } else {
+            // For guest assessments, use the guest results page
+            return route('assessment.results', assessment.id); // You might want to create a separate route for guest results
         }
     };
 
@@ -587,6 +622,12 @@ export default function AssessmentsIndex({ assessments, locale }: AssessmentsInd
                                                                         {getLocalizedText(assessment.tool, 'description')}
                                                                     </p>
                                                                 )}
+                                                                {/* Assessment Type Indicator */}
+                                                                <div className="flex items-center gap-2 mb-2">
+                                                                    <Badge variant="secondary" className="text-xs">
+                                                                        {isUserAssessment(assessment) ? 'Authenticated User' : 'Guest Assessment'}
+                                                                    </Badge>
+                                                                </div>
                                                             </div>
                                                             <Badge className={`${getStatusColor(assessment.status)} flex items-center gap-2 px-3 py-1.5 text-sm font-semibold`}>
                                                                 {getStatusIcon(assessment.status)}
@@ -677,11 +718,11 @@ export default function AssessmentsIndex({ assessments, locale }: AssessmentsInd
                                                 )}
                                             </div>
 
-                                            {/* Enhanced Actions */}
+                                            {/* Enhanced Actions - Fixed routing based on assessment type */}
                                             <div className="flex flex-col gap-3 min-w-0">
                                                 {assessment.status === 'completed' ? (
                                                     <>
-                                                        <Link href={`/assessment/${assessment.id}/results`}>
+                                                        <Link href={getResultsUrl(assessment)}>
                                                             <Button className="w-full bg-gradient-to-r from-emerald-600 to-emerald-700 hover:from-emerald-700 hover:to-emerald-800 shadow-lg">
                                                                 <Eye className="h-4 w-4 mr-2" />
                                                                 {t.viewResults}
@@ -700,7 +741,7 @@ export default function AssessmentsIndex({ assessments, locale }: AssessmentsInd
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Link href={`/assessment/${assessment.id}/take`}>
+                                                        <Link href={getContinueUrl(assessment)}>
                                                             <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
                                                                 <PlayCircle className="h-4 w-4 mr-2" />
                                                                 {t.continueAssessment}

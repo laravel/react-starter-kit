@@ -92,6 +92,10 @@ interface User {
 interface AssessmentStartProps {
     assessmentData: AssessmentData;
     locale: string;
+    prefillData?: {           // Add this
+        name: string;
+        email: string;
+    } | null;
     auth?: {
         user: User;
     };
@@ -327,7 +331,7 @@ const translations: Translations = {
     }
 };
 
-export default function AssessmentStart({ assessmentData, locale, auth }: AssessmentStartProps) {
+export default function AssessmentStart({ assessmentData, locale, prefillData, auth }: AssessmentStartProps) {
     const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const [currentStep, setCurrentStep] = useState<'info' | 'preview' | 'assessment'>('info');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -344,8 +348,8 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
 
     const { data, setData, post, processing, errors } = useForm({
         tool_id: tool.id,
-        guest_name: user?.name || '',
-        guest_email: user?.email || '',
+        name: prefillData?.name || '',           // Use prefillData from props
+        email: prefillData?.email || '',         // Use prefillData from props
         organization: user?.organization || '',
         responses: {} as Record<number, { criterion_id: number; response: 'yes' | 'no' | 'na'; notes?: string; attachment?: File }>,
     });
@@ -414,7 +418,7 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
     });
 
     const startAssessment = () => {
-        if (!data.guest_name || !data.guest_email) {
+        if (!data.name || !data.email) {          // Changed from guest_name and guest_email
             return;
         }
         setCurrentStep('preview');
@@ -439,41 +443,31 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
     const submitAssessment = () => {
         if (!isComplete || processing) return;
 
-        const formData = new FormData();
-        formData.append('tool_id', tool.id.toString());
-        formData.append('guest_name', data.guest_name);
-        formData.append('guest_email', data.guest_email);
-        if (data.organization) {
-            formData.append('organization', data.organization);
-        }
-
-        allCriteria.forEach((criterion, index) => {
-            const response = data.responses[criterion.id];
-            if (response) {
-                formData.append(`responses[${index}][criterion_id]`, criterion.id.toString());
-                formData.append(`responses[${index}][response]`, response.response);
-
-                if (response.notes) {
-                    formData.append(`responses[${index}][notes]`, response.notes);
+        const formData = {
+            tool_id: tool.id,
+            name: data.name,
+            email: data.email,
+            organization: data.organization || null,
+            responses: allCriteria.reduce((acc, criterion) => {
+                const response = data.responses[criterion.id];
+                if (response) {
+                    acc[criterion.id] = {
+                        criterion_id: criterion.id,
+                        response: response.response,
+                        notes: response.notes || null,
+                        attachment: response.attachment || null
+                    };
                 }
+                return acc;
+            }, {})
+        };
 
-                if (response.attachment) {
-                    formData.append(`responses[${index}][attachment]`, response.attachment);
-                }
-            }
-        });
-
-        post('/assessment/submit', {
-            data: formData,
-            forceFormData: true,
-            onSuccess: () => {
-                // Handle success
-            },
-            onError: (errors) => {
-                console.error('Error submitting assessment:', errors);
-            },
-        });
+        // Use the POST route for assessment.start (handled by GuestAssessmentController)
+        post(route('assessment.start'), formData);
     };
+
+    // ... rest of your component
+
 
     // Info Step - User Information Collection
     if (currentStep === 'info') {
@@ -645,44 +639,48 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
                                         <CardContent className="space-y-8">
                                             <div className="space-y-6">
                                                 <div className="space-y-3">
-                                                    <Label htmlFor="guest_name" className="flex items-center text-base font-semibold text-gray-700">
+                                                    <Label htmlFor="name"
+                                                           className="flex items-center text-base font-semibold text-gray-700">
                                                         <User className="w-4 h-4 mr-2 text-blue-600" />
                                                         {t.fullName} <span className="text-red-500 ml-1">*</span>
                                                     </Label>
                                                     <Input
-                                                        id="guest_name"
-                                                        value={data.guest_name}
-                                                        onChange={(e) => setData('guest_name', e.target.value)}
+                                                        id="name"
+                                                        value={data.name}                           // Changed from guest_name
+                                                        onChange={(e) => setData('name', e.target.value)}    // Changed field name
                                                         placeholder={t.enterFullName}
                                                         className="h-14 text-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                                         required
                                                         disabled={!!user}
                                                     />
-                                                    <InputError message={errors.guest_name} />
+                                                    <InputError message={errors.name} /> {/* Changed error field */}
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <Label htmlFor="guest_email" className="flex items-center text-base font-semibold text-gray-700">
+                                                    <Label htmlFor="email"
+                                                           className="flex items-center text-base font-semibold text-gray-700">
                                                         <Mail className="w-4 h-4 mr-2 text-blue-600" />
                                                         {t.emailAddress} <span className="text-red-500 ml-1">*</span>
                                                     </Label>
                                                     <Input
-                                                        id="guest_email"
+                                                        id="email"
                                                         type="email"
-                                                        value={data.guest_email}
-                                                        onChange={(e) => setData('guest_email', e.target.value)}
+                                                        value={data.email}                          // Changed from guest_email
+                                                        onChange={(e) => setData('email', e.target.value)}   // Changed field name
                                                         placeholder={t.enterEmail}
                                                         className="h-14 text-lg border-gray-200 focus:border-blue-500 focus:ring-blue-500 rounded-xl"
                                                         required
                                                         disabled={!!user}
                                                     />
-                                                    <InputError message={errors.guest_email} />
+                                                    <InputError message={errors.email} /> {/* Changed error field */}
                                                 </div>
 
                                                 <div className="space-y-3">
-                                                    <Label htmlFor="organization" className="flex items-center text-base font-semibold text-gray-700">
+                                                    <Label htmlFor="organization"
+                                                           className="flex items-center text-base font-semibold text-gray-700">
                                                         <Building className="w-4 h-4 mr-2 text-blue-600" />
-                                                        {t.organization} <span className="text-sm text-gray-500 ml-1">({t.optional})</span>
+                                                        {t.organization} <span
+                                                        className="text-sm text-gray-500 ml-1">({t.optional})</span>
                                                     </Label>
                                                     <Input
                                                         id="organization"
@@ -699,7 +697,7 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
                                                 <Button
                                                     onClick={startAssessment}
                                                     size="lg"
-                                                    disabled={!data.guest_name || !data.guest_email}
+                                                    disabled={!data.name || !data.email}
                                                     className="w-full h-14 text-lg font-semibold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     <Play className="w-5 h-5 mr-3" />
@@ -724,14 +722,17 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
             <>
                 <Head title={`${t.preview} - ${getLocalizedText(tool, 'name')}`} />
 
-                <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div
+                    className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'}`}
+                    dir={language === 'ar' ? 'rtl' : 'ltr'}>
                     {/* Header */}
                     <header className="backdrop-blur-md bg-white/80 border-b border-white/20 shadow-lg">
                         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                             <div className="flex justify-between items-center h-16">
                                 <div className="flex items-center space-x-4">
                                     <div className="flex items-center space-x-3">
-                                        <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                                        <div
+                                            className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
                                             <Target className="w-5 h-5 text-white" />
                                         </div>
                                         <div>
@@ -783,11 +784,11 @@ export default function AssessmentStart({ assessmentData, locale, auth }: Assess
                                     <div className="grid md:grid-cols-3 gap-4">
                                         <div className="space-y-1">
                                             <div className="text-sm font-medium text-gray-500">{t.fullName}</div>
-                                            <div className="text-base font-semibold text-gray-900">{data.guest_name}</div>
+                                            <div className="text-base font-semibold text-gray-900">{data.name}</div>
                                         </div>
                                         <div className="space-y-1">
                                             <div className="text-sm font-medium text-gray-500">{t.emailAddress}</div>
-                                            <div className="text-base font-semibold text-gray-900">{data.guest_email}</div>
+                                            <div className="text-base font-semibold text-gray-900">{data.email}</div>
                                         </div>
                                         <div className="space-y-1">
                                             <div className="text-sm font-medium text-gray-500">{t.organization}</div>

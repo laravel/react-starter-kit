@@ -1,41 +1,59 @@
-import { Head } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import React from 'react';
+import { Head, Link } from '@inertiajs/react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { ArrowLeft, Download, CheckCircle, XCircle, MinusCircle, FileText } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
+import AppLayout from '@/layouts/app-layout';
+import { type BreadcrumbItem } from '@/types';
+import {
+    CheckCircle,
+    Download,
+    Share2,
+    XCircle,
+    MinusCircle,
+    TrendingUp,
+    Award,
+    BarChart3,
+    FileText,
+    Target,
+    Calendar,
+    User,
+    Building
+} from 'lucide-react';
 
-interface Assessment {
+interface AssessmentResult {
     id: number;
     name: string;
     email: string;
+    organization?: string;
     status: string;
-    completed_at: string | null;
+    completed_at?: string;
+    created_at: string;
     tool: {
         id: number;
-        name: string;
+        name_en: string;
+        name_ar: string;
     };
 }
 
 interface DomainResult {
     domain_id: number;
     domain_name: string;
-    score: number;
-    percentage: number;
+    score_percentage: number;
     total_criteria: number;
     applicable_criteria: number;
     yes_count: number;
     no_count: number;
     na_count: number;
-    weight_percentage?: number;
+    weighted_score?: number;
 }
 
 interface CategoryResult {
     category_id: number;
     category_name: string;
-    score: number;
-    percentage: number;
-    applicable_count: number;
+    score_percentage: number;
+    applicable_criteria: number;
     yes_count: number;
     no_count: number;
     na_count: number;
@@ -53,278 +71,502 @@ interface AssessmentResults {
     category_results: Record<string, CategoryResult[]>;
 }
 
-interface ResultsProps {
-    assessment: Assessment;
+interface AssessmentResultsProps {
+    assessment: AssessmentResult;
     results: AssessmentResults;
+    locale?: string;
 }
 
-export default function Results({ assessment, results }: ResultsProps) {
-    const getScoreColor = (percentage: number) => {
-        if (percentage >= 80) return 'text-green-600 bg-green-50 border-green-200';
-        if (percentage >= 60) return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-        if (percentage >= 40) return 'text-orange-600 bg-orange-50 border-orange-200';
-        return 'text-red-600 bg-red-50 border-red-200';
+// Enhanced Bar Chart Component
+interface BarChartProps {
+    data: Array<{
+        name: string;
+        value: number;
+        color: string;
+        details?: {
+            yes: number;
+            no: number;
+            na: number;
+            total: number;
+        };
+    }>;
+    height?: number;
+    showValues?: boolean;
+}
+
+const BarChart: React.FC<BarChartProps> = ({ data, height = 350, showValues = true }) => {
+    const maxValue = Math.max(...data.map(d => d.value));
+
+    return (
+        <div className="w-full p-4" style={{ height: `${height}px` }}>
+            <div className="flex items-end justify-between h-full gap-3">
+                {data.map((item, index) => (
+                    <div key={index} className="flex flex-col items-center flex-1 group">
+                        {/* Value label */}
+                        {showValues && (
+                            <div className="text-lg font-bold text-gray-900 mb-3">
+                                {Math.round(item.value)}%
+                            </div>
+                        )}
+
+                        {/* Bar container */}
+                        <div className="relative w-full flex-1 flex items-end">
+                            {/* Bar */}
+                            <div
+                                className="w-full rounded-t-lg transition-all duration-700 ease-out relative group-hover:opacity-80"
+                                style={{
+                                    height: `${Math.max((item.value / maxValue) * 85, 8)}%`,
+                                    backgroundColor: item.color,
+                                    minHeight: '20px'
+                                }}
+                            >
+                                {/* Tooltip on hover */}
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs rounded-lg px-3 py-2 whitespace-nowrap z-20 shadow-lg">
+                                    <div className="font-semibold">{item.name}</div>
+                                    <div>Score: {Math.round(item.value)}%</div>
+                                    {item.details && (
+                                        <div className="mt-1 text-xs">
+                                            <div>✓ {item.details.yes} Yes</div>
+                                            <div>✗ {item.details.no} No</div>
+                                            <div>○ {item.details.na} N/A</div>
+                                        </div>
+                                    )}
+                                    {/* Arrow */}
+                                    <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-gray-900"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Label */}
+                        <div className="text-sm text-gray-700 text-center mt-3 leading-tight font-medium px-1">
+                            {item.name.length > 12 ? `${item.name.substring(0, 12)}...` : item.name}
+                        </div>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+};
+
+// Horizontal Bar Component for Categories
+interface HorizontalBarProps {
+    label: string;
+    value: number;
+    maxValue: number;
+    color: string;
+    details?: {
+        yes: number;
+        no: number;
+        na: number;
+    };
+}
+
+const HorizontalBar: React.FC<HorizontalBarProps> = ({ label, value, maxValue, color, details }) => {
+    const percentage = maxValue > 0 ? (value / maxValue) * 100 : 0;
+
+    return (
+        <div className="space-y-3">
+            <div className="flex justify-between items-center">
+                <span className="text-sm font-semibold text-gray-900">{label}</span>
+                <span className="text-lg font-bold" style={{ color }}>{Math.round(value)}%</span>
+            </div>
+            <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
+                <div
+                    className="h-4 rounded-full transition-all duration-700 ease-out shadow-sm"
+                    style={{
+                        width: `${percentage}%`,
+                        backgroundColor: color
+                    }}
+                />
+            </div>
+            {details && (
+                <div className="flex justify-between text-sm text-gray-600 bg-gray-50 rounded px-3 py-2">
+                    <span className="flex items-center">
+                        <CheckCircle className="w-4 h-4 text-green-600 mr-1" />
+                        {details.yes} Yes
+                    </span>
+                    <span className="flex items-center">
+                        <XCircle className="w-4 h-4 text-red-600 mr-1" />
+                        {details.no} No
+                    </span>
+                    <span className="flex items-center">
+                        <MinusCircle className="w-4 h-4 text-gray-600 mr-1" />
+                        {details.na} N/A
+                    </span>
+                </div>
+            )}
+        </div>
+    );
+};
+
+export default function AssessmentResults({ assessment, results, locale = 'en' }: AssessmentResultsProps) {
+    const isArabic = locale === 'ar';
+
+    const breadcrumbs: BreadcrumbItem[] = [
+        {
+            title: 'Assessment Tools',
+            href: '/assessment-tools',
+        },
+        {
+            title: isArabic ? 'النتائج' : 'Results',
+            href: `/assessment/${assessment.id}/results`,
+        },
+    ];
+
+    const getName = (item: { name_en: string; name_ar: string }): string => {
+        return isArabic ? item.name_ar : item.name_en;
     };
 
-    const getScoreLabel = (percentage: number) => {
-        if (percentage >= 80) return 'Excellent';
-        if (percentage >= 60) return 'Good';
-        if (percentage >= 40) return 'Fair';
-        return 'Needs Improvement';
+    const getScoreColor = (score: number): string => {
+        if (score >= 80) return '#10B981'; // Green
+        if (score >= 60) return '#F59E0B'; // Amber
+        if (score >= 40) return '#EF4444'; // Red
+        return '#6B7280'; // Gray
     };
 
-    const downloadReport = () => {
-        // This would trigger a PDF download
-        window.open(route('assessment.download', assessment.id), '_blank');
+    const getScoreColorClass = (score: number): string => {
+        if (score >= 80) return 'text-green-600';
+        if (score >= 60) return 'text-amber-600';
+        if (score >= 40) return 'text-red-600';
+        return 'text-gray-600';
+    };
+
+    const getScoreLevel = (score: number): string => {
+        if (isArabic) {
+            if (score >= 80) return 'ممتاز';
+            if (score >= 60) return 'جيد';
+            if (score >= 40) return 'مقبول';
+            return 'يحتاج تحسين';
+        } else {
+            if (score >= 80) return 'Excellent';
+            if (score >= 60) return 'Good';
+            if (score >= 40) return 'Fair';
+            return 'Needs Improvement';
+        }
+    };
+
+    const getScoreBadgeColor = (score: number): string => {
+        if (score >= 80) return 'bg-green-100 text-green-800 border-green-200';
+        if (score >= 60) return 'bg-amber-100 text-amber-800 border-amber-200';
+        if (score >= 40) return 'bg-red-100 text-red-800 border-red-200';
+        return 'bg-gray-100 text-gray-800 border-gray-200';
+    };
+
+    // Prepare domain chart data
+    const domainChartData = results.domain_results.map((domain) => ({
+        name: domain.domain_name,
+        value: domain.score_percentage,
+        color: getScoreColor(domain.score_percentage),
+        details: {
+            yes: domain.yes_count,
+            no: domain.no_count,
+            na: domain.na_count,
+            total: domain.total_criteria
+        }
+    }));
+
+    const formatDate = (dateString: string): string => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    };
+
+    const getCompletionText = (): string => {
+        if (assessment.completed_at) {
+            return isArabic ? `اكتمل في ${formatDate(assessment.completed_at)}` : `Completed on ${formatDate(assessment.completed_at)}`;
+        }
+        return isArabic ? `تم الإنشاء في ${formatDate(assessment.created_at)}` : `Created on ${formatDate(assessment.created_at)}`;
     };
 
     return (
-        <>
-            <Head title={`Assessment Results - ${assessment.tool.name}`} />
+        <AppLayout breadcrumbs={breadcrumbs}>
+            <Head title={`${isArabic ? 'نتائج التقييم' : 'Assessment Results'} - ${getName(assessment.tool)}`} />
 
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+            <div className={`flex h-full flex-1 flex-col gap-6 rounded-xl p-6 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
                 {/* Header */}
-                <header className="bg-white shadow-sm border-b">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-16">
-                            <div className="flex items-center space-x-4">
-                                <a href={route('assessment.index')} className="flex items-center text-gray-600 hover:text-gray-900">
-                                    <ArrowLeft className="w-5 h-5 mr-2" />
-                                    Back to Assessments
-                                </a>
+                <div className="flex items-start justify-between">
+                    <div className="space-y-1">
+                        <h1 className="text-3xl font-bold text-gray-900">
+                            {isArabic ? 'نتائج التقييم' : 'Assessment Results'}
+                        </h1>
+                        <p className="text-lg text-gray-600">
+                            {getName(assessment.tool)}
+                        </p>
+                        <div className="flex items-center gap-4 text-sm text-gray-500">
+                            <div className="flex items-center gap-1">
+                                <User className="h-4 w-4" />
+                                {assessment.name}
                             </div>
-                            <div className="flex items-center space-x-4">
-                                <Button onClick={downloadReport} variant="outline">
-                                    <Download className="w-4 h-4 mr-2" />
-                                    Download Report
-                                </Button>
+                            {assessment.organization && (
+                                <div className="flex items-center gap-1">
+                                    <Building className="h-4 w-4" />
+                                    {assessment.organization}
+                                </div>
+                            )}
+                            <div className="flex items-center gap-1">
+                                <Calendar className="h-4 w-4" />
+                                {getCompletionText()}
                             </div>
+                            <Badge className={`${assessment.status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}`}>
+                                {assessment.status === 'completed' ? (isArabic ? 'مكتمل' : 'Completed') : (isArabic ? 'قيد المعالجة' : 'Processing')}
+                            </Badge>
                         </div>
                     </div>
-                </header>
 
-                <div className="py-8 px-4 sm:px-6 lg:px-8">
-                    <div className="max-w-6xl mx-auto">
-                        {/* Assessment Overview */}
-                        <Card className="mb-8">
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <div>
-                                        <CardTitle className="text-2xl mb-2">
-                                            {assessment.tool.name} Assessment Results
-                                        </CardTitle>
-                                        <CardDescription>
-                                            Assessment for {assessment.name} ({assessment.email})
-                                        </CardDescription>
-                                        {assessment.completed_at && (
-                                            <p className="text-sm text-gray-500 mt-1">
-                                                Completed on {new Date(assessment.completed_at).toLocaleDateString()}
-                                            </p>
-                                        )}
-                                    </div>
-                                    <Badge variant={assessment.status === 'completed' ? 'default' : 'secondary'}>
-                                        {assessment.status === 'completed' ? 'Complete' : 'In Progress'}
-                                    </Badge>
-                                </div>
-                            </CardHeader>
-                        </Card>
-
-                        {/* Overall Score */}
-                        <Card className="mb-8">
-                            <CardHeader>
-                                <CardTitle className="text-xl">Overall Assessment Score</CardTitle>
-                                <CardDescription>
-                                    Your overall performance across all domains
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className="flex items-center space-x-4">
-                                        <div className="text-4xl font-bold text-gray-900">
-                                            {Math.round(results.overall_percentage)}%
-                                        </div>
-                                        <div className={`px-3 py-1 rounded-full border text-sm font-medium ${getScoreColor(results.overall_percentage)}`}>
-                                            {getScoreLabel(results.overall_percentage)}
-                                        </div>
-                                    </div>
-                                    <div className="text-right text-sm text-gray-600">
-                                        <div>{results.yes_count} out of {results.applicable_criteria} applicable criteria met</div>
-                                        <div className="text-xs">{results.na_count} criteria marked as not applicable</div>
-                                    </div>
-                                </div>
-                                <Progress value={results.overall_percentage} className="h-3 mb-4" />
-
-                                {/* Score Breakdown */}
-                                <div className="grid grid-cols-3 gap-4 mt-6">
-                                    <div className="text-center p-4 bg-green-50 rounded-lg border border-green-200">
-                                        <div className="flex items-center justify-center mb-2">
-                                            <CheckCircle className="w-5 h-5 text-green-600 mr-1" />
-                                            <span className="text-2xl font-bold text-green-600">{results.yes_count}</span>
-                                        </div>
-                                        <div className="text-sm text-green-700">Yes Responses</div>
-                                    </div>
-                                    <div className="text-center p-4 bg-red-50 rounded-lg border border-red-200">
-                                        <div className="flex items-center justify-center mb-2">
-                                            <XCircle className="w-5 h-5 text-red-600 mr-1" />
-                                            <span className="text-2xl font-bold text-red-600">{results.no_count}</span>
-                                        </div>
-                                        <div className="text-sm text-red-700">No Responses</div>
-                                    </div>
-                                    <div className="text-center p-4 bg-gray-50 rounded-lg border border-gray-200">
-                                        <div className="flex items-center justify-center mb-2">
-                                            <MinusCircle className="w-5 h-5 text-gray-600 mr-1" />
-                                            <span className="text-2xl font-bold text-gray-600">{results.na_count}</span>
-                                        </div>
-                                        <div className="text-sm text-gray-700">Not Applicable</div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Domain Results */}
-                        <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                            {results.domain_results.map((domain) => (
-                                <Card key={domain.domain_id}>
-                                    <CardHeader>
-                                        <div className="flex justify-between items-start">
-                                            <div>
-                                                <CardTitle className="text-lg">{domain.domain_name}</CardTitle>
-                                                <CardDescription>
-                                                    {domain.applicable_criteria} applicable criteria
-                                                </CardDescription>
-                                            </div>
-                                            <div className="text-right">
-                                                <div className="text-2xl font-bold text-gray-900">
-                                                    {Math.round(domain.percentage)}%
-                                                </div>
-                                                <div className={`px-2 py-1 rounded text-xs font-medium ${getScoreColor(domain.percentage)}`}>
-                                                    {getScoreLabel(domain.percentage)}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <Progress value={domain.percentage} className="mb-4" />
-                                        <div className="grid grid-cols-3 gap-2 text-sm">
-                                            <div className="text-center">
-                                                <div className="font-medium text-green-600">{domain.yes_count}</div>
-                                                <div className="text-xs text-gray-500">Yes</div>
-                                            </div>
-                                            <div className="text-center">
-                                                <div className="font-medium text-red-600">{domain.no_count}</div>
-                                                <div className="text-xs text-gray-500">No</div>
-                                            </div>
-                                            <div className="text-center">
-                                                <div className="font-medium text-gray-600">{domain.na_count}</div>
-                                                <div className="text-xs text-gray-500">N/A</div>
-                                            </div>
-                                        </div>
-
-                                        {/* Category breakdown for this domain */}
-                                        {results.category_results[domain.domain_id] && (
-                                            <div className="mt-4 pt-4 border-t">
-                                                <h4 className="text-sm font-medium text-gray-900 mb-2">Category Breakdown:</h4>
-                                                <div className="space-y-2">
-                                                    {results.category_results[domain.domain_id].map((category) => (
-                                                        <div key={category.category_id} className="flex justify-between items-center text-sm">
-                                                            <span className="text-gray-600">{category.category_name}</span>
-                                                            <div className="flex items-center space-x-2">
-                                                                <span className="font-medium">{Math.round(category.percentage)}%</span>
-                                                                <span className="text-xs text-gray-500">
-                                                                    ({category.yes_count}/{category.applicable_count})
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-
-                        {/* Recommendations */}
-                        <Card className="mb-8">
-                            <CardHeader>
-                                <CardTitle className="text-xl flex items-center">
-                                    <FileText className="w-5 h-5 mr-2" />
-                                    Recommendations
-                                </CardTitle>
-                                <CardDescription>
-                                    Areas for improvement based on your assessment results
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-4">
-                                    {results.domain_results
-                                        .filter(domain => domain.percentage < 80)
-                                        .sort((a, b) => a.percentage - b.percentage)
-                                        .map((domain) => (
-                                            <div key={domain.domain_id} className="border-l-4 border-orange-500 pl-4">
-                                                <h4 className="font-medium text-gray-900">{domain.domain_name}</h4>
-                                                <p className="text-sm text-gray-600 mt-1">
-                                                    Score: {Math.round(domain.percentage)}% - Consider focusing on improving processes in this area.
-                                                    You have {domain.no_count} criteria that need attention.
-                                                </p>
-                                            </div>
-                                        ))}
-
-                                    {results.domain_results.every(domain => domain.percentage >= 80) && (
-                                        <div className="border-l-4 border-green-500 pl-4">
-                                            <h4 className="font-medium text-green-900">Excellent Performance!</h4>
-                                            <p className="text-sm text-green-700 mt-1">
-                                                All domains are performing well. Continue maintaining these high standards and consider sharing best practices with other teams.
-                                            </p>
-                                        </div>
-                                    )}
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Next Steps */}
-                        <Card>
-                            <CardHeader>
-                                <CardTitle className="text-xl">Next Steps</CardTitle>
-                                <CardDescription>
-                                    Suggested actions based on your assessment
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-3">
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
-                                            1
-                                        </div>
-                                        <div>
-                                            <h4 className="font-medium">Review Low-Scoring Areas</h4>
-                                            <p className="text-sm text-gray-600">Focus on domains and categories with scores below 60%</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
-                                            2
-                                        </div>
-                                        <div>
-                                            <h4 className="font-medium">Create Action Plans</h4>
-                                            <p className="text-sm text-gray-600">Develop specific improvement plans for identified gaps</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-start space-x-3">
-                                        <div className="w-6 h-6 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center text-sm font-bold mt-0.5">
-                                            3
-                                        </div>
-                                        <div>
-                                            <h4 className="font-medium">Schedule Follow-up Assessment</h4>
-                                            <p className="text-sm text-gray-600">Plan a reassessment in 3-6 months to track progress</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </CardContent>
-                        </Card>
+                    <div className="flex gap-2">
+                        <Button variant="outline" size="sm">
+                            <Share2 className="h-4 w-4 mr-2" />
+                            {isArabic ? 'مشاركة' : 'Share'}
+                        </Button>
+                        <Button variant="outline" size="sm">
+                            <Download className="h-4 w-4 mr-2" />
+                            {isArabic ? 'تحميل PDF' : 'Download PDF'}
+                        </Button>
                     </div>
                 </div>
+
+                {/* Success Message */}
+                <Card className="border-green-200 bg-green-50">
+                    <CardContent className="flex items-center gap-3 p-4">
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                        <div className="flex-1">
+                            <p className="text-green-800 font-medium">
+                                {isArabic
+                                    ? 'تم إرسال التقييم بنجاح! يمكنك مراجعة النتائج أدناه.'
+                                    : 'Assessment submitted successfully! You can review your results below.'
+                                }
+                            </p>
+                            {assessment.completed_at && (
+                                <p className="text-green-700 text-sm mt-1">
+                                    {isArabic
+                                        ? `تم الانتهاء في ${formatDate(assessment.completed_at)}`
+                                        : `Completed on ${formatDate(assessment.completed_at)}`
+                                    }
+                                </p>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Overall Score Card */}
+                <Card className="border-2 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-xl">
+                            <Award className="h-6 w-6 text-blue-600" />
+                            {isArabic ? 'النتيجة الإجمالية' : 'Overall Score'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            {/* Score Display */}
+                            <div className="lg:col-span-1 flex flex-col items-center justify-center space-y-3">
+                                <div className="text-6xl font-bold">
+                                    <span className={getScoreColorClass(results.overall_percentage)}>
+                                        {Math.round(results.overall_percentage)}%
+                                    </span>
+                                </div>
+                                <Badge className={`${getScoreBadgeColor(results.overall_percentage)} px-4 py-1 text-sm font-medium`}>
+                                    {getScoreLevel(results.overall_percentage)}
+                                </Badge>
+                                <Progress value={results.overall_percentage} className="w-full h-3" />
+                            </div>
+
+                            {/* Statistics */}
+                            <div className="lg:col-span-2 grid grid-cols-3 gap-4">
+                                <div className="text-center p-4 bg-white rounded-lg border border-green-200">
+                                    <div className="flex items-center justify-center mb-2">
+                                        <CheckCircle className="h-5 w-5 text-green-600 mr-1" />
+                                        <span className="text-2xl font-bold text-green-600">{results.yes_count}</span>
+                                    </div>
+                                    <div className="text-sm text-gray-700 font-medium">
+                                        {isArabic ? 'إجابات نعم' : 'Yes Responses'}
+                                    </div>
+                                </div>
+                                <div className="text-center p-4 bg-white rounded-lg border border-red-200">
+                                    <div className="flex items-center justify-center mb-2">
+                                        <XCircle className="h-5 w-5 text-red-600 mr-1" />
+                                        <span className="text-2xl font-bold text-red-600">{results.no_count}</span>
+                                    </div>
+                                    <div className="text-sm text-gray-700 font-medium">
+                                        {isArabic ? 'إجابات لا' : 'No Responses'}
+                                    </div>
+                                </div>
+                                <div className="text-center p-4 bg-white rounded-lg border border-gray-200">
+                                    <div className="flex items-center justify-center mb-2">
+                                        <MinusCircle className="h-5 w-5 text-gray-600 mr-1" />
+                                        <span className="text-2xl font-bold text-gray-600">{results.na_count}</span>
+                                    </div>
+                                    <div className="text-sm text-gray-700 font-medium">
+                                        {isArabic ? 'غير قابل للتطبيق' : 'Not Applicable'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="mt-4 pt-4 border-t border-gray-200">
+                            <div className="flex justify-between text-sm text-gray-600">
+                                <span>
+                                    {isArabic ? 'إجمالي المعايير:' : 'Total Criteria:'} {results.total_criteria}
+                                </span>
+                                <span>
+                                    {isArabic ? 'المعايير القابلة للتطبيق:' : 'Applicable Criteria:'} {results.applicable_criteria}
+                                </span>
+                                <span>
+                                    {isArabic ? 'نسبة النجاح:' : 'Success Rate:'} {Math.round((results.yes_count / Math.max(results.applicable_criteria, 1)) * 100)}%
+                                </span>
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Domain Results Bar Chart */}
+                <Card className="shadow-xl">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5 text-blue-600" />
+                            {isArabic ? 'أداء المجالات' : 'Domain Performance'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <BarChart data={domainChartData} height={400} />
+                    </CardContent>
+                </Card>
+
+                {/* Detailed Domain Results */}
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-semibold flex items-center gap-2">
+                        <Target className="h-6 w-6 text-blue-600" />
+                        {isArabic ? 'النتائج التفصيلية' : 'Detailed Results'}
+                    </h2>
+
+                    {results.domain_results.map((domain) => (
+                        <Card key={domain.domain_id} className="overflow-hidden shadow-lg">
+                            <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100">
+                                <div className="flex items-center justify-between">
+                                    <CardTitle className="text-xl">{domain.domain_name}</CardTitle>
+                                    <div className="flex items-center gap-3">
+                                        <Badge className={`${getScoreBadgeColor(domain.score_percentage)} px-3 py-1`}>
+                                            {Math.round(domain.score_percentage)}%
+                                        </Badge>
+                                        <span className="text-sm text-gray-600">
+                                            {domain.applicable_criteria} {isArabic ? 'معايير' : 'criteria'}
+                                        </span>
+                                    </div>
+                                </div>
+                                <Progress value={domain.score_percentage} className="h-2 mt-2" />
+                            </CardHeader>
+                            <CardContent className="pt-6">
+                                {/* Domain Statistics */}
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg font-bold text-gray-900">{domain.total_criteria}</div>
+                                        <div className="text-xs text-gray-600">{isArabic ? 'إجمالي المعايير' : 'Total Criteria'}</div>
+                                    </div>
+                                    <div className="text-center p-3 bg-green-50 rounded-lg">
+                                        <div className="text-lg font-bold text-green-600">{domain.yes_count}</div>
+                                        <div className="text-xs text-gray-600">{isArabic ? 'نعم' : 'Yes'}</div>
+                                    </div>
+                                    <div className="text-center p-3 bg-red-50 rounded-lg">
+                                        <div className="text-lg font-bold text-red-600">{domain.no_count}</div>
+                                        <div className="text-xs text-gray-600">{isArabic ? 'لا' : 'No'}</div>
+                                    </div>
+                                    <div className="text-center p-3 bg-gray-50 rounded-lg">
+                                        <div className="text-lg font-bold text-gray-600">{domain.na_count}</div>
+                                        <div className="text-xs text-gray-600">{isArabic ? 'غير قابل' : 'N/A'}</div>
+                                    </div>
+                                </div>
+
+                                {/* Category Breakdown */}
+                                {results.category_results[domain.domain_id] && (
+                                    <div className="space-y-4">
+                                        <h4 className="font-medium text-gray-900 border-b pb-2">
+                                            {isArabic ? 'تفصيل الفئات' : 'Category Breakdown'}
+                                        </h4>
+                                        <div className="grid gap-4 md:grid-cols-2">
+                                            {results.category_results[domain.domain_id].map((category) => (
+                                                <div key={category.category_id} className="p-4 border border-gray-200 rounded-lg bg-white">
+                                                    <HorizontalBar
+                                                        label={category.category_name}
+                                                        value={category.score_percentage}
+                                                        maxValue={100}
+                                                        color={getScoreColor(category.score_percentage)}
+                                                        details={{
+                                                            yes: category.yes_count,
+                                                            no: category.no_count,
+                                                            na: category.na_count
+                                                        }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+
+                {/* Recommendations */}
+                <Card className="border-amber-200 bg-amber-50">
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2 text-amber-800">
+                            <TrendingUp className="h-5 w-5" />
+                            {isArabic ? 'التوصيات' : 'Recommendations'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="space-y-4">
+                            {results.domain_results
+                                .filter(domain => domain.score_percentage < 70)
+                                .sort((a, b) => a.score_percentage - b.score_percentage)
+                                .map((domain) => (
+                                    <div key={domain.domain_id} className="border-l-4 border-amber-500 pl-4 py-2">
+                                        <h4 className="font-medium text-amber-900">{domain.domain_name}</h4>
+                                        <p className="text-sm text-amber-800 mt-1">
+                                            {isArabic
+                                                ? `النتيجة: ${Math.round(domain.score_percentage)}% - يوصى بالتركيز على تحسين العمليات في هذا المجال. لديك ${domain.no_count} معايير تحتاج إلى اهتمام.`
+                                                : `Score: ${Math.round(domain.score_percentage)}% - Consider focusing on improving processes in this area. You have ${domain.no_count} criteria that need attention.`
+                                            }
+                                        </p>
+                                    </div>
+                                ))}
+
+                            {results.domain_results.every(domain => domain.score_percentage >= 70) && (
+                                <div className="border-l-4 border-green-500 pl-4 py-2">
+                                    <h4 className="font-medium text-green-900">
+                                        {isArabic ? 'أداء ممتاز!' : 'Excellent Performance!'}
+                                    </h4>
+                                    <p className="text-sm text-green-800 mt-1">
+                                        {isArabic
+                                            ? 'جميع المجالات تؤدي بشكل جيد. استمر في الحفاظ على هذه المعايير العالية وفكر في مشاركة أفضل الممارسات مع الفرق الأخرى.'
+                                            : 'All domains are performing well. Continue maintaining these high standards and consider sharing best practices with other teams.'
+                                        }
+                                    </p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+                {/* Action Buttons */}
+                <div className="flex justify-center gap-4 pt-6">
+                    <Link href="/assessment-tools">
+                        <Button variant="outline" size="lg" className="px-8">
+                            <FileText className="h-4 w-4 mr-2" />
+                            {isArabic ? 'تقييم جديد' : 'New Assessment'}
+                        </Button>
+                    </Link>
+                    <Link href="/assessments">
+                        <Button size="lg" className="px-8">
+                            <BarChart3 className="h-4 w-4 mr-2" />
+                            {isArabic ? 'عرض جميع التقييمات' : 'View All Assessments'}
+                        </Button>
+                    </Link>
+                </div>
             </div>
-        </>
+        </AppLayout>
     );
 }

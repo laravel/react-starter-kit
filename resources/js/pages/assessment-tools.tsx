@@ -399,10 +399,9 @@ export default function AssessmentTools({ tools, locale }: AssessmentToolsProps)
                                                 )}
                                             </div>
 
-                                            <Link href={`/assessment/start/${tool.id}`} className="w-full">
-                                                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
-                                                    <Play className="w-4 h-4 mr-2" />
-                                                    {t.startAssessment}
+                                            <Link href={route('assessment.start.form', tool.id)}>
+                                                <Button className="w-full mt-4">
+                                                    Start Assessment
                                                 </Button>
                                             </Link>
                                         </CardContent>
@@ -585,11 +584,9 @@ export default function AssessmentTools({ tools, locale }: AssessmentToolsProps)
                                                 </div>
                                             </div>
 
-                                            <Link href={`/assessment/start/${tool.id}`} className="w-full">
-                                                <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg group-hover:shadow-xl transition-all duration-300">
-                                                    <Play className="w-4 h-4 mr-2" />
-                                                    {t.startAssessment}
-                                                    <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+                                            <Link href={route('assessment.start.form', tool.id)}>
+                                                <Button className="w-full mt-4">
+                                                    Start Assessment
                                                 </Button>
                                             </Link>
                                         </CardContent>

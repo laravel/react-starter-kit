@@ -16,9 +16,12 @@ class Assessment extends Model
         'tool_id',
         'name',
         'email',
+        'organization',
         'status',
-        'started_at',    // Added missing field
-        'completed_at',  // Added missing field
+        'started_at',
+        'completed_at',
+        'title_en',      // Add these if they don't exist
+        'title_ar',      // Add these if they don't exist
         'created_at',
         'updated_at',
     ];
@@ -49,6 +52,22 @@ class Assessment extends Model
     }
 
     /**
+     * Check if this is a guest assessment (no user_id)
+     */
+    public function isGuestAssessment(): bool
+    {
+        return is_null($this->user_id);
+    }
+
+    /**
+     * Check if this assessment belongs to a specific user
+     */
+    public function belongsToUser(int $userId): bool
+    {
+        return $this->user_id === $userId;
+    }
+
+    /**
      * Calculate and save assessment results
      */
     public function calculateResults(): void
@@ -56,11 +75,10 @@ class Assessment extends Model
         $tool = $this->tool->load(['domains.categories.criteria']);
         $responses = $this->responses->keyBy('criterion_id');
 
-
-        // Convert responses to simple array format - FIXED
+        // Convert responses to simple array format
         $responseArray = [];
         foreach ($responses as $criterionId => $response) {
-            $responseArray[$criterionId] = $response->response; // Now uses 'response' field
+            $responseArray[$criterionId] = $response->response;
         }
 
         // Clear existing results
@@ -113,8 +131,33 @@ class Assessment extends Model
         $categoryResults = $results->where('category_id', '!=', null)->groupBy('domain_id');
 
         return [
-            'domain_results' => $domainResults,
-            'category_results' => $categoryResults,
+            'domain_results' => $domainResults->map(function ($result) {
+                return [
+                    'domain_id' => $result->domain_id,
+                    'domain_name' => $result->domain->name_en, // You might want to handle localization
+                    'score_percentage' => $result->score_percentage,
+                    'total_criteria' => $result->total_criteria,
+                    'applicable_criteria' => $result->applicable_criteria,
+                    'yes_count' => $result->yes_count,
+                    'no_count' => $result->no_count,
+                    'na_count' => $result->na_count,
+                    'weighted_score' => $result->weighted_score,
+                ];
+            }),
+            'category_results' => $categoryResults->map(function ($categories, $domainId) {
+                return $categories->map(function ($result) {
+                    return [
+                        'category_id' => $result->category_id,
+                        'category_name' => $result->category->name_en, // You might want to handle localization
+                        'score_percentage' => $result->score_percentage,
+                        'applicable_criteria' => $result->applicable_criteria,
+                        'yes_count' => $result->yes_count,
+                        'no_count' => $result->no_count,
+                        'na_count' => $result->na_count,
+                        'weight_percentage' => $result->weighted_score,
+                    ];
+                });
+            }),
             'overall_percentage' => $domainResults->avg('score_percentage') ?? 0,
             'total_criteria' => $domainResults->sum('total_criteria'),
             'applicable_criteria' => $domainResults->sum('applicable_criteria'),
@@ -125,7 +168,7 @@ class Assessment extends Model
     }
 
     /**
-     * Check if assessment is complete - FIXED
+     * Check if assessment is complete
      */
     public function isComplete(): bool
     {
@@ -167,7 +210,7 @@ class Assessment extends Model
     }
 
     /**
-     * Get completion percentage - FIXED
+     * Get completion percentage
      */
     public function getCompletionPercentage(): float
     {
@@ -198,7 +241,51 @@ class Assessment extends Model
             'completed_at' => now(),
         ]);
 
-
         $this->calculateResults();
+    }
+
+    /**
+     * Get the appropriate display name for the assessment
+     */
+    public function getDisplayName(string $locale = 'en'): string
+    {
+        $field = "title_{$locale}";
+
+        // If assessment has a title, use it
+        if ($this->{$field}) {
+            return $this->{$field};
+        }
+
+        // Otherwise, use the tool name
+        $toolField = "name_{$locale}";
+        return $this->tool->{$toolField} ?? $this->tool->name_en;
+    }
+
+    /**
+     * Get the appropriate assessor name
+     */
+    public function getAssessorName(): string
+    {
+        // If it's a user assessment, return the user's name
+        if ($this->user_id && $this->user) {
+            return $this->user->name;
+        }
+
+        // Otherwise, return the guest name
+        return $this->name ?? 'Unknown';
+    }
+
+    /**
+     * Get the appropriate email
+     */
+    public function getAssessorEmail(): string
+    {
+        // If it's a user assessment, return the user's email
+        if ($this->user_id && $this->user) {
+            return $this->user->email;
+        }
+
+        // Otherwise, return the guest email
+        return $this->email ?? '';
     }
 }

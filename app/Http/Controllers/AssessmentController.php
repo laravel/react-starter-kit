@@ -10,20 +10,13 @@ use Inertia\Inertia;
 
 class AssessmentController extends Controller
 {
-
     public function index(Request $request)
     {
         $locale = app()->getLocale();
 
+        // Get assessments for the authenticated user
         $assessments = Assessment::with(['tool'])
-            ->where(function($query) {
-                if (auth()->check()) {
-                    $query->where('user_id', auth()->id());
-                } else {
-                    // For guests, you might want to use session or not show this page
-                    $query->whereNull('id'); // Returns empty result
-                }
-            })
+            ->where('user_id', auth()->id()) // Only get current user's assessments
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($assessment) use ($locale) {
@@ -38,23 +31,34 @@ class AssessmentController extends Controller
 
                 return [
                     'id' => $assessment->id,
-                    'title_en' => $assessment->title_en,
-                    'title_ar' => $assessment->title_ar,
+                    'title_en' => $assessment->title_en ?? $assessment->tool->name_en,
+                    'title_ar' => $assessment->title_ar ?? $assessment->tool->name_ar,
                     'tool' => [
+                        'id' => $assessment->tool->id,
                         'name_en' => $assessment->tool->name_en,
                         'name_ar' => $assessment->tool->name_ar,
+                        'description_en' => $assessment->tool->description_en,
+                        'description_ar' => $assessment->tool->description_ar,
+                        'image' => $assessment->tool->image ? asset('storage/' . $assessment->tool->image) : null,
                     ],
-                    'guest_name' => $assessment->guest_name,
+                    'guest_name' => $assessment->name ?? auth()->user()->name,
+                    'guest_email' => $assessment->email ?? auth()->user()->email,
                     'organization' => $assessment->organization,
                     'status' => $assessment->status,
                     'created_at' => $assessment->created_at->toISOString(),
+                    'updated_at' => $assessment->updated_at->toISOString(),
                     'overall_score' => $overallScore,
+                    'completion_percentage' => $assessment->getCompletionPercentage(),
+                    'user_id' => $assessment->user_id, // Add this to distinguish user vs guest assessments
                 ];
             });
 
         return Inertia::render('assessments/index', [
             'assessments' => $assessments,
             'locale' => $locale,
+            'auth' => [
+                'user' => auth()->user()
+            ]
         ]);
     }
 
@@ -62,8 +66,8 @@ class AssessmentController extends Controller
     {
         $validated = $request->validate([
             'tool_id' => 'required|exists:tools,id',
-            'guest_name' => 'required|string|max:255',
-            'guest_email' => 'required|email|max:255',
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
             'organization' => 'nullable|string|max:255',
             'responses' => 'required|array',
             'responses.*' => 'required|numeric|between:0,100',
@@ -74,14 +78,16 @@ class AssessmentController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create the assessment
+            // Create the assessment for authenticated user
             $assessment = Assessment::create([
                 'tool_id' => $validated['tool_id'],
-                'user_id' => auth()->id(), // Will be null for guests
-                'guest_name' => $validated['guest_name'],
-                'guest_email' => $validated['guest_email'],
+                'user_id' => auth()->id(), // Set the authenticated user
+                'name' => $validated['name'],
+                'email' => $validated['email'],
                 'organization' => $validated['organization'],
                 'status' => 'completed',
+                'started_at' => now(),
+                'completed_at' => now(),
             ]);
 
             // Create assessment responses
@@ -89,10 +95,13 @@ class AssessmentController extends Controller
                 AssessmentResponse::create([
                     'assessment_id' => $assessment->id,
                     'criterion_id' => $criterionId,
-                    'value' => $value,
+                    'response' => $this->convertValueToResponse($value), // Convert numeric to yes/no/na
                     'notes' => $validated['notes'][$criterionId] ?? null,
                 ]);
             }
+
+            // Calculate results
+            $assessment->calculateResults();
 
             DB::commit();
 
@@ -112,6 +121,11 @@ class AssessmentController extends Controller
     {
         $locale = app()->getLocale();
 
+        // Check if user can access this assessment
+        if ($assessment->user_id !== auth()->id()) {
+            abort(403, 'You do not have permission to view this assessment.');
+        }
+
         // Load assessment with all related data
         $assessment->load([
             'tool',
@@ -120,20 +134,20 @@ class AssessmentController extends Controller
             'responses.criterion'
         ]);
 
-        // Calculate results by domain and category
-        $results = $this->calculateResults($assessment);
+        // Get the results using the existing method
+        $results = $assessment->getResults();
 
-        return Inertia::render('assessment/results', [
+        return Inertia::render('assessment/results', [ // Note: lowercase 'results' for authenticated users
             'assessment' => [
                 'id' => $assessment->id,
-                'title_en' => $assessment->title_en,
-                'title_ar' => $assessment->title_ar,
+                'title_en' => $assessment->title_en ?? $assessment->tool->name_en,
+                'title_ar' => $assessment->title_ar ?? $assessment->tool->name_ar,
                 'tool' => [
                     'id' => $assessment->tool->id,
                     'name_en' => $assessment->tool->name_en,
                     'name_ar' => $assessment->tool->name_ar,
                 ],
-                'guest_name' => $assessment->guest_name,
+                'guest_name' => $assessment->name ?? auth()->user()->name,
                 'organization' => $assessment->organization,
                 'created_at' => $assessment->created_at->format('Y-m-d H:i:s'),
             ],
@@ -142,6 +156,23 @@ class AssessmentController extends Controller
         ]);
     }
 
+    /**
+     * Convert numeric value to response format
+     */
+    private function convertValueToResponse($value): string
+    {
+        if ($value >= 75) {
+            return 'yes';
+        } elseif ($value >= 25) {
+            return 'no';
+        } else {
+            return 'na';
+        }
+    }
+
+    /**
+     * Calculate results for authenticated user assessments
+     */
     private function calculateResults(Assessment $assessment)
     {
         $domainResults = [];
@@ -183,7 +214,7 @@ class AssessmentController extends Controller
                         return [
                             'criterion_name_en' => $response->criterion->name_en,
                             'criterion_name_ar' => $response->criterion->name_ar,
-                            'value' => $response->value,
+                            'response' => $response->response,
                             'notes' => $response->notes,
                         ];
                     }),

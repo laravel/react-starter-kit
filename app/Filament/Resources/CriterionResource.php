@@ -59,6 +59,7 @@ class CriterionResource extends Resource
                     ])
                     ->default('active')
                     ->required(),
+                Forms\Components\Toggle::make('requires_attachment')
             ]);
     }
 

@@ -208,6 +208,7 @@ export default function Take({ assessment, tool, existingResponses, completionPe
     const handleResponseChange = async (criterionId: number, response: 'yes' | 'no' | 'na') => {
         setResponses(prev => ({ ...prev, [criterionId]: response }));
 
+        // Prepare form data
         const formData = new FormData();
         formData.append('criterion_id', criterionId.toString());
         formData.append('response', response);
@@ -220,22 +221,20 @@ export default function Take({ assessment, tool, existingResponses, completionPe
             formData.append('attachment', attachments[criterionId]!);
         }
 
-        try {
-            const result = await fetch(route('assessment.save-response', assessment.id), {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-                },
-                body: formData,
-            });
-
-            const data = await result.json();
-            if (data.success) {
+        // Use Inertia's router.post method for auto-save
+        router.post(route('assessment.save-response', assessment.id), formData, {
+            preserveScroll: true,
+            preserveState: true,
+            only: [], // Don't reload any props
+            onSuccess: (page) => {
                 setLastSaved(new Date());
-            }
-        } catch (error) {
-            console.error('Error saving response:', error);
-        }
+                console.log('Response saved successfully');
+            },
+            onError: (errors) => {
+                console.error('Error saving response:', errors);
+                // You can show an error toast here if needed
+            },
+        });
     };
 
     const handleNotesChange = (criterionId: number, value: string) => {
@@ -251,26 +250,25 @@ export default function Take({ assessment, tool, existingResponses, completionPe
 
         setIsSubmitting(true);
 
-        const submissionData = { responses: {} };
+        // Prepare submission data
+        const submissionData = {
+            responses: {}
+        };
 
+        // Add all responses
         Object.entries(responses).forEach(([criterionId, response]) => {
             submissionData.responses[criterionId] = {
                 criterion_id: parseInt(criterionId),
                 response: response,
+                notes: notes[criterionId] || null,
+                attachment: attachments[criterionId] || null
             };
-
-            if (notes[criterionId]) {
-                submissionData.responses[criterionId].notes = notes[criterionId];
-            }
-
-            if (attachments[criterionId]) {
-                submissionData.responses[criterionId].attachment = attachments[criterionId];
-            }
         });
 
+        // Use Inertia's router.post method
         router.post(route('assessment.submit', assessment.id), submissionData, {
             onSuccess: () => {
-                router.visit(route('assessment.results', assessment.id));
+                // Will be redirected to results page automatically
             },
             onError: (errors) => {
                 console.error('Error submitting assessment:', errors);

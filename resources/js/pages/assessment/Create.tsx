@@ -61,7 +61,16 @@ export default function Create({ tool, prefillData }: CreateProps) {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('assessment.start'));
+
+        // Use Inertia's post method
+        post(route('assessment.start'), {
+            onSuccess: () => {
+                // Will be redirected automatically
+            },
+            onError: (errors) => {
+                console.error('Error starting assessment:', errors);
+            },
+        });
     };
 
     const totalCategories = tool.domains.reduce((acc, domain) => acc + domain.categories.length, 0);
