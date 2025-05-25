@@ -53,6 +53,8 @@ class CategoryResource extends Resource
                     ->required()
                     ->numeric()
                     ->default(0),
+                Forms\Components\TextInput::make('weight_percentage')
+                    ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
                         'active' => 'Active',
@@ -75,6 +77,7 @@ class CategoryResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('weight_percentage'),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
                         'danger' => 'inactive',

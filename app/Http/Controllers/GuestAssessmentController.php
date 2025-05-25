@@ -247,7 +247,7 @@ class GuestAssessmentController extends Controller
     public function sendEmail(Assessment $assessment)
     {
         try {
-            // Generate limited results
+
             $results = $assessment->results()->with(['domain'])->get();
             $domainResults = $results->where('category_id', null);
 

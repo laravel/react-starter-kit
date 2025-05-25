@@ -7,6 +7,8 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { type BreadcrumbItem } from '@/types';
+import { router } from '@inertiajs/react'
+
 import {
     CheckCircle,
     Lock,
@@ -171,16 +173,21 @@ export default function GuestLimitedResults({ assessment, results, sessionData, 
     };
 
     const sendEmail = () => {
-        fetch(route('guest.assessment.send-email', assessment.id), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
-            },
-        }).then(() => {
-            setIsEmailSent(true);
-        }).catch(console.error);
+        router.post(
+            route('guest.assessment.send-email', assessment.id),
+            {},
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setIsEmailSent(true);
+                },
+                onError: (errors) => {
+                    console.error(errors);
+                },
+            }
+        );
     };
+
 
     const formatDate = (dateString: string): string => {
         const date = new Date(dateString);

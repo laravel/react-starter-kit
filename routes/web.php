@@ -28,21 +28,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Start assessment for authenticated users (redirects to start.tsx)
     Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
         ->name('assessment.start');
-    // Submit assessment for authenticated users
+
+    // Submit assessment for authenticated users - THIS ROUTE MUST EXIST
     Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
         ->name('assessment.submit');
 
-    // Results for authenticated users (results.tsx - different from guest Results.tsx)
+    // Results for authenticated users (results.tsx)
     Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
         ->name('assessment.results');
 
     // List all user's assessments
     Route::get('/assessments', [AssessmentController::class, 'index'])
         ->name('assessments.index');
-
-    // Admin analytics (if user has admin permissions)
-    Route::get('/admin/guest-analytics', [GuestAssessmentController::class, 'getAnalytics'])
-        ->name('admin.guest-analytics');
 });
 
 // Guest routes (for non-authenticated users)
@@ -90,3 +87,8 @@ Route::get('/register', function(\Illuminate\Http\Request $request) {
         ]
     ]);
 })->middleware('guest')->name('register');
+
+
+
+
+

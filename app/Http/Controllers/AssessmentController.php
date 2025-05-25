@@ -6,6 +6,7 @@ use App\Models\Assessment;
 use App\Models\AssessmentResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
 class AssessmentController extends Controller
@@ -62,17 +63,67 @@ class AssessmentController extends Controller
         ]);
     }
 
+
+// In app/Http/Controllers/AssessmentController.php
+// REPLACE the entire submit method and make sure there's only ONE convertValueToResponse method
+
     public function submit(Request $request)
     {
+        Log::info('Assessment submission started', $request->all());
+
+        // The data is coming in the wrong format, so let's handle it correctly
+        $requestData = $request->all();
+
+        // Convert the responses format if needed
+        $responses = [];
+        $notes = [];
+
+        if (isset($requestData['responses'])) {
+            foreach ($requestData['responses'] as $criterionId => $responseData) {
+                if (is_array($responseData)) {
+                    // Handle the object format from frontend
+                    $response = $responseData['response'] ?? null;
+                    $noteText = $responseData['notes'] ?? null;
+
+                    // Convert response to numeric
+                    switch ($response) {
+                        case 'yes':
+                            $responses[$criterionId] = 100;
+                            break;
+                        case 'no':
+                            $responses[$criterionId] = 0;
+                            break;
+                        case 'na':
+                            $responses[$criterionId] = 50;
+                            break;
+                        default:
+                            $responses[$criterionId] = 0;
+                    }
+
+                    if ($noteText) {
+                        $notes[$criterionId] = $noteText;
+                    }
+                } else {
+                    // Handle numeric format (in case frontend sends it correctly)
+                    $responses[$criterionId] = $responseData;
+                }
+            }
+        }
+
         $validated = $request->validate([
             'tool_id' => 'required|exists:tools,id',
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
             'organization' => 'nullable|string|max:255',
-            'responses' => 'required|array',
-            'responses.*' => 'required|numeric|between:0,100',
-            'notes' => 'nullable|array',
-            'notes.*' => 'nullable|string|max:1000',
+        ]);
+
+        // Add the processed responses to validation
+        $validated['responses'] = $responses;
+        $validated['notes'] = $notes;
+
+        Log::info('Processed data', [
+            'responses' => $responses,
+            'notes' => $notes
         ]);
 
         try {
@@ -81,7 +132,7 @@ class AssessmentController extends Controller
             // Create the assessment for authenticated user
             $assessment = Assessment::create([
                 'tool_id' => $validated['tool_id'],
-                'user_id' => auth()->id(), // Set the authenticated user
+                'user_id' => auth()->id(),
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'organization' => $validated['organization'],
@@ -90,32 +141,63 @@ class AssessmentController extends Controller
                 'completed_at' => now(),
             ]);
 
+            Log::info('Assessment created', ['assessment_id' => $assessment->id]);
+
             // Create assessment responses
             foreach ($validated['responses'] as $criterionId => $value) {
                 AssessmentResponse::create([
                     'assessment_id' => $assessment->id,
                     'criterion_id' => $criterionId,
-                    'response' => $this->convertValueToResponse($value), // Convert numeric to yes/no/na
+                    'response' => $this->convertValueToResponse($value),
                     'notes' => $validated['notes'][$criterionId] ?? null,
                 ]);
             }
 
+            Log::info('Responses created');
+
             // Calculate results
             $assessment->calculateResults();
 
+            Log::info('Results calculated');
+
             DB::commit();
 
+            Log::info('Assessment submission completed successfully', ['assessment_id' => $assessment->id]);
+
+            // Redirect to authenticated user results page
             return redirect()->route('assessment.results', $assessment->id)
                 ->with('success', 'Assessment submitted successfully!');
 
         } catch (\Exception $e) {
             DB::rollBack();
 
+            Log::error('Assessment submission failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
             return back()->withErrors([
                 'submit' => 'There was an error submitting your assessment. Please try again.'
             ]);
         }
     }
+
+// Make sure there's ONLY ONE convertValueToResponse method in your entire controller
+    private function convertValueToResponse($value): string
+    {
+        if ($value >= 75) {
+            return 'yes';
+        } elseif ($value >= 25) {
+            return 'no';
+        } else {
+            return 'na';
+        }
+    }
+
+    /**
+     * Convert numeric value to response format
+     */
+
 
     public function results(Assessment $assessment)
     {
@@ -159,16 +241,7 @@ class AssessmentController extends Controller
     /**
      * Convert numeric value to response format
      */
-    private function convertValueToResponse($value): string
-    {
-        if ($value >= 75) {
-            return 'yes';
-        } elseif ($value >= 25) {
-            return 'no';
-        } else {
-            return 'na';
-        }
-    }
+
 
     /**
      * Calculate results for authenticated user assessments

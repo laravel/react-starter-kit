@@ -348,11 +348,19 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
 
     const { data, setData, post, processing, errors } = useForm({
         tool_id: tool.id,
-        name: prefillData?.name || '',           // Use prefillData from props
-        email: prefillData?.email || '',         // Use prefillData from props
-        organization: user?.organization || '',
+        name: prefillData?.name || auth?.user?.name || '',
+        email: prefillData?.email || auth?.user?.email || '',
+        organization: auth?.user?.organization || '',
         responses: {} as Record<number, { criterion_id: number; response: 'yes' | 'no' | 'na'; notes?: string; attachment?: File }>,
     });
+
+// And update your startAssessment function to check auth properly:
+    const startAssessment = () => {
+        if (!data.name || !data.email) {
+            return;
+        }
+        setCurrentStep('preview');
+    };
 
     function getLocalizedText(item: any, field: string): string {
         return language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
@@ -417,12 +425,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         return true;
     });
 
-    const startAssessment = () => {
-        if (!data.name || !data.email) {          // Changed from guest_name and guest_email
-            return;
-        }
-        setCurrentStep('preview');
-    };
+
 
     const proceedToAssessment = () => {
         setCurrentStep('assessment');
@@ -440,30 +443,66 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         }
     };
 
+    // Alternative: Fix the frontend submitAssessment function to send the correct format
+
     const submitAssessment = () => {
         if (!isComplete || processing) return;
 
-        const formData = {
+        console.log('Starting assessment submission...');
+
+        // Prepare submission data for authenticated users
+        const submissionData = {
             tool_id: tool.id,
             name: data.name,
             email: data.email,
             organization: data.organization || null,
-            responses: allCriteria.reduce((acc, criterion) => {
-                const response = data.responses[criterion.id];
-                if (response) {
-                    acc[criterion.id] = {
-                        criterion_id: criterion.id,
-                        response: response.response,
-                        notes: response.notes || null,
-                        attachment: response.attachment || null
-                    };
-                }
-                return acc;
-            }, {})
+            responses: {},
+            notes: {}
         };
 
-        // Use the POST route for assessment.start (handled by GuestAssessmentController)
-        post(route('assessment.start'), formData);
+        // Convert responses to the NUMERIC format expected by AssessmentController
+        allCriteria.forEach(criterion => {
+            const response = data.responses[criterion.id];
+            if (response && response.response) {
+                // Convert response to numeric value for AssessmentController
+                let numericValue;
+                switch (response.response) {
+                    case 'yes':
+                        numericValue = 100;
+                        break;
+                    case 'no':
+                        numericValue = 0;
+                        break;
+                    case 'na':
+                        numericValue = 50;
+                        break;
+                    default:
+                        numericValue = 0;
+                }
+
+                // Send ONLY the numeric value, not the object
+                submissionData.responses[criterion.id] = numericValue;
+
+                if (response.notes) {
+                    submissionData.notes[criterion.id] = response.notes;
+                }
+            }
+        });
+
+        console.log('Submission data:', submissionData);
+
+        // Submit to authenticated user route
+        post(route('assessment.submit'), submissionData, {
+            onSuccess: (page) => {
+                console.log('Assessment submitted successfully', page);
+            },
+            onError: (errors) => {
+                console.error('Submission errors:', errors);
+            },
+            onFinish: () => {
+                console.log('Submission finished');
+            }
+        });
     };
 
     // ... rest of your component

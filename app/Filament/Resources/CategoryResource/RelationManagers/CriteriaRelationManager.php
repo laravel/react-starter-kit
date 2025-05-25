@@ -63,7 +63,7 @@ class CriteriaRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name_en')
                     ->label('Name (English)'),
                 Tables\Columns\TextColumn::make('order')
-                    ->sortable(),
+                    ->sortable(),  Tables\Columns\TextColumn::make('weight_percentage'),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
                         'danger' => 'inactive',

@@ -45,6 +45,10 @@ class CategoriesRelationManager extends RelationManager
                     ->required()
                     ->numeric()
                     ->default(0),
+                Forms\Components\TextInput::make('weight_percentage')
+                    ->numeric()
+                    ->suffix('%')
+                    ->required(),
                 Forms\Components\Select::make('status')
                     ->options([
                         'active' => 'Active',
@@ -63,7 +67,7 @@ class CategoriesRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('name_en')
                     ->label('Name (English)'),
                 Tables\Columns\TextColumn::make('order')
-                    ->sortable(),
+                    ->sortable(), Tables\Columns\TextColumn::make('weight_percentage'),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
                         'danger' => 'inactive',
