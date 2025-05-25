@@ -30,6 +30,16 @@ class GuestAssessmentController extends Controller
             'tools' => $tools,
         ]);
     }
+    public function index2()
+    {
+        $tools = Tool::with(['domains.categories'])
+            ->where('status', 'active')
+            ->get();
+
+        return Inertia::render('welcome2', [
+            'tools' => $tools,
+        ]);
+    }
 
     /**
      * Start a new assessment

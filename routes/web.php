@@ -44,7 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Guest routes (for non-authenticated users)
 Route::get('/', [GuestAssessmentController::class, 'index'])->name('home');
-
+Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
 // Create assessment form for guests
 Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create'])
     ->name('assessment.create');
