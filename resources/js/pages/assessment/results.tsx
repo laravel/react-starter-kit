@@ -21,6 +21,7 @@ import {
     User,
     Building
 } from 'lucide-react';
+import PDFGeneratorComponent from '@/components/PDFGeneratorComponent';
 
 // Dynamic import for ApexCharts to avoid SSR issues
 let ApexCharts: any;
@@ -75,11 +76,7 @@ interface AssessmentResults {
     category_results: Record<string, CategoryResult[]>;
 }
 
-interface AssessmentResultsProps {
-    assessment: AssessmentResult;
-    results: AssessmentResults;
-    locale?: string;
-}
+
 
 // ApexChart Bar Chart Component
 interface ApexBarChartProps {
@@ -344,7 +341,41 @@ const HorizontalBar: React.FC<HorizontalBarProps> = ({ label, value, maxValue, c
     );
 };
 
-export default function AssessmentResults({ assessment, results, locale = 'en' }: AssessmentResultsProps) {
+interface AssessmentResultsProps {
+    assessment: {
+        id: number;
+        name: string;
+        email: string;
+        organization?: string;
+        status: string;
+        created_at: string;
+        completed_at?: string;
+        tool: {
+            id: number;
+            name_en: string;
+            name_ar: string;
+        };
+    };
+    results: {
+        overall_percentage: number;
+        yes_count: number;
+        no_count: number;
+        na_count: number;
+        domain_results: any[];
+        category_results?: any;
+        total_criteria: number;
+        applicable_criteria: number;
+    };
+    locale?: string;
+    isGuest?: boolean;
+}
+
+export default function AssessmentResults({
+                                              assessment,
+                                              results,
+                                              locale = 'en',
+                                              isGuest = false
+                                          }: AssessmentResultsProps) {
     const isArabic = locale === 'ar';
     const [useApexCharts, setUseApexCharts] = useState(true);
 
@@ -469,10 +500,7 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                             <Share2 className="h-4 w-4 mr-2" />
                             {isArabic ? 'مشاركة' : 'Share'}
                         </Button>
-                        <Button variant="outline" size="sm">
-                            <Download className="h-4 w-4 mr-2" />
-                            {isArabic ? 'تحميل PDF' : 'Download PDF'}
-                        </Button>
+
                     </div>
                 </div>
 
@@ -669,6 +697,12 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
                         </Card>
                     ))}
                 </div>
+                <PDFGeneratorComponent
+                    assessment={assessment}
+                    locale={locale}
+                    isGuest={false}
+                    results={results}
+                />
 
                 {/* Recommendations */}
                 <Card className="border-amber-200 bg-amber-50">

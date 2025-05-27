@@ -3,11 +3,13 @@
 namespace App\Filament\Widgets;
 
 use App\Models\GuestSession;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
 use Carbon\Carbon;
 
 class DeviceBreakdownChart extends ChartWidget
 {
+    use HasWidgetShield;
     protected static ?string $heading = 'Device Usage Breakdown';
 
     protected static ?int $sort = 2;

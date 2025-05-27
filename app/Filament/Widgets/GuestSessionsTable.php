@@ -3,12 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Models\GuestSession;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Filament\Widgets\TableWidget as BaseWidget;
 
 class GuestSessionsTable extends BaseWidget
 {
+    use HasWidgetShield;
     protected static ?string $heading = 'Recent Guest Sessions';
 
     protected static ?int $sort = 5;

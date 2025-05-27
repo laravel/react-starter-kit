@@ -9,8 +9,46 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
 
+use App\Services\AssessmentReportService;
+
 class AssessmentController extends Controller
 {
+    protected AssessmentReportService $reportService;
+
+    public function __construct(AssessmentReportService $reportService)
+    {
+        $this->reportService = $reportService;
+    }
+
+    /**
+     * Add this method to your existing controller
+     */
+    public function downloadReport(Request $request, Assessment $assessment)
+    {
+        // Authorize user can access this assessment
+        $this->authorize('view', $assessment);
+
+        $settings = $request->validate([
+            'language' => 'in:arabic,english,bilingual',
+            'template' => 'in:comprehensive,summary,detailed,minimal',
+            'include_charts' => 'boolean',
+            'include_recommendations' => 'boolean',
+            'watermark' => 'boolean',
+        ]);
+
+        try {
+            $pdf = $this->reportService->generateUniversalReport($assessment, $settings);
+            $filename = "assessment_report_{$assessment->id}.pdf";
+
+            return response($pdf, 200, [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Failed to generate report'], 500);
+        }
+    }
+
     public function index(Request $request)
     {
         $locale = app()->getLocale();
@@ -63,10 +101,6 @@ class AssessmentController extends Controller
         ]);
     }
 
-
-// In app/Http/Controllers/AssessmentController.php
-// REPLACE the entire submit method and make sure there's only ONE convertValueToResponse method
-
     public function submit(Request $request)
     {
         Log::info('Assessment submission started', $request->all());
@@ -85,26 +119,14 @@ class AssessmentController extends Controller
                     $response = $responseData['response'] ?? null;
                     $noteText = $responseData['notes'] ?? null;
 
-                    // Convert response to numeric
-                    switch ($response) {
-                        case 'yes':
-                            $responses[$criterionId] = 100;
-                            break;
-                        case 'no':
-                            $responses[$criterionId] = 0;
-                            break;
-                        case 'na':
-                            $responses[$criterionId] = 50;
-                            break;
-                        default:
-                            $responses[$criterionId] = 0;
-                    }
+                    // FIXED: Don't convert to numeric - store the string response directly
+                    $responses[$criterionId] = $response; // Keep as 'yes', 'no', or 'na'
 
                     if ($noteText) {
                         $notes[$criterionId] = $noteText;
                     }
                 } else {
-                    // Handle numeric format (in case frontend sends it correctly)
+                    // Handle string format directly
                     $responses[$criterionId] = $responseData;
                 }
             }
@@ -144,11 +166,11 @@ class AssessmentController extends Controller
             Log::info('Assessment created', ['assessment_id' => $assessment->id]);
 
             // Create assessment responses
-            foreach ($validated['responses'] as $criterionId => $value) {
+            foreach ($validated['responses'] as $criterionId => $responseValue) {
                 AssessmentResponse::create([
                     'assessment_id' => $assessment->id,
                     'criterion_id' => $criterionId,
-                    'response' => $this->convertValueToResponse($value),
+                    'response' => $responseValue, // Store directly as 'yes', 'no', or 'na'
                     'notes' => $validated['notes'][$criterionId] ?? null,
                 ]);
             }
@@ -182,22 +204,17 @@ class AssessmentController extends Controller
         }
     }
 
-// Make sure there's ONLY ONE convertValueToResponse method in your entire controller
-    private function convertValueToResponse($value): string
-    {
-        if ($value >= 75) {
-            return 'yes';
-        } elseif ($value >= 25) {
-            return 'no';
-        } else {
-            return 'na';
-        }
-    }
-
-    /**
-     * Convert numeric value to response format
-     */
-
+    // REMOVE THIS METHOD - We don't need it anymore since we're storing responses directly
+    // private function convertValueToResponse($value): string
+    // {
+    //     if ($value >= 75) {
+    //         return 'yes';
+    //     } elseif ($value >= 25) {
+    //         return 'no';
+    //     } else {
+    //         return 'na';
+    //     }
+    // }
 
     public function results(Assessment $assessment)
     {
@@ -239,11 +256,6 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Convert numeric value to response format
-     */
-
-
-    /**
      * Calculate results for authenticated user assessments
      */
     private function calculateResults(Assessment $assessment)
@@ -262,7 +274,7 @@ class AssessmentController extends Controller
 
             // Group by category within domain
             $responsesByCategory = $domainResponses->groupBy(function ($response) {
-                return $response->criterion->category->id;
+                return $response->criterion->category->domain->id;
             });
 
             $categoryResults = [];

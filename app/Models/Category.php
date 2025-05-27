@@ -75,7 +75,14 @@ class Category extends Model
         $applicableCount = 0;
 
         foreach ($criteria as $criterion) {
-            $response = $responses[$criterion->id] ?? 'no';
+            // Check if response exists for this criterion
+            if (!isset($responses[$criterion->id])) {
+                // If no response exists, treat as unanswered (you might want to handle this differently)
+                $naCount++; // or you could skip this criterion entirely
+                continue;
+            }
+
+            $response = $responses[$criterion->id];
 
             switch ($response) {
                 case 'yes':
@@ -87,6 +94,10 @@ class Category extends Model
                     $applicableCount++;
                     break;
                 case 'na':
+                    $naCount++;
+                    break;
+                default:
+                    // Handle unexpected response values
                     $naCount++;
                     break;
             }

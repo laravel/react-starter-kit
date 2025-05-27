@@ -4,6 +4,7 @@ namespace App\Filament\Widgets;
 
 use App\Models\GuestSession;
 use App\Models\Assessment;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Carbon\Carbon;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class GuestAnalyticsOverview extends BaseWidget
 {
+    use HasWidgetShield;
 //    protected static ?string $heading = 'Guest Assessment Analytics';
 
     protected static ?int $sort = 1;

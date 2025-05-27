@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Controllers\AssessmentReportController;
 use App\Http\Controllers\AssessmentToolsController;
+use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
 use App\Models\Tool;
@@ -42,6 +44,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('assessments.index');
 });
 
+Route::post('/contact/sales', [ContactSalesController::class, 'store'])->name('contact.sales');
+Route::get('/contact/sales', [ContactSalesController::class, 'show'])->name('contact.sales.show');
 // Guest routes (for non-authenticated users)
 Route::get('/', [GuestAssessmentController::class, 'index'])->name('home');
 Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
@@ -79,16 +83,85 @@ Route::post('/guest/session/{assessment}/update', [GuestAssessmentController::cl
     ->name('guest.session.update');
 
 // Enhanced registration route with prefilled data
-Route::get('/register', function(\Illuminate\Http\Request $request) {
-    return Inertia::render('auth/register', [
-        'prefillData' => [
-            'name' => $request->query('name'),
-            'email' => $request->query('email'),
-        ]
-    ]);
-})->middleware('guest')->name('register');
+//Route::get('/register', function(\Illuminate\Http\Request $request) {
+//    return Inertia::render('auth/register', [
+//        'prefillData' => [
+//            'name' => $request->query('name'),
+//            'email' => $request->query('email'),
+//        ]
+//    ]);
+//})->middleware('guest')->name('register');
 
 
+
+// routes/api.php - Add these routes
+Route::post('/assessments/{assessment}/reports/generate', [AssessmentReportController::class, 'generateReport']);
+Route::get('/assessments/{assessment}/reports/preview', [AssessmentReportController::class, 'previewReport']);
+
+// routes/web.php - Add download route
+Route::get('/assessments/{assessment}/report', [AssessmentController::class, 'downloadReport'])
+    ->name('assessments.report.download');
+
+
+// Add these routes to your existing routes/web.php file
+
+use App\Http\Controllers\AssessmentPDFController;
+
+// Add these routes to your existing authenticated routes group
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Your existing routes...
+
+    // PDF Generation for authenticated users
+    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
+        ->name('assessments.report.download');
+});
+
+// Add this route for guest assessments (outside the auth middleware)
+Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadGuestReport'])
+    ->name('guest.assessments.report.download');
+
+// If you want API endpoints as well, add these to routes/api.php
+Route::middleware(['auth'])->group(function () {
+    Route::post('/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadReport']);
+    Route::get('/reports/templates', function () {
+        return response()->json([
+            'success' => true,
+            'data' => [
+                [
+                    'id' => 'comprehensive',
+                    'name' => 'Comprehensive Report',
+                    'name_ar' => 'تقرير شامل',
+                    'description' => 'Complete assessment report with all details',
+                    'description_ar' => 'تقرير تقييم كامل مع جميع التفاصيل',
+                    'pages' => '8-12',
+                    'includes' => ['client_info', 'results', 'charts', 'recommendations', 'action_plan']
+                ],
+                [
+                    'id' => 'summary',
+                    'name' => 'Executive Summary',
+                    'name_ar' => 'ملخص تنفيذي',
+                    'description' => 'Brief overview with key findings',
+                    'description_ar' => 'نظرة عامة موجزة مع النتائج الرئيسية',
+                    'pages' => '3-5',
+                    'includes' => ['client_info', 'overall_score', 'key_recommendations']
+                ],
+                [
+                    'id' => 'detailed',
+                    'name' => 'Detailed Analysis',
+                    'name_ar' => 'تحليل مفصل',
+                    'description' => 'In-depth analysis with category breakdowns',
+                    'description_ar' => 'تحليل متعمق مع تفصيل الفئات',
+                    'pages' => '10-15',
+                    'includes' => ['client_info', 'results', 'category_breakdown', 'charts', 'detailed_recommendations']
+                ]
+            ]
+        ]);
+    });
+});
+
+// For guest API access (if needed)
+Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
+    ->middleware(['throttle:10,1']);
 
 
 

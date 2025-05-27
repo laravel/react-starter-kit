@@ -3,12 +3,14 @@
 namespace App\Filament\Widgets;
 
 use App\Models\GuestSession;
+use BezhanSalleh\FilamentShield\Traits\HasWidgetShield;
 use Filament\Widgets\ChartWidget;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
 
 class SessionsTrendChart extends ChartWidget
 {
+    use HasWidgetShield;
     protected static ?string $heading = 'Sessions Trend Over Time';
 
     protected static ?int $sort = 4;

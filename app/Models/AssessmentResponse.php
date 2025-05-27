@@ -18,27 +18,6 @@ class AssessmentResponse extends Model
     ];
 
     // Add accessor for frontend compatibility
-    public function getIsAvailableAttribute(): ?bool
-    {
-        return match($this->response) {
-            'yes' => true,
-            'no' => false,
-            'na' => null,
-            default => null,
-        };
-    }
-
-    // Add mutator for backward compatibility
-    public function setIsAvailableAttribute($value): void
-    {
-        $this->attributes['response'] = match($value) {
-            true => 'yes',
-            false => 'no',
-            null => 'na',
-            default => 'na',
-        };
-    }
-
     public function assessment(): BelongsTo
     {
         return $this->belongsTo(Assessment::class);
@@ -47,5 +26,11 @@ class AssessmentResponse extends Model
     public function criterion(): BelongsTo
     {
         return $this->belongsTo(Criterion::class);
+    }
+
+    // Add this method to help with debugging
+    public function getResponseValue(): string
+    {
+        return $this->response ?? 'na';
     }
 }
