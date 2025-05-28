@@ -80,6 +80,9 @@ class CriterionResource extends Resource
                         'danger' => 'inactive',
                         'success' => 'active',
                     ]),
+                Tables\Columns\ToggleColumn::make('requires_attachment')
+
+                   ,
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

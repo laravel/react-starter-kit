@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Facades\Log;
 
 class Assessment extends Model
 {
@@ -21,8 +22,8 @@ class Assessment extends Model
         'status',
         'started_at',
         'completed_at',
-        'title_en',      // Add these if they don't exist
-        'title_ar',      // Add these if they don't exist
+        'title_en',
+        'title_ar',
         'created_at',
         'updated_at',
     ];
@@ -37,7 +38,6 @@ class Assessment extends Model
         return $this->belongsTo(User::class);
     }
 
-    // In App\Models\Assessment.php
     public function guestSession(): HasOne
     {
         return $this->hasOne(GuestSession::class);
@@ -82,11 +82,17 @@ class Assessment extends Model
         $tool = $this->tool->load(['domains.categories.criteria']);
         $responses = $this->responses->keyBy('criterion_id');
 
-        // Convert responses to simple array format
+        // Convert responses to simple array format for the calculation methods
         $responseArray = [];
         foreach ($responses as $criterionId => $response) {
-            $responseArray[$criterionId] = $response->response;
+            $responseArray[$criterionId] = $response->response; // 'yes', 'no', or 'na'
         }
+
+        Log::info('Calculating results for assessment', [
+            'assessment_id' => $this->id,
+            'responses_count' => count($responseArray),
+            'sample_responses' => array_slice($responseArray, 0, 5, true)
+        ]);
 
         // Clear existing results
         $this->results()->delete();
@@ -94,6 +100,12 @@ class Assessment extends Model
         // Calculate results for each domain and category
         foreach ($tool->domains as $domain) {
             $domainScore = $domain->calculateScore($responseArray);
+
+            Log::info('Domain score calculated', [
+                'domain_id' => $domain->id,
+                'domain_name' => $domain->name_en,
+                'score' => $domainScore
+            ]);
 
             // Save domain result
             AssessmentResult::create([
@@ -128,49 +140,160 @@ class Assessment extends Model
     }
 
     /**
-     * Get assessment results
+     * Get assessment results with fixed calculation
      */
     public function getResults(): array
     {
-        $results = $this->results()->with(['domain', 'category'])->get();
+        Log::info('Getting results for assessment', ['assessment_id' => $this->id]);
 
-        $domainResults = $results->where('category_id', null)->values();
-        $categoryResults = $results->where('category_id', '!=', null)->groupBy('domain_id');
+        // Get all responses for this assessment
+        $responses = $this->responses()->with('criterion.category.domain')->get();
 
-        return [
-            'domain_results' => $domainResults->map(function ($result) {
+        Log::info('Responses loaded', [
+            'count' => $responses->count(),
+            'sample' => $responses->take(3)->map(function($r) {
                 return [
-                    'domain_id' => $result->domain_id,
-                    'domain_name' => $result->domain->name_en, // You might want to handle localization
-                    'score_percentage' => $result->score_percentage,
-                    'total_criteria' => $result->total_criteria,
-                    'applicable_criteria' => $result->applicable_criteria,
-                    'yes_count' => $result->yes_count,
-                    'no_count' => $result->no_count,
-                    'na_count' => $result->na_count,
-                    'weighted_score' => $result->weighted_score,
+                    'criterion_id' => $r->criterion_id,
+                    'response' => $r->response,
+                    'criterion_name' => $r->criterion->name_en ?? 'Unknown'
                 ];
-            }),
-            'category_results' => $categoryResults->map(function ($categories, $domainId) {
-                return $categories->map(function ($result) {
-                    return [
-                        'category_id' => $result->category_id,
-                        'category_name' => $result->category->name_en, // You might want to handle localization
-                        'score_percentage' => $result->score_percentage,
-                        'applicable_criteria' => $result->applicable_criteria,
-                        'yes_count' => $result->yes_count,
-                        'no_count' => $result->no_count,
-                        'na_count' => $result->na_count,
-                        'weight_percentage' => $result->weighted_score,
-                    ];
-                });
-            }),
-            'overall_percentage' => $domainResults->avg('score_percentage') ?? 0,
-            'total_criteria' => $domainResults->sum('total_criteria'),
-            'applicable_criteria' => $domainResults->sum('applicable_criteria'),
-            'yes_count' => $domainResults->sum('yes_count'),
-            'no_count' => $domainResults->sum('no_count'),
-            'na_count' => $domainResults->sum('na_count'),
+            })
+        ]);
+
+        if ($responses->isEmpty()) {
+            Log::warning('No responses found for assessment', ['assessment_id' => $this->id]);
+            return $this->getEmptyResults();
+        }
+
+        // Count responses by type
+        $yesCount = $responses->where('response', 'yes')->count();
+        $noCount = $responses->where('response', 'no')->count();
+        $naCount = $responses->where('response', 'na')->count();
+        $totalResponses = $yesCount + $noCount + $naCount;
+        $applicableResponses = $yesCount + $noCount; // Exclude N/A from applicable
+
+        Log::info('Response counts', [
+            'yes' => $yesCount,
+            'no' => $noCount,
+            'na' => $naCount,
+            'total' => $totalResponses,
+            'applicable' => $applicableResponses
+        ]);
+
+        // Calculate overall percentage - FIXED LOGIC
+        // If all responses are "Yes", score should be 100%
+        // If all responses are "No", score should be 0%
+        // N/A responses are excluded from the calculation
+        $overallPercentage = 0;
+        if ($applicableResponses > 0) {
+            $overallPercentage = ($yesCount / $applicableResponses) * 100;
+        }
+
+        Log::info('Overall percentage calculated', [
+            'percentage' => $overallPercentage,
+            'calculation' => "({$yesCount} / {$applicableResponses}) * 100"
+        ]);
+
+        // Group responses by domain
+        $domainResults = [];
+        $responsesByDomain = $responses->groupBy(function ($response) {
+            return $response->criterion->category->domain->id;
+        });
+
+        foreach ($responsesByDomain as $domainId => $domainResponses) {
+            $domain = $domainResponses->first()->criterion->category->domain;
+
+            $domainYesCount = $domainResponses->where('response', 'yes')->count();
+            $domainNoCount = $domainResponses->where('response', 'no')->count();
+            $domainNaCount = $domainResponses->where('response', 'na')->count();
+            $domainApplicable = $domainYesCount + $domainNoCount;
+
+            // Calculate domain percentage
+            $domainPercentage = 0;
+            if ($domainApplicable > 0) {
+                $domainPercentage = ($domainYesCount / $domainApplicable) * 100;
+            }
+
+            $domainResults[] = [
+                'domain_id' => $domain->id,
+                'domain_name' => $domain->name_en,
+                'score_percentage' => round($domainPercentage, 2),
+                'total_criteria' => $domainResponses->count(),
+                'applicable_criteria' => $domainApplicable,
+                'yes_count' => $domainYesCount,
+                'no_count' => $domainNoCount,
+                'na_count' => $domainNaCount,
+                'weighted_score' => round($domainPercentage, 2),
+            ];
+        }
+
+        // Group responses by category within domains
+        $categoryResults = [];
+        foreach ($responsesByDomain as $domainId => $domainResponses) {
+            $categoriesByDomain = $domainResponses->groupBy(function ($response) {
+                return $response->criterion->category->id;
+            });
+
+            $categoryResults[$domainId] = [];
+            foreach ($categoriesByDomain as $categoryId => $categoryResponses) {
+                $category = $categoryResponses->first()->criterion->category;
+
+                $categoryYesCount = $categoryResponses->where('response', 'yes')->count();
+                $categoryNoCount = $categoryResponses->where('response', 'no')->count();
+                $categoryNaCount = $categoryResponses->where('response', 'na')->count();
+                $categoryApplicable = $categoryYesCount + $categoryNoCount;
+
+                // Calculate category percentage
+                $categoryPercentage = 0;
+                if ($categoryApplicable > 0) {
+                    $categoryPercentage = ($categoryYesCount / $categoryApplicable) * 100;
+                }
+
+                $categoryResults[$domainId][] = [
+                    'category_id' => $category->id,
+                    'category_name' => $category->name_en,
+                    'score_percentage' => round($categoryPercentage, 2),
+                    'applicable_criteria' => $categoryApplicable,
+                    'yes_count' => $categoryYesCount,
+                    'no_count' => $categoryNoCount,
+                    'na_count' => $categoryNaCount,
+                ];
+            }
+        }
+
+        $results = [
+            'domain_results' => $domainResults,
+            'category_results' => $categoryResults,
+            'overall_percentage' => round($overallPercentage, 2),
+            'total_criteria' => $totalResponses,
+            'applicable_criteria' => $applicableResponses,
+            'yes_count' => $yesCount,
+            'no_count' => $noCount,
+            'na_count' => $naCount,
+        ];
+
+        Log::info('Final results calculated', [
+            'overall_percentage' => $results['overall_percentage'],
+            'domain_count' => count($domainResults)
+        ]);
+
+        return $results;
+    }
+
+    /**
+     * Get empty results structure
+     */
+    private function getEmptyResults(): array
+    {
+        return [
+            'domain_results' => [],
+            'category_results' => [],
+            'overall_percentage' => 0,
+            'total_criteria' => 0,
+            'applicable_criteria' => 0,
+            'yes_count' => 0,
+            'no_count' => 0,
+            'na_count' => 0,
         ];
     }
 

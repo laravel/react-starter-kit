@@ -1,63 +1,31 @@
 <?php
 
+use App\Http\Controllers\AssessmentPDFController;
 use App\Http\Controllers\AssessmentReportController;
 use App\Http\Controllers\AssessmentToolsController;
 use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\UserRegistrationController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-});
-
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
-
-    // Assessment Tools routes for authenticated users
-    Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
-        ->name('assessment-tools');
-
-    // Start assessment for authenticated users (redirects to start.tsx)
-    Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
-        ->name('assessment.start');
-
-    // Submit assessment for authenticated users - THIS ROUTE MUST EXIST
-    Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
-        ->name('assessment.submit');
-
-    // Results for authenticated users (results.tsx)
-    Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
-        ->name('assessment.results');
-
-    // List all user's assessments
-    Route::get('/assessments', [AssessmentController::class, 'index'])
-        ->name('assessments.index');
-});
-
-Route::post('/contact/sales', [ContactSalesController::class, 'store'])->name('contact.sales');
-Route::get('/contact/sales', [ContactSalesController::class, 'show'])->name('contact.sales.show');
-// Guest routes (for non-authenticated users)
+// Public routes
 Route::get('/', [GuestAssessmentController::class, 'index'])->name('home');
 Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
-// Create assessment form for guests
+
+// Free user registration route (public)
+Route::post('/user/register-free', [UserRegistrationController::class, 'registerFreeUser'])
+    ->name('user.register-free');
+
+// Guest routes (for non-authenticated users)
 Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create'])
     ->name('assessment.create');
 
-// Start assessment for guests
 Route::post('/assessment/start', [GuestAssessmentController::class, 'start'])
     ->name('guest.assessment.start');
 
-// Assessment taking routes (accessible by both guests and authenticated users)
 Route::get('/assessment/{assessment}/take', [GuestAssessmentController::class, 'take'])
     ->name('assessment.take');
 
@@ -70,57 +38,97 @@ Route::post('/assessment/{assessment}/update-details', [GuestAssessmentControlle
 Route::post('/assessment/{assessment}/submit', [GuestAssessmentController::class, 'submit'])
     ->name('guest.assessment.submit');
 
-// Guest results (GuestResults.tsx - limited view)
 Route::get('/guest/assessment/{assessment}/results', [GuestAssessmentController::class, 'results'])
     ->name('guest.assessment.results');
 
-// Guest email functionality
 Route::post('/guest/assessment/{assessment}/send-email', [GuestAssessmentController::class, 'sendEmail'])
     ->name('guest.assessment.send-email');
 
-// Guest session tracking
 Route::post('/guest/session/{assessment}/update', [GuestAssessmentController::class, 'updateSession'])
     ->name('guest.session.update');
 
-// Enhanced registration route with prefilled data
-//Route::get('/register', function(\Illuminate\Http\Request $request) {
-//    return Inertia::render('auth/register', [
-//        'prefillData' => [
-//            'name' => $request->query('name'),
-//            'email' => $request->query('email'),
-//        ]
-//    ]);
-//})->middleware('guest')->name('register');
+// Contact routes
+Route::post('/contact/sales', [ContactSalesController::class, 'store'])->name('contact.sales');
+Route::get('/contact/sales', [ContactSalesController::class, 'show'])->name('contact.sales.show');
 
-
-
-// routes/api.php - Add these routes
-Route::post('/assessments/{assessment}/reports/generate', [AssessmentReportController::class, 'generateReport']);
-Route::get('/assessments/{assessment}/reports/preview', [AssessmentReportController::class, 'previewReport']);
-
-// routes/web.php - Add download route
-Route::get('/assessments/{assessment}/report', [AssessmentController::class, 'downloadReport'])
-    ->name('assessments.report.download');
-
-
-// Add these routes to your existing routes/web.php file
-
-use App\Http\Controllers\AssessmentPDFController;
-
-// Add these routes to your existing authenticated routes group
+// Authenticated routes with role-based access
 Route::middleware(['auth', 'verified'])->group(function () {
-    // Your existing routes...
 
-    // PDF Generation for authenticated users
+    // Dashboard - Only for premium and admin users
+    Route::get('/dashboard', function () {
+        return Inertia::render('dashboard');
+    })->middleware(['checkAccess:dashboard'])->name('dashboard');
+
+    // Assessment Tools - Available for all authenticated users (free, premium, admin)
+    Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
+//        ->middleware(['checkAccess:free'])
+        ->name('assessment-tools');
+
+    // Assessment routes for authenticated users
+    Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
+//        ->middleware(['checkAccess:free'])
+        ->name('assessment.start');
+
+    Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
+//        ->middleware(['checkAccess:free'])
+        ->name('assessment.submit');
+
+    Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
+//        ->middleware(['checkAccess:free'])
+        ->name('assessment.results');
+
+    // Assessment history - Available for all authenticated users
+    Route::get('/assessments', [AssessmentController::class, 'index'])
+//        ->middleware(['checkAccess:free'])
+        ->name('assessments.index');
+
+    // Subscription routes - Only for free users who want to upgrade
+    Route::get('/subscription', [UserRegistrationController::class, 'showSubscription'])
+//        ->middleware(['checkAccess:free'])
+        ->name('subscription.show');
+
+    Route::post('/subscription/request', [UserRegistrationController::class, 'requestSubscription'])
+//        ->middleware(['checkAccess:free'])
+        ->name('subscription.request');
+
+    // PDF Reports with role-based restrictions
+    Route::get('/assessments/{assessment}/report', [AssessmentController::class, 'downloadReport'])
+//        ->middleware(['checkAccess:free']) // Free users get basic reports
+        ->name('assessments.report.download');
+
+    // Advanced features - Premium only
+    Route::middleware(['checkAccess:premium'])->group(function () {
+        Route::get('/advanced-analytics', function () {
+            return Inertia::render('analytics/advanced');
+        })->name('analytics.advanced');
+
+        Route::get('/team-management', function () {
+            return Inertia::render('team/management');
+        })->name('team.management');
+
+        Route::get('/api-access', function () {
+            return Inertia::render('api/access');
+        })->name('api.access');
+    });
+});
+
+// Admin routes - Only for super_admin role
+Route::middleware(['auth', 'verified', 'checkAccess:admin'])->group(function () {
+    // Filament admin panel routes are handled by FilamentServiceProvider
+    // Additional admin routes can be added here
+});
+
+// PDF Generation routes
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
         ->name('assessments.report.download');
 });
 
-// Add this route for guest assessments (outside the auth middleware)
+// Guest PDF reports
 Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->name('guest.assessments.report.download');
 
-// If you want API endpoints as well, add these to routes/api.php
+// API routes
 Route::middleware(['auth'])->group(function () {
     Route::post('/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadReport']);
     Route::get('/reports/templates', function () {
@@ -159,9 +167,9 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
-// For guest API access (if needed)
+// Guest API access (limited)
 Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->middleware(['throttle:10,1']);
 
-
-
+require __DIR__.'/settings.php';
+require __DIR__.'/auth.php';

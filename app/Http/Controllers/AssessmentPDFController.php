@@ -6,50 +6,85 @@ use App\Models\Assessment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Mpdf\Mpdf;
+use Illuminate\Support\Facades\Log;
 
 class AssessmentPDFController extends Controller
 {
     /**
-     * Generate PDF report for assessment - Simple version
+     * Generate PDF report for assessment - Simplified version
      */
     public function downloadReport(Request $request, Assessment $assessment)
     {
-        // Basic validation
-        $settings = $request->validate([
-            'language' => 'in:arabic,english,bilingual',
-            'template' => 'in:comprehensive,summary,detailed',
-            'include_charts' => 'boolean',
-            'include_recommendations' => 'boolean',
-            'watermark' => 'boolean',
+        Log::info('PDF Generation Started', [
+            'assessment_id' => $assessment->id,
+            'user_id' => auth()->id(),
+            'assessment_user_id' => $assessment->user_id,
         ]);
 
-        // Set defaults
-        $settings = array_merge([
-            'language' => 'arabic',
-            'template' => 'comprehensive',
-            'include_charts' => true,
-            'include_recommendations' => true,
-            'watermark' => false,
-        ], $settings);
-
         try {
-            // Load assessment with relationships
-            $assessment->load(['tool', 'responses', 'results']);
-
-            // Calculate results if not already calculated
-            if ($assessment->results->isEmpty()) {
-                $assessment->calculateResults();
-                $assessment->refresh();
+            // Check authorization
+            if ($assessment->user_id !== auth()->id()) {
+                Log::warning('Unauthorized PDF access attempt');
+                return response()->json(['error' => 'Unauthorized access'], 403);
             }
 
-            // Get assessment results
-            $results = $assessment->getResults();
+            // Simple validation
+            $settings = [
+                'language' => $request->get('language', 'arabic'),
+                'template' => $request->get('template', 'comprehensive'),
+                'include_charts' => $request->boolean('include_charts', true),
+                'include_recommendations' => $request->boolean('include_recommendations', true),
+                'watermark' => $request->boolean('watermark', false),
+            ];
 
-            // Generate HTML content
-            $html = $this->generateHTML($assessment, $results, $settings);
+            Log::info('Settings prepared', $settings);
+
+            // Load basic assessment data
+            $assessment->load(['tool']);
+
+            Log::info('Assessment loaded', [
+                'tool_name' => $assessment->tool->name_en ?? 'Unknown',
+                'status' => $assessment->status
+            ]);
+
+            // Get results - with fallback if getResults() fails
+            try {
+                $results = $assessment->getResults();
+                Log::info('Results retrieved via getResults()', [
+                    'overall_percentage' => $results['overall_percentage'] ?? 0
+                ]);
+            } catch (\Exception $e) {
+                Log::warning('getResults() failed, using fallback', ['error' => $e->getMessage()]);
+
+                // Fallback: calculate basic results from responses
+                $responses = $assessment->responses;
+                $yesCount = $responses->where('response', 'yes')->count();
+                $noCount = $responses->where('response', 'no')->count();
+                $naCount = $responses->where('response', 'na')->count();
+                $total = $yesCount + $noCount + $naCount;
+
+                $results = [
+                    'overall_percentage' => $total > 0 ? ($yesCount / $total) * 100 : 0,
+                    'yes_count' => $yesCount,
+                    'no_count' => $noCount,
+                    'na_count' => $naCount,
+                    'total_criteria' => $total,
+                    'applicable_criteria' => $yesCount + $noCount,
+                    'domain_results' => []
+                ];
+
+                Log::info('Fallback results calculated', $results);
+            }
+
+            // Generate simple HTML
+            $html = $this->generateSimpleHTML($assessment, $results, $settings);
+
+            Log::info('HTML generated', ['length' => strlen($html)]);
 
             // Create PDF
-            $pdf = $this->createPDF($html, $settings);
+            $pdf = $this->createSimplePDF($html, $settings);
+
+            Log::info('PDF created', ['size' => strlen($pdf)]);
 
             // Generate filename
             $filename = $this->generateFilename($assessment, $settings);
@@ -57,56 +92,70 @@ class AssessmentPDFController extends Controller
             return response($pdf, 200, [
                 'Content-Type' => 'application/pdf',
                 'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+                'Cache-Control' => 'no-cache, no-store, must-revalidate',
+                'Pragma' => 'no-cache',
+                'Expires' => '0'
             ]);
 
         } catch (\Exception $e) {
-            \Log::error('PDF Generation Error: ' . $e->getMessage());
-            return response()->json(['error' => 'Failed to generate PDF report'], 500);
+            Log::error('PDF Generation Failed', [
+                'assessment_id' => $assessment->id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => explode("\n", $e->getTraceAsString())
+            ]);
+
+            return response()->json([
+                'error' => 'PDF generation failed',
+                'message' => $e->getMessage(),
+                'debug' => [
+                    'file' => basename($e->getFile()),
+                    'line' => $e->getLine(),
+                    'assessment_id' => $assessment->id
+                ]
+            ], 500);
         }
     }
 
     /**
-     * Generate HTML content for PDF
+     * Generate simple HTML content
      */
-    private function generateHTML(Assessment $assessment, array $results, array $settings): string
-    {
-        $isArabic = $settings['language'] === 'arabic';
-
-        // Get certification level
-        $certification = $this->getCertificationLevel($results['overall_percentage']);
-
-        // Generate recommendations
-        $recommendations = $settings['include_recommendations']
-            ? $this->generateRecommendations($results['domain_results'], $isArabic)
-            : [];
-
-        // Create HTML content
-        $html = $this->buildHTMLTemplate($assessment, $results, $certification, $recommendations, $settings);
-
-        return $html;
-    }
-
-    /**
-     * Build HTML template
-     */
-    private function buildHTMLTemplate(Assessment $assessment, array $results, array $certification, array $recommendations, array $settings): string
+    private function generateSimpleHTML(Assessment $assessment, array $results, array $settings): string
     {
         $isArabic = $settings['language'] === 'arabic';
         $dir = $isArabic ? 'rtl' : 'ltr';
-        $lang = $isArabic ? 'ar' : 'en';
 
-        $html = "
-<!DOCTYPE html>
-<html dir='{$dir}' lang='{$lang}'>
+        // Safe data extraction
+        $toolName = $assessment->tool->name_en ?? 'Assessment Tool';
+        if ($isArabic && !empty($assessment->tool->name_ar)) {
+            $toolName = $assessment->tool->name_ar;
+        }
+
+        $assessorName = $assessment->name ?? 'Unknown';
+        $assessorEmail = $assessment->email ?? 'Not provided';
+        $organization = $assessment->organization ?? ($isArabic ? 'غير محدد' : 'Not specified');
+
+        $overallScore = $results['overall_percentage'] ?? 0;
+        $yesCount = $results['yes_count'] ?? 0;
+        $noCount = $results['no_count'] ?? 0;
+        $naCount = $results['na_count'] ?? 0;
+
+        $certLevel = $this->getCertificationLevel($overallScore);
+
+        $html = "<!DOCTYPE html>
+<html dir='{$dir}'>
 <head>
     <meta charset='UTF-8'>
     <title>" . ($isArabic ? 'تقرير التقييم' : 'Assessment Report') . "</title>
     <style>
         body {
-            font-family: 'DejaVu Sans', sans-serif;
+            font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             direction: {$dir};
+            margin: 20px;
+            padding: 0;
         }
         .header {
             background: linear-gradient(135deg, #1e40af, #3b82f6);
@@ -114,222 +163,201 @@ class AssessmentPDFController extends Controller
             padding: 30px;
             text-align: center;
             margin-bottom: 30px;
+            border-radius: 10px;
         }
         .header h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+            font-size: 28px;
+            margin: 0 0 10px 0;
+        }
+        .header h2 {
+            font-size: 20px;
+            margin: 0 0 10px 0;
+            opacity: 0.9;
         }
         .section {
-            margin-bottom: 30px;
-        }
-        .section h2 {
-            color: #1e40af;
-            font-size: 18px;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #3b82f6;
-            padding-bottom: 5px;
-        }
-        .client-info {
             background: #f8f9fa;
+            margin-bottom: 25px;
             padding: 20px;
             border-radius: 8px;
-            margin-bottom: 20px;
+            border-left: 4px solid #3b82f6;
         }
-        .score-card {
-            background: #f0f7ff;
-            border: 2px solid #3b82f6;
-            padding: 20px;
+        .section h3 {
+            color: #1e40af;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        .score-display {
             text-align: center;
-            border-radius: 8px;
-            margin-bottom: 20px;
+            padding: 30px;
+            background: white;
+            border-radius: 10px;
+            margin: 20px 0;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .overall-score {
+        .score-number {
             font-size: 48px;
             font-weight: bold;
-            color: {$certification['color']};
+            color: " . $certLevel['color'] . ";
             margin-bottom: 10px;
         }
         .cert-badge {
-            background-color: {$certification['bg_color']};
-            color: {$certification['color']};
+            background: " . $certLevel['bg_color'] . ";
+            color: " . $certLevel['color'] . ";
             padding: 10px 20px;
             border-radius: 20px;
             font-weight: bold;
             display: inline-block;
+            border: 2px solid " . $certLevel['color'] . ";
         }
-        .domain-card {
-            border: 1px solid #e5e7eb;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-radius: 8px;
-        }
-        .domain-header {
+        .stats-row {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .domain-name {
-            font-weight: bold;
-            font-size: 16px;
-        }
-        .domain-score {
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 20px;
-            background-color: #e5e7eb;
-            border-radius: 10px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #ef4444, #f97316, #eab308, #22c55e);
-            border-radius: 10px;
-        }
-        .stats-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            margin-top: 10px;
+            justify-content: space-around;
+            margin-top: 20px;
         }
         .stat-item {
             text-align: center;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .stat-yes { background-color: #dcfce7; color: #166534; }
-        .stat-no { background-color: #fee2e2; color: #dc2626; }
-        .stat-na { background-color: #f3f4f6; color: #6b7280; }
-        .recommendations {
-            background: #fffbeb;
-            border: 1px solid #fbbf24;
             padding: 15px;
             border-radius: 8px;
+            min-width: 80px;
         }
-        .recommendation-item {
-            margin-bottom: 10px;
-            padding: 10px;
-            background: white;
-            border-left: 4px solid #f59e0b;
-            border-radius: 4px;
+        .stat-yes { background: #dcfce7; color: #166534; }
+        .stat-no { background: #fee2e2; color: #dc2626; }
+        .stat-na { background: #f3f4f6; color: #6b7280; }
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        .info-table th, .info-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .info-table th {
+            background: #f1f5f9;
+            font-weight: bold;
         }
         .footer {
             text-align: center;
             margin-top: 40px;
             padding: 20px;
             background: #f8f9fa;
+            border-radius: 8px;
             color: #666;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class='header'>
-        <h1>" . ($isArabic ? 'تقرير التقييم النهائي' : 'Final Assessment Report') . "</h1>
-        <h2>" . ($isArabic ? $assessment->tool->name_ar : $assessment->tool->name_en) . "</h2>
-        <p>" . ($isArabic ? 'التاريخ: ' : 'Date: ') . date('Y/m/d') . "</p>
+        <h1>" . ($isArabic ? 'تقرير التقييم' : 'Assessment Report') . "</h1>
+        <h2>" . htmlspecialchars($toolName) . "</h2>
+        <p>" . ($isArabic ? 'تاريخ الإنتاج: ' : 'Generated: ') . date('Y-m-d H:i') . "</p>
     </div>
 
     <!-- Client Information -->
     <div class='section'>
-        <h2>" . ($isArabic ? 'معلومات العميل' : 'Client Information') . "</h2>
-        <div class='client-info'>
-            <p><strong>" . ($isArabic ? 'الاسم: ' : 'Name: ') . "</strong>" . $assessment->getAssessorName() . "</p>
-            <p><strong>" . ($isArabic ? 'البريد الإلكتروني: ' : 'Email: ') . "</strong>" . $assessment->getAssessorEmail() . "</p>
-            " . ($assessment->organization ? "<p><strong>" . ($isArabic ? 'المؤسسة: ' : 'Organization: ') . "</strong>" . $assessment->organization . "</p>" : "") . "
-            <p><strong>" . ($isArabic ? 'تاريخ التقييم: ' : 'Assessment Date: ') . "</strong>" . $assessment->created_at->format('Y/m/d') . "</p>
-        </div>
+        <h3>" . ($isArabic ? 'معلومات المقيم' : 'Assessor Information') . "</h3>
+        <table class='info-table'>
+            <tr>
+                <th>" . ($isArabic ? 'الاسم' : 'Name') . "</th>
+                <td>" . htmlspecialchars($assessorName) . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'البريد الإلكتروني' : 'Email') . "</th>
+                <td>" . htmlspecialchars($assessorEmail) . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'المؤسسة' : 'Organization') . "</th>
+                <td>" . htmlspecialchars($organization) . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'تاريخ التقييم' : 'Assessment Date') . "</th>
+                <td>" . $assessment->created_at->format('Y-m-d') . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'الحالة' : 'Status') . "</th>
+                <td>" . ucfirst($assessment->status) . "</td>
+            </tr>
+        </table>
     </div>
 
     <!-- Overall Score -->
     <div class='section'>
-        <h2>" . ($isArabic ? 'النتيجة الإجمالية' : 'Overall Score') . "</h2>
-        <div class='score-card'>
-            <div class='overall-score'>" . number_format($results['overall_percentage'], 1) . "%</div>
-            <div class='cert-badge'>" . $certification['text'] . "</div>
-            <div class='stats-grid' style='margin-top: 20px;'>
+        <h3>" . ($isArabic ? 'النتيجة الإجمالية' : 'Overall Score') . "</h3>
+        <div class='score-display'>
+            <div class='score-number'>" . number_format($overallScore, 1) . "%</div>
+            <div class='cert-badge'>" . ($isArabic ? $certLevel['text_ar'] : $certLevel['text_en']) . "</div>
+
+            <div class='stats-row'>
                 <div class='stat-item stat-yes'>
-                    <div style='font-size: 20px; font-weight: bold;'>" . $results['yes_count'] . "</div>
+                    <div style='font-size: 24px; font-weight: bold;'>{$yesCount}</div>
                     <div>" . ($isArabic ? 'نعم' : 'Yes') . "</div>
                 </div>
                 <div class='stat-item stat-no'>
-                    <div style='font-size: 20px; font-weight: bold;'>" . $results['no_count'] . "</div>
+                    <div style='font-size: 24px; font-weight: bold;'>{$noCount}</div>
                     <div>" . ($isArabic ? 'لا' : 'No') . "</div>
                 </div>
                 <div class='stat-item stat-na'>
-                    <div style='font-size: 20px; font-weight: bold;'>" . $results['na_count'] . "</div>
+                    <div style='font-size: 24px; font-weight: bold;'>{$naCount}</div>
                     <div>" . ($isArabic ? 'غير قابل' : 'N/A') . "</div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Domain Results -->
+    <!-- Summary -->
     <div class='section'>
-        <h2>" . ($isArabic ? 'النتائج التفصيلية' : 'Detailed Results') . "</h2>";
-
-        // Domain results loop
-        foreach ($results['domain_results'] as $domain) {
-            $scoreColor = $this->getScoreColor($domain['score_percentage']);
-            $html .= "
-        <div class='domain-card'>
-            <div class='domain-header'>
-                <div class='domain-name'>" . $domain['domain_name'] . "</div>
-                <div class='domain-score' style='color: {$scoreColor};'>" . number_format($domain['score_percentage'], 1) . "%</div>
-            </div>
-            <div class='progress-bar'>
-                <div class='progress-fill' style='width: " . $domain['score_percentage'] . "%;'></div>
-            </div>
-            <div class='stats-grid'>
-                <div class='stat-item stat-yes'>
-                    <div style='font-weight: bold;'>" . $domain['yes_count'] . "</div>
-                    <div style='font-size: 12px;'>" . ($isArabic ? 'نعم' : 'Yes') . "</div>
-                </div>
-                <div class='stat-item stat-no'>
-                    <div style='font-weight: bold;'>" . $domain['no_count'] . "</div>
-                    <div style='font-size: 12px;'>" . ($isArabic ? 'لا' : 'No') . "</div>
-                </div>
-                <div class='stat-item stat-na'>
-                    <div style='font-weight: bold;'>" . $domain['na_count'] . "</div>
-                    <div style='font-size: 12px;'>" . ($isArabic ? 'غير قابل' : 'N/A') . "</div>
-                </div>
-            </div>
-        </div>";
-        }
-
-        $html .= "
+        <h3>" . ($isArabic ? 'ملخص النتائج' : 'Results Summary') . "</h3>
+        <table class='info-table'>
+            <tr>
+                <th>" . ($isArabic ? 'إجمالي الردود' : 'Total Responses') . "</th>
+                <td>" . ($yesCount + $noCount + $naCount) . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'الردود القابلة للتطبيق' : 'Applicable Responses') . "</th>
+                <td>" . ($yesCount + $noCount) . "</td>
+            </tr>
+            <tr>
+                <th>" . ($isArabic ? 'معدل النجاح' : 'Success Rate') . "</th>
+                <td>" . (($yesCount + $noCount) > 0 ? number_format(($yesCount / ($yesCount + $noCount)) * 100, 1) : 0) . "%</td>
+            </tr>
+        </table>
     </div>";
 
-        // Add recommendations if enabled
-        if (!empty($recommendations)) {
+        // Add recommendations if score is low
+        if ($overallScore < 80) {
             $html .= "
     <!-- Recommendations -->
     <div class='section'>
-        <h2>" . ($isArabic ? 'التوصيات' : 'Recommendations') . "</h2>
-        <div class='recommendations'>";
+        <h3>" . ($isArabic ? 'التوصيات' : 'Recommendations') . "</h3>
+        <p>";
 
-            foreach ($recommendations as $recommendation) {
-                $html .= "
-            <div class='recommendation-item'>
-                <strong>" . $recommendation['domain'] . ":</strong>
-                " . $recommendation['text'] . "
-            </div>";
+            if ($overallScore < 50) {
+                $html .= $isArabic
+                    ? "النتيجة الحالية تتطلب تحسينات جذرية وشاملة. ننصح بوضع خطة تطوير عاجلة وتخصيص الموارد اللازمة للتحسين."
+                    : "Current score requires comprehensive improvements. We recommend developing an urgent improvement plan and allocating necessary resources.";
+            } elseif ($overallScore < 70) {
+                $html .= $isArabic
+                    ? "النتيجة تشير إلى الحاجة لتحسينات متوسطة. ننصح بمراجعة العمليات الحالية وتطوير الممارسات."
+                    : "Score indicates need for moderate improvements. We recommend reviewing current processes and developing practices.";
+            } else {
+                $html .= $isArabic
+                    ? "النتيجة جيدة ولكن يمكن تحسينها. ننصح بالتركيز على النقاط الضعيفة والتحسين المستمر."
+                    : "Good score but can be improved. We recommend focusing on weak points and continuous improvement.";
             }
 
-            $html .= "
-        </div>
+            $html .= "</p>
     </div>";
         }
 
         $html .= "
     <!-- Footer -->
     <div class='footer'>
-        <p>" . ($isArabic ? 'هذا التقرير تم إنتاجه بواسطة نظام التقييم الآلي' : 'This report was generated by the automated assessment system') . "</p>
-        <p>" . ($isArabic ? 'تاريخ الإنتاج: ' : 'Generated on: ') . now()->format('Y/m/d H:i') . "</p>
+        <p><strong>" . ($isArabic ? 'تم إنتاج هذا التقرير آلياً بواسطة نظام التقييم' : 'This report was automatically generated by the assessment system') . "</strong></p>
+        <p>" . ($isArabic ? 'معرف التقييم: ' : 'Assessment ID: ') . $assessment->id . "</p>
+        <p>" . ($isArabic ? 'تاريخ الإنتاج: ' : 'Generated on: ') . now()->format('Y-m-d H:i:s') . "</p>
     </div>
 </body>
 </html>";
@@ -338,24 +366,29 @@ class AssessmentPDFController extends Controller
     }
 
     /**
-     * Create PDF using mPDF
+     * Create PDF with simple configuration
      */
-    private function createPDF(string $html, array $settings): string
+    private function createSimplePDF(string $html, array $settings): string
     {
         $isArabic = $settings['language'] === 'arabic';
+
+        // Ensure temp directory exists
+        $tempDir = storage_path('app/temp');
+        if (!file_exists($tempDir)) {
+            mkdir($tempDir, 0755, true);
+        }
 
         $config = [
             'mode' => 'utf-8',
             'format' => 'A4',
-            'default_font_size' => 11,
+            'default_font_size' => 12,
             'default_font' => 'dejavusans',
             'margin_left' => 15,
             'margin_right' => 15,
             'margin_top' => 20,
             'margin_bottom' => 20,
-            'margin_header' => 10,
-            'margin_footer' => 10,
             'dir' => $isArabic ? 'rtl' : 'ltr',
+            'tempDir' => $tempDir,
         ];
 
         $mpdf = new Mpdf($config);
@@ -372,8 +405,7 @@ class AssessmentPDFController extends Controller
         }
 
         $mpdf->WriteHTML($html);
-
-        return $mpdf->Output('', 'S'); // Return as string
+        return $mpdf->Output('', 'S');
     }
 
     /**
@@ -383,19 +415,29 @@ class AssessmentPDFController extends Controller
     {
         if ($score >= 90) {
             return [
-                'text' => 'اعتماد كامل', // Full Certification
+                'text_en' => 'Full Certification',
+                'text_ar' => 'اعتماد كامل',
                 'color' => '#22c55e',
                 'bg_color' => '#dcfce7'
             ];
         } elseif ($score >= 80) {
             return [
-                'text' => 'اعتماد مشروط', // Conditional Certification
+                'text_en' => 'Conditional Certification',
+                'text_ar' => 'اعتماد مشروط',
                 'color' => '#f59e0b',
                 'bg_color' => '#fef3c7'
             ];
+        } elseif ($score >= 70) {
+            return [
+                'text_en' => 'Improvement Needed',
+                'text_ar' => 'يحتاج تحسين',
+                'color' => '#f97316',
+                'bg_color' => '#fed7aa'
+            ];
         } else {
             return [
-                'text' => 'اعتماد مرفوض', // Certification Denied
+                'text_en' => 'Certification Denied',
+                'text_ar' => 'اعتماد مرفوض',
                 'color' => '#ef4444',
                 'bg_color' => '#fee2e2'
             ];
@@ -403,57 +445,15 @@ class AssessmentPDFController extends Controller
     }
 
     /**
-     * Get score color
-     */
-    private function getScoreColor(float $score): string
-    {
-        if ($score >= 80) return '#22c55e'; // Green
-        if ($score >= 60) return '#f59e0b'; // Amber
-        if ($score >= 40) return '#ef4444'; // Red
-        return '#6b7280'; // Gray
-    }
-
-    /**
-     * Generate simple recommendations
-     */
-    private function generateRecommendations(array $domainResults, bool $isArabic): array
-    {
-        $recommendations = [];
-
-        foreach ($domainResults as $domain) {
-            if ($domain['score_percentage'] < 70) {
-                $recommendations[] = [
-                    'domain' => $domain['domain_name'],
-                    'text' => $isArabic
-                        ? "النتيجة {$domain['score_percentage']}% - يتطلب تحسين هذا المجال لرفع الأداء"
-                        : "Score {$domain['score_percentage']}% - This domain requires improvement to enhance performance"
-                ];
-            }
-        }
-
-        if (empty($recommendations)) {
-            $recommendations[] = [
-                'domain' => $isArabic ? 'الأداء العام' : 'Overall Performance',
-                'text' => $isArabic
-                    ? 'أداء ممتاز! استمر في الحفاظ على هذه المعايير العالية'
-                    : 'Excellent performance! Continue maintaining these high standards'
-            ];
-        }
-
-        return $recommendations;
-    }
-
-    /**
      * Generate filename
      */
     private function generateFilename(Assessment $assessment, array $settings): string
     {
-        $assessorName = str_replace([' ', '.', '/', '\\'], '_', $assessment->getAssessorName());
-        $toolName = str_replace([' ', '.', '/', '\\'], '_', $assessment->tool->name_en);
+        $assessorName = preg_replace('/[^a-zA-Z0-9_-]/', '_', $assessment->name ?? 'assessor');
         $date = $assessment->created_at->format('Y-m-d');
         $language = $settings['language'];
 
-        return "assessment_report_{$toolName}_{$assessorName}_{$date}_{$language}.pdf";
+        return "assessment_report_{$assessorName}_{$date}_{$language}.pdf";
     }
 
     /**
@@ -461,14 +461,53 @@ class AssessmentPDFController extends Controller
      */
     public function downloadGuestReport(Request $request, Assessment $assessment)
     {
-        // Validate that this is a guest assessment
-        if (!$assessment->isGuestAssessment()) {
-            return response()->json(['error' => 'Invalid assessment type'], 403);
+        // Skip auth check for guest assessments
+        if (!$assessment->isGuestAssessment() || $assessment->status !== 'completed') {
+            return response()->json(['error' => 'Invalid assessment'], 400);
         }
 
-        // For guest assessments, we can be more lenient with session validation
-        // or implement a token-based system
+        // Use same logic but without auth check
+        $settings = [
+            'language' => $request->get('language', 'arabic'),
+            'template' => $request->get('template', 'comprehensive'),
+            'include_charts' => $request->boolean('include_charts', true),
+            'include_recommendations' => $request->boolean('include_recommendations', true),
+            'watermark' => $request->boolean('watermark', false),
+        ];
 
-        return $this->downloadReport($request, $assessment);
+        $assessment->load(['tool']);
+
+        // Get results with fallback
+        try {
+            $results = $assessment->getResults();
+        } catch (\Exception $e) {
+            $responses = $assessment->responses;
+            $yesCount = $responses->where('response', 'yes')->count();
+            $noCount = $responses->where('response', 'no')->count();
+            $naCount = $responses->where('response', 'na')->count();
+            $total = $yesCount + $noCount + $naCount;
+
+            $results = [
+                'overall_percentage' => $total > 0 ? ($yesCount / $total) * 100 : 0,
+                'yes_count' => $yesCount,
+                'no_count' => $noCount,
+                'na_count' => $naCount,
+                'total_criteria' => $total,
+                'applicable_criteria' => $yesCount + $noCount,
+                'domain_results' => []
+            ];
+        }
+
+        $html = $this->generateSimpleHTML($assessment, $results, $settings);
+        $pdf = $this->createSimplePDF($html, $settings);
+        $filename = $this->generateFilename($assessment, $settings);
+
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            'Cache-Control' => 'no-cache, no-store, must-revalidate',
+            'Pragma' => 'no-cache',
+            'Expires' => '0'
+        ]);
     }
 }

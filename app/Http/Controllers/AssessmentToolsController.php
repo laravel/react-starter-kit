@@ -1,25 +1,32 @@
 <?php
-// app/Http/Controllers/AssessmentToolsController.php
+
 namespace App\Http\Controllers;
 
+use App\Models\Assessment;
 use App\Models\Tool;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AssessmentToolsController extends Controller
 {
     /**
-     * Display the assessment tools page
+     * Display assessment tools with user limits
      */
-    public function index(Request $request): Response
+    public function index()
     {
-        $locale = app()->getLocale();
-
+        $user = auth()->user();
         $tools = Tool::where('status', 'active')
-            ->orderBy('name_en')
-            ->get()
-            ->map(function ($tool) {
+            ->with(['domains.categories.criteria'])
+            ->orderBy('order')
+            ->get();
+
+        // Get user's current assessment usage
+        $currentAssessments = $user->assessments()->count();
+        $assessmentLimit = $user->getAssessmentLimit();
+        $canCreateMore = $user->canCreateAssessment();
+
+        return Inertia::render('assessment-tools', [
+            'tools' => $tools->map(function ($tool) {
                 return [
                     'id' => $tool->id,
                     'name_en' => $tool->name_en,
@@ -28,46 +35,51 @@ class AssessmentToolsController extends Controller
                     'description_ar' => $tool->description_ar,
                     'image' => $tool->image ? asset('storage/' . $tool->image) : null,
                     'status' => $tool->status,
+                    'total_criteria' => $tool->getCriteriaCount(),
+                    'total_domains' => $tool->domains->count(),
+                    'estimated_time' => ceil($tool->getCriteriaCount() * 1.5), // 1.5 minutes per criterion
                 ];
-            });
-
-        return Inertia::render('assessment-tools', [
-            'tools' => $tools,
-            'locale' => $locale,
+            }),
+            'userLimits' => [
+                'current_assessments' => $currentAssessments,
+                'assessment_limit' => $assessmentLimit,
+                'can_create_more' => $canCreateMore,
+                'is_premium' => $user->isPremium(),
+                'subscription_status' => $user->getSubscriptionStatus(),
+            ],
+            'locale' => app()->getLocale(),
         ]);
     }
 
     /**
-     * Render the assessment start form - this shows the form page
+     * Start assessment with limit checking
      */
-    public function start(Request $request, Tool $tool): Response
+    public function start(Tool $tool)
     {
-        // Ensure the tool is active
-        if ($tool->status !== 'active') {
-            abort(404, 'Assessment tool not found or inactive.');
+        $user = auth()->user();
+
+        // Check if user can create assessment
+        if (!$user->canCreateAssessment()) {
+            return redirect()->route('subscription.show')
+                ->with('error', 'You have reached your assessment limit. Please upgrade to premium.');
         }
 
-        $locale = app()->getLocale();
+        // Check if user already has an incomplete assessment for this tool
+        $existingAssessment = $user->assessments()
+            ->where('tool_id', $tool->id)
+            ->where('status', '!=', 'completed')
+            ->first();
 
-        // Get domains for this tool with their categories and criteria
-        $domains = $tool->domains()
-            ->where('status', 'active')
-            ->with([
-                'categories' => function ($query) {
-                    $query->where('status', 'active')
-                        ->orderBy('order')
-                        ->with([
-                            'criteria' => function ($query) {
-                                $query->where('status', 'active')
-                                    ->orderBy('order');
-                            }
-                        ]);
-                }
-            ])
-            ->orderBy('order')
-            ->get();
+        if ($existingAssessment) {
+            return redirect()->route('assessment.take', $existingAssessment->id)
+                ->with('info', 'Continuing your existing assessment for this tool.');
+        }
 
-        // Transform the data for the frontend
+        // Load tool with all related data
+        $tool->load(['domains.categories.criteria' => function ($query) {
+            $query->where('status', 'active')->orderBy('order');
+        }]);
+
         $assessmentData = [
             'tool' => [
                 'id' => $tool->id,
@@ -77,7 +89,7 @@ class AssessmentToolsController extends Controller
                 'description_ar' => $tool->description_ar,
                 'image' => $tool->image ? asset('storage/' . $tool->image) : null,
             ],
-            'domains' => $domains->map(function ($domain) {
+            'domains' => $tool->domains->map(function ($domain) {
                 return [
                     'id' => $domain->id,
                     'name_en' => $domain->name_en,
@@ -110,19 +122,27 @@ class AssessmentToolsController extends Controller
             }),
         ];
 
-        // Get user data for prefilling if authenticated
-        $prefillData = null;
-        if (auth()->check()) {
-            $prefillData = [
-                'name' => auth()->user()->name,
-                'email' => auth()->user()->email,
-            ];
-        }
-
         return Inertia::render('assessment/start', [
             'assessmentData' => $assessmentData,
-            'locale' => $locale,
-            'prefillData' => $prefillData,  // Add this for authenticated users
+            'locale' => app()->getLocale(),
+            'prefillData' => [
+                'name' => $user->name,
+                'email' => $user->email,
+            ],
+            'auth' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'organization' => $user->details?->company_name,
+                ],
+            ],
+            'userLimits' => [
+                'current_assessments' => $user->assessments()->count(),
+                'assessment_limit' => $user->getAssessmentLimit(),
+                'can_create_more' => $user->canCreateAssessment(),
+                'is_premium' => $user->isPremium(),
+            ],
         ]);
     }
 }

@@ -32,7 +32,8 @@ import {
     Star,
     TrendingUp,
     HelpCircle,
-    AlertCircle
+    AlertCircle,
+    Skip
 } from 'lucide-react';
 
 interface Tool {
@@ -161,7 +162,9 @@ const translations = {
         addNotesPlaceholder: "Add notes...",
         completed: "completed",
         submit: "Submit",
-        completeAllRequired: "Complete all required questions to submit"
+        completeAllRequired: "Complete all required questions to submit",
+        currentDomain: "Current domain",
+        currentCategory: "Current category"
     },
     ar: {
         startAssessment: "بدء التقييم",
@@ -225,21 +228,20 @@ const translations = {
         addNotesPlaceholder: "إضافة ملاحظات...",
         completed: "مكتمل",
         submit: "إرسال",
-        completeAllRequired: "أكمل جميع الأسئلة المطلوبة للإرسال"
+        completeAllRequired: "أكمل جميع الأسئلة المطلوبة للإرسال",
+        currentDomain: "المجال الحالي",
+        currentCategory: "الفئة الحالية"
     }
 };
 
 export default function AssessmentStart({ assessmentData, locale, prefillData, auth }: AssessmentStartProps) {
     const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const [currentStep, setCurrentStep] = useState<'info' | 'preview' | 'assessment'>('info');
-    const [currentPageIndex, setCurrentPageIndex] = useState(0);
+    const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
     const { tool, domains } = assessmentData;
     const t = translations[language];
     const user = auth?.user;
-
-    // Constants
-    const QUESTIONS_PER_PAGE = 5;
 
     // Flatten all criteria into a single array for simplified navigation
     const allCriteria = domains
@@ -247,12 +249,24 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         .flatMap(category => category.criteria)
         .sort((a, b) => a.order - b.order);
 
-    // Calculate pagination
-    const totalPages = Math.ceil(allCriteria.length / QUESTIONS_PER_PAGE);
-    const currentPageCriteria = allCriteria.slice(
-        currentPageIndex * QUESTIONS_PER_PAGE,
-        (currentPageIndex + 1) * QUESTIONS_PER_PAGE
-    );
+    // Get current question
+    const currentCriterion = allCriteria[currentQuestionIndex];
+
+    // Find current domain and category for context
+    const getCurrentContext = () => {
+        if (!currentCriterion) return null;
+
+        for (const domain of domains) {
+            for (const category of domain.categories) {
+                if (category.criteria.some(c => c.id === currentCriterion.id)) {
+                    return { domain, category };
+                }
+            }
+        }
+        return null;
+    };
+
+    const currentContext = getCurrentContext();
 
     const { data, setData, post, processing, errors } = useForm({
         tool_id: tool.id,
@@ -317,6 +331,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
     const totalCategories = domains.reduce((total, domain) => total + domain.categories.length, 0);
     const completedCriteria = Object.keys(data.responses).filter(id => data.responses[parseInt(id)]?.response).length;
     const progressPercentage = totalCriteria > 0 ? (completedCriteria / totalCriteria) * 100 : 0;
+    const currentProgressPercentage = totalCriteria > 0 ? ((currentQuestionIndex + 1) / totalCriteria) * 100 : 0;
     const estimatedMinutes = Math.ceil(totalCriteria * 1.5);
 
     // Check if assessment is complete
@@ -336,15 +351,15 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         setCurrentStep('assessment');
     };
 
-    const goToNextPage = () => {
-        if (currentPageIndex < totalPages - 1) {
-            setCurrentPageIndex(currentPageIndex + 1);
+    const goToNextQuestion = () => {
+        if (currentQuestionIndex < totalCriteria - 1) {
+            setCurrentQuestionIndex(currentQuestionIndex + 1);
         }
     };
 
-    const goToPreviousPage = () => {
-        if (currentPageIndex > 0) {
-            setCurrentPageIndex(currentPageIndex - 1);
+    const goToPreviousQuestion = () => {
+        if (currentQuestionIndex > 0) {
+            setCurrentQuestionIndex(currentQuestionIndex - 1);
         }
     };
 
@@ -408,7 +423,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         });
     };
 
-    // Info Step - User Information Collection
+    // Info Step - User Information Collection (same as before)
     if (currentStep === 'info') {
         return (
             <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -691,7 +706,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                 {t.assessmentOverview}
                             </h2>
                             <p className="text-lg text-gray-600">
-                                You will be asked {totalCriteria} questions across {totalPages} pages
+                                You will answer {totalCriteria} questions one at a time
                             </p>
                         </div>
 
@@ -742,12 +757,12 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                             <div className="text-xs font-medium text-green-700">Est. Minutes</div>
                                         </div>
                                         <div className="text-center p-3 bg-gradient-to-br from-purple-50 to-purple-100 rounded-lg">
-                                            <div className="text-xl font-bold text-purple-900">{totalPages}</div>
-                                            <div className="text-xs font-medium text-purple-700">Pages</div>
+                                            <div className="text-xl font-bold text-purple-900">{domains.length}</div>
+                                            <div className="text-xs font-medium text-purple-700">Domains</div>
                                         </div>
                                         <div className="text-center p-3 bg-gradient-to-br from-orange-50 to-orange-100 rounded-lg">
-                                            <div className="text-xl font-bold text-orange-900">{QUESTIONS_PER_PAGE}</div>
-                                            <div className="text-xs font-medium text-orange-700">Per Page</div>
+                                            <div className="text-xl font-bold text-orange-900">1</div>
+                                            <div className="text-xs font-medium text-orange-700">Per Screen</div>
                                         </div>
                                     </div>
                                 </CardContent>
@@ -766,19 +781,19 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                 <div className="grid md:grid-cols-2 gap-4">
                                     <div className="flex items-center space-x-2">
                                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">1</div>
-                                        <span className="text-sm text-gray-700">Answer with <strong>Yes</strong>, <strong>No</strong>, or <strong>N/A</strong></span>
+                                        <span className="text-sm text-gray-700">One question displayed at a time</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">2</div>
-                                        <span className="text-sm text-gray-700">Some questions may require file uploads</span>
+                                        <span className="text-sm text-gray-700">Answer with <strong>Yes</strong>, <strong>No</strong>, or <strong>N/A</strong></span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">3</div>
-                                        <span className="text-sm text-gray-700">Add optional notes for context</span>
+                                        <span className="text-sm text-gray-700">Some questions may require file uploads</span>
                                     </div>
                                     <div className="flex items-center space-x-2">
                                         <div className="w-4 h-4 bg-blue-500 rounded-full flex items-center justify-center text-white text-xs font-bold">4</div>
-                                        <span className="text-sm text-gray-700">Navigate with Previous/Next buttons</span>
+                                        <span className="text-sm text-gray-700">Navigate easily with Previous/Next buttons</span>
                                     </div>
                                 </div>
                             </CardContent>
@@ -810,42 +825,49 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         );
     }
 
-    // Assessment Step - Single Card Interface with Fixed Height
-    const isLastPage = currentPageIndex === totalPages - 1;
-    const pageProgressPercentage = totalPages > 0 ? ((currentPageIndex + 1) / totalPages) * 100 : 0;
+    // Assessment Step - Single Question Interface (No Scrolling, Perfect Sizing)
+    const isLastQuestion = currentQuestionIndex === totalCriteria - 1;
+    const isFirstQuestion = currentQuestionIndex === 0;
+    const currentResponse = data.responses[currentCriterion?.id];
 
     return (
-        <div className={`h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'} flex flex-col`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-            {/* Header with Progress */}
-            <header className="backdrop-blur-md bg-white/80 border-b border-white/20 shadow-lg flex-shrink-0">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                    <div className="flex justify-between items-center h-16">
+        <div className={`h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'} flex flex-col overflow-hidden`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            {/* Header with Progress - Fixed Height */}
+            <header className="backdrop-blur-md bg-white/80 border-b border-white/20 shadow-lg flex-shrink-0 h-20">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
+                    <div className="flex justify-between items-center h-full">
                         <div className="flex items-center space-x-4">
                             <div className="flex items-center space-x-3">
-                                <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <Target className="w-5 h-5 text-white" />
+                                <div className="w-10 h-10 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                    <Target className="w-6 h-6 text-white" />
                                 </div>
                                 <div>
                                     <h1 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
                                         {getLocalizedText(tool, 'name')}
                                     </h1>
                                     <div className="flex items-center space-x-2 text-sm text-gray-500">
-                                        <span>{t.page} {currentPageIndex + 1} {t.of} {totalPages}</span>
+                                        <span>{t.question} {currentQuestionIndex + 1} {t.of} {totalCriteria}</span>
                                         <span>•</span>
-                                        <span>{Math.round(progressPercentage)}% Complete</span>
+                                        <span>{Math.round(currentProgressPercentage)}% Progress</span>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
                         <div className="flex items-center space-x-4">
-                            <div className="flex items-center space-x-2">
-                                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                            {/* Progress Bar */}
+                            <div className="flex items-center space-x-3">
+                                <div className="w-48 h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
                                     <div
-                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500"
-                                        style={{ width: `${progressPercentage}%` }}
+                                        className="h-full bg-gradient-to-r from-blue-500 to-purple-600 transition-all duration-500 ease-out rounded-full"
+                                        style={{ width: `${currentProgressPercentage}%` }}
                                     />
                                 </div>
+                                <span className="text-sm font-semibold text-gray-700 min-w-[3rem]">
+                                    {Math.round(currentProgressPercentage)}%
+                                </span>
                             </div>
+
                             <Button
                                 variant="outline"
                                 size="sm"
@@ -860,190 +882,215 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                 </div>
             </header>
 
-            {/* Main Content - Single Card with Fixed Height and Internal Scrolling */}
-            <div className="flex-grow flex flex-col p-6">
-                <div className="max-w-6xl mx-auto w-full h-full flex flex-col">
-                    {/* Single Card Container with All Questions */}
-                    <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50 overflow-hidden flex-grow flex flex-col">
-                        <CardContent className="flex-grow flex flex-col p-0">
-                            {/* Questions Area - No Scrolling, Fit to Available Space */}
-                            <div className="flex-grow p-4 space-y-4">
-                                {currentPageCriteria.map((criterion, index) => {
-                                    const response = data.responses[criterion.id];
-                                    const questionNumber = currentPageIndex * QUESTIONS_PER_PAGE + index + 1;
+            {/* Main Content - Single Question Card (Fills remaining space exactly) */}
+            <div className="flex-1 flex flex-col p-6 overflow-hidden">
+                <div className="max-w-5xl mx-auto w-full h-full flex flex-col">
+                    {/* Context Breadcrumb */}
+                    {currentContext && (
+                        <div className="flex-shrink-0 mb-4">
+                            <div className="flex items-center space-x-2 text-sm text-gray-600 bg-white/60 rounded-full px-4 py-2 backdrop-blur-sm">
+                                <span className="font-medium">{t.currentDomain}:</span>
+                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                    {getLocalizedText(currentContext.domain, 'name')}
+                                </Badge>
+                                <span className="text-gray-400">•</span>
+                                <span className="font-medium">{t.currentCategory}:</span>
+                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                                    {getLocalizedText(currentContext.category, 'name')}
+                                </Badge>
+                            </div>
+                        </div>
+                    )}
 
-                                    return (
-                                        <div key={criterion.id} className="border border-gray-100 rounded-lg p-3 bg-white">
-                                            {/* Compact Question Layout */}
-                                            <div className="flex items-start gap-3 mb-2">
-                                                <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-purple-600 rounded-md flex items-center justify-center text-white font-bold text-xs flex-shrink-0">
-                                                    {questionNumber}
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <h3 className="text-sm font-semibold text-gray-900 leading-tight mb-1">
-                                                        {getLocalizedText(criterion, 'name')}
-                                                    </h3>
-                                                    {getLocalizedText(criterion, 'description') && (
-                                                        <p className="text-sm text-gray-600 leading-relaxed mb-2">
-                                                            {getLocalizedText(criterion, 'description')}
-                                                        </p>
-                                                    )}
-                                                </div>
-                                                {/* Response Status Icon */}
-                                                {response?.response && (
-                                                    <div className="flex-shrink-0">
-                                                        {response.response === 'yes' && <CheckCircle className="w-4 h-4 text-green-600" />}
-                                                        {response.response === 'no' && <XCircle className="w-4 h-4 text-red-600" />}
-                                                        {response.response === 'na' && <MinusCircle className="w-4 h-4 text-gray-600" />}
-                                                    </div>
-                                                )}
+                    {/* Single Question Card - Takes up remaining space */}
+                    <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50 overflow-hidden flex-1 flex flex-col">
+                        <CardContent className="flex-1 flex flex-col p-0">
+                            {/* Question Content - Flexible sizing */}
+                            <div className="flex-1 flex flex-col justify-center p-8 lg:p-12">
+                                {currentCriterion && (
+                                    <div className="space-y-8">
+                                        {/* Question Number Badge */}
+                                        <div className="flex justify-center">
+                                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+                                                <span className="text-2xl font-bold text-white">{currentQuestionIndex + 1}</span>
                                             </div>
+                                        </div>
 
-                                            {/* Attachment Warning */}
-                                            {criterion.requires_attachment && (
-                                                <div className="flex items-center gap-1 px-2 py-1 bg-amber-50 border border-amber-200 rounded mb-2">
-                                                    <Upload className="w-3 h-3 text-amber-600" />
-                                                    <span className="text-sm text-amber-800 font-medium">{t.fileRequiredIfYes}</span>
-                                                </div>
+                                        {/* Question Title */}
+                                        <div className="text-center space-y-4">
+                                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight max-w-4xl mx-auto">
+                                                {getLocalizedText(currentCriterion, 'name')}
+                                            </h2>
+
+                                            {getLocalizedText(currentCriterion, 'description') && (
+                                                <p className="text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                                                    {getLocalizedText(currentCriterion, 'description')}
+                                                </p>
                                             )}
+                                        </div>
 
-                                            {/* Response Buttons - More Compact */}
-                                            <div className="flex gap-1 mb-2">
+                                        {/* Attachment Warning */}
+                                        {currentCriterion.requires_attachment && (
+                                            <div className="flex items-center justify-center">
+                                                <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl shadow-sm">
+                                                    <Upload className="w-5 h-5 text-amber-600" />
+                                                    <span className="text-sm font-medium text-amber-800">{t.fileRequiredIfYes}</span>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        {/* Response Buttons - Large and Clear */}
+                                        <div className="flex justify-center">
+                                            <div className="flex gap-4">
                                                 <Button
-                                                    variant={response?.response === 'yes' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(criterion.id, 'yes')}
-                                                    size="sm"
-                                                    className={`h-7 px-3 text-sm font-medium ${
-                                                        response?.response === 'yes'
-                                                            ? 'bg-green-500 hover:bg-green-600 text-white'
-                                                            : 'border-green-200 text-green-700 hover:bg-green-50'
+                                                    variant={currentResponse?.response === 'yes' ? 'default' : 'outline'}
+                                                    onClick={() => handleResponseChange(currentCriterion.id, 'yes')}
+                                                    size="lg"
+                                                    className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
+                                                        currentResponse?.response === 'yes'
+                                                            ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg scale-105'
+                                                            : 'border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
                                                     }`}
                                                 >
-                                                    <CheckCircle className="w-3 h-3 mr-1" />
+                                                    <CheckCircle className="w-5 h-5 mr-2" />
                                                     {t.yes}
                                                 </Button>
+
                                                 <Button
-                                                    variant={response?.response === 'no' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(criterion.id, 'no')}
-                                                    size="sm"
-                                                    className={`h-7 px-3 text-sm font-medium ${
-                                                        response?.response === 'no'
-                                                            ? 'bg-red-500 hover:bg-red-600 text-white'
-                                                            : 'border-red-200 text-red-700 hover:bg-red-50'
+                                                    variant={currentResponse?.response === 'no' ? 'default' : 'outline'}
+                                                    onClick={() => handleResponseChange(currentCriterion.id, 'no')}
+                                                    size="lg"
+                                                    className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
+                                                        currentResponse?.response === 'no'
+                                                            ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                                                            : 'border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300'
                                                     }`}
                                                 >
-                                                    <XCircle className="w-3 h-3 mr-1" />
+                                                    <XCircle className="w-5 h-5 mr-2" />
                                                     {t.no}
                                                 </Button>
+
                                                 <Button
-                                                    variant={response?.response === 'na' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(criterion.id, 'na')}
-                                                    size="sm"
-                                                    className={`h-7 px-3 text-sm font-medium ${
-                                                        response?.response === 'na'
-                                                            ? 'bg-gray-500 hover:bg-gray-600 text-white'
-                                                            : 'border-gray-200 text-gray-700 hover:bg-gray-50'
+                                                    variant={currentResponse?.response === 'na' ? 'default' : 'outline'}
+                                                    onClick={() => handleResponseChange(currentCriterion.id, 'na')}
+                                                    size="lg"
+                                                    className={`h-16 px-8 text-lg font-semibold min-w-[140px] transition-all duration-200 ${
+                                                        currentResponse?.response === 'na'
+                                                            ? 'bg-gray-500 hover:bg-gray-600 text-white shadow-lg scale-105'
+                                                            : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
                                                     }`}
                                                 >
-                                                    <MinusCircle className="w-3 h-3 mr-1" />
+                                                    <MinusCircle className="w-5 h-5 mr-2" />
                                                     {t.notApplicable}
                                                 </Button>
                                             </div>
+                                        </div>
 
-                                            {/* Notes and File Upload - Compact Single Row */}
-                                            <div className="flex gap-2">
-                                                <div className="flex-1">
-                                                    <Textarea
-                                                        placeholder={t.addNotesPlaceholder}
-                                                        value={response?.notes || ''}
-                                                        onChange={(e) => handleNotesChange(criterion.id, e.target.value)}
-                                                        className="h-8 resize-none text-sm py-1 px-2 font-medium border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
-                                                        rows={1}
-                                                    />
-                                                </div>
+                                        {/* Additional Options - Notes and File Upload */}
+                                        <div className="space-y-4 max-w-2xl mx-auto">
+                                            {/* Notes Section */}
+                                            <div className="space-y-2">
+                                                <Label className="text-base font-medium text-gray-700">{t.notes}</Label>
+                                                <Textarea
+                                                    placeholder={t.notesPlaceholder}
+                                                    value={currentResponse?.notes || ''}
+                                                    onChange={(e) => handleNotesChange(currentCriterion.id, e.target.value)}
+                                                    className="min-h-[100px] text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none"
+                                                    rows={3}
+                                                />
+                                            </div>
 
-                                                {/* File Upload - Only show if required and answered Yes */}
-                                                {criterion.requires_attachment && response?.response === 'yes' && (
-                                                    <div className="w-40 flex-shrink-0">
-                                                        <div className="relative">
-                                                            <Input
-                                                                type="file"
-                                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                                                onChange={(e) => handleAttachmentChange(criterion.id, e.target.files?.[0] || null)}
-                                                                className="absolute inset-0 w-full h-8 opacity-0 cursor-pointer z-10"
-                                                            />
-                                                            <Button
-                                                                type="button"
-                                                                variant="outline"
-                                                                size="sm"
-                                                                className="w-full h-8 text-xs font-medium bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 relative z-0"
-                                                            >
-                                                                <Upload className="w-3 h-3 mr-1" />
-                                                                {response?.attachment ? t.changeFile : t.uploadFile}
-                                                            </Button>
-                                                        </div>
-                                                        {response?.attachment && (
-                                                            <div className="mt-1 text-xs text-green-700 font-medium flex items-center">
-                                                                <CheckCircle className="w-3 h-3 mr-1 text-green-600" />
-                                                                <span className="truncate" title={response.attachment.name}>
-                                                                    {response.attachment.name.length > 18
-                                                                        ? response.attachment.name.substring(0, 15) + '...'
-                                                                        : response.attachment.name}
+                                            {/* File Upload - Only show if required and answered Yes */}
+                                            {currentCriterion.requires_attachment && currentResponse?.response === 'yes' && (
+                                                <div className="space-y-2">
+                                                    <Label className="text-base font-medium text-red-700 flex items-center">
+                                                        <Upload className="w-4 h-4 mr-2" />
+                                                        {t.requiredAttachment}
+                                                    </Label>
+                                                    <div className="relative">
+                                                        <Input
+                                                            type="file"
+                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                            onChange={(e) => handleAttachmentChange(currentCriterion.id, e.target.files?.[0] || null)}
+                                                            className="absolute inset-0 w-full h-12 opacity-0 cursor-pointer z-10"
+                                                        />
+                                                        <Button
+                                                            type="button"
+                                                            variant="outline"
+                                                            className="w-full h-12 text-base font-medium bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 border-2 border-dashed relative z-0"
+                                                        >
+                                                            <Upload className="w-5 h-5 mr-2" />
+                                                            {currentResponse?.attachment ? t.changeFile : t.uploadFile}
+                                                        </Button>
+                                                    </div>
+                                                    {currentResponse?.attachment && (
+                                                        <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                                            <div className="flex items-center text-green-700">
+                                                                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
+                                                                <span className="font-medium text-sm">
+                                                                    {currentResponse.attachment.name}
                                                                 </span>
                                                             </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <p className="text-xs text-gray-500">{t.supportedFormats}</p>
+                                                </div>
+                                            )}
                                         </div>
-                                    );
-                                })}
+                                    </div>
+                                )}
                             </div>
 
-                            {/* Fixed Footer with Navigation - More Compact */}
-                            <div className="flex-shrink-0 p-3 bg-gray-50 border-t">
-                                <div className="flex justify-between items-center">
+                            {/* Fixed Footer Navigation - Compact */}
+                            <div className="flex-shrink-0 p-6 bg-gradient-to-r from-gray-50 to-white border-t border-gray-200">
+                                <div className="flex justify-between items-center max-w-5xl mx-auto">
+                                    {/* Left - Previous Button */}
                                     <Button
                                         variant="outline"
-                                        size="sm"
-                                        onClick={currentPageIndex === 0 ? () => setCurrentStep('preview') : goToPreviousPage}
-                                        className="h-8 px-4 text-sm"
+                                        size="lg"
+                                        onClick={isFirstQuestion ? () => setCurrentStep('preview') : goToPreviousQuestion}
+                                        className="h-12 px-6 text-base font-medium"
                                     >
-                                        <ChevronLeft className="w-4 h-4 mr-1" />
-                                        {currentPageIndex === 0 ? t.back : t.previous}
+                                        <ChevronLeft className="w-5 h-5 mr-2" />
+                                        {isFirstQuestion ? t.back : t.previous}
                                     </Button>
 
-                                    <div className="text-center">
-                                        <div className="text-xs text-gray-600">
-                                            {currentPageIndex + 1} / {totalPages} • {completedCriteria} / {totalCriteria} {t.completed}
+                                    {/* Center - Progress Info */}
+                                    <div className="text-center space-y-1">
+                                        <div className="text-sm font-medium text-gray-900">
+                                            {currentQuestionIndex + 1} / {totalCriteria}
+                                        </div>
+                                        <div className="text-xs text-gray-500">
+                                            {completedCriteria} {t.completed}
                                         </div>
                                     </div>
 
-                                    <div className="flex space-x-2">
-                                        {!isLastPage ? (
+                                    {/* Right - Next/Submit Button */}
+                                    <div className="flex space-x-3">
+                                        {!isLastQuestion ? (
                                             <Button
-                                                size="sm"
-                                                onClick={goToNextPage}
-                                                className="h-8 px-4 text-sm bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                                size="lg"
+                                                onClick={goToNextQuestion}
+                                                className="h-12 px-6 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                                             >
                                                 {t.next}
-                                                <ChevronRight className="w-4 h-4 ml-1" />
+                                                <ChevronRight className="w-5 h-5 ml-2" />
                                             </Button>
                                         ) : (
                                             <Button
                                                 onClick={submitAssessment}
                                                 disabled={!isComplete || processing}
-                                                size="sm"
-                                                className="h-8 px-4 text-sm bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50"
+                                                size="lg"
+                                                className="h-12 px-6 text-base font-medium bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
                                             >
                                                 {processing ? (
                                                     <>
-                                                        <div className="w-3 h-3 mr-2 border border-white border-t-transparent rounded-full animate-spin" />
+                                                        <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
                                                         {t.submitting}
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <Award className="w-4 h-4 mr-1" />
+                                                        <Award className="w-5 h-5 mr-2" />
                                                         {t.submit}
                                                     </>
                                                 )}
@@ -1052,10 +1099,10 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                     </div>
                                 </div>
 
-                                {/* Compact Completion Warning */}
-                                {isLastPage && !isComplete && (
-                                    <div className="mt-2 p-2 bg-amber-50 border border-amber-200 rounded text-center">
-                                        <div className="text-xs text-amber-800">
+                                {/* Completion Warning for Final Question */}
+                                {isLastQuestion && !isComplete && (
+                                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center max-w-2xl mx-auto">
+                                        <div className="text-sm text-amber-800 font-medium">
                                             {t.completeAllRequired}
                                         </div>
                                     </div>

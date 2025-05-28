@@ -4,6 +4,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class AssessmentResponse extends Model
 {
@@ -33,4 +34,12 @@ class AssessmentResponse extends Model
     {
         return $this->response ?? 'na';
     }
+
+
+
+    public function correctiveAction(): HasOne
+    {
+        return $this->hasOne(CorrectiveAction::class);
+    }
+
 }

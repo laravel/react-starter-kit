@@ -85,7 +85,6 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
 
     const isArabic = locale === 'ar';
 
-    console.log(results, assessment);
     // Default templates if API fails
     const defaultTemplates: ReportTemplate[] = [
         {
@@ -129,6 +128,7 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
                 headers: {
                     'Accept': 'application/json',
                     'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '',
                 }
             });
             if (response.ok) {
@@ -149,7 +149,7 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
         setSuccess(null);
 
         try {
-            // Use web route for direct download
+            // Prepare request parameters
             const params = new URLSearchParams({
                 language: settings.language,
                 template: settings.template,
@@ -158,23 +158,80 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
                 watermark: settings.watermark ? '1' : '0'
             });
 
+            // Get CSRF token
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            // Create URL for PDF generation
             const url = isGuest
                 ? `/guest/assessments/${assessment.id}/report?${params}`
                 : `/assessments/${assessment.id}/report?${params}`;
 
-            // Create a temporary link and click it
+            console.log('PDF Generation URL:', url);
+
+            // Use fetch to handle the request properly
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/pdf',
+                    'X-Requested-With': 'XMLHttpRequest',
+                    ...(csrfToken && { 'X-CSRF-TOKEN': csrfToken })
+                }
+            });
+
+            if (!response.ok) {
+                // Try to get error message from response
+                const errorText = await response.text();
+                console.error('PDF generation failed:', response.status, errorText);
+                throw new Error(`HTTP ${response.status}: ${errorText || 'Failed to generate PDF'}`);
+            }
+
+            // Get the PDF blob
+            const blob = await response.blob();
+
+            // Verify it's actually a PDF
+            if (blob.type !== 'application/pdf' && !blob.type.includes('pdf')) {
+                console.error('Response is not a PDF:', blob.type);
+                throw new Error('Server did not return a PDF file');
+            }
+
+            // Create download link
+            const downloadUrl = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
-            link.href = url;
-            link.target = '_blank';
-            link.download = `assessment-report-${assessment.id}.pdf`;
+            link.href = downloadUrl;
+            link.download = `assessment-report-${assessment.id}-${Date.now()}.pdf`;
+
+            // Trigger download
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
 
-            setSuccess(isArabic ? 'تم إنتاج التقرير بنجاح!' : 'Report generated successfully!');
-        } catch (error) {
-            setError(isArabic ? 'حدث خطأ في إنتاج التقرير' : 'Failed to generate report');
+            // Clean up
+            window.URL.revokeObjectURL(downloadUrl);
+
+            setSuccess(isArabic ? 'تم إنتاج التقرير وتحميله بنجاح!' : 'Report generated and downloaded successfully!');
+
+        } catch (error: any) {
             console.error('PDF generation error:', error);
+
+            let errorMessage = isArabic ? 'حدث خطأ في إنتاج التقرير' : 'Failed to generate report';
+
+            if (error.message.includes('HTTP 500')) {
+                errorMessage = isArabic
+                    ? 'خطأ في الخادم - يرجى المحاولة مرة أخرى'
+                    : 'Server error - please try again';
+            } else if (error.message.includes('HTTP 403')) {
+                errorMessage = isArabic
+                    ? 'ليس لديك صلاحية للوصول لهذا التقرير'
+                    : 'You do not have permission to access this report';
+            } else if (error.message.includes('HTTP 404')) {
+                errorMessage = isArabic
+                    ? 'التقييم غير موجود'
+                    : 'Assessment not found';
+            } else if (error.message) {
+                errorMessage = error.message;
+            }
+
+            setError(errorMessage);
         } finally {
             setIsGenerating(false);
         }
@@ -406,15 +463,25 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
                     {/* Status Messages */}
                     {error && (
                         <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-800 mb-4">
-                            <AlertCircle className="w-5 h-5" />
-                            {error}
+                            <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                            <div className="flex-1">
+                                <div className="font-medium">
+                                    {isArabic ? 'خطأ في إنتاج التقرير' : 'PDF Generation Error'}
+                                </div>
+                                <div className="text-sm mt-1">{error}</div>
+                            </div>
                         </div>
                     )}
 
                     {success && (
                         <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-800 mb-4">
-                            <CheckCircle className="w-5 h-5" />
-                            {success}
+                            <CheckCircle className="w-5 h-5 flex-shrink-0" />
+                            <div className="flex-1">
+                                <div className="font-medium">{success}</div>
+                                <div className="text-sm mt-1">
+                                    {isArabic ? 'تحقق من مجلد التحميلات الخاص بك' : 'Check your downloads folder'}
+                                </div>
+                            </div>
                         </div>
                     )}
 
@@ -423,7 +490,7 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
                         <Button
                             onClick={generatePDF}
                             disabled={isGenerating || !canGenerateReport()}
-                            className="px-8 py-3 text-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400"
+                            className="px-8 py-3 text-lg bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
                         >
                             {isGenerating ? (
                                 <>
@@ -447,6 +514,17 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorProps> = ({
                             </p>
                         )}
                     </div>
+
+                    {/* Debug Information (remove in production) */}
+                    {process.env.NODE_ENV === 'development' && (
+                        <div className="mt-4 p-3 bg-gray-50 border border-gray-200 rounded text-xs">
+                            <strong>Debug Info:</strong><br/>
+                            Assessment ID: {assessment.id}<br/>
+                            Is Guest: {isGuest.toString()}<br/>
+                            Status: {assessment.status}<br/>
+                            Has Results: {(results && results.overall_percentage !== undefined).toString()}
+                        </div>
+                    )}
                 </CardContent>
             </Card>
         </div>

@@ -25,7 +25,6 @@ import PDFGeneratorComponent from '@/components/PDFGeneratorComponent';
 
 // Dynamic import for ApexCharts to avoid SSR issues
 let ApexCharts: any;
-let Chart: any;
 
 interface AssessmentResult {
     id: number;
@@ -76,26 +75,25 @@ interface AssessmentResults {
     category_results: Record<string, CategoryResult[]>;
 }
 
-
-
-// ApexChart Bar Chart Component
-interface ApexBarChartProps {
+// Enhanced ApexChart Component for Yes/No/NA Stacked Bars
+interface ApexStackedBarChartProps {
     data: Array<{
         name: string;
-        value: number;
-        color: string;
-        details?: {
-            yes: number;
-            no: number;
-            na: number;
-            total: number;
-        };
+        yes: number;
+        no: number;
+        na: number;
     }>;
     height?: number;
     isArabic?: boolean;
+    title?: string;
 }
 
-const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabic = false }) => {
+const ApexStackedBarChart: React.FC<ApexStackedBarChartProps> = ({
+                                                                     data,
+                                                                     height = 400,
+                                                                     isArabic = false,
+                                                                     title = ''
+                                                                 }) => {
     const [chartLoaded, setChartLoaded] = useState(false);
     const chartRef = React.useRef<HTMLDivElement>(null);
 
@@ -103,7 +101,6 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
         const loadApexCharts = async () => {
             if (typeof window !== 'undefined' && !ApexCharts) {
                 try {
-                    // Try to import from CDN or installed package
                     const apexModule = await import('apexcharts');
                     ApexCharts = apexModule.default;
                     setChartLoaded(true);
@@ -124,6 +121,7 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
                 chart: {
                     type: 'bar',
                     height: height,
+                    stacked: true,
                     toolbar: {
                         show: false,
                     },
@@ -136,7 +134,7 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
                 plotOptions: {
                     bar: {
                         horizontal: false,
-                        columnWidth: '55%',
+                        columnWidth: '70%',
                         endingShape: 'rounded',
                         borderRadius: 4,
                     },
@@ -144,10 +142,10 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
                 dataLabels: {
                     enabled: true,
                     formatter: function (val: number) {
-                        return Math.round(val) + '%';
+                        return val > 0 ? val.toString() : '';
                     },
                     style: {
-                        fontSize: '12px',
+                        fontSize: '11px',
                         fontWeight: 'bold',
                         colors: ['#ffffff'],
                     },
@@ -169,33 +167,39 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
                 },
                 yaxis: {
                     title: {
-                        text: isArabic ? 'النسبة المئوية' : 'Percentage (%)',
+                        text: isArabic ? 'عدد المعايير' : 'Number of Criteria',
                         style: {
                             fontSize: '14px',
                             fontWeight: '600',
                         },
                     },
-                    min: 0,
-                    max: 100,
                     labels: {
                         formatter: function (val: number) {
-                            return Math.round(val) + '%';
+                            return Math.round(val).toString();
                         },
                     },
                 },
                 fill: {
-                    colors: data.map(item => item.color),
+                    colors: ['#22c55e', '#ef4444', '#6b7280'],
                     opacity: 0.9,
+                },
+                legend: {
+                    position: 'top',
+                    horizontalAlign: 'center',
+                    fontSize: '12px',
+                    markers: {
+                        width: 12,
+                        height: 12,
+                        radius: 12,
+                    },
                 },
                 tooltip: {
                     y: {
-                        formatter: function (val: number, { dataPointIndex }: { dataPointIndex: number }) {
-                            const item = data[dataPointIndex];
-                            let tooltip = `Score: ${Math.round(val)}%`;
-                            if (item.details) {
-                                tooltip += `<br/>✓ ${item.details.yes} Yes<br/>✗ ${item.details.no} No<br/>○ ${item.details.na} N/A`;
-                            }
-                            return tooltip;
+                        formatter: function (val: number, { seriesIndex }: any) {
+                            const types = ['Yes', 'No', 'N/A'];
+                            const typesAr = ['نعم', 'لا', 'غير قابل'];
+                            const type = isArabic ? typesAr[seriesIndex] : types[seriesIndex];
+                            return `${type}: ${val}`;
                         },
                     },
                     style: {
@@ -206,15 +210,23 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
                     borderColor: '#f1f5f9',
                     strokeDashArray: 4,
                 },
-                theme: {
-                    mode: 'light',
-                },
+                colors: ['#22c55e', '#ef4444', '#6b7280'],
             };
 
-            const series = [{
-                name: isArabic ? 'النتيجة' : 'Score',
-                data: data.map(item => Math.round(item.value)),
-            }];
+            const series = [
+                {
+                    name: isArabic ? 'نعم' : 'Yes',
+                    data: data.map(item => item.yes),
+                },
+                {
+                    name: isArabic ? 'لا' : 'No',
+                    data: data.map(item => item.no),
+                },
+                {
+                    name: isArabic ? 'غير قابل' : 'N/A',
+                    data: data.map(item => item.na),
+                },
+            ];
 
             const chart = new ApexCharts(chartRef.current, {
                 ...chartOptions,
@@ -245,52 +257,196 @@ const ApexBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400, isArabi
     return <div ref={chartRef} className="w-full" />;
 };
 
-// Fallback Simple Bar Chart Component (if ApexCharts fails to load)
-const SimpleBarChart: React.FC<ApexBarChartProps> = ({ data, height = 400 }) => {
-    const maxValue = Math.max(...data.map(d => d.value));
+// Simple Stacked Bar Chart Fallback
+const SimpleStackedBarChart: React.FC<ApexStackedBarChartProps> = ({ data, height = 400, isArabic = false }) => {
+    const maxTotal = Math.max(...data.map(d => d.yes + d.no + d.na));
 
     return (
         <div className="w-full" style={{ height: `${height}px` }}>
             <div className="flex items-end justify-between h-full gap-2 p-4">
-                {data.map((item, index) => (
-                    <div key={index} className="flex flex-col items-center flex-1">
-                        {/* Value label */}
-                        <div className="text-sm font-medium text-gray-900 mb-2">
-                            {Math.round(item.value)}%
-                        </div>
+                {data.map((item, index) => {
+                    const total = item.yes + item.no + item.na;
+                    const yesHeight = total > 0 ? (item.yes / total) * 100 : 0;
+                    const noHeight = total > 0 ? (item.no / total) * 100 : 0;
+                    const naHeight = total > 0 ? (item.na / total) * 100 : 0;
+                    const barHeight = (total / maxTotal) * 80;
 
-                        {/* Bar */}
-                        <div
-                            className="w-full rounded-t-md transition-all duration-500 ease-out relative group"
-                            style={{
-                                height: `${(item.value / maxValue) * 80}%`,
-                                backgroundColor: item.color,
-                                minHeight: '20px'
-                            }}
-                        >
-                            {/* Hover tooltip */}
-                            <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
-                                {item.name}: {Math.round(item.value)}%
-                                {item.details && (
-                                    <div className="text-xs mt-1">
-                                        ✓{item.details.yes} ✗{item.details.no} ○{item.details.na}
-                                    </div>
+                    return (
+                        <div key={index} className="flex flex-col items-center flex-1">
+                            {/* Total count label */}
+                            <div className="text-sm font-medium text-gray-900 mb-2">
+                                {total}
+                            </div>
+
+                            {/* Stacked Bar */}
+                            <div
+                                className="w-full rounded-md transition-all duration-500 ease-out relative group overflow-hidden"
+                                style={{
+                                    height: `${Math.max(barHeight, 20)}%`,
+                                    minHeight: '20px'
+                                }}
+                            >
+                                {/* Yes section */}
+                                {item.yes > 0 && (
+                                    <div
+                                        className="w-full bg-green-500"
+                                        style={{ height: `${yesHeight}%` }}
+                                        title={`${isArabic ? 'نعم' : 'Yes'}: ${item.yes}`}
+                                    />
                                 )}
+
+                                {/* No section */}
+                                {item.no > 0 && (
+                                    <div
+                                        className="w-full bg-red-500"
+                                        style={{ height: `${noHeight}%` }}
+                                        title={`${isArabic ? 'لا' : 'No'}: ${item.no}`}
+                                    />
+                                )}
+
+                                {/* N/A section */}
+                                {item.na > 0 && (
+                                    <div
+                                        className="w-full bg-gray-500"
+                                        style={{ height: `${naHeight}%` }}
+                                        title={`${isArabic ? 'غير قابل' : 'N/A'}: ${item.na}`}
+                                    />
+                                )}
+
+                                {/* Hover tooltip */}
+                                <div className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 opacity-0 group-hover:opacity-100 transition-opacity bg-gray-900 text-white text-xs rounded px-2 py-1 whitespace-nowrap z-10">
+                                    <div>{item.name}</div>
+                                    <div className="text-green-300">✓{item.yes}</div>
+                                    <div className="text-red-300">✗{item.no}</div>
+                                    <div className="text-gray-300">○{item.na}</div>
+                                </div>
+                            </div>
+
+                            {/* Label */}
+                            <div className="text-xs text-gray-600 text-center mt-2 leading-tight">
+                                {item.name}
                             </div>
                         </div>
+                    );
+                })}
+            </div>
 
-                        {/* Label */}
-                        <div className="text-xs text-gray-600 text-center mt-2 leading-tight">
-                            {item.name}
-                        </div>
-                    </div>
-                ))}
+            {/* Legend */}
+            <div className="flex justify-center gap-4 mt-4 text-sm">
+                <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-green-500 rounded"></div>
+                    <span>{isArabic ? 'نعم' : 'Yes'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-red-500 rounded"></div>
+                    <span>{isArabic ? 'لا' : 'No'}</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <div className="w-3 h-3 bg-gray-500 rounded"></div>
+                    <span>{isArabic ? 'غير قابل' : 'N/A'}</span>
+                </div>
             </div>
         </div>
     );
 };
 
-// Horizontal Bar Component for Categories
+// Overall Count Chart Component
+interface OverallCountChartProps {
+    yesCount: number;
+    noCount: number;
+    naCount: number;
+    isArabic?: boolean;
+}
+
+const OverallCountChart: React.FC<OverallCountChartProps> = ({
+                                                                 yesCount,
+                                                                 noCount,
+                                                                 naCount,
+                                                                 isArabic = false
+                                                             }) => {
+    const total = yesCount + noCount + naCount;
+    const maxCount = Math.max(yesCount, noCount, naCount);
+
+    return (
+        <div className="w-full h-64">
+            <div className="flex items-end justify-center h-full gap-8 p-4">
+                {/* Yes Bar */}
+                <div className="flex flex-col items-center">
+                    <div className="text-lg font-bold text-gray-900 mb-2">
+                        {yesCount}
+                    </div>
+                    <div
+                        className="w-16 bg-green-500 rounded-t-lg transition-all duration-700 ease-out flex items-end justify-center text-white font-bold"
+                        style={{
+                            height: `${maxCount > 0 ? (yesCount / maxCount) * 80 : 0}%`,
+                            minHeight: yesCount > 0 ? '30px' : '0px'
+                        }}
+                    >
+                        {yesCount > 0 && (
+                            <div className="pb-2 text-sm">
+                                {Math.round((yesCount / total) * 100)}%
+                            </div>
+                        )}
+                    </div>
+                    <div className="text-sm font-medium text-green-700 mt-2 flex items-center">
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        {isArabic ? 'نعم' : 'Yes'}
+                    </div>
+                </div>
+
+                {/* No Bar */}
+                <div className="flex flex-col items-center">
+                    <div className="text-lg font-bold text-gray-900 mb-2">
+                        {noCount}
+                    </div>
+                    <div
+                        className="w-16 bg-red-500 rounded-t-lg transition-all duration-700 ease-out flex items-end justify-center text-white font-bold"
+                        style={{
+                            height: `${maxCount > 0 ? (noCount / maxCount) * 80 : 0}%`,
+                            minHeight: noCount > 0 ? '30px' : '0px'
+                        }}
+                    >
+                        {noCount > 0 && (
+                            <div className="pb-2 text-sm">
+                                {Math.round((noCount / total) * 100)}%
+                            </div>
+                        )}
+                    </div>
+                    <div className="text-sm font-medium text-red-700 mt-2 flex items-center">
+                        <XCircle className="w-4 h-4 mr-1" />
+                        {isArabic ? 'لا' : 'No'}
+                    </div>
+                </div>
+
+                {/* N/A Bar */}
+                <div className="flex flex-col items-center">
+                    <div className="text-lg font-bold text-gray-900 mb-2">
+                        {naCount}
+                    </div>
+                    <div
+                        className="w-16 bg-gray-500 rounded-t-lg transition-all duration-700 ease-out flex items-end justify-center text-white font-bold"
+                        style={{
+                            height: `${maxCount > 0 ? (naCount / maxCount) * 80 : 0}%`,
+                            minHeight: naCount > 0 ? '30px' : '0px'
+                        }}
+                    >
+                        {naCount > 0 && (
+                            <div className="pb-2 text-sm">
+                                {Math.round((naCount / total) * 100)}%
+                            </div>
+                        )}
+                    </div>
+                    <div className="text-sm font-medium text-gray-700 mt-2 flex items-center">
+                        <MinusCircle className="w-4 h-4 mr-1" />
+                        {isArabic ? 'غير قابل' : 'N/A'}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+// Horizontal Bar Component for Categories (keeping existing)
 interface HorizontalBarProps {
     label: string;
     value: number;
@@ -429,20 +585,29 @@ export default function AssessmentResults({
         return 'bg-gray-100 text-gray-800 border-gray-200';
     };
 
-    // Prepare domain chart data
+    // Prepare domain chart data for Yes/No/NA counts
     const domainChartData = results.domain_results.map((domain) => ({
         name: domain.domain_name.length > 15 ?
             domain.domain_name.substring(0, 15) + '...' :
             domain.domain_name,
-        value: domain.score_percentage,
-        color: getScoreColor(domain.score_percentage),
-        details: {
-            yes: domain.yes_count,
-            no: domain.no_count,
-            na: domain.na_count,
-            total: domain.total_criteria
-        }
+        yes: domain.yes_count,
+        no: domain.no_count,
+        na: domain.na_count,
     }));
+
+    // Prepare category chart data
+    const getCategoryChartData = (domainId: number) => {
+        if (!results.category_results[domainId]) return [];
+
+        return results.category_results[domainId].map((category) => ({
+            name: category.category_name.length > 15 ?
+                category.category_name.substring(0, 15) + '...' :
+                category.category_name,
+            yes: category.yes_count,
+            no: category.no_count,
+            na: category.na_count,
+        }));
+    };
 
     const formatDate = (dateString: string): string => {
         const date = new Date(dateString);
@@ -500,7 +665,6 @@ export default function AssessmentResults({
                             <Share2 className="h-4 w-4 mr-2" />
                             {isArabic ? 'مشاركة' : 'Share'}
                         </Button>
-
                     </div>
                 </div>
 
@@ -598,13 +762,31 @@ export default function AssessmentResults({
                     </CardContent>
                 </Card>
 
+                {/* Overall Count Chart */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle className="flex items-center gap-2">
+                            <BarChart3 className="h-5 w-5 text-blue-600" />
+                            {isArabic ? 'إجمالي الإجابات' : 'Overall Response Count'}
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <OverallCountChart
+                            yesCount={results.yes_count}
+                            noCount={results.no_count}
+                            naCount={results.na_count}
+                            isArabic={isArabic}
+                        />
+                    </CardContent>
+                </Card>
+
                 {/* Domain Results Chart */}
                 <Card>
                     <CardHeader>
                         <CardTitle className="flex items-center gap-2 justify-between">
                             <div className="flex items-center gap-2">
                                 <BarChart3 className="h-5 w-5 text-blue-600" />
-                                {isArabic ? 'أداء المجالات' : 'Domain Performance'}
+                                {isArabic ? 'أداء المجالات - عدد الإجابات' : 'Domain Performance - Response Count'}
                             </div>
                             <Button
                                 variant="outline"
@@ -617,9 +799,18 @@ export default function AssessmentResults({
                     </CardHeader>
                     <CardContent>
                         {useApexCharts ? (
-                            <ApexBarChart data={domainChartData} height={350} isArabic={isArabic} />
+                            <ApexStackedBarChart
+                                data={domainChartData}
+                                height={400}
+                                isArabic={isArabic}
+                                title={isArabic ? 'أداء المجالات' : 'Domain Performance'}
+                            />
                         ) : (
-                            <SimpleBarChart data={domainChartData} height={350} isArabic={isArabic} />
+                            <SimpleStackedBarChart
+                                data={domainChartData}
+                                height={400}
+                                isArabic={isArabic}
+                            />
                         )}
                     </CardContent>
                 </Card>
@@ -668,11 +859,36 @@ export default function AssessmentResults({
                                     </div>
                                 </div>
 
-                                {/* Category Breakdown */}
-                                {results.category_results[domain.domain_id] && (
+                                {/* Category Breakdown Chart */}
+                                {results.category_results[domain.domain_id] && getCategoryChartData(domain.domain_id).length > 0 && (
                                     <div className="space-y-4">
                                         <h4 className="font-medium text-gray-900 border-b pb-2">
-                                            {isArabic ? 'تفصيل الفئات' : 'Category Breakdown'}
+                                            {isArabic ? 'تفصيل الفئات - عدد الإجابات' : 'Category Breakdown - Response Count'}
+                                        </h4>
+                                        <div className="bg-gray-50 rounded-lg p-4">
+                                            {useApexCharts ? (
+                                                <ApexStackedBarChart
+                                                    data={getCategoryChartData(domain.domain_id)}
+                                                    height={300}
+                                                    isArabic={isArabic}
+                                                    title={`${domain.domain_name} - ${isArabic ? 'الفئات' : 'Categories'}`}
+                                                />
+                                            ) : (
+                                                <SimpleStackedBarChart
+                                                    data={getCategoryChartData(domain.domain_id)}
+                                                    height={300}
+                                                    isArabic={isArabic}
+                                                />
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Category Breakdown - Horizontal Bars */}
+                                {results.category_results[domain.domain_id] && (
+                                    <div className="space-y-4 mt-6">
+                                        <h4 className="font-medium text-gray-900 border-b pb-2">
+                                            {isArabic ? 'تفصيل الفئات - النسب المئوية' : 'Category Breakdown - Percentages'}
                                         </h4>
                                         <div className="grid gap-4 md:grid-cols-2">
                                             {results.category_results[domain.domain_id].map((category) => (
@@ -697,6 +913,8 @@ export default function AssessmentResults({
                         </Card>
                     ))}
                 </div>
+
+                {/* PDF Generator Component */}
                 <PDFGeneratorComponent
                     assessment={assessment}
                     locale={locale}
