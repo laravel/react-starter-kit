@@ -22,22 +22,110 @@ class GuestAssessmentController extends Controller
      */
     public function index()
     {
-        $tools = Tool::with(['domains.categories'])
-            ->where('status', 'active')
-            ->get();
+        $user = auth()->user();
 
-        return Inertia::render('welcome', [
-            'tools' => $tools,
+        // If user is authenticated, redirect them to their appropriate page
+        if ($user) {
+            try {
+                // Load relationships safely
+                $user->load(['subscription', 'details', 'roles']);
+
+                // Create default subscription/details if missing
+                if (!$user->subscription || !$user->details) {
+                    $user->createDefaultSubscriptionAndDetails();
+                    $user->refresh();
+                }
+
+                // Redirect based on user type - FIXED ROUTES
+                if ($user->isAdmin()) {
+                    return redirect()->route('dashboard'); // Admin goes to dashboard
+                } elseif ($user->isPremium()) {
+                    return redirect()->route('dashboard'); // Premium goes to dashboard
+                } else {
+                    return redirect()->route('assessment-tools'); // Free goes to assessment tools
+                }
+            } catch (\Exception $e) {
+                // Log error and fallback to assessment tools
+                Log::error('Home redirect failed', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+
+                return redirect()->route('assessment-tools');
+            }
+        }
+
+        // Show welcome page for guests
+        return Inertia::render('Welcome2', [
+            'auth' => [
+                'user' => null
+            ],
+            'locale' => app()->getLocale()
         ]);
     }
+
+    /**
+     * Show the home2 page (/home) - For free users to register/subscribe
+     */
     public function index2()
     {
-        $tools = Tool::with(['domains.categories'])
-            ->where('status', 'active')
-            ->get();
+        $user = auth()->user();
 
-        return Inertia::render('welcome2', [
-            'tools' => $tools,
+        // If user is authenticated, show them the welcome page with user info
+        if ($user) {
+            try {
+                // Load relationships safely
+                $user->load(['subscription', 'details', 'roles']);
+
+                // Create default subscription/details if missing
+                if (!$user->subscription || !$user->details) {
+                    $user->createDefaultSubscriptionAndDetails();
+                    $user->refresh();
+                }
+
+                // Show welcome page with user authentication info
+                return Inertia::render('Welcome2', [
+                    'auth' => [
+                        'user' => [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'email' => $user->email,
+                            'subscription' => $user->subscription ? [
+                                'plan_type' => $user->subscription->plan_type,
+                                'status' => $user->subscription->status,
+                            ] : null,
+                        ]
+                    ],
+                    'locale' => app()->getLocale()
+                ]);
+
+            } catch (\Exception $e) {
+                // Log error and show basic welcome page
+                Log::error('Home2 user load failed', [
+                    'user_id' => $user->id,
+                    'error' => $e->getMessage()
+                ]);
+
+                // Fallback - show welcome page without user data
+                return Inertia::render('Welcome2', [
+                    'auth' => [
+                        'user' => [
+                            'id' => $user->id,
+                            'name' => $user->name,
+                            'email' => $user->email,
+                        ]
+                    ],
+                    'locale' => app()->getLocale()
+                ]);
+            }
+        }
+
+        // Show welcome page for guests (same as index for non-authenticated)
+        return Inertia::render('Welcome2', [
+            'auth' => [
+                'user' => null
+            ],
+            'locale' => app()->getLocale()
         ]);
     }
 

@@ -8,7 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -41,7 +41,7 @@ class UserRegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create user with basic info only
+            // Create user with basic info only - remove the boot method dependency
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -50,7 +50,7 @@ class UserRegistrationController extends Controller
                 'email_verified_at' => now(), // Auto-verify for free users
             ]);
 
-            // Create user details
+            // Manually create user details (since boot method might cause issues)
             $user->details()->create([
                 'phone' => $validated['phone'],
                 'company' => $validated['company'],
@@ -69,9 +69,32 @@ class UserRegistrationController extends Controller
                 'preferred_language' => app()->getLocale(),
             ]);
 
-            // Assign free role if you're using Spatie Permission
+            // Manually create default free subscription
+            $user->subscriptions()->create([
+                'plan_type' => 'free',
+                'status' => 'active',
+                'started_at' => now(),
+                'features' => [
+                    'assessments_limit' => 1,
+                    'pdf_reports' => 'basic',
+                    'advanced_analytics' => false,
+                    'team_management' => false,
+                    'api_access' => false,
+                    'priority_support' => false,
+                    'custom_branding' => false,
+                ]
+            ]);
+
+            // Assign free role if using Spatie Permission
             if (method_exists($user, 'assignRole')) {
-                $user->assignRole('free');
+                try {
+                    $user->assignRole('free');
+                } catch (Exception $e) {
+                    Log::warning('Could not assign role to user', [
+                        'user_id' => $user->id,
+                        'error' => $e->getMessage()
+                    ]);
+                }
             }
 
             DB::commit();
@@ -113,17 +136,23 @@ class UserRegistrationController extends Controller
      */
     private function sendAdminNotification(User $user)
     {
-        // Simple email notification without custom notification class
-        $adminEmail = 'subscribe@afaqcm.com';
+        try {
+            $adminEmail = 'subscribe@afaqcm.com';
+            $subject = 'New Free User Registration - ' . config('app.name');
+            $message = $this->buildNotificationMessage($user);
 
-        $subject = 'New Free User Registration - ' . config('app.name');
-        $message = $this->buildNotificationMessage($user);
-
-        // Using Laravel's basic mail functionality
-        \Mail::raw($message, function ($mail) use ($adminEmail, $subject) {
-            $mail->to($adminEmail)
-                ->subject($subject);
-        });
+            // Using Laravel's basic mail functionality
+            Mail::raw($message, function ($mail) use ($adminEmail, $subject) {
+                $mail->to($adminEmail)
+                    ->subject($subject);
+            });
+        } catch (Exception $e) {
+            Log::error('Failed to send admin notification', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            // Don't throw exception to avoid breaking user registration
+        }
     }
 
     /**
@@ -136,15 +165,15 @@ class UserRegistrationController extends Controller
         return "New free user registered:\n\n" .
             "Name: {$user->name}\n" .
             "Email: {$user->email}\n" .
-            "Phone: {$details->phone}\n" .
-            "Company: {$details->company_name}\n" .
-            "Company Type: {$details->company_type}\n" .
-            "Position: {$details->position}\n" .
-            "City: {$details->city}\n" .
-            "Website: {$details->website}\n" .
-            "Industry: {$details->industry}\n" .
-            "Company Size: {$details->company_size}\n" .
-            "How did you hear: {$details->how_did_you_hear}\n" .
+            "Phone: " . ($details->phone ?? 'Not provided') . "\n" .
+            "Company: " . ($details->company_name ?? 'Not provided') . "\n" .
+            "Company Type: " . ($details->company_type ?? 'Not specified') . "\n" .
+            "Position: " . ($details->position ?? 'Not specified') . "\n" .
+            "City: " . ($details->city ?? 'Not specified') . "\n" .
+            "Website: " . ($details->website ?? 'Not specified') . "\n" .
+            "Industry: " . ($details->industry ?? 'Not specified') . "\n" .
+            "Company Size: " . ($details->company_size ?? 'Not specified') . "\n" .
+            "How did you hear: " . ($details->how_did_you_hear ?? 'Not specified') . "\n" .
             "Marketing Emails: " . ($details->marketing_emails ? 'Yes' : 'No') . "\n" .
             "Newsletter: " . ($details->newsletter_subscription ? 'Yes' : 'No') . "\n" .
             "Registered At: {$user->created_at}\n";
@@ -155,9 +184,26 @@ class UserRegistrationController extends Controller
      */
     public function showSubscription()
     {
-        return Inertia::render('subscription/upgrade', [
-            'user' => auth()->user(),
-            'currentPlan' => 'free'
+        $user = auth()->user();
+
+        // Load relationships to avoid errors
+        $user->load(['details', 'subscription']);
+
+        return Inertia::render('SubscriptionUpgrade', [
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'details' => $user->details ? [
+                    'phone' => $user->details->phone,
+                    'company_name' => $user->details->company_name,
+                ] : null,
+                'subscription' => $user->subscription ? [
+                    'plan_type' => $user->subscription->plan_type,
+                    'status' => $user->subscription->status,
+                ] : null,
+            ],
+            'currentPlan' => $user->subscription?->plan_type ?? 'free'
         ]);
     }
 
@@ -198,30 +244,38 @@ class UserRegistrationController extends Controller
      */
     private function sendSubscriptionRequest(User $user, array $data)
     {
-        $adminEmail = 'subscribe@afaqcm.com';
-        $subject = 'Subscription Request - ' . $user->name;
-        $details = $user->details;
+        try {
+            $adminEmail = 'subscribe@afaqcm.com';
+            $subject = 'Subscription Request - ' . $user->name;
+            $details = $user->details;
 
-        $message = "Subscription request received:\n\n" .
-            "User: {$user->name} ({$user->email})\n" .
-            "Company: {$details->company_name}\n" .
-            "Phone: {$details->phone}\n" .
-            "Position: {$details->position}\n" .
-            "Industry: {$details->industry}\n" .
-            "Company Size: {$details->company_size}\n" .
-            "Requested Plan: {$data['plan']}\n" .
-            "Current Plan: free\n";
+            $message = "Subscription request received:\n\n" .
+                "User: {$user->name} ({$user->email})\n" .
+                "Company: " . ($details?->company_name ?? 'Not provided') . "\n" .
+                "Phone: " . ($details?->phone ?? 'Not provided') . "\n" .
+                "Position: " . ($details?->position ?? 'Not provided') . "\n" .
+                "Industry: " . ($details?->industry ?? 'Not provided') . "\n" .
+                "Company Size: " . ($details?->company_size ?? 'Not provided') . "\n" .
+                "Requested Plan: {$data['plan']}\n" .
+                "Current Plan: " . ($user->subscription?->plan_type ?? 'free') . "\n";
 
-        if (!empty($data['message'])) {
-            $message .= "Message: {$data['message']}\n";
+            if (!empty($data['message'])) {
+                $message .= "Message: {$data['message']}\n";
+            }
+
+            $message .= "Request Date: " . now()->format('Y-m-d H:i:s') . "\n";
+
+            Mail::raw($message, function ($mail) use ($adminEmail, $subject) {
+                $mail->to($adminEmail)
+                    ->subject($subject);
+            });
+        } catch (Exception $e) {
+            Log::error('Failed to send subscription request email', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage()
+            ]);
+            // Don't throw to avoid breaking the request
         }
-
-        $message .= "Request Date: " . now()->format('Y-m-d H:i:s') . "\n";
-
-        \Mail::raw($message, function ($mail) use ($adminEmail, $subject) {
-            $mail->to($adminEmail)
-                ->subject($subject);
-        });
     }
 
     /**
@@ -235,8 +289,8 @@ class UserRegistrationController extends Controller
             $message = "🔔 New subscription request\n\n";
             $message .= "👤 Name: {$user->name}\n";
             $message .= "📧 Email: {$user->email}\n";
-            $message .= "🏢 Company: {$details->company_name}\n";
-            $message .= "📱 Phone: {$details->phone}\n";
+            $message .= "🏢 Company: " . ($details?->company_name ?? 'Not provided') . "\n";
+            $message .= "📱 Phone: " . ($details?->phone ?? 'Not provided') . "\n";
             $message .= "💼 Plan: " . ucfirst($data['plan']) . "\n";
 
             if (!empty($data['message'])) {
@@ -251,28 +305,11 @@ class UserRegistrationController extends Controller
                 'message' => $message
             ]);
 
-            // Example integration with WhatsApp API (uncomment and configure)
-            /*
-            $whatsappService = new WhatsAppService();
-            $whatsappService->sendMessage([
-                'to' => config('app.whatsapp_admin_number'),
-                'message' => $message
-            ]);
-            */
-
         } catch (Exception $e) {
             Log::error('WhatsApp message failed', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage()
             ]);
         }
-    }
-
-    /**
-     * Show registration form
-     */
-    public function showRegistrationForm()
-    {
-        return Inertia::render('auth/free-register');
     }
 }

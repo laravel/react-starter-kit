@@ -9,24 +9,33 @@ use Symfony\Component\HttpFoundation\Response;
 class CheckAssessmentLimits
 {
     /**
-     * Handle an incoming request to check assessment limits
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
-        $user = auth()->user();
+        $user = $request->user();
 
+        // Allow access if no user (guest)
         if (!$user) {
-            return redirect()->route('login');
+            return $next($request);
         }
 
-        // Check if user can create more assessments
-        if (!$user->canCreateAssessment()) {
-            $limit = $user->getAssessmentLimit();
-
-            return redirect()->route('subscription.show')
-                ->with('error', "You have reached your assessment limit of {$limit}. Please upgrade to premium for unlimited assessments.");
+        // Always allow premium/admin users
+        if ($user->isPremium() || $user->isAdmin()) {
+            return $next($request);
         }
 
+        // For free users, check limits only on POST requests (submissions)
+        if ($request->isMethod('POST') && $request->routeIs('assessment.submit')) {
+            if (!$user->canCreateAssessment()) {
+                return redirect()->route('subscription.show')
+                    ->with('error', 'You have reached your assessment limit. Please upgrade to premium for unlimited assessments.');
+            }
+        }
+
+        // Allow GET requests (viewing assessment tools, starting assessments)
         return $next($request);
     }
 }

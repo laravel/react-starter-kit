@@ -26,9 +26,6 @@ Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create
 Route::post('/assessment/start', [GuestAssessmentController::class, 'start'])
     ->name('guest.assessment.start');
 
-Route::get('/assessment/{assessment}/take', [GuestAssessmentController::class, 'take'])
-    ->name('assessment.take');
-
 Route::post('/assessment/{assessment}/response', [GuestAssessmentController::class, 'saveResponse'])
     ->name('assessment.save-response');
 
@@ -51,53 +48,72 @@ Route::post('/guest/session/{assessment}/update', [GuestAssessmentController::cl
 Route::post('/contact/sales', [ContactSalesController::class, 'store'])->name('contact.sales');
 Route::get('/contact/sales', [ContactSalesController::class, 'show'])->name('contact.sales.show');
 
-// Authenticated routes with role-based access
+// Guest PDF reports
+Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadGuestReport'])
+    ->name('guest.assessments.report.download');
+
+// Authenticated routes - REMOVED MIDDLEWARE BLOCKING FREE USERS
 Route::middleware(['auth', 'verified'])->group(function () {
 
-    // Dashboard - Only for premium and admin users
-    Route::get('/dashboard', function () {
-        return Inertia::render('dashboard');
-    })->middleware(['checkAccess:dashboard'])->name('dashboard');
+    // ========================================
+    // ASSESSMENT TOOLS - ACCESSIBLE TO ALL AUTHENTICATED USERS
+    // ========================================
 
-    // Assessment Tools - Available for all authenticated users (free, premium, admin)
+    // Assessment Tools - This routes free users to FreeUserAssessmentPage, premium to dashboard version
     Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
-//        ->middleware(['checkAccess:free'])
         ->name('assessment-tools');
 
     // Assessment routes for authenticated users
     Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
-//        ->middleware(['checkAccess:free'])
         ->name('assessment.start');
 
     Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
-//        ->middleware(['checkAccess:free'])
         ->name('assessment.submit');
 
+    // Assessment results - Different views based on user type
     Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
-//        ->middleware(['checkAccess:free'])
-        ->name('assessment.results');
+        ->name('assessment.results'); // Auto-redirects based on user type
+
+    // Free user results page (outside dashboard)
+    Route::get('/assessment/results/{assessment}/free', [AssessmentController::class, 'freeResults'])
+        ->name('assessment.results.free');
 
     // Assessment history - Available for all authenticated users
     Route::get('/assessments', [AssessmentController::class, 'index'])
-//        ->middleware(['checkAccess:free'])
         ->name('assessments.index');
 
-    // Subscription routes - Only for free users who want to upgrade
+    // Subscription routes - Available for all users (NO MIDDLEWARE)
     Route::get('/subscription', [UserRegistrationController::class, 'showSubscription'])
-//        ->middleware(['checkAccess:free'])
         ->name('subscription.show');
 
     Route::post('/subscription/request', [UserRegistrationController::class, 'requestSubscription'])
-//        ->middleware(['checkAccess:free'])
         ->name('subscription.request');
 
-    // PDF Reports with role-based restrictions
-    Route::get('/assessments/{assessment}/report', [AssessmentController::class, 'downloadReport'])
-//        ->middleware(['checkAccess:free']) // Free users get basic reports
+    // PDF Reports - Available for all authenticated users (with different access levels)
+    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
         ->name('assessments.report.download');
 
+    // ========================================
+    // PREMIUM USER ROUTES (Dashboard Access)
+    // ========================================
+
+    // Dashboard - Only for premium and admin users
+    Route::middleware('checkAccess:dashboard')->group(function () {
+        Route::get('/dashboard', function () {
+            return Inertia::render('dashboard');
+        })->name('dashboard');
+
+        // Premium Assessment Tools (dashboard version)
+        Route::get('/dashboard/assessment-tools', [AssessmentToolsController::class, 'premiumIndex'])
+            ->name('dashboard.assessment-tools');
+
+        // Premium user results page (dashboard version)
+        Route::get('/assessment/results/{assessment}/premium', [AssessmentController::class, 'premiumResults'])
+            ->name('assessment.results.premium');
+    });
+
     // Advanced features - Premium only
-    Route::middleware(['checkAccess:premium'])->group(function () {
+    Route::middleware('checkAccess:premium')->group(function () {
         Route::get('/advanced-analytics', function () {
             return Inertia::render('analytics/advanced');
         })->name('analytics.advanced');
@@ -114,23 +130,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 // Admin routes - Only for super_admin role
 Route::middleware(['auth', 'verified', 'checkAccess:admin'])->group(function () {
-    // Filament admin panel routes are handled by FilamentServiceProvider
     // Additional admin routes can be added here
+    // Filament admin panel routes are handled by FilamentServiceProvider
 });
 
-// PDF Generation routes
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
-        ->name('assessments.report.download');
-});
-
-// Guest PDF reports
-Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadGuestReport'])
-    ->name('guest.assessments.report.download');
-
-// API routes
+// API routes for authenticated users
 Route::middleware(['auth'])->group(function () {
     Route::post('/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadReport']);
+
     Route::get('/reports/templates', function () {
         return response()->json([
             'success' => true,

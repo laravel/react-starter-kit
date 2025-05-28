@@ -22,7 +22,7 @@ return [
 
     'super_admin' => [
         'enabled' => true,
-        'name' => 'super_admin',
+        'name' => 'super_admin', // Should match your admin role
         'define_via_gate' => false,
         'intercept_gate' => 'before', // after
     ],

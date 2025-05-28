@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\CheckAssessmentLimits;
 use App\Http\Middleware\CheckFilamentAccess;
 use App\Http\Middleware\CheckUserAccess;
 use App\Http\Middleware\HandleAppearance;
@@ -22,10 +23,15 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-//             CheckUserAccess::class,
-//            CheckFilamentAccess::class,
-
+            CheckUserAccess::class,
+            CheckFilamentAccess::class,
+            CheckAssessmentLimits::class,
+        ])->alias([
+            'checkAccess' => \App\Http\Middleware\CheckUserAccess::class,
+            'filamentAccess' => \App\Http\Middleware\CheckFilamentAccess::class,
+            'checkAssessmentLimits' => \App\Http\Middleware\CheckAssessmentLimits::class,
         ]);
+
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

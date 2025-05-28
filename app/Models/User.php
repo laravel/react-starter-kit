@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Filament\Models\Contracts\FilamentUser;
+use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -10,7 +12,7 @@ use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
-class User extends Authenticatable
+class User extends Authenticatable implements FilamentUser
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
@@ -25,7 +27,13 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_type',
     ];
+    public function canAccessPanel(Panel $panel): bool
+    {
+        // Only allow actual admins to access Filament
+        return $this->hasRole(['admin', 'super_admin']);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -96,6 +104,7 @@ class User extends Authenticatable
      */
     public function isPremium(): bool
     {
+        // Your existing logic
         $subscription = $this->subscription;
         return $subscription && $subscription->isPremium() && $subscription->isActive();
     }
@@ -105,7 +114,8 @@ class User extends Authenticatable
      */
     public function isAdmin(): bool
     {
-        return $this->hasRole(['super_admin', 'admin']);
+        // Check if user has admin roles or if they have the admin user_type
+        return $this->hasRole(['super_admin', 'admin']) || $this->user_type === 'admin';
     }
 
     /**
@@ -118,7 +128,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get subscription status
+     * Get subscription status with safer fallbacks
      */
     public function getSubscriptionStatus(): string
     {
@@ -160,7 +170,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's assessment limit
+     * Get user's assessment limit with safer fallbacks
      */
     public function getAssessmentLimit(): ?int
     {
@@ -169,7 +179,7 @@ class User extends Authenticatable
         }
 
         $subscription = $this->subscription;
-        if ($subscription) {
+        if ($subscription && method_exists($subscription, 'getFeature')) {
             return $subscription->getFeature('assessments_limit', 1);
         }
 
@@ -181,6 +191,10 @@ class User extends Authenticatable
      */
     public function canCreateAssessment(): bool
     {
+        if ($this->isAdmin()) {
+            return true; // Admins always can create
+        }
+
         $limit = $this->getAssessmentLimit();
 
         if ($limit === null) {
@@ -200,7 +214,7 @@ class User extends Authenticatable
         }
 
         $subscription = $this->subscription;
-        if ($subscription) {
+        if ($subscription && method_exists($subscription, 'getFeature')) {
             return $subscription->getFeature('pdf_reports', 'basic');
         }
 
@@ -224,7 +238,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's full profile data
+     * Get user's full profile data with safe fallbacks
      */
     public function getFullProfileData(): array
     {
@@ -237,15 +251,18 @@ class User extends Authenticatable
             'email' => $this->email,
             'email_verified_at' => $this->email_verified_at,
             'created_at' => $this->created_at,
+            'user_type' => $this->user_type ?? 'free',
             'details' => $details ? $details->toArray() : null,
             'subscription' => [
                 'plan_type' => $subscription?->plan_type ?? 'free',
                 'status' => $subscription?->status ?? 'active',
                 'expires_at' => $subscription?->expires_at,
-                'features' => $subscription?->getFeatures() ?? [],
-                'is_active' => $subscription?->isActive() ?? false,
+                'features' => $subscription && method_exists($subscription, 'getFeatures')
+                    ? $subscription->getFeatures()
+                    : $this->getDefaultFeatures(),
+                'is_active' => $subscription?->isActive() ?? true,
             ],
-            'roles' => $this->roles->pluck('name')->toArray(),
+            'roles' => method_exists($this, 'roles') ? $this->roles->pluck('name')->toArray() : [],
             'permissions' => [
                 'can_access_dashboard' => $this->canAccessDashboard(),
                 'can_access_advanced_features' => $this->canAccessAdvancedFeatures(),
@@ -253,5 +270,46 @@ class User extends Authenticatable
                 'pdf_report_level' => $this->getPdfReportLevel(),
             ]
         ];
+    }
+
+    /**
+     * Get default features for free users
+     */
+    private function getDefaultFeatures(): array
+    {
+        return [
+            'assessments_limit' => 1,
+            'pdf_reports' => 'basic',
+            'advanced_analytics' => false,
+            'team_management' => false,
+            'api_access' => false,
+            'priority_support' => false,
+            'custom_branding' => false,
+        ];
+    }
+
+    /**
+     * Create default subscription and details for user
+     */
+    public function createDefaultSubscriptionAndDetails(): void
+    {
+        // Create subscription if it doesn't exist
+        if (!$this->subscription) {
+            $this->subscriptions()->create([
+                'plan_type' => 'free',
+                'status' => 'active',
+                'started_at' => now(),
+                'features' => $this->getDefaultFeatures()
+            ]);
+        }
+
+        // Create details if they don't exist
+        if (!$this->details) {
+            $this->details()->create([
+                'preferred_language' => 'en',
+                'marketing_emails' => true,
+                'newsletter_subscription' => false,
+            ]);
+        }
     }
 }

@@ -44,7 +44,7 @@ class EditUser extends EditRecord
                             'cancelled_reason' => 'Downgraded by admin'
                         ]);
                         $this->record->syncRoles(['free']);
-                        $this->notify('success', 'User downgraded to free plan');
+//                        $this->notify('success', 'User downgraded to free plan');
                     } else {
                         // Upgrade to premium
                         if ($subscription) {
@@ -64,7 +64,7 @@ class EditUser extends EditRecord
                             ]);
                         }
                         $this->record->syncRoles(['premium']);
-                        $this->notify('success', 'User upgraded to premium plan');
+//                        $this->notify('success', 'User upgraded to premium plan');
                     }
                 })
                 ->requiresConfirmation()
