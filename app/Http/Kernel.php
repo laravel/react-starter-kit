@@ -38,6 +38,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \App\Http\Middleware\HandleInertiaRequests::class,
             \App\Http\Middleware\HandleAppearance::class,
+            // REMOVED: CheckFilamentAccess from web middleware - it should only be applied to admin routes
         ],
 
         'api' => [
@@ -70,6 +71,7 @@ class Kernel extends HttpKernel
         // Custom middleware aliases
         'checkAccess' => \App\Http\Middleware\CheckUserAccess::class,
         'checkAssessmentLimits' => \App\Http\Middleware\CheckAssessmentLimits::class,
+        // FIXED: Only apply CheckFilamentAccess to specific admin routes, not globally
         'checkFilamentAccess' => \App\Http\Middleware\CheckFilamentAccess::class,
     ];
 }

@@ -95,12 +95,15 @@ class AssessmentController extends Controller
     }
 
     /**
-     * Show user's assessments with limits info
+     * Show user's assessments with proper routing for free vs premium users
      */
     public function index(Request $request)
     {
         $user = auth()->user();
         $locale = app()->getLocale();
+
+        // Load user relationships
+        $user->load(['details', 'subscription']);
 
         $assessments = Assessment::with(['tool'])
             ->where('user_id', $user->id)
@@ -109,10 +112,8 @@ class AssessmentController extends Controller
             ->map(function ($assessment) use ($locale) {
                 $overallScore = null;
                 if ($assessment->status === 'completed') {
-                    $responses = $assessment->responses;
-                    if ($responses->count() > 0) {
-                        $overallScore = round($responses->avg('value'), 1);
-                    }
+                    $results = $assessment->getResults();
+                    $overallScore = $results['overall_percentage'] ?? null;
                 }
 
                 return [
@@ -139,25 +140,48 @@ class AssessmentController extends Controller
                 ];
             });
 
-        return Inertia::render('assessments/index', [
-            'assessments' => $assessments,
-            'locale' => $locale,
-            'auth' => [
-                'user' => $user->getFullProfileData()
-            ],
-            'userLimits' => [
-                'current_assessments' => $assessments->count(),
-                'assessment_limit' => $user->getAssessmentLimit(),
-                'can_create_more' => $user->canCreateAssessment(),
-                'is_premium' => $user->isPremium(),
-                'subscription_status' => $user->getSubscriptionStatus(),
-                'days_until_limit_reset' => null, // For future implementation
-            ]
-        ]);
+        $userLimits = [
+            'current_assessments' => $assessments->count(),
+            'assessment_limit' => $user->getAssessmentLimit(),
+            'can_create_more' => $user->canCreateAssessment(),
+            'is_premium' => $user->isPremium(),
+            'subscription_status' => $user->getSubscriptionStatus(),
+        ];
+
+        // Route to different pages based on user type
+        if ($user->isPremium() || $user->isAdmin()) {
+            // Premium users get the full dashboard assessment index
+            return Inertia::render('assessments/index', [
+                'assessments' => $assessments,
+                'userLimits' => $userLimits,
+                'locale' => $locale,
+                'auth' => [
+                    'user' => $user->getFullProfileData()
+                ],
+            ]);
+        } else {
+            // Free users get the simplified assessment index
+            return Inertia::render('FreeUserAssessmentIndex', [
+                'assessments' => $assessments,
+                'userLimits' => $userLimits,
+                'locale' => $locale,
+                'auth' => [
+                    'user' => [
+                        'id' => $user->id,
+                        'name' => $user->name,
+                        'email' => $user->email,
+                        'details' => $user->details ? [
+                            'company_name' => $user->details->company_name,
+                            'phone' => $user->details->phone,
+                        ] : null,
+                    ]
+                ],
+            ]);
+        }
     }
 
     /**
-     * Show assessment results with user restrictions
+     * Show assessment results with different views for free vs premium
      */
     public function results(Assessment $assessment)
     {
@@ -180,31 +204,49 @@ class AssessmentController extends Controller
         // Get the results using the existing method
         $results = $assessment->getResults();
 
-        return Inertia::render('assessment/results', [
-            'assessment' => [
-                'id' => $assessment->id,
-                'title_en' => $assessment->title_en ?? $assessment->tool->name_en,
-                'title_ar' => $assessment->title_ar ?? $assessment->tool->name_ar,
-                'tool' => [
-                    'id' => $assessment->tool->id,
-                    'name_en' => $assessment->tool->name_en,
-                    'name_ar' => $assessment->tool->name_ar,
+        $assessmentData = [
+            'id' => $assessment->id,
+            'title_en' => $assessment->title_en ?? $assessment->tool->name_en,
+            'title_ar' => $assessment->title_ar ?? $assessment->tool->name_ar,
+            'tool' => [
+                'id' => $assessment->tool->id,
+                'name_en' => $assessment->tool->name_en,
+                'name_ar' => $assessment->tool->name_ar,
+            ],
+            'name' => $assessment->name ?? $user->name,
+            'email' => $assessment->email ?? $user->email,
+            'organization' => $assessment->organization,
+            'status' => $assessment->status,
+            'created_at' => $assessment->created_at->format('Y-m-d H:i:s'),
+            'completed_at' => $assessment->completed_at?->format('Y-m-d H:i:s'),
+        ];
+
+        if ($user->isPremium() || $user->isAdmin()) {
+            // Premium users get full results page
+            return Inertia::render('assessment/results', [
+                'assessment' => $assessmentData,
+                'results' => $results,
+                'locale' => $locale,
+                'userAccess' => [
+                    'is_premium' => true,
+                    'pdf_report_level' => 'full',
+                    'can_access_advanced_features' => true,
+                    'subscription_status' => $user->getSubscriptionStatus(),
                 ],
-                'name' => $assessment->name ?? $user->name,
-                'email' => $assessment->email ?? $user->email,
-                'organization' => $assessment->organization,
-                'status' => $assessment->status,
-                'created_at' => $assessment->created_at->format('Y-m-d H:i:s'),
-                'completed_at' => $assessment->completed_at?->format('Y-m-d H:i:s'),
-            ],
-            'results' => $results,
-            'locale' => $locale,
-            'userAccess' => [
-                'is_premium' => $user->isPremium(),
-                'pdf_report_level' => $user->getPdfReportLevel(),
-                'can_access_advanced_features' => $user->canAccessAdvancedFeatures(),
-                'subscription_status' => $user->getSubscriptionStatus(),
-            ],
-        ]);
+            ]);
+        } else {
+            // Free users get limited results page
+            return Inertia::render('assessment/FreeUserResults', [
+                'assessment' => $assessmentData,
+                'results' => $results,
+                'locale' => $locale,
+                'userAccess' => [
+                    'is_premium' => false,
+                    'pdf_report_level' => 'basic',
+                    'can_access_advanced_features' => false,
+                    'subscription_status' => $user->getSubscriptionStatus(),
+                ],
+            ]);
+        }
     }
 }

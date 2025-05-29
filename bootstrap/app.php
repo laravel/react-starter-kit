@@ -23,13 +23,12 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
-            CheckUserAccess::class,
-            CheckFilamentAccess::class,
-            CheckAssessmentLimits::class,
+            // REMOVED: CheckUserAccess, CheckFilamentAccess, CheckAssessmentLimits from global web middleware
+            // These should be applied only to specific routes that need them
         ])->alias([
-            'checkAccess' => \App\Http\Middleware\CheckUserAccess::class,
-            'filamentAccess' => \App\Http\Middleware\CheckFilamentAccess::class,
-            'checkAssessmentLimits' => \App\Http\Middleware\CheckAssessmentLimits::class,
+            'checkAccess' => CheckUserAccess::class,
+            'filamentAccess' => CheckFilamentAccess::class,
+            'checkAssessmentLimits' => CheckAssessmentLimits::class,
         ]);
 
     })

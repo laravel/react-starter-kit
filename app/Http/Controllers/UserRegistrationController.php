@@ -41,7 +41,7 @@ class UserRegistrationController extends Controller
         try {
             DB::beginTransaction();
 
-            // Create user with basic info only - remove the boot method dependency
+            // Create user with free type
             $user = User::create([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
@@ -50,7 +50,7 @@ class UserRegistrationController extends Controller
                 'email_verified_at' => now(), // Auto-verify for free users
             ]);
 
-            // Manually create user details (since boot method might cause issues)
+            // Create user details
             $user->details()->create([
                 'phone' => $validated['phone'],
                 'company' => $validated['company'],
@@ -69,14 +69,14 @@ class UserRegistrationController extends Controller
                 'preferred_language' => app()->getLocale(),
             ]);
 
-            // Manually create default free subscription
+            // FIXED: Create free subscription with proper limits
             $user->subscriptions()->create([
                 'plan_type' => 'free',
                 'status' => 'active',
                 'started_at' => now(),
                 'features' => [
-                    'assessments_limit' => 1,
-                    'pdf_reports' => 'basic',
+                    'assessments_limit' => 1, // Only 1 assessment allowed
+                    'pdf_reports' => 'basic', // Domain-level only
                     'advanced_analytics' => false,
                     'team_management' => false,
                     'api_access' => false,
@@ -113,8 +113,9 @@ class UserRegistrationController extends Controller
             // Log them in automatically
             auth()->login($user);
 
+            // FIXED: Redirect to free user assessment tools
             return redirect()->route('assessment-tools')->with('success',
-                'Registration successful! You can now access our free assessment tools.'
+                'Registration successful! You can now access our free assessment tools. You have 1 free assessment available.'
             );
 
         } catch (Exception $e) {
@@ -137,7 +138,7 @@ class UserRegistrationController extends Controller
     private function sendAdminNotification(User $user)
     {
         try {
-            $adminEmail = 'subscribe@afaqcm.com';
+            $adminEmail = 'test@test-demos.space';
             $subject = 'New Free User Registration - ' . config('app.name');
             $message = $this->buildNotificationMessage($user);
 
@@ -245,7 +246,7 @@ class UserRegistrationController extends Controller
     private function sendSubscriptionRequest(User $user, array $data)
     {
         try {
-            $adminEmail = 'subscribe@afaqcm.com';
+            $adminEmail = 'test@test-demos.space';
             $subject = 'Subscription Request - ' . $user->name;
             $details = $user->details;
 
