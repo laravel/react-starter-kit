@@ -313,6 +313,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                 <div className="flex items-center">
                                     <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
                                         <span className="text-blue-600 font-bold text-lg">LOGO</span>
+
+
                                     </div>
                                 </div>
 

@@ -825,13 +825,13 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         );
     }
 
-    // Assessment Step - Single Question Interface (No Scrolling, Perfect Sizing)
+    // Assessment Step - Single Question Interface (FIXED: Proper height management and scrolling)
     const isLastQuestion = currentQuestionIndex === totalCriteria - 1;
     const isFirstQuestion = currentQuestionIndex === 0;
     const currentResponse = data.responses[currentCriterion?.id];
 
     return (
-        <div className={`h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'} flex flex-col overflow-hidden`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+        <div className={`min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 ${language === 'ar' ? 'rtl' : 'ltr'} flex flex-col`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
             {/* Header with Progress - Fixed Height */}
             <header className="backdrop-blur-md bg-white/80 border-b border-white/20 shadow-lg flex-shrink-0 h-20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full">
@@ -882,234 +882,237 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                 </div>
             </header>
 
-            {/* Main Content - Single Question Card (Fills remaining space exactly) */}
-            <div className="flex-1 flex flex-col p-6 overflow-hidden">
-                <div className="max-w-5xl mx-auto w-full h-full flex flex-col">
-                    {/* Context Breadcrumb */}
-                    {currentContext && (
-                        <div className="flex-shrink-0 mb-4">
-                            <div className="flex items-center space-x-2 text-sm text-gray-600 bg-white/60 rounded-full px-4 py-2 backdrop-blur-sm">
-                                <span className="font-medium">{t.currentDomain}:</span>
-                                <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
-                                    {getLocalizedText(currentContext.domain, 'name')}
-                                </Badge>
-                                <span className="text-gray-400">•</span>
-                                <span className="font-medium">{t.currentCategory}:</span>
-                                <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
-                                    {getLocalizedText(currentContext.category, 'name')}
-                                </Badge>
-                            </div>
-                        </div>
-                    )}
-
-                    {/* Single Question Card - Takes up remaining space */}
-                    <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50 overflow-hidden flex-1 flex flex-col">
-                        <CardContent className="flex-1 flex flex-col p-0">
-                            {/* Question Content - Flexible sizing */}
-                            <div className="flex-1 flex flex-col justify-center p-8 lg:p-12">
-                                {currentCriterion && (
-                                    <div className="space-y-8">
-                                        {/* Question Number Badge */}
-                                        <div className="flex justify-center">
-                                            <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
-                                                <span className="text-2xl font-bold text-white">{currentQuestionIndex + 1}</span>
-                                            </div>
-                                        </div>
-
-                                        {/* Question Title */}
-                                        <div className="text-center space-y-4">
-                                            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight max-w-4xl mx-auto">
-                                                {getLocalizedText(currentCriterion, 'name')}
-                                            </h2>
-
-                                            {getLocalizedText(currentCriterion, 'description') && (
-                                                <p className="text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-                                                    {getLocalizedText(currentCriterion, 'description')}
-                                                </p>
-                                            )}
-                                        </div>
-
-                                        {/* Attachment Warning */}
-                                        {currentCriterion.requires_attachment && (
-                                            <div className="flex items-center justify-center">
-                                                <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl shadow-sm">
-                                                    <Upload className="w-5 h-5 text-amber-600" />
-                                                    <span className="text-sm font-medium text-amber-800">{t.fileRequiredIfYes}</span>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Response Buttons - Large and Clear */}
-                                        <div className="flex justify-center">
-                                            <div className="flex gap-4">
-                                                <Button
-                                                    variant={currentResponse?.response === 'yes' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(currentCriterion.id, 'yes')}
-                                                    size="lg"
-                                                    className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
-                                                        currentResponse?.response === 'yes'
-                                                            ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg scale-105'
-                                                            : 'border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
-                                                    }`}
-                                                >
-                                                    <CheckCircle className="w-5 h-5 mr-2" />
-                                                    {t.yes}
-                                                </Button>
-
-                                                <Button
-                                                    variant={currentResponse?.response === 'no' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(currentCriterion.id, 'no')}
-                                                    size="lg"
-                                                    className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
-                                                        currentResponse?.response === 'no'
-                                                            ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
-                                                            : 'border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300'
-                                                    }`}
-                                                >
-                                                    <XCircle className="w-5 h-5 mr-2" />
-                                                    {t.no}
-                                                </Button>
-
-                                                <Button
-                                                    variant={currentResponse?.response === 'na' ? 'default' : 'outline'}
-                                                    onClick={() => handleResponseChange(currentCriterion.id, 'na')}
-                                                    size="lg"
-                                                    className={`h-16 px-8 text-lg font-semibold min-w-[140px] transition-all duration-200 ${
-                                                        currentResponse?.response === 'na'
-                                                            ? 'bg-gray-500 hover:bg-gray-600 text-white shadow-lg scale-105'
-                                                            : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
-                                                    }`}
-                                                >
-                                                    <MinusCircle className="w-5 h-5 mr-2" />
-                                                    {t.notApplicable}
-                                                </Button>
-                                            </div>
-                                        </div>
-
-                                        {/* Additional Options - Notes and File Upload */}
-                                        <div className="space-y-4 max-w-2xl mx-auto">
-                                            {/* Notes Section */}
-                                            <div className="space-y-2">
-                                                <Label className="text-base font-medium text-gray-700">{t.notes}</Label>
-                                                <Textarea
-                                                    placeholder={t.notesPlaceholder}
-                                                    value={currentResponse?.notes || ''}
-                                                    onChange={(e) => handleNotesChange(currentCriterion.id, e.target.value)}
-                                                    className="min-h-[100px] text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none"
-                                                    rows={3}
-                                                />
-                                            </div>
-
-                                            {/* File Upload - Only show if required and answered Yes */}
-                                            {currentCriterion.requires_attachment && currentResponse?.response === 'yes' && (
-                                                <div className="space-y-2">
-                                                    <Label className="text-base font-medium text-red-700 flex items-center">
-                                                        <Upload className="w-4 h-4 mr-2" />
-                                                        {t.requiredAttachment}
-                                                    </Label>
-                                                    <div className="relative">
-                                                        <Input
-                                                            type="file"
-                                                            accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
-                                                            onChange={(e) => handleAttachmentChange(currentCriterion.id, e.target.files?.[0] || null)}
-                                                            className="absolute inset-0 w-full h-12 opacity-0 cursor-pointer z-10"
-                                                        />
-                                                        <Button
-                                                            type="button"
-                                                            variant="outline"
-                                                            className="w-full h-12 text-base font-medium bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 border-2 border-dashed relative z-0"
-                                                        >
-                                                            <Upload className="w-5 h-5 mr-2" />
-                                                            {currentResponse?.attachment ? t.changeFile : t.uploadFile}
-                                                        </Button>
-                                                    </div>
-                                                    {currentResponse?.attachment && (
-                                                        <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
-                                                            <div className="flex items-center text-green-700">
-                                                                <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
-                                                                <span className="font-medium text-sm">
-                                                                    {currentResponse.attachment.name}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                    <p className="text-xs text-gray-500">{t.supportedFormats}</p>
-                                                </div>
-                                            )}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-
-                            {/* Fixed Footer Navigation - Compact */}
-                            <div className="flex-shrink-0 p-6 bg-gradient-to-r from-gray-50 to-white border-t border-gray-200">
-                                <div className="flex justify-between items-center max-w-5xl mx-auto">
-                                    {/* Left - Previous Button */}
-                                    <Button
-                                        variant="outline"
-                                        size="lg"
-                                        onClick={isFirstQuestion ? () => setCurrentStep('preview') : goToPreviousQuestion}
-                                        className="h-12 px-6 text-base font-medium"
-                                    >
-                                        <ChevronLeft className="w-5 h-5 mr-2" />
-                                        {isFirstQuestion ? t.back : t.previous}
-                                    </Button>
-
-                                    {/* Center - Progress Info */}
-                                    <div className="text-center space-y-1">
-                                        <div className="text-sm font-medium text-gray-900">
-                                            {currentQuestionIndex + 1} / {totalCriteria}
-                                        </div>
-                                        <div className="text-xs text-gray-500">
-                                            {completedCriteria} {t.completed}
-                                        </div>
-                                    </div>
-
-                                    {/* Right - Next/Submit Button */}
-                                    <div className="flex space-x-3">
-                                        {!isLastQuestion ? (
-                                            <Button
-                                                size="lg"
-                                                onClick={goToNextQuestion}
-                                                className="h-12 px-6 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                                            >
-                                                {t.next}
-                                                <ChevronRight className="w-5 h-5 ml-2" />
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                onClick={submitAssessment}
-                                                disabled={!isComplete || processing}
-                                                size="lg"
-                                                className="h-12 px-6 text-base font-medium bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
-                                            >
-                                                {processing ? (
-                                                    <>
-                                                        <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                                                        {t.submitting}
-                                                    </>
-                                                ) : (
-                                                    <>
-                                                        <Award className="w-5 h-5 mr-2" />
-                                                        {t.submit}
-                                                    </>
-                                                )}
-                                            </Button>
-                                        )}
+            {/* Main Content Area - Flexible with scrolling */}
+            <div className="flex-1 flex flex-col min-h-0">
+                <div className="flex-1 overflow-y-auto">
+                    <div className="p-6">
+                        <div className="max-w-5xl mx-auto">
+                            {/* Context Breadcrumb */}
+                            {currentContext && (
+                                <div className="mb-6">
+                                    <div className="flex items-center space-x-2 text-sm text-gray-600 bg-white/60 rounded-full px-4 py-2 backdrop-blur-sm w-fit">
+                                        <span className="font-medium">{t.currentDomain}:</span>
+                                        <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+                                            {getLocalizedText(currentContext.domain, 'name')}
+                                        </Badge>
+                                        <span className="text-gray-400">•</span>
+                                        <span className="font-medium">{t.currentCategory}:</span>
+                                        <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200">
+                                            {getLocalizedText(currentContext.category, 'name')}
+                                        </Badge>
                                     </div>
                                 </div>
+                            )}
 
-                                {/* Completion Warning for Final Question */}
-                                {isLastQuestion && !isComplete && (
-                                    <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center max-w-2xl mx-auto">
-                                        <div className="text-sm text-amber-800 font-medium">
-                                            {t.completeAllRequired}
+                            {/* Single Question Card */}
+                            <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50 overflow-hidden">
+                                <CardContent className="p-8 lg:p-12">
+                                    {currentCriterion && (
+                                        <div className="space-y-8">
+                                            {/* Question Number Badge */}
+                                            <div className="flex justify-center">
+                                                <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-xl">
+                                                    <span className="text-2xl font-bold text-white">{currentQuestionIndex + 1}</span>
+                                                </div>
+                                            </div>
+
+                                            {/* Question Title */}
+                                            <div className="text-center space-y-4">
+                                                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 leading-tight max-w-4xl mx-auto">
+                                                    {getLocalizedText(currentCriterion, 'name')}
+                                                </h2>
+
+                                                {getLocalizedText(currentCriterion, 'description') && (
+                                                    <p className="text-lg lg:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
+                                                        {getLocalizedText(currentCriterion, 'description')}
+                                                    </p>
+                                                )}
+                                            </div>
+
+                                            {/* Attachment Warning */}
+                                            {currentCriterion.requires_attachment && (
+                                                <div className="flex items-center justify-center">
+                                                    <div className="flex items-center gap-2 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl shadow-sm">
+                                                        <Upload className="w-5 h-5 text-amber-600" />
+                                                        <span className="text-sm font-medium text-amber-800">{t.fileRequiredIfYes}</span>
+                                                    </div>
+                                                </div>
+                                            )}
+
+                                            {/* Response Buttons - Large and Clear */}
+                                            <div className="flex justify-center">
+                                                <div className="flex gap-4">
+                                                    <Button
+                                                        variant={currentResponse?.response === 'yes' ? 'default' : 'outline'}
+                                                        onClick={() => handleResponseChange(currentCriterion.id, 'yes')}
+                                                        size="lg"
+                                                        className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
+                                                            currentResponse?.response === 'yes'
+                                                                ? 'bg-green-500 hover:bg-green-600 text-white shadow-lg scale-105'
+                                                                : 'border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300'
+                                                        }`}
+                                                    >
+                                                        <CheckCircle className="w-5 h-5 mr-2" />
+                                                        {t.yes}
+                                                    </Button>
+
+                                                    <Button
+                                                        variant={currentResponse?.response === 'no' ? 'default' : 'outline'}
+                                                        onClick={() => handleResponseChange(currentCriterion.id, 'no')}
+                                                        size="lg"
+                                                        className={`h-16 px-8 text-lg font-semibold min-w-[120px] transition-all duration-200 ${
+                                                            currentResponse?.response === 'no'
+                                                                ? 'bg-red-500 hover:bg-red-600 text-white shadow-lg scale-105'
+                                                                : 'border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300'
+                                                        }`}
+                                                    >
+                                                        <XCircle className="w-5 h-5 mr-2" />
+                                                        {t.no}
+                                                    </Button>
+
+                                                    <Button
+                                                        variant={currentResponse?.response === 'na' ? 'default' : 'outline'}
+                                                        onClick={() => handleResponseChange(currentCriterion.id, 'na')}
+                                                        size="lg"
+                                                        className={`h-16 px-8 text-lg font-semibold min-w-[140px] transition-all duration-200 ${
+                                                            currentResponse?.response === 'na'
+                                                                ? 'bg-gray-500 hover:bg-gray-600 text-white shadow-lg scale-105'
+                                                                : 'border-gray-200 text-gray-700 hover:bg-gray-50 hover:border-gray-300'
+                                                        }`}
+                                                    >
+                                                        <MinusCircle className="w-5 h-5 mr-2" />
+                                                        {t.notApplicable}
+                                                    </Button>
+                                                </div>
+                                            </div>
+
+                                            {/* Additional Options - Notes and File Upload */}
+                                            <div className="space-y-4 max-w-2xl mx-auto">
+                                                {/* Notes Section */}
+                                                <div className="space-y-2">
+                                                    <Label className="text-base font-medium text-gray-700">{t.notes}</Label>
+                                                    <Textarea
+                                                        placeholder={t.notesPlaceholder}
+                                                        value={currentResponse?.notes || ''}
+                                                        onChange={(e) => handleNotesChange(currentCriterion.id, e.target.value)}
+                                                        className="min-h-[100px] text-base border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 rounded-xl resize-none"
+                                                        rows={3}
+                                                    />
+                                                </div>
+
+                                                {/* File Upload - Only show if required and answered Yes */}
+                                                {currentCriterion.requires_attachment && currentResponse?.response === 'yes' && (
+                                                    <div className="space-y-2">
+                                                        <Label className="text-base font-medium text-red-700 flex items-center">
+                                                            <Upload className="w-4 h-4 mr-2" />
+                                                            {t.requiredAttachment}
+                                                        </Label>
+                                                        <div className="relative">
+                                                            <Input
+                                                                type="file"
+                                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.txt"
+                                                                onChange={(e) => handleAttachmentChange(currentCriterion.id, e.target.files?.[0] || null)}
+                                                                className="absolute inset-0 w-full h-12 opacity-0 cursor-pointer z-10"
+                                                            />
+                                                            <Button
+                                                                type="button"
+                                                                variant="outline"
+                                                                className="w-full h-12 text-base font-medium bg-amber-50 border-amber-300 text-amber-800 hover:bg-amber-100 border-2 border-dashed relative z-0"
+                                                            >
+                                                                <Upload className="w-5 h-5 mr-2" />
+                                                                {currentResponse?.attachment ? t.changeFile : t.uploadFile}
+                                                            </Button>
+                                                        </div>
+                                                        {currentResponse?.attachment && (
+                                                            <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                                                                <div className="flex items-center text-green-700">
+                                                                    <CheckCircle className="w-4 h-4 mr-2 text-green-600" />
+                                                                    <span className="font-medium text-sm">
+                                                                        {currentResponse.attachment.name}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        )}
+                                                        <p className="text-xs text-gray-500">{t.supportedFormats}</p>
+                                                    </div>
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
+                                </CardContent>
+                            </Card>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Fixed Footer Navigation - Always visible and properly positioned */}
+                <div className="flex-shrink-0 bg-gradient-to-r from-gray-50 to-white border-t border-gray-200 shadow-lg">
+                    <div className="p-6">
+                        <div className="flex justify-between items-center max-w-5xl mx-auto">
+                            {/* Left - Previous Button */}
+                            <Button
+                                variant="outline"
+                                size="lg"
+                                onClick={isFirstQuestion ? () => setCurrentStep('preview') : goToPreviousQuestion}
+                                className="h-12 px-6 text-base font-medium"
+                            >
+                                <ChevronLeft className="w-5 h-5 mr-2" />
+                                {isFirstQuestion ? t.back : t.previous}
+                            </Button>
+
+                            {/* Center - Progress Info */}
+                            <div className="text-center space-y-1">
+                                <div className="text-sm font-medium text-gray-900">
+                                    {currentQuestionIndex + 1} / {totalCriteria}
+                                </div>
+                                <div className="text-xs text-gray-500">
+                                    {completedCriteria} {t.completed}
+                                </div>
+                            </div>
+
+                            {/* Right - Next/Submit Button */}
+                            <div className="flex space-x-3">
+                                {!isLastQuestion ? (
+                                    <Button
+                                        size="lg"
+                                        onClick={goToNextQuestion}
+                                        className="h-12 px-6 text-base font-medium bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                                    >
+                                        {t.next}
+                                        <ChevronRight className="w-5 h-5 ml-2" />
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={submitAssessment}
+                                        disabled={!isComplete || processing}
+                                        size="lg"
+                                        className="h-12 px-6 text-base font-medium bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {processing ? (
+                                            <>
+                                                <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                                {t.submitting}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <Award className="w-5 h-5 mr-2" />
+                                                {t.submit}
+                                            </>
+                                        )}
+                                    </Button>
                                 )}
                             </div>
-                        </CardContent>
-                    </Card>
+                        </div>
+
+                        {/* Completion Warning for Final Question */}
+                        {isLastQuestion && !isComplete && (
+                            <div className="mt-4 p-3 bg-amber-50 border border-amber-200 rounded-lg text-center max-w-2xl mx-auto">
+                                <div className="text-sm text-amber-800 font-medium">
+                                    {t.completeAllRequired}
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
             </div>
         </div>

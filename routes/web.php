@@ -7,6 +7,7 @@ use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\UserRegistrationController;
+use App\Http\Controllers\FreeUserController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -18,6 +19,7 @@ Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2')
 // Free user registration route (public)
 Route::post('/user/register-free', [UserRegistrationController::class, 'registerFreeUser'])
     ->name('user.register-free');
+
 
 // Guest routes (for non-authenticated users)
 Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create'])
@@ -56,6 +58,26 @@ Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::c
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // ========================================
+    // FREE USER ROUTES - SEPARATE CONTROLLER
+    // ========================================
+
+    // Free User Assessment Management - Using dedicated FreeUserController
+    Route::get('/free-user/assessments', [FreeUserController::class, 'index'])
+        ->name('free-user.index');
+
+    Route::get('/free-user/assessments/{assessment}/results', [FreeUserController::class, 'results'])
+        ->name('free-user.results');
+
+    Route::get('/free-user/assessments/{assessment}/edit', [FreeUserController::class, 'edit'])
+        ->name('free-user.edit');
+
+    Route::put('/free-user/assessments/{assessment}', [FreeUserController::class, 'update'])
+        ->name('free-user.update');
+
+    Route::post('/free-user/assessments/submit', [FreeUserController::class, 'submit'])
+        ->name('free-user.submit');
+
+    // ========================================
     // ASSESSMENT TOOLS - ACCESSIBLE TO ALL AUTHENTICATED USERS
     // ========================================
 
@@ -74,14 +96,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
         ->name('assessment.results');
 
-    // Assessment history - Available for all authenticated users with proper routing
-    // FIXED: Use the correct route name that matches your controller
-    Route::get('/assessments', [AssessmentController::class, 'index'])
-        ->name('assessments.index');
+    // Assessment history - Route to appropriate controller based on user type
+    Route::get('/assessments', function() {
+        $user = auth()->user();
+
+        // Route to appropriate controller based on user type
+        if ($user->isPremium() || $user->isAdmin()) {
+            return app(AssessmentController::class)->index();
+        } else {
+            return app(FreeUserController::class)->index();
+        }
+    })->name('assessments.index');
 
     // Alternative route for backward compatibility
-    Route::get('/my-assessments', [AssessmentController::class, 'index'])
-        ->name('assessments');
+    Route::get('/my-assessments', function() {
+        return redirect()->route('assessments.index');
+    })->name('assessments');
 
     // ========================================
     // SUBSCRIPTION ROUTES - AVAILABLE FOR ALL USERS
@@ -99,10 +129,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('subscription.request');
 
     // ========================================
-    // ASSESSMENT SAVING AND EXITING
+    // PDF REPORTS - ROUTE TO APPROPRIATE CONTROLLER
     // ========================================
+
+    // Free User PDF Reports
     Route::get('/assessments/{assessment}/free-report', [App\Http\Controllers\FreeUserPDFController::class, 'downloadFreeUserReport'])
         ->name('assessments.free-report.download');
+
+    // Premium PDF Reports
+    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
+        ->name('assessments.report.download');
+
+    // ========================================
+    // ASSESSMENT SAVING AND EXITING
+    // ========================================
 
     // Save and exit route - saves current progress and redirects to assessments
     Route::post('/assessment/{assessment}/save-exit', function(\App\Models\Assessment $assessment) {
@@ -167,10 +207,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('assessments.index')
             ->with('success', 'Assessment progress saved successfully!');
     })->name('assessment.save-and-exit');
-
-    // PDF Reports - Available for all authenticated users (with different access levels)
-    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
-        ->name('assessments.report.download');
 
     // ========================================
     // PREMIUM USER ROUTES (Dashboard Access)

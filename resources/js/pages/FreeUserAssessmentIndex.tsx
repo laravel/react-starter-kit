@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { DownloadButton } from '@/components/DownloadButton';
-
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import {
@@ -33,7 +31,9 @@ import {
     X,
     Download,
     Eye,
-    Plus
+    Plus,
+    Edit,
+    Pause
 } from 'lucide-react';
 
 interface Assessment {
@@ -54,6 +54,7 @@ interface Assessment {
     status: string;
     created_at: string;
     updated_at: string;
+    completed_at?: string;
     overall_score?: number;
     completion_percentage: number;
     user_id?: number;
@@ -115,21 +116,6 @@ export default function FreeUserAssessmentIndex({
             minute: '2-digit'
         });
     };
-
-    const handleDownload = () => {
-        const url = route('assessments.report.download', assessment.id);
-
-        // Create temporary link
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `Assessment_Report_${assessment.id}.pdf`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    };
-
-
-
 
     const getStatusBadge = (status: string) => {
         switch (status) {
@@ -440,22 +426,22 @@ export default function FreeUserAssessmentIndex({
                                                 </div>
                                             </div>
 
-                                            {/* Action Buttons */}
+                                            {/* Action Buttons - FIXED ROUTING */}
                                             <div className="flex flex-wrap gap-3 pt-4 border-t border-gray-200">
                                                 {assessment.status === 'completed' ? (
                                                     <>
-                                                        <Link href={route('assessment.results', assessment.id)}>
+                                                        <Link href={route('free-user.results', assessment.id)}>
                                                             <Button className="bg-blue-600 hover:bg-blue-700">
                                                                 <Eye className="w-4 h-4 mr-2" />
                                                                 View Results
                                                             </Button>
                                                         </Link>
                                                         <a
-                                                            href={route('assessments.free-report.download', [assessment.id])}
+                                                            href={route('assessments.free-report.download', assessment.id)}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             download
-                                                            data-inertia="false"       // ← tell Inertia to ignore this link
+                                                            data-inertia="false"
                                                         >
                                                             <Button variant="outline">
                                                                 <Download className="w-4 h-4 mr-2" />
@@ -464,12 +450,14 @@ export default function FreeUserAssessmentIndex({
                                                         </a>
                                                     </>
                                                 ) : (
-                                                    <Link href={route('assessment.start', assessment.tool.id)}>
-                                                    <Button className="bg-green-600 hover:bg-green-700">
-                                                            <Play className="w-4 h-4 mr-2" />
-                                                            Continue Assessment
-                                                        </Button>
-                                                    </Link>
+                                                    <>
+                                                        <Link href={route('free-user.edit', assessment.id)}>
+                                                            <Button className="bg-green-600 hover:bg-green-700">
+                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                Continue Editing
+                                                            </Button>
+                                                        </Link>
+                                                    </>
                                                 )}
 
                                                 <Link href="/subscription">

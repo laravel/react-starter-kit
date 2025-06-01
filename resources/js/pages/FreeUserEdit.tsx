@@ -9,37 +9,27 @@ import { Textarea } from '@/components/ui/textarea';
 import { Progress } from '@/components/ui/progress';
 import {
     Target,
-    Clock,
-    BarChart3,
-    Users,
-    Crown,
-    Shield,
-    AlertTriangle,
     CheckCircle,
-    Star,
-    TrendingUp,
-    FileText,
-    Play,
-    Lock,
-    Zap,
-    ArrowRight,
-    Award,
-    Globe,
-    Calendar,
-    Sparkles,
-    LogOut,
-    User,
-    Building,
-    Mail,
-    Phone,
-    Settings,
-    Bell,
-    Menu,
     X,
-    ChevronDown,
+    Lock,
     ArrowLeft,
+    Save,
+    Send,
+    AlertTriangle,
+    Shield,
+    User,
+    LogOut,
+    ChevronDown,
     Info
 } from 'lucide-react';
+
+interface Assessment {
+    id: number;
+    name: string;
+    email: string;
+    organization?: string;
+    status: string;
+}
 
 interface Tool {
     id: number;
@@ -85,14 +75,6 @@ interface AssessmentData {
     domains: Domain[];
 }
 
-interface UserLimits {
-    current_assessments: number;
-    assessment_limit: number | null;
-    can_create_more: boolean;
-    is_premium: boolean;
-    subscription_status: string;
-}
-
 interface User {
     id: number;
     name: string;
@@ -102,29 +84,33 @@ interface User {
     };
 }
 
-interface FreeUserStartProps {
+interface FreeUserEditProps {
+    assessment: Assessment;
     assessmentData: AssessmentData;
-    userLimits: UserLimits;
+    existingResponses: Record<number, number>;
+    existingNotes: Record<number, string>;
     user: User;
-    prefillData: {
-        name: string;
-        email: string;
-    };
     locale: string;
 }
 
-export default function FreeUserStart({ assessmentData, userLimits, user, prefillData, locale }: FreeUserStartProps) {
+export default function FreeUserEdit({
+                                         assessment,
+                                         assessmentData,
+                                         existingResponses,
+                                         existingNotes,
+                                         user,
+                                         locale
+                                     }: FreeUserEditProps) {
     const [showUserMenu, setShowUserMenu] = useState(false);
-    const [currentStep, setCurrentStep] = useState(1);
     const isArabic = locale === 'ar';
 
-    const { data, setData, post, processing, errors } = useForm({
-        tool_id: assessmentData.tool.id,
-        name: prefillData.name,
-        email: prefillData.email,
-        organization: user.details?.company_name || '',
-        responses: {} as Record<number, number>,
-        notes: {} as Record<number, string>,
+    const { data, setData, put, processing, errors } = useForm({
+        name: assessment.name,
+        email: assessment.email,
+        organization: assessment.organization || '',
+        responses: existingResponses,
+        notes: existingNotes,
+        action: 'save', // 'save' or 'submit'
     });
 
     const getName = (item: { name_en: string; name_ar: string }): string => {
@@ -156,9 +142,16 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
         });
     };
 
+    const handleSave = (e: React.FormEvent) => {
+        e.preventDefault();
+        setData('action', 'save');
+        put(route('free-user.update', assessment.id));
+    };
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        post(route('assessment.submit'));
+        setData('action', 'submit');
+        put(route('free-user.update', assessment.id));
     };
 
     const getCompletionPercentage = (): number => {
@@ -172,7 +165,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
 
     return (
         <>
-            <Head title={`Start Assessment - ${getName(assessmentData.tool)}`} />
+            <Head title={`Edit Assessment - ${getName(assessmentData.tool)}`} />
 
             <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
                 {/* Header */}
@@ -181,10 +174,10 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                         <div className="flex justify-between items-center h-16">
                             {/* Logo and Back */}
                             <div className="flex items-center space-x-4">
-                                <Link href="/assessment-tools">
+                                <Link href={route('free-user.index')}>
                                     <Button variant="ghost" size="sm">
                                         <ArrowLeft className="w-4 h-4 mr-2" />
-                                        Back to Tools
+                                        Back to Assessments
                                     </Button>
                                 </Link>
                                 <div className="flex items-center space-x-3">
@@ -192,7 +185,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                         <Target className="w-6 h-6 text-white" />
                                     </div>
                                     <div>
-                                        <h1 className="text-xl font-bold text-gray-900">{getName(assessmentData.tool)}</h1>
+                                        <h1 className="text-xl font-bold text-gray-900">Edit Assessment</h1>
                                         <div className="flex items-center space-x-2">
                                             <Badge className="bg-blue-100 text-blue-800">
                                                 <Shield className="w-3 h-3 mr-1" />
@@ -203,7 +196,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                 </div>
                             </div>
 
-                            {/* User Menu */}
+                            {/* Progress and User Menu */}
                             <div className="flex items-center space-x-4">
                                 <div className="text-sm text-gray-600">
                                     {Math.round(getCompletionPercentage())}% Complete
@@ -227,7 +220,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                                 <p className="text-xs text-gray-500">{user.email}</p>
                                             </div>
                                             <Link href="/subscription" className="flex items-center px-4 py-2 text-sm text-purple-600 hover:bg-purple-50">
-                                                <Crown className="w-4 h-4 mr-3" />
+                                                <Target className="w-4 h-4 mr-3" />
                                                 Upgrade Plan
                                             </Link>
                                             <Link href="/logout" method="post" className="flex items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50">
@@ -263,15 +256,15 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                     <div className="flex items-center space-x-3">
                                         <Info className="w-5 h-5 text-blue-600" />
                                         <div>
-                                            <h3 className="font-semibold text-blue-900">Free Plan Assessment</h3>
+                                            <h3 className="font-semibold text-blue-900">Editing Free Plan Assessment</h3>
                                             <p className="text-sm text-blue-700">
-                                                You'll receive basic results. Upgrade to premium for detailed analytics and comprehensive reports.
+                                                You can edit your assessment until you submit it. Once submitted, you'll get basic results.
                                             </p>
                                         </div>
                                     </div>
                                     <Link href="/subscription">
                                         <Button variant="outline" className="text-blue-600 border-blue-600 hover:bg-blue-50">
-                                            <Crown className="w-4 h-4 mr-2" />
+                                            <Target className="w-4 h-4 mr-2" />
                                             Upgrade
                                         </Button>
                                     </Link>
@@ -279,7 +272,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                             </CardContent>
                         </Card>
 
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                        <form className="space-y-6">
                             {/* Assessment Info */}
                             <Card className="border-0 shadow-xl">
                                 <CardHeader>
@@ -296,9 +289,8 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                             value={data.name}
                                             onChange={(e) => setData('name', e.target.value)}
                                             required
-                                            className="bg-gray-50"
-                                            disabled
                                         />
+                                        {errors.name && <p className="text-red-600 text-sm mt-1">{errors.name}</p>}
                                     </div>
                                     <div>
                                         <Label htmlFor="email">Email Address</Label>
@@ -308,9 +300,8 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                             value={data.email}
                                             onChange={(e) => setData('email', e.target.value)}
                                             required
-                                            className="bg-gray-50"
-                                            disabled
                                         />
+                                        {errors.email && <p className="text-red-600 text-sm mt-1">{errors.email}</p>}
                                     </div>
                                     <div className="md:col-span-2">
                                         <Label htmlFor="organization">Organization (Optional)</Label>
@@ -415,37 +406,52 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                 </Card>
                             ))}
 
-                            {/* Submission */}
-                            <Card className="border-0 shadow-xl bg-gradient-to-r from-green-50 to-emerald-50">
+                            {/* Action Buttons */}
+                            <Card className="border-0 shadow-xl bg-gradient-to-r from-gray-50 to-gray-100">
                                 <CardContent className="p-6">
                                     <div className="text-center space-y-4">
-                                        <h3 className="text-xl font-bold text-gray-900">Ready to Submit?</h3>
+                                        <h3 className="text-xl font-bold text-gray-900">Save Your Progress</h3>
                                         <p className="text-gray-600">
                                             You've completed {Object.keys(data.responses).length} of {totalCriteria} questions.
-                                            {!isComplete() && " Please answer all questions before submitting."}
                                         </p>
 
                                         <div className="flex justify-center gap-4">
-                                            <Link href={route('free-user.index')}>
-                                                <Button variant="outline" size="lg">
-                                                    <ArrowLeft className="w-4 h-4 mr-2" />
-                                                    Save & Exit
-                                                </Button>
-                                            </Link>
                                             <Button
-                                                type="submit"
+                                                type="button"
+                                                variant="outline"
                                                 size="lg"
-                                                disabled={!isComplete() || processing}
-                                                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
+                                                onClick={handleSave}
+                                                disabled={processing}
+                                                className="px-8"
                                             >
-                                                {processing ? (
+                                                {processing && data.action === 'save' ? (
+                                                    <>
+                                                        <div className="w-4 h-4 mr-2 border-2 border-gray-400 border-t-transparent rounded-full animate-spin"></div>
+                                                        Saving...
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <Save className="w-4 h-4 mr-2" />
+                                                        Save Progress
+                                                    </>
+                                                )}
+                                            </Button>
+
+                                            <Button
+                                                type="button"
+                                                size="lg"
+                                                onClick={handleSubmit}
+                                                disabled={!isComplete() || processing}
+                                                className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 px-8"
+                                            >
+                                                {processing && data.action === 'submit' ? (
                                                     <>
                                                         <div className="w-4 h-4 mr-2 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
                                                         Submitting...
                                                     </>
                                                 ) : (
                                                     <>
-                                                        <CheckCircle className="w-4 h-4 mr-2" />
+                                                        <Send className="w-4 h-4 mr-2" />
                                                         Submit Assessment
                                                     </>
                                                 )}
@@ -457,7 +463,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                                 <div className="flex items-center justify-center">
                                                     <AlertTriangle className="w-4 h-4 text-amber-600 mr-2" />
                                                     <span className="text-sm text-amber-800">
-                                                        {totalCriteria - Object.keys(data.responses).length} questions remaining
+                                                        {totalCriteria - Object.keys(data.responses).length} questions remaining to submit
                                                     </span>
                                                 </div>
                                             </div>
@@ -474,7 +480,11 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                                     </div>
                                                     <div className="flex items-center justify-center">
                                                         <CheckCircle className="w-3 h-3 mr-1" />
-                                                        View response breakdown
+                                                        View response breakdown by domain
+                                                    </div>
+                                                    <div className="flex items-center justify-center">
+                                                        <CheckCircle className="w-3 h-3 mr-1" />
+                                                        Download basic PDF report
                                                     </div>
                                                     <div className="flex items-center justify-center text-gray-500">
                                                         <Lock className="w-3 h-3 mr-1" />
@@ -483,7 +493,7 @@ export default function FreeUserStart({ assessmentData, userLimits, user, prefil
                                                 </div>
                                                 <Link href="/subscription">
                                                     <Button variant="outline" size="sm" className="text-blue-600 border-blue-600 hover:bg-blue-100">
-                                                        <Crown className="w-3 h-3 mr-1" />
+                                                        <Target className="w-3 h-3 mr-1" />
                                                         Upgrade for Full Analysis
                                                     </Button>
                                                 </Link>
