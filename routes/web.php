@@ -12,14 +12,26 @@ use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
-// Public routes
-Route::get('/', [GuestAssessmentController::class, 'index'])->name('home');
+// ========================================
+// PUBLIC HOME ROUTE - Updated for Admin Redirect
+// ========================================
+
+Route::get('/', function () {
+    // Check if user is authenticated and is admin
+    if (auth()->check() && auth()->user()->isAdmin()) {
+        return redirect('/dashboard');
+    }
+
+    // For all other users (non-authenticated, premium, or free), show the Welcome2 page
+    return app(GuestAssessmentController::class)->index2();
+})->name('home');
+
+// Alternative home route for compatibility
 Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
 
 // Free user registration route (public)
 Route::post('/user/register-free', [UserRegistrationController::class, 'registerFreeUser'])
     ->name('user.register-free');
-
 
 // Guest routes (for non-authenticated users)
 Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create'])
@@ -78,10 +90,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('free-user.submit');
 
     // ========================================
-    // ASSESSMENT TOOLS - ACCESSIBLE TO ALL AUTHENTICATED USERS
+    // ASSESSMENT TOOLS - FIXED ROUTING
     // ========================================
 
-    // Assessment Tools - Routes free users to FreeUserAssessmentPage, premium to dashboard version
+    // Assessment Tools - Use AssessmentToolsController for all users
     Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
         ->name('assessment-tools');
 
@@ -96,14 +108,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
         ->name('assessment.results');
 
+    // ========================================
+    // ASSESSMENT HISTORY - FIXED ROUTING
+    // ========================================
+
     // Assessment history - Route to appropriate controller based on user type
     Route::get('/assessments', function() {
         $user = auth()->user();
 
         // Route to appropriate controller based on user type
         if ($user->isPremium() || $user->isAdmin()) {
-            return app(AssessmentController::class)->index();
+            // For premium/admin users, use AssessmentController
+            return app(AssessmentController::class)->index(request());
         } else {
+            // For free users, use FreeUserController
             return app(FreeUserController::class)->index();
         }
     })->name('assessments.index');
@@ -163,7 +181,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('assessment.save-exit');
 
     // Alternative save and exit that accepts form data
-    Route::post('/assessment/save-and-exit', function(Request $request) {
+    Route::post('/assessment/save-and-exit', function(\Illuminate\Http\Request $request) {
         $user = auth()->user();
 
         $assessmentId = $request->input('assessment_id');
@@ -239,10 +257,18 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 });
 
-// Admin routes - Only for super_admin role
+// ========================================
+// ADMIN ROUTES - Only for super_admin role
+// ========================================
+
 Route::middleware(['auth', 'verified', 'checkAccess:admin'])->group(function () {
-    // Additional admin routes can be added here
+    // Admin-specific routes can be added here
     // Filament admin panel routes are handled by FilamentServiceProvider
+
+    // You can add custom admin routes here if needed
+    Route::get('/admin/custom', function () {
+        return Inertia::render('admin/custom');
+    })->name('admin.custom');
 });
 
 // API routes for authenticated users
@@ -285,9 +311,17 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+use App\Http\Controllers\ReportController;
+
+Route::get('/cmo-report', [ReportController::class, 'generateReport'])->name('cmo.report');
+Route::get('/cmo-report/preview', [ReportController::class, 'previewReport'])->name('cmo.report.preview');
+
 // Guest API access (limited)
 Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->middleware(['throttle:10,1']);
+
+Route::get('/report/landscape', [ReportController::class, 'landscapeChart']);
+
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';

@@ -260,6 +260,67 @@
             background: #f8f9fa;
         }
 
+        /* NEW: Action items styling */
+        .actions-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .action-type-header {
+            background: #1e40af;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .action-type-header.improvement {
+            background: #059669; /* Green for improvement */
+        }
+
+        .action-type-header.corrective {
+            background: #dc2626; /* Red for corrective */
+        }
+
+        .action-item {
+            background: white;
+            margin: 8px 0;
+            padding: 12px 15px;
+            border-radius: 6px;
+            border-right: 4px solid #3b82f6;
+            font-size: 14px;
+        }
+
+        .action-item.improvement {
+            border-right-color: #059669;
+        }
+
+        .action-item.corrective {
+            border-right-color: #dc2626;
+        }
+
+        .criterion-group {
+            margin-bottom: 25px;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .criterion-header {
+            background: #f3f4f6;
+            padding: 12px 15px;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .actions-list {
+            padding: 15px;
+        }
+
         .footer {
             text-align: center;
             background: #f8f9fa;
@@ -377,7 +438,7 @@
         @foreach($results['domain_results'] as $domain)
             <div class="score-card">
                 <div class="score-header">
-                    <div class="score-icon" style="background-color: {{ $this->getDomainColor($loop->index) }};">
+                    <div class="score-icon" style="background-color: {{ getDomainColor($loop->index) }};">
                         {{ $loop->iteration }}
                     </div>
                     <div class="score-content">
@@ -389,7 +450,7 @@
                 </div>
 
                 <div class="score-bar">
-                    <div class="score-fill progress-{{ $this->getScoreClass($domain['score_percentage']) }}"
+                    <div class="score-fill progress-{{ getScoreClass($domain['score_percentage']) }}"
                          style="width: {{ $domain['score_percentage'] }}%;"></div>
                 </div>
 
@@ -413,6 +474,57 @@
         @endforeach
     </div>
 
+    {{-- ENHANCED: Detailed Actions Section using Action Model --}}
+    @if(isset($actions) && !empty($actions))
+        <div class="section">
+            <h3>الإجراءات المطلوبة</h3>
+
+            {{-- Group actions by criteria --}}
+            @php
+                $actionsByCriteria = collect($actions)->groupBy('criterion_id');
+            @endphp
+
+            @foreach($actionsByCriteria as $criterionId => $criterionActions)
+                @php
+                    $criterion = $criterionActions->first()->criterion ?? null;
+                    $improvementActions = $criterionActions->where('flag', true);
+                    $correctiveActions = $criterionActions->where('flag', false);
+                @endphp
+
+                <div class="criterion-group">
+                    <div class="criterion-header">
+                        {{ $criterion ? $criterion->name_ar : "معيار غير محدد" }}
+                    </div>
+                    <div class="actions-list">
+                        {{-- Improvement Actions --}}
+                        @if($improvementActions->count() > 0)
+                            <div class="action-type-header improvement">
+                                🔧 إجراءات تحسينية ({{ $improvementActions->count() }})
+                            </div>
+                            @foreach($improvementActions as $action)
+                                <div class="action-item improvement">
+                                    {{ $action->action_ar }}
+                                </div>
+                            @endforeach
+                        @endif
+
+                        {{-- Corrective Actions --}}
+                        @if($correctiveActions->count() > 0)
+                            <div class="action-type-header corrective">
+                                ⚠️ إجراءات تصحيحية ({{ $correctiveActions->count() }})
+                            </div>
+                            @foreach($correctiveActions as $action)
+                                <div class="action-item corrective">
+                                    {{ $action->action_ar }}
+                                </div>
+                            @endforeach
+                        @endif
+                    </div>
+                </div>
+            @endforeach
+        </div>
+    @endif
+
     {{-- Recommendations --}}
     @if($settings['include_recommendations'] && !empty($recommendations))
         <div class="section">
@@ -429,7 +541,7 @@
         </div>
     @endif
 
-    {{-- Action Plan --}}
+    {{-- ENHANCED: Action Plan using dynamic data --}}
     <div class="section">
         <h3>خطة العمل الموصى بها</h3>
         <table class="action-plan-table">
@@ -440,21 +552,59 @@
                 <th>الهدف المطلوب</th>
                 <th>الأولوية</th>
                 <th>الإجراءات المطلوبة</th>
+                <th>نوع الإجراء</th>
             </tr>
             </thead>
             <tbody>
             @foreach($results['domain_results'] as $domain)
+                @php
+                    $priority = getPriorityLevel($domain['score_percentage']);
+                    $targetScore = getTargetScore($domain['score_percentage']);
+                    $actionType = getRecommendedActionType($domain['score_percentage']);
+                @endphp
                 <tr>
                     <td>{{ $domain['domain_name'] }}</td>
                     <td>{{ number_format($domain['score_percentage'], 1) }}%</td>
-                    <td>{{ $domain['score_percentage'] < 70 ? '85%+' : '90%+' }}</td>
-                    <td>{{ $domain['score_percentage'] < 60 ? 'عالية' : ($domain['score_percentage'] < 80 ? 'متوسطة' : 'منخفضة') }}</td>
-                    <td>{{ $this->getActionPlan($domain['domain_name'], $domain['score_percentage']) }}</td>
+                    <td>{{ $targetScore }}%</td>
+                    <td style="color: {{ getPriorityColor($priority) }};">{{ $priority }}</td>
+                    <td>{{ getActionPlan($domain['domain_name'], $domain['score_percentage']) }}</td>
+                    <td style="background-color: {{ $actionType === 'تحسينية' ? '#dcfce7' : '#fee2e2' }};">
+                        {{ $actionType }}
+                    </td>
                 </tr>
             @endforeach
             </tbody>
         </table>
     </div>
+
+    {{-- Summary Statistics --}}
+    @if(isset($actions))
+        <div class="section">
+            <h3>إحصائيات الإجراءات</h3>
+            @php
+                $totalActions = collect($actions)->count();
+                $improvementCount = collect($actions)->where('flag', true)->count();
+                $correctiveCount = collect($actions)->where('flag', false)->count();
+            @endphp
+
+            <div class="stats-grid">
+                <div class="stats-row">
+                    <div class="stat-item" style="background-color: #dcfce7; color: #15803d;">
+                        <div class="stat-value">{{ $improvementCount }}</div>
+                        <div class="stat-label">إجراءات تحسينية</div>
+                    </div>
+                    <div class="stat-item" style="background-color: #fee2e2; color: #dc2626;">
+                        <div class="stat-value">{{ $correctiveCount }}</div>
+                        <div class="stat-label">إجراءات تصحيحية</div>
+                    </div>
+                    <div class="stat-item" style="background-color: #f3f4f6; color: #6b7280;">
+                        <div class="stat-value">{{ $totalActions }}</div>
+                        <div class="stat-label">إجمالي الإجراءات</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    @endif
 
     {{-- Footer --}}
     <div class="footer">
@@ -489,5 +639,30 @@
         } else {
             return "مراجعة دورية والحفاظ على المستوى الحالي";
         }
+    }
+
+    function getPriorityLevel($score) {
+        if ($score < 60) return 'عالية';
+        if ($score < 80) return 'متوسطة';
+        return 'منخفضة';
+    }
+
+    function getPriorityColor($priority) {
+        switch($priority) {
+            case 'عالية': return '#dc2626';
+            case 'متوسطة': return '#f59e0b';
+            case 'منخفضة': return '#059669';
+            default: return '#6b7280';
+        }
+    }
+
+    function getTargetScore($currentScore) {
+        if ($currentScore < 70) return '85+';
+        if ($currentScore < 85) return '90+';
+        return '95+';
+    }
+
+    function getRecommendedActionType($score) {
+        return $score < 70 ? 'تصحيحية' : 'تحسينية';
     }
 @endphp

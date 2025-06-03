@@ -1,5 +1,5 @@
 <?php
-
+// app/Providers/Filament/AdminPanelProvider.php
 namespace App\Providers\Filament;
 
 use Filament\Http\Middleware\Authenticate;
@@ -30,16 +30,17 @@ class AdminPanelProvider extends PanelProvider
             ->login()
             ->colors([
                 'primary' => Color::Amber,
-            ])
+            ])->brandName(function (): string {
+                return app()->getLocale() === 'ar'
+                    ? 'لوحة إدارة التقييم'
+                    : 'Assessment Admin Panel';
+            })
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
             ->pages([
                 Pages\Dashboard::class,
-            ])
-            ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
-            ->widgets([
-
-            ])
+            ])->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
+            ->widgets([])
             ->middleware([
                 EncryptCookies::class,
                 AddQueuedCookiesToResponse::class,
@@ -50,12 +51,6 @@ class AdminPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-            ])
-            ->plugins([
-                FilamentShieldPlugin::make(),
-            ])
-            ->authMiddleware([
-                Authenticate::class,
             ])->plugins([
                 FilamentShieldPlugin::make()
                     ->gridColumns([
@@ -73,6 +68,19 @@ class AdminPanelProvider extends PanelProvider
                         'default' => 1,
                         'sm' => 2,
                     ]),
-            ]);
+            ])->authMiddleware([
+                Authenticate::class,
+            ])->renderHook(
+                'panels::head.end',
+                fn (): string => app()->getLocale() === 'ar'
+                    ? '<style>
+                        .fi-body { direction: rtl; }
+                        .fi-ta-text { text-align: right; }
+                        .fi-ta-text[dir="ltr"] { text-align: left; }
+                        .fi-sidebar { right: 0; left: auto; }
+                        .fi-main { margin-right: var(--sidebar-width); margin-left: 0; }
+                      </style>'
+                    : ''
+            );
     }
 }

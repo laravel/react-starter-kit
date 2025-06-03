@@ -1,7 +1,9 @@
 <?php
 namespace App\Filament\Resources;
 
+use App\Filament\Resources\AssessmentResource\RelationManagers\ResponsesRelationManager;
 use App\Filament\Resources\CriterionResource\Pages;
+use App\Filament\Resources\CriterionResource\RelationManagers\ActionsRelationManager;
 use App\Models\Criterion;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -114,6 +116,12 @@ class CriterionResource extends Resource
             ->defaultSort('order');
     }
 
+    public static function getRelations(): array
+    {
+        return [
+            ActionsRelationManager::class,
+        ];
+    }
     public static function getPages(): array
     {
         return [

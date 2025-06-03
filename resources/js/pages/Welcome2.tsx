@@ -37,7 +37,8 @@ import {
     AlertCircle,
     Eye,
     EyeOff,
-    Loader2
+    Loader2,
+    UserCheck
 } from 'lucide-react';
 
 const translations = {
@@ -50,6 +51,7 @@ const translations = {
         getDemo: "Get a demo",
         enrollNow: "Enroll now",
         dashboard: "Dashboard",
+        admin: "Admin",
         logout: "Logout",
         assessmentTools: "Assessment Tools",
         myAssessments: "My Assessments",
@@ -107,6 +109,7 @@ const translations = {
         getDemo: "احصل على عرض توضيحي",
         enrollNow: "اشترك الآن",
         dashboard: "لوحة القيادة",
+        admin: "الإدارة",
         logout: "تسجيل الخروج",
         assessmentTools: "أدوات التقييم",
         myAssessments: "تقييماتي",
@@ -166,6 +169,9 @@ interface Welcome2Props {
             subscription?: {
                 plan_type: string;
             };
+            roles?: Array<{
+                name: string;
+            }>;
         };
     };
     locale?: string;
@@ -251,8 +257,22 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         });
     };
 
+    // Check if user is admin
+    const isAdmin = () => {
+        return auth?.user?.roles?.some(role => role.name === 'super_admin') || false;
+    };
+
     const getUserPlanBadge = () => {
         if (!auth?.user) return null;
+
+        if (isAdmin()) {
+            return (
+                <Badge className="bg-gradient-to-r from-red-600 to-orange-600 text-white">
+                    <UserCheck className="w-3 h-3 mr-1" />
+                    Admin
+                </Badge>
+            );
+        }
 
         const planType = auth.user.subscription?.plan_type || 'free';
 
@@ -275,29 +295,14 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
 
     const getRedirectRoute = () => {
         if (!auth?.user) return '/assessment-tools';
+
+        if (isAdmin()) {
+            return '/dashboard';
+        }
+
         const planType = auth.user.subscription?.plan_type || 'free';
         return planType === 'premium' ? '/dashboard' : '/assessment-tools';
     };
-
-    // Company size options
-    const companySizeOptions = [
-        { value: '1-10', label: '1-10 employees' },
-        { value: '11-50', label: '11-50 employees' },
-        { value: '51-200', label: '51-200 employees' },
-        { value: '201-500', label: '201-500 employees' },
-        { value: '501-1000', label: '501-1000 employees' },
-        { value: '1000+', label: '1000+ employees' },
-    ];
-
-    // How did you hear options
-    const howHeardOptions = [
-        { value: 'search_engine', label: 'Search Engine (Google, Bing)' },
-        { value: 'social_media', label: 'Social Media' },
-        { value: 'referral', label: 'Referral from colleague' },
-        { value: 'conference', label: 'Conference or Event' },
-        { value: 'advertisement', label: 'Online Advertisement' },
-        { value: 'other', label: 'Other' },
-    ];
 
     return (
         <>
@@ -313,8 +318,6 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                 <div className="flex items-center">
                                     <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
                                         <span className="text-blue-600 font-bold text-lg">LOGO</span>
-
-
                                     </div>
                                 </div>
 
@@ -322,12 +325,34 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                 <div className="hidden md:flex items-center space-x-4">
                                     {auth?.user ? (
                                         <div className="flex items-center space-x-4">
-                                            <Link href={getRedirectRoute()}>
-                                                <Button className="bg-white text-blue-900 hover:bg-gray-100">
-                                                    <Target className="h-4 w-4 mr-2" />
-                                                    {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
-                                                </Button>
-                                            </Link>
+                                            {/* Admin-specific buttons */}
+                                            {isAdmin() && (
+                                                <>
+                                                    <Link href="/admin">
+                                                        <Button className="bg-red-600 hover:bg-red-700 text-white">
+                                                            <UserCheck className="h-4 w-4 mr-2" />
+                                                            {t.admin}
+                                                        </Button>
+                                                    </Link>
+                                                    <Link href="/dashboard">
+                                                        <Button className="bg-blue-600 hover:bg-blue-700 text-white">
+                                                            <BarChart3 className="h-4 w-4 mr-2" />
+                                                            {t.dashboard}
+                                                        </Button>
+                                                    </Link>
+                                                </>
+                                            )}
+
+                                            {/* Non-admin users get the regular button */}
+                                            {!isAdmin() && (
+                                                <Link href={getRedirectRoute()}>
+                                                    <Button className="bg-white text-blue-900 hover:bg-gray-100">
+                                                        <Target className="h-4 w-4 mr-2" />
+                                                        {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
+                                                    </Button>
+                                                </Link>
+                                            )}
+
                                             <div className="flex items-center space-x-2 text-white">
                                                 <User className="h-5 w-5" />
                                                 <span>{auth.user.name}</span>
@@ -373,10 +398,29 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                         <div className="space-y-2">
                                             <div className="px-3 py-2 text-white">
                                                 Welcome, {auth.user.name}
+                                                <div className="mt-1">{getUserPlanBadge()}</div>
                                             </div>
-                                            <Link href={getRedirectRoute()} className="text-white hover:text-cyan-400 block px-3 py-2 text-base font-medium">
-                                                {auth.user.subscription?.plan_type === 'premium' ? 'Dashboard' : 'Assessment Tools'}
-                                            </Link>
+
+                                            {/* Admin mobile menu items */}
+                                            {isAdmin() && (
+                                                <>
+                                                    <Link href="/admin" className="text-white hover:text-cyan-400 block px-3 py-2 text-base font-medium">
+                                                        <UserCheck className="h-4 w-4 inline mr-2" />
+                                                        {t.admin}
+                                                    </Link>
+                                                    <Link href="/dashboard" className="text-white hover:text-cyan-400 block px-3 py-2 text-base font-medium">
+                                                        <BarChart3 className="h-4 w-4 inline mr-2" />
+                                                        {t.dashboard}
+                                                    </Link>
+                                                </>
+                                            )}
+
+                                            {/* Non-admin mobile menu */}
+                                            {!isAdmin() && (
+                                                <Link href={getRedirectRoute()} className="text-white hover:text-cyan-400 block px-3 py-2 text-base font-medium">
+                                                    {auth.user.subscription?.plan_type === 'premium' ? 'Dashboard' : 'Assessment Tools'}
+                                                </Link>
+                                            )}
                                         </div>
                                     ) : (
                                         <button
@@ -441,18 +485,41 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                     <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-2xl">
                                         <h3 className="text-xl font-bold text-white mb-4 text-center">Welcome back, {auth.user.name}!</h3>
                                         <div className="flex flex-col sm:flex-row gap-3">
-                                            <Link href={getRedirectRoute()} className="flex-1">
-                                                <Button className="w-full bg-white text-blue-900 hover:bg-gray-100">
-                                                    <Target className="h-4 w-4 mr-2" />
-                                                    {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
-                                                </Button>
-                                            </Link>
-                                            <Link href="/assessments" className="flex-1">
-                                                <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-blue-900">
-                                                    <FileText className="h-4 w-4 mr-2" />
-                                                    {t.myAssessments}
-                                                </Button>
-                                            </Link>
+                                            {/* Admin gets both Admin and Dashboard buttons */}
+                                            {isAdmin() && (
+                                                <>
+                                                    <Link href="/admin" className="flex-1">
+                                                        <Button className="w-full bg-red-600 hover:bg-red-700 text-white">
+                                                            <UserCheck className="h-4 w-4 mr-2" />
+                                                            {t.admin}
+                                                        </Button>
+                                                    </Link>
+                                                    <Link href="/dashboard" className="flex-1">
+                                                        <Button className="w-full bg-blue-600 hover:bg-blue-700 text-white">
+                                                            <BarChart3 className="h-4 w-4 mr-2" />
+                                                            {t.dashboard}
+                                                        </Button>
+                                                    </Link>
+                                                </>
+                                            )}
+
+                                            {/* Non-admin gets regular buttons */}
+                                            {!isAdmin() && (
+                                                <>
+                                                    <Link href={getRedirectRoute()} className="flex-1">
+                                                        <Button className="w-full bg-white text-blue-900 hover:bg-gray-100">
+                                                            <Target className="h-4 w-4 mr-2" />
+                                                            {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
+                                                        </Button>
+                                                    </Link>
+                                                    <Link href="/assessments" className="flex-1">
+                                                        <Button variant="outline" className="w-full border-white text-white hover:bg-white hover:text-blue-900">
+                                                            <FileText className="h-4 w-4 mr-2" />
+                                                            {t.myAssessments}
+                                                        </Button>
+                                                    </Link>
+                                                </>
+                                            )}
                                         </div>
                                     </div>
                                 )}

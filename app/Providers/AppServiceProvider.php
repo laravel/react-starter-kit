@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\User;
+use BezhanSalleh\FilamentLanguageSwitch\LanguageSwitch;
 use Filament\Facades\Filament;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
@@ -38,7 +39,10 @@ class AppServiceProvider extends ServiceProvider
                 return $user->isAdmin();
             });
         });
-
+        LanguageSwitch::configureUsing(function (LanguageSwitch $switch) {
+            $switch
+                ->locales(['ar','en']); // also accepts a closure
+        });
         // Configure Filament auth guard and redirects
         config([
             'filament.auth.guard' => 'web',

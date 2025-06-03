@@ -38,6 +38,30 @@ class Criterion extends Model
         return $this->hasMany(AssessmentResponse::class);
     }
 
+    /**
+     * Get all actions for this criterion
+     */
+    public function actions(): HasMany
+    {
+        return $this->hasMany(Action::class);
+    }
+
+    /**
+     * Get improvement actions only
+     */
+    public function improvementActions(): HasMany
+    {
+        return $this->hasMany(Action::class)->where('flag', true);
+    }
+
+    /**
+     * Get corrective actions only
+     */
+    public function correctiveActions(): HasMany
+    {
+        return $this->hasMany(Action::class)->where('flag', false);
+    }
+
     public function getName(string $locale = null): string
     {
         $locale = $locale ?: app()->getLocale();

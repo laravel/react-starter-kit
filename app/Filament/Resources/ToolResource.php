@@ -17,45 +17,68 @@ class ToolResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
     protected static ?int $navigationSort = 1;
 
+    // Dynamic labels that respect current locale
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.tool.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.tool.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.tool.plural_label');
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('filament.resources.tool.navigation_group');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Tabs::make('Translations')
+                Forms\Components\Tabs::make(__('filament.form.translations'))
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('English')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.english'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_en')
-                                    ->label('Name (English)')
+                                    ->label(__('filament.fields.name_en'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_en')
-                                    ->label('Description (English)')
+                                    ->label(__('filament.fields.description_en'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
-                        Forms\Components\Tabs\Tab::make('Arabic')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.arabic'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_ar')
-                                    ->label('Name (Arabic)')
+                                    ->label(__('filament.fields.name_ar'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_ar')
-                                    ->label('Description (Arabic)')
+                                    ->label(__('filament.fields.description_ar'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
                     ])
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('image')
+                    ->label(__('filament.fields.image'))
                     ->image()
                     ->directory('tools')
                     ->visibility('public')
                     ->columnSpanFull(),
                 Forms\Components\Select::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ])
                     ->default('active')
                     ->required(),
@@ -67,43 +90,58 @@ class ToolResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\ImageColumn::make('image')
-                    ->label('Image'),
+                    ->label(__('filament.fields.image')),
                 Tables\Columns\TextColumn::make('name_en')
-                    ->label('Name (English)')
+                    ->label(__('filament.fields.name_en'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('name_ar')
-                    ->label('Name (Arabic)')
+                    ->label(__('filament.fields.name_ar'))
                     ->searchable(),
                 Tables\Columns\BadgeColumn::make('status')
+                    ->label(__('filament.fields.status'))
                     ->colors([
                         'danger' => 'inactive',
                         'success' => 'active',
-                    ]),
+                    ])
+                    ->formatStateUsing(fn (string $state): string => __("filament.status.{$state}")),
                 Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('filament.fields.created_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('filament.fields.updated_at'))
                     ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ]),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ViewAction::make()
+                    ->label(__('filament.actions.view')),
+                Tables\Actions\EditAction::make()
+                    ->label(__('filament.actions.edit')),
+                Tables\Actions\DeleteAction::make()
+                    ->label(__('filament.actions.delete')),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label(__('filament.actions.delete')),
                 ]),
+            ])
+            ->emptyStateHeading(__('filament.empty_states.no_tools'))
+            ->emptyStateDescription(__('filament.empty_states.start_by_creating', ['resource' => __('filament.resources.tool.label')]))
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make()
+                    ->label(__('filament.empty_states.create_first', ['resource' => __('filament.resources.tool.label')])),
             ]);
     }
 
@@ -113,9 +151,6 @@ class ToolResource extends Resource
             DomainRelationManager::class,
         ];
     }
-
-
-
 
     public static function getPages(): array
     {
