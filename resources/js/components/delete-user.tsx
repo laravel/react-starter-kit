@@ -1,35 +1,46 @@
 import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { FormEventHandler, useCallback, useRef, useState } from 'react';
 
 import InputError from '@/components/input-error';
+import { ResponsiveModal } from '@/components/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import HeadingSmall from '@/components/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { DialogDescription, DialogFooter, DialogTitle } from '@/components/ui/dialog';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
+
     const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
+    const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const handleModalClose = useCallback(() => {
+        setIsOpen(false);
+        clearErrors();
+        reset();
+    }, [clearErrors, reset]);
+
+    const handleOpenChange = useCallback(
+        (open: boolean) => {
+            if (!open) handleModalClose();
+            else setIsOpen(true);
+        },
+        [handleModalClose],
+    );
 
     const deleteUser: FormEventHandler = (e) => {
         e.preventDefault();
 
         destroy(route('profile.destroy'), {
             preserveScroll: true,
-            onSuccess: () => closeModal(),
+            onSuccess: () => handleModalClose(),
             onError: () => passwordInput.current?.focus(),
             onFinish: () => reset(),
         });
     };
-
-    const closeModal = () => {
-        clearErrors();
-        reset();
-    };
-
     return (
         <div className="space-y-6">
             <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
@@ -39,13 +50,14 @@ export default function DeleteUser() {
                     <p className="text-sm">Please proceed with caution, this cannot be undone.</p>
                 </div>
 
-                <Dialog>
-                    <DialogTrigger asChild>
-                        <Button variant="destructive">Delete account</Button>
-                    </DialogTrigger>
-                    <DialogContent>
+                <Button variant="destructive" onClick={() => setIsOpen(true)}>
+                    Delete account
+                </Button>
+
+                <ResponsiveModal open={isOpen} onOpenChange={handleOpenChange}>
+                    <div className="p-4 sm:p-6">
                         <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
-                        <DialogDescription>
+                        <DialogDescription className="mt-2 mb-4">
                             Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password
                             to confirm you would like to permanently delete your account.
                         </DialogDescription>
@@ -70,19 +82,17 @@ export default function DeleteUser() {
                             </div>
 
                             <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
+                                <Button variant="secondary" onClick={handleModalClose} type="button">
+                                    Cancel
+                                </Button>
 
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
+                                <Button variant="destructive" disabled={processing} type="submit">
+                                    Delete account
                                 </Button>
                             </DialogFooter>
                         </form>
-                    </DialogContent>
-                </Dialog>
+                    </div>
+                </ResponsiveModal>
             </div>
         </div>
     );
