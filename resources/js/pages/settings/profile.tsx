@@ -1,5 +1,4 @@
 import { type BreadcrumbItem, type SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
 import { Head, Link, useForm, usePage } from '@inertiajs/react';
 import { FormEventHandler } from 'react';
 
@@ -107,15 +106,13 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                         <div className="flex items-center gap-4">
                             <Button disabled={processing}>Save</Button>
 
-                            <Transition
-                                show={recentlySuccessful}
-                                enter="transition ease-in-out"
-                                enterFrom="opacity-0"
-                                leave="transition ease-in-out"
-                                leaveTo="opacity-0"
+                            <p
+                              className={`text-sm text-neutral-600 transition-opacity duration-500 ${
+                                recentlySuccessful ? 'opacity-100' : 'opacity-0'
+                              }`}
                             >
-                                <p className="text-sm text-neutral-600">Saved</p>
-                            </Transition>
+                              Saved
+                            </p>
                         </div>
                     </form>
                 </div>
