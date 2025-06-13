@@ -48,26 +48,45 @@ class Tool extends Model
         return $this->{$field};
     }
 
-
-    public function criteria(): HasManyThrough
+    /**
+     * FIXED: Get criteria count using proper relationship counting
+     */
+    public function getCriteriaCount(): int
     {
-        return $this->hasManyThrough(
-            Criterion::class,
-            Domain::class,
-            'tool_id',      // Foreign key on domains table
-            'category_id',  // Foreign key on criteria table
-            'id',           // Local key on tools table
-            'id'            // Local key on domains table
-        )->join('categories', 'criteria.category_id', '=', 'categories.id')
-            ->where('categories.domain_id', '=', 'domains.id');
+        // Option 1: Use relationship counting (more efficient)
+        return $this->domains()
+            ->withCount(['categories' => function ($query) {
+                $query->withCount('criteria');
+            }])
+            ->get()
+            ->sum(function ($domain) {
+                return $domain->categories->sum('criteria_count');
+            });
     }
 
-    public function getCriteriaCount(): int
+    /**
+     * Alternative method using raw DB query if relationships become complex
+     */
+    public function getCriteriaCountRaw(): int
     {
         return DB::table('criteria')
             ->join('categories', 'criteria.category_id', '=', 'categories.id')
             ->join('domains', 'categories.domain_id', '=', 'domains.id')
             ->where('domains.tool_id', $this->id)
             ->count();
+    }
+
+    /**
+     * Even simpler approach using existing relationships
+     */
+    public function getCriteriaCountSimple(): int
+    {
+        $count = 0;
+        foreach ($this->domains as $domain) {
+            foreach ($domain->categories as $category) {
+                $count += $category->criteria()->count();
+            }
+        }
+        return $count;
     }
 }

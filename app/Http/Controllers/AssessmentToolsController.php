@@ -15,18 +15,21 @@ class AssessmentToolsController extends Controller
     public function index()
     {
         $user = auth()->user();
-
-        // Get all active tools with statistics
         $tools = Tool::where('status', 'active')
-            ->withCount(['assessments', 'domains', 'criteria'])
+            ->withCount(['assessments', 'domains'])
             ->with(['domains' => function($query) {
-                $query->withCount('categories');
+                $query->withCount(['categories' => function($q) {
+                    $q->withCount('criteria');
+                }]);
             }])
             ->orderBy('name_en')
             ->get()
             ->map(function ($tool) {
-                // Calculate total criteria and estimated time
-                $totalCriteria = $tool->getCriteriaCount();
+                // Calculate total criteria from loaded relationships
+                $totalCriteria = $tool->domains->sum(function($domain) {
+                    return $domain->categories->sum('criteria_count');
+                });
+
                 $estimatedTime = max(10, ceil($totalCriteria * 0.5)); // Minimum 10 minutes
 
                 return [
@@ -45,98 +48,18 @@ class AssessmentToolsController extends Controller
             });
 
         // Get user limits and access info
-        $userLimits = $user->getAssessmentLimits();
+        $userLimits = [
+            'current_assessments' => $user->assessments()->count(),
+            'assessment_limit' => $user->getAssessmentLimit(),
+            'can_create_more' => $user->canCreateAssessment(),
+            'is_premium' => $user->isPremium(),
+            'subscription_status' => $user->getSubscriptionStatus(),
+        ];
 
-        // Determine which view to render based on user type
-        if ($user->isPremium() || $user->isAdmin()) {
-            // Premium/Admin users get full dashboard view
-            return Inertia::render('assessment-tools/PremiumIndex', [
-                'tools' => $tools,
-                'userLimits' => $userLimits,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'plan_type' => $user->getPlanType(),
-                    'subscription' => $user->subscription,
-                ],
-                'locale' => app()->getLocale(),
-            ]);
-        } else {
-            // Free users get limited view
-            return Inertia::render('FreeUserAssessmentPage', [
-                'tools' => $tools,
-                'userLimits' => $userLimits,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'details' => $user->details,
-                ],
-                'locale' => app()->getLocale(),
-            ]);
-        }
-    }
-
-    /**
-     * Premium-specific assessment tools page
-     */
-    public function premiumIndex()
-    {
-        $user = auth()->user();
-
-        // Ensure user has premium access
-        if (!$user->isPremium() && !$user->isAdmin()) {
-            return redirect()->route('assessment-tools')
-                ->with('error', 'Premium access required.');
-        }
-
-        // Get tools with advanced statistics for premium users
-        $tools = Tool::where('status', 'active')
-            ->withCount(['assessments', 'domains'])
-            ->with([
-                'domains.categories.criteria',
-                'assessments' => function($query) use ($user) {
-                    $query->where('user_id', $user->id);
-                }
-            ])
-            ->orderBy('name_en')
-            ->get()
-            ->map(function ($tool) use ($user) {
-                $totalCriteria = $tool->getCriteriaCount();
-                $userAssessments = $tool->assessments->count();
-                $lastAssessment = $tool->assessments->sortByDesc('created_at')->first();
-
-                return [
-                    'id' => $tool->id,
-                    'name_en' => $tool->name_en,
-                    'name_ar' => $tool->name_ar,
-                    'description_en' => $tool->description_en,
-                    'description_ar' => $tool->description_ar,
-                    'image' => $tool->image,
-                    'status' => $tool->status,
-                    'total_domains' => $tool->domains_count,
-                    'total_criteria' => $totalCriteria,
-                    'estimated_time' => max(10, ceil($totalCriteria * 0.5)),
-                    'assessments_count' => $tool->assessments_count,
-                    'user_assessments' => $userAssessments,
-                    'last_assessment' => $lastAssessment ? [
-                        'id' => $lastAssessment->id,
-                        'created_at' => $lastAssessment->created_at,
-                        'status' => $lastAssessment->status,
-                    ] : null,
-                ];
-            });
-
-        return Inertia::render('dashboard/AssessmentTools', [
+        // Return the assessment tools page with user limits
+        return Inertia::render('assessment-tools', [
             'tools' => $tools,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'plan_type' => $user->getPlanType(),
-                'subscription' => $user->subscription,
-            ],
+            'userLimits' => $userLimits,
             'locale' => app()->getLocale(),
         ]);
     }
@@ -149,8 +72,7 @@ class AssessmentToolsController extends Controller
         $user = auth()->user();
 
         // Check user limits
-        $userLimits = $user->getAssessmentLimits();
-        if (!$userLimits['can_create_more']) {
+        if (!$user->canCreateAssessment()) {
             if ($user->isFree()) {
                 return redirect()->route('subscription.show')
                     ->with('error', 'You have reached your assessment limit. Please upgrade to premium for unlimited assessments.');
@@ -221,34 +143,18 @@ class AssessmentToolsController extends Controller
             'email' => $user->email,
         ];
 
-        // Route to appropriate assessment start page based on user type
-        if ($user->isPremium() || $user->isAdmin()) {
-            return Inertia::render('assessment/PremiumStart', [
-                'assessmentData' => $assessmentData,
-                'userLimits' => $userLimits,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'plan_type' => $user->getPlanType(),
-                    'subscription' => $user->subscription,
-                ],
-                'prefillData' => $prefillData,
-                'locale' => app()->getLocale(),
-            ]);
-        } else {
-            return Inertia::render('assessment/FreeUserStart', [
-                'assessmentData' => $assessmentData,
-                'userLimits' => $userLimits,
-                'user' => [
-                    'id' => $user->id,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'details' => $user->details,
-                ],
-                'prefillData' => $prefillData,
-                'locale' => app()->getLocale(),
-            ]);
-        }
+        // Route to assessment start page
+        return Inertia::render('assessment/Start', [
+            'assessmentData' => $assessmentData,
+            'userLimits' => $userLimits,
+            'user' => [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'subscription' => $user->subscription,
+            ],
+            'prefillData' => $prefillData,
+            'locale' => app()->getLocale(),
+        ]);
     }
 }

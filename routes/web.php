@@ -18,9 +18,9 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     // Check if user is authenticated and is admin
-    if (auth()->check() && auth()->user()->isAdmin()) {
-        return redirect('/dashboard');
-    }
+//    if (auth()->check() && auth()->user()->isAdmin()) {
+//        return redirect('/dashboard');
+//    }
 
     // For all other users (non-authenticated, premium, or free), show the Welcome2 page
     return app(GuestAssessmentController::class)->index2();

@@ -316,9 +316,11 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                             <div className="flex justify-between items-center h-16">
                                 {/* Logo */}
                                 <div className="flex items-center">
-                                    <div className="w-12 h-12 bg-white rounded flex items-center justify-center">
-                                        <span className="text-blue-600 font-bold text-lg">LOGO</span>
-                                    </div>
+                                    <img
+                                        src="/storage/logo.svg"
+                                        alt="FAQ Logo"
+                                        className="bg-transparent h-12 w-auto object-contain hover:scale-105 transition-transform duration-200"
+                                    />
                                 </div>
 
                                 {/* Right side navigation */}
