@@ -2,6 +2,7 @@
 
 use App\Http\Middleware\CheckAssessmentLimits;
 use App\Http\Middleware\CheckFilamentAccess;
+use App\Http\Middleware\CheckToolAccess;
 use App\Http\Middleware\CheckUserAccess;
 use App\Http\Middleware\HandleAppearance;
 use App\Http\Middleware\HandleInertiaRequests;
@@ -27,6 +28,7 @@ return Application::configure(basePath: dirname(__DIR__))
             // These should be applied only to specific routes that need them
         ])->alias([
             'checkAccess' => CheckUserAccess::class,
+            'checkToolAccess' => CheckToolAccess::class,
             'filamentAccess' => CheckFilamentAccess::class,
             'checkAssessmentLimits' => CheckAssessmentLimits::class,
         ]);

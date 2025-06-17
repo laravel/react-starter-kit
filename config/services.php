@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+
+    'paddle' => [
+        'vendor_id' => env('PADDLE_VENDOR_ID'),
+        'vendor_auth_code' => env('PADDLE_VENDOR_AUTH_CODE'),
+        'client_side_token' => env('PADDLE_CLIENT_SIDE_TOKEN'),
+        'retain_key' => env('PADDLE_RETAIN_KEY'),
+        'sandbox' => env('PADDLE_SANDBOX', true),
+        'webhook' => [
+            'secret' => env('PADDLE_WEBHOOK_SECRET'),
+            'tolerance' => env('PADDLE_WEBHOOK_TOLERANCE', 300),
+        ],
+    ],
 ];

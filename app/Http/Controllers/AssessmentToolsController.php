@@ -10,11 +10,18 @@ use Inertia\Inertia;
 class AssessmentToolsController extends Controller
 {
     /**
-     * Display assessment tools - works for all user types
+     * Display assessment tools - PREMIUM ACCESS ONLY
      */
     public function index()
     {
         $user = auth()->user();
+
+        // Only premium users and admins can access assessment tools
+        if (!$user->isPremium() && !$user->isAdmin()) {
+            return redirect()->route('subscription.show')
+                ->with('error', 'Assessment tools are available for premium users only. Please upgrade your subscription.');
+        }
+
         $tools = Tool::where('status', 'active')
             ->withCount(['assessments', 'domains'])
             ->with(['domains' => function($query) {
@@ -24,13 +31,17 @@ class AssessmentToolsController extends Controller
             }])
             ->orderBy('name_en')
             ->get()
-            ->map(function ($tool) {
+            ->map(function ($tool) use ($user) {
                 // Calculate total criteria from loaded relationships
                 $totalCriteria = $tool->domains->sum(function($domain) {
                     return $domain->categories->sum('criteria_count');
                 });
 
                 $estimatedTime = max(10, ceil($totalCriteria * 0.5)); // Minimum 10 minutes
+
+                // Check per-tool access
+                $hasToolAccess = $user->hasAccessToTool($tool->id);
+                $toolSubscription = $user->getToolSubscription($tool->id);
 
                 return [
                     'id' => $tool->id,
@@ -44,6 +55,9 @@ class AssessmentToolsController extends Controller
                     'total_criteria' => $totalCriteria,
                     'estimated_time' => $estimatedTime,
                     'assessments_count' => $tool->assessments_count,
+                    'requires_premium' => $tool->requiresPremium(),
+                    'has_access' => $hasToolAccess,
+                    'subscription_type' => $toolSubscription ? $toolSubscription->plan_type : 'none',
                 ];
             });
 
@@ -53,10 +67,11 @@ class AssessmentToolsController extends Controller
             'assessment_limit' => $user->getAssessmentLimit(),
             'can_create_more' => $user->canCreateAssessment(),
             'is_premium' => $user->isPremium(),
+            'is_admin' => $user->isAdmin(),
             'subscription_status' => $user->getSubscriptionStatus(),
         ];
 
-        // Return the assessment tools page with user limits
+        // Return the assessment tools page with per-tool access
         return Inertia::render('assessment-tools', [
             'tools' => $tools,
             'userLimits' => $userLimits,
@@ -65,96 +80,58 @@ class AssessmentToolsController extends Controller
     }
 
     /**
-     * Start an assessment for a specific tool
+     * Start an assessment for a specific tool - WITH PER-TOOL ACCESS CHECK
      */
     public function start(Tool $tool)
     {
         $user = auth()->user();
 
-        // Check user limits
-        if (!$user->canCreateAssessment()) {
-            if ($user->isFree()) {
+        // Check if user has access to this specific tool
+        if (!$user->hasAccessToTool($tool->id)) {
+            return redirect()->route('subscription.show')
+                ->with('error', "You don't have access to the {$tool->name_en} tool. Please subscribe to access this tool.");
+        }
+
+        // Check user limits for this specific tool
+        $toolSubscription = $user->getToolSubscription($tool->id);
+
+        if ($toolSubscription) {
+            $assessmentLimit = $toolSubscription->getFeature('assessments_limit');
+            $currentAssessments = $user->assessments()->where('tool_id', $tool->id)->count();
+
+            if ($assessmentLimit !== null && $currentAssessments >= $assessmentLimit) {
                 return redirect()->route('subscription.show')
-                    ->with('error', 'You have reached your assessment limit. Please upgrade to premium for unlimited assessments.');
+                    ->with('error', "You have reached your assessment limit for {$tool->name_en}. Please upgrade to premium for unlimited assessments.");
             }
         }
 
-        // Load tool with all necessary data
+        // Load tool with domains and criteria
         $tool->load([
-            'domains' => function($query) {
-                $query->orderBy('order')->with([
-                    'categories' => function($q) {
-                        $q->orderBy('order')->with([
-                            'criteria' => function($q2) {
-                                $q2->orderBy('order');
-                            }
-                        ]);
-                    }
-                ]);
+            'domains.categories.criteria' => function ($query) {
+                $query->orderBy('order');
             }
         ]);
 
-        // Prepare assessment data
-        $assessmentData = [
-            'tool' => [
-                'id' => $tool->id,
-                'name_en' => $tool->name_en,
-                'name_ar' => $tool->name_ar,
-                'description_en' => $tool->description_en,
-                'description_ar' => $tool->description_ar,
-                'image' => $tool->image,
-            ],
-            'domains' => $tool->domains->map(function ($domain) {
-                return [
-                    'id' => $domain->id,
-                    'name_en' => $domain->name_en,
-                    'name_ar' => $domain->name_ar,
-                    'description_en' => $domain->description_en,
-                    'description_ar' => $domain->description_ar,
-                    'order' => $domain->order,
-                    'categories' => $domain->categories->map(function ($category) {
-                        return [
-                            'id' => $category->id,
-                            'name_en' => $category->name_en,
-                            'name_ar' => $category->name_ar,
-                            'description_en' => $category->description_en,
-                            'description_ar' => $category->description_ar,
-                            'order' => $category->order,
-                            'criteria' => $category->criteria->map(function ($criterion) {
-                                return [
-                                    'id' => $criterion->id,
-                                    'name_en' => $criterion->name_en,
-                                    'name_ar' => $criterion->name_ar,
-                                    'description_en' => $criterion->description_en,
-                                    'description_ar' => $criterion->description_ar,
-                                    'order' => $criterion->order,
-                                    'requires_attachment' => $criterion->requires_attachment,
-                                ];
-                            }),
-                        ];
-                    }),
-                ];
-            }),
-        ];
-
-        // Pre-fill user data
-        $prefillData = [
-            'name' => $user->name,
+        // Create the assessment
+        $assessment = Assessment::create([
+            'user_id' => $user->id,
+            'tool_id' => $tool->id,
+            'name' => $user->name . ' - ' . $tool->name_en,
             'email' => $user->email,
-        ];
-
-        // Route to assessment start page
-        return Inertia::render('assessment/Start', [
-            'assessmentData' => $assessmentData,
-            'userLimits' => $userLimits,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'subscription' => $user->subscription,
-            ],
-            'prefillData' => $prefillData,
-            'locale' => app()->getLocale(),
+            'organization' => $user->details->organization ?? 'Not specified',
+            'status' => 'in_progress',
+            'started_at' => now(),
         ]);
+
+        return redirect()->route('assessment.take', $assessment);
+    }
+
+    /**
+     * Premium dashboard version - for premium users accessing via dashboard
+     */
+    public function premiumIndex()
+    {
+        // This method remains the same but could include additional premium features
+        return $this->index();
     }
 }

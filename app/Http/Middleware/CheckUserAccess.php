@@ -1,64 +1,62 @@
 <?php
 
+// Update app/Http/Middleware/CheckUserAccess.php
+// Replace the existing middleware with this enhanced version
+
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Support\Facades\Auth;
 
 class CheckUserAccess
 {
     /**
      * Handle an incoming request.
      */
-    public function handle(Request $request, Closure $next, string $accessLevel = 'free'): Response
+    public function handle(Request $request, Closure $next, string $accessType = 'authenticated')
     {
-        $user = $request->user();
-
-        // Ensure user is authenticated
-        if (!$user) {
+        if (!Auth::check()) {
             return redirect()->route('login');
         }
 
-        // Load user relationships safely
-        $user->load(['subscription', 'roles']);
+        $user = Auth::user();
 
-        switch ($accessLevel) {
-            case 'dashboard':
-                // Dashboard access requires premium or admin
-                if (!$user->isPremium() && !$user->isAdmin()) {
-                    // Free users should go to their assessment tools page
-                    return redirect()->route('assessment-tools')
-                        ->with('info', 'Upgrade to premium to access the dashboard.');
+        // Load necessary relationships
+        $user->load(['subscription', 'details', 'roles']);
+
+        // Create default subscription/details if missing
+        if (!$user->subscription || !$user->details) {
+            $user->createDefaultSubscriptionAndDetails();
+            $user->refresh();
+        }
+
+        switch ($accessType) {
+            case 'admin':
+                if (!$user->isAdmin()) {
+                    return redirect()->route('assessment-tools.redirect')
+                        ->with('error', 'Admin access required.');
                 }
                 break;
 
             case 'premium':
-                // Premium features require premium subscription or admin
                 if (!$user->isPremium() && !$user->isAdmin()) {
-                    return redirect()->route('subscription.show')
-                        ->with('error', 'This feature requires a premium subscription.');
+                    return redirect()->route('tools.discover')
+                        ->with('info', 'Premium subscription required to access assessment tools. Browse available tools below and subscribe to get started!');
                 }
                 break;
 
-            case 'admin':
-                // Admin access requires admin role
-                if (!$user->isAdmin()) {
-                    // Regular users (free or premium) go to their appropriate page
-                    if ($user->isPremium()) {
-                        return redirect()->route('dashboard')
-                            ->with('error', 'Access denied. Admin privileges required.');
-                    } else {
-                        return redirect()->route('assessment-tools')
-                            ->with('error', 'Access denied. Admin privileges required.');
-                    }
+            case 'dashboard':
+                if (!$user->canAccessDashboard()) {
+                    return redirect()->route('tools.discover')
+                        ->with('info', 'Dashboard access requires premium subscription. Upgrade to unlock advanced features!');
                 }
                 break;
 
-            case 'free':
+            case 'authenticated':
             default:
-                // Free level access - all authenticated users allowed
-                return $next($request);
+                // Just require authentication - already checked above
+                break;
         }
 
         return $next($request);

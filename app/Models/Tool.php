@@ -89,4 +89,19 @@ class Tool extends Model
         }
         return $count;
     }
+
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(ToolSubscription::class);
+    }
+
+    /**
+     * Check if tool requires premium access
+     */
+    public function requiresPremium(): bool
+    {
+        // You can add a 'premium_only' column to tools table
+        // or define premium tools by their IDs
+        return $this->premium_only ?? false;
+    }
 }

@@ -38,7 +38,8 @@ import {
     Eye,
     EyeOff,
     Loader2,
-    UserCheck
+    UserCheck,
+    ArrowLeft
 } from 'lucide-react';
 
 const translations = {
@@ -98,7 +99,10 @@ const translations = {
         benefit1: "1 Free comprehensive assessment",
         benefit2: "Domain-level results summary",
         benefit3: "Basic improvement recommendations",
-        benefit4: "Option to upgrade for detailed analytics"
+        benefit4: "Option to upgrade for detailed analytics",
+        backToOptions: "Back to Options",
+        createAccount: "Create Your Account",
+        signIn: "Sign In to Your Account"
     },
     ar: {
         courses: "الدورات",
@@ -156,7 +160,10 @@ const translations = {
         benefit1: "تقييم شامل مجاني واحد",
         benefit2: "ملخص نتائج على مستوى المجال",
         benefit3: "توصيات تحسين أساسية",
-        benefit4: "خيار الترقية للتحليلات المفصلة"
+        benefit4: "خيار الترقية للتحليلات المفصلة",
+        backToOptions: "العودة للخيارات",
+        createAccount: "إنشاء حسابك",
+        signIn: "تسجيل الدخول إلى حسابك"
     }
 };
 
@@ -220,6 +227,12 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         setShowExistingUserForm(false);
     };
 
+    const handleBackToOptions = () => {
+        setShowUserOptions(true);
+        setShowNewUserForm(false);
+        setShowExistingUserForm(false);
+    };
+
     const toggleLanguage = () => {
         setCurrentLang(prev => prev === 'en' ? 'ar' : 'en');
     };
@@ -246,10 +259,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         e.preventDefault();
         postExistingUser(route('login'), {
             onSuccess: () => {
-                // User will be redirected automatically
-                if (typeof window !== 'undefined') {
-                    window.location.href = '/assessment-tools';
-                }
+                // User will be redirected automatically by the backend
+                // No need for manual redirect as the server will handle it
             },
             onError: (errors) => {
                 console.error('Login errors:', errors);
@@ -301,7 +312,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         }
 
         const planType = auth.user.subscription?.plan_type || 'free';
-        return planType === 'premium' ? '/dashboard' : '/assessment-tools';
+        return planType === 'premium' ? '/dashboard' : '/freeUserAssessmentPage';
     };
 
     return (
@@ -350,7 +361,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                 <Link href={getRedirectRoute()}>
                                                     <Button className="bg-white text-blue-900 hover:bg-gray-100">
                                                         <Target className="h-4 w-4 mr-2" />
-                                                        {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
+                                                        {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Free Assessment'}
                                                     </Button>
                                                 </Link>
                                             )}
@@ -420,7 +431,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                             {/* Non-admin mobile menu */}
                                             {!isAdmin() && (
                                                 <Link href={getRedirectRoute()} className="text-white hover:text-cyan-400 block px-3 py-2 text-base font-medium">
-                                                    {auth.user.subscription?.plan_type === 'premium' ? 'Dashboard' : 'Assessment Tools'}
+                                                    {auth.user.subscription?.plan_type === 'premium' ? 'Dashboard' : 'Free Assessment'}
                                                 </Link>
                                             )}
                                         </div>
@@ -478,7 +489,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                     </div>
                                     <div className="flex items-center space-x-3 text-blue-100 bg-white/10 rounded-lg p-4 backdrop-blur-sm">
                                         <BarChart3 className="h-6 w-6 text-cyan-400 flex-shrink-0" />
-                                        <span className="text-sm font-medium">Assessment Tools</span>
+                                        <span className="text-sm font-medium">Free Assessment</span>
                                     </div>
                                 </div>
 
@@ -511,7 +522,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                     <Link href={getRedirectRoute()} className="flex-1">
                                                         <Button className="w-full bg-white text-blue-900 hover:bg-gray-100">
                                                             <Target className="h-4 w-4 mr-2" />
-                                                            {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Assessment Tools'}
+                                                            {auth.user.subscription?.plan_type === 'premium' ? 'Go to Dashboard' : 'Free Assessment'}
                                                         </Button>
                                                     </Link>
                                                     <Link href="/assessments" className="flex-1">
@@ -531,81 +542,98 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                             {!auth?.user && (
                                 <div className="flex justify-center items-center">
                                     <div className="w-full max-w-md space-y-6">
-                                        {/* Assessment Section */}
-                                        <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-2xl text-center">
-                                            <h3 className="text-xl font-bold text-white mb-2">
-                                                {t.assessmentTitle}
-                                            </h3>
-                                            <p className="text-cyan-300 text-sm mb-6">
-                                                {t.assessmentSubtitle}
-                                            </p>
+                                        {/* Assessment Section - Only show when not in forms */}
+                                        {!showNewUserForm && !showExistingUserForm && (
+                                            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-6 shadow-2xl text-center">
+                                                <h3 className="text-xl font-bold text-white mb-2">
+                                                    {t.assessmentTitle}
+                                                </h3>
+                                                <p className="text-cyan-300 text-sm mb-6">
+                                                    {t.assessmentSubtitle}
+                                                </p>
 
-                                            {/* Benefits */}
-                                            <div className="bg-white/5 rounded-lg p-4 mb-6">
-                                                <h4 className="text-white font-semibold mb-3">{t.benefits}</h4>
-                                                <div className="space-y-2 text-sm text-cyan-200">
-                                                    <div className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                                                        <span>{t.benefit1}</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                                                        <span>{t.benefit2}</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                                                        <span>{t.benefit3}</span>
-                                                    </div>
-                                                    <div className="flex items-center space-x-2">
-                                                        <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
-                                                        <span>{t.benefit4}</span>
+                                                {/* Benefits */}
+                                                <div className="bg-white/5 rounded-lg p-4 mb-6">
+                                                    <h4 className="text-white font-semibold mb-3">{t.benefits}</h4>
+                                                    <div className="space-y-2 text-sm text-cyan-200">
+                                                        <div className="flex items-center space-x-2">
+                                                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                                                            <span>{t.benefit1}</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                                                            <span>{t.benefit2}</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                                                            <span>{t.benefit3}</span>
+                                                        </div>
+                                                        <div className="flex items-center space-x-2">
+                                                            <CheckCircle className="w-4 h-4 text-green-400 flex-shrink-0" />
+                                                            <span>{t.benefit4}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
+
+                                                {!showUserOptions && (
+                                                    <Button
+                                                        onClick={handleDownloadClick}
+                                                        className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-300"
+                                                    >
+                                                        <Download className="h-5 w-5 mr-2" />
+                                                        {t.downloadNow}
+                                                    </Button>
+                                                )}
+
+                                                {/* User Options */}
+                                                {showUserOptions && (
+                                                    <div className="space-y-3">
+                                                        <Button
+                                                            onClick={() => {
+                                                                setShowNewUserForm(true);
+                                                                setShowExistingUserForm(false);
+                                                            }}
+                                                            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                                                        >
+                                                            <UserPlus className="h-4 w-4 mr-2" />
+                                                            {t.newUser}
+                                                        </Button>
+                                                        <Button
+                                                            onClick={() => {
+                                                                setShowExistingUserForm(true);
+                                                                setShowNewUserForm(false);
+                                                            }}
+                                                            className="w-full bg-white/10 border border-white/30 text-white hover:bg-white hover:text-blue-900"
+                                                        >
+                                                            <User className="h-4 w-4 mr-2" />
+                                                            {t.existingUser}
+                                                        </Button>
+                                                    </div>
+                                                )}
                                             </div>
+                                        )}
 
-                                            {!showUserOptions && (
-                                                <Button
-                                                    onClick={handleDownloadClick}
-                                                    className="w-full h-12 text-lg font-semibold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white shadow-lg transition-all duration-300"
-                                                >
-                                                    <Download className="h-5 w-5 mr-2" />
-                                                    {t.downloadNow}
-                                                </Button>
-                                            )}
-
-                                            {/* User Options */}
-                                            {showUserOptions && (
-                                                <div className="space-y-3">
+                                        {/* New User Form - Enhanced with larger inputs */}
+                                        {showNewUserForm && (
+                                            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
+                                                {/* Header with back button */}
+                                                <div className="flex items-center mb-6">
                                                     <Button
-                                                        onClick={() => {
-                                                            setShowNewUserForm(true);
-                                                            setShowExistingUserForm(false);
-                                                        }}
-                                                        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white"
+                                                        onClick={handleBackToOptions}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-white hover:text-cyan-400 p-0 mr-3"
                                                     >
-                                                        <UserPlus className="h-4 w-4 mr-2" />
-                                                        {t.newUser}
+                                                        <ArrowLeft className="h-5 w-5" />
                                                     </Button>
-                                                    <Button
-                                                        onClick={() => {
-                                                            setShowExistingUserForm(true);
-                                                            setShowNewUserForm(false);
-                                                        }}
-                                                        className="w-full bg-white/10 border border-white/30 text-white hover:bg-white hover:text-blue-900"
-                                                    >
-                                                        <User className="h-4 w-4 mr-2" />
-                                                        {t.existingUser}
-                                                    </Button>
+                                                    <h3 className="text-xl font-bold text-white">{t.createAccount}</h3>
                                                 </div>
-                                            )}
 
-                                            {/* New User Form - Simplified */}
-                                            {showNewUserForm && (
-                                                <div className="pt-4 border-t border-white/20 text-left max-h-96 overflow-y-auto">
-                                                    <form onSubmit={handleNewUserSubmit} className="space-y-4">
-                                                        {/* Essential fields only */}
-                                                        <div>
-                                                            <Label htmlFor="name" className="text-white text-sm">
+                                                <form onSubmit={handleNewUserSubmit} className="space-y-5">
+                                                    {/* Grid layout for better organization */}
+                                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="name" className="text-white text-sm font-medium">
                                                                 {t.name} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Input
@@ -613,7 +641,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 type="text"
                                                                 value={newUserData.name}
                                                                 onChange={(e) => setNewUserData('name', e.target.value)}
-                                                                className="bg-white/90 border-white/30"
+                                                                className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                                 placeholder="John Smith"
                                                                 required
                                                             />
@@ -622,8 +650,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             )}
                                                         </div>
 
-                                                        <div>
-                                                            <Label htmlFor="email" className="text-white text-sm">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="email" className="text-white text-sm font-medium">
                                                                 {t.email} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Input
@@ -631,7 +659,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 type="email"
                                                                 value={newUserData.email}
                                                                 onChange={(e) => setNewUserData('email', e.target.value)}
-                                                                className="bg-white/90 border-white/30"
+                                                                className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                                 placeholder="john@company.com"
                                                                 required
                                                             />
@@ -640,8 +668,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             )}
                                                         </div>
 
-                                                        <div>
-                                                            <Label htmlFor="phone" className="text-white text-sm">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="phone" className="text-white text-sm font-medium">
                                                                 {t.phone} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Input
@@ -649,7 +677,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 type="tel"
                                                                 value={newUserData.phone}
                                                                 onChange={(e) => setNewUserData('phone', e.target.value)}
-                                                                className="bg-white/90 border-white/30"
+                                                                className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                                 placeholder="+1 (555) 123-4567"
                                                                 required
                                                             />
@@ -658,8 +686,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             )}
                                                         </div>
 
-                                                        <div>
-                                                            <Label htmlFor="company_name" className="text-white text-sm">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="company_name" className="text-white text-sm font-medium">
                                                                 {t.companyName} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Input
@@ -667,7 +695,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 type="text"
                                                                 value={newUserData.company_name}
                                                                 onChange={(e) => setNewUserData('company_name', e.target.value)}
-                                                                className="bg-white/90 border-white/30"
+                                                                className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                                 placeholder="ABC Corporation"
                                                                 required
                                                             />
@@ -676,12 +704,12 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             )}
                                                         </div>
 
-                                                        <div>
-                                                            <Label htmlFor="company_type" className="text-white text-sm">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="company_type" className="text-white text-sm font-medium">
                                                                 {t.companyType} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Select onValueChange={(value) => setNewUserData('company_type', value)}>
-                                                                <SelectTrigger className="bg-white/90 border-white/30">
+                                                                <SelectTrigger className="bg-white/90 border-white/30 h-12 mt-1">
                                                                     <SelectValue placeholder={t.selectCompanyType} />
                                                                 </SelectTrigger>
                                                                 <SelectContent>
@@ -695,8 +723,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             )}
                                                         </div>
 
-                                                        <div>
-                                                            <Label htmlFor="company" className="text-white text-sm">
+                                                        <div className="md:col-span-2">
+                                                            <Label htmlFor="company" className="text-white text-sm font-medium">
                                                                 {t.company} <span className="text-red-400">*</span>
                                                             </Label>
                                                             <Input
@@ -704,7 +732,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 type="text"
                                                                 value={newUserData.company}
                                                                 onChange={(e) => setNewUserData('company', e.target.value)}
-                                                                className="bg-white/90 border-white/30"
+                                                                className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                                 placeholder="Technology, Healthcare, Finance..."
                                                                 required
                                                             />
@@ -712,73 +740,88 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 <p className="text-red-300 text-xs mt-1">{newUserErrors.company}</p>
                                                             )}
                                                         </div>
+                                                    </div>
 
-                                                        {/* Terms and conditions */}
-                                                        <div className="space-y-3 border-t border-white/20 pt-4">
-                                                            <div className="flex items-start space-x-2">
-                                                                <Checkbox
-                                                                    id="agree_terms"
-                                                                    checked={newUserData.agree_terms}
-                                                                    onCheckedChange={(checked) => setNewUserData('agree_terms', !!checked)}
-                                                                    className="mt-1"
-                                                                />
-                                                                <Label htmlFor="agree_terms" className="text-white text-sm leading-relaxed">
-                                                                    {t.agreeTerms} <span className="text-red-400">*</span>
-                                                                </Label>
-                                                            </div>
-                                                            {newUserErrors.agree_terms && (
-                                                                <p className="text-red-300 text-xs">You must agree to the terms to continue</p>
-                                                            )}
-
-                                                            <div className="flex items-start space-x-2">
-                                                                <Checkbox
-                                                                    id="marketing_emails"
-                                                                    checked={newUserData.marketing_emails}
-                                                                    onCheckedChange={(checked) => setNewUserData('marketing_emails', !!checked)}
-                                                                    className="mt-1"
-                                                                />
-                                                                <Label htmlFor="marketing_emails" className="text-white text-sm leading-relaxed">
-                                                                    {t.marketingEmails}
-                                                                </Label>
-                                                            </div>
+                                                    {/* Terms and conditions */}
+                                                    <div className="space-y-4 border-t border-white/20 pt-5">
+                                                        <div className="flex items-start space-x-3">
+                                                            <Checkbox
+                                                                id="agree_terms"
+                                                                checked={newUserData.agree_terms}
+                                                                onCheckedChange={(checked) => setNewUserData('agree_terms', !!checked)}
+                                                                className="mt-1"
+                                                            />
+                                                            <Label htmlFor="agree_terms" className="text-white text-sm leading-relaxed">
+                                                                {t.agreeTerms} <span className="text-red-400">*</span>
+                                                            </Label>
                                                         </div>
-
-                                                        {/* Form Errors */}
-                                                        {Object.keys(newUserErrors).length > 0 && (
-                                                            <Alert className="bg-red-500/20 border-red-400">
-                                                                <AlertCircle className="h-4 w-4" />
-                                                                <AlertDescription className="text-red-200 text-sm">
-                                                                    Please fix the errors above before submitting.
-                                                                </AlertDescription>
-                                                            </Alert>
+                                                        {newUserErrors.agree_terms && (
+                                                            <p className="text-red-300 text-xs">You must agree to the terms to continue</p>
                                                         )}
 
-                                                        <Button
-                                                            type="submit"
-                                                            disabled={processingNewUser || !newUserData.agree_terms}
-                                                            className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-12 font-semibold"
-                                                        >
-                                                            {processingNewUser ? (
-                                                                <>
-                                                                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                                                                    {t.processing}
-                                                                </>
-                                                            ) : (
-                                                                <>
-                                                                    <UserPlus className="h-4 w-4 mr-2" />
-                                                                    {t.registerDownload}
-                                                                </>
-                                                            )}
-                                                        </Button>
-                                                    </form>
-                                                </div>
-                                            )}
+                                                        <div className="flex items-start space-x-3">
+                                                            <Checkbox
+                                                                id="marketing_emails"
+                                                                checked={newUserData.marketing_emails}
+                                                                onCheckedChange={(checked) => setNewUserData('marketing_emails', !!checked)}
+                                                                className="mt-1"
+                                                            />
+                                                            <Label htmlFor="marketing_emails" className="text-white text-sm leading-relaxed">
+                                                                {t.marketingEmails}
+                                                            </Label>
+                                                        </div>
+                                                    </div>
 
-                                            {/* Existing User Form - Simplified */}
-                                            {showExistingUserForm && (
-                                                <form onSubmit={handleExistingUserSubmit} className="space-y-4 pt-4 border-t border-white/20 text-left">
+                                                    {/* Form Errors */}
+                                                    {Object.keys(newUserErrors).length > 0 && (
+                                                        <Alert className="bg-red-500/20 border-red-400">
+                                                            <AlertCircle className="h-4 w-4" />
+                                                            <AlertDescription className="text-red-200 text-sm">
+                                                                Please fix the errors above before submitting.
+                                                            </AlertDescription>
+                                                        </Alert>
+                                                    )}
+
+                                                    <Button
+                                                        type="submit"
+                                                        disabled={processingNewUser || !newUserData.agree_terms}
+                                                        className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white h-14 text-lg font-semibold mt-6"
+                                                    >
+                                                        {processingNewUser ? (
+                                                            <>
+                                                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
+                                                                {t.processing}
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <UserPlus className="h-5 w-5 mr-2" />
+                                                                {t.registerDownload}
+                                                            </>
+                                                        )}
+                                                    </Button>
+                                                </form>
+                                            </div>
+                                        )}
+
+                                        {/* Existing User Form - Enhanced with larger inputs */}
+                                        {showExistingUserForm && (
+                                            <div className="bg-white/10 backdrop-blur-lg border border-white/20 rounded-2xl p-8 shadow-2xl">
+                                                {/* Header with back button */}
+                                                <div className="flex items-center mb-6">
+                                                    <Button
+                                                        onClick={handleBackToOptions}
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        className="text-white hover:text-cyan-400 p-0 mr-3"
+                                                    >
+                                                        <ArrowLeft className="h-5 w-5" />
+                                                    </Button>
+                                                    <h3 className="text-xl font-bold text-white">{t.signIn}</h3>
+                                                </div>
+
+                                                <form onSubmit={handleExistingUserSubmit} className="space-y-5">
                                                     <div>
-                                                        <Label htmlFor="existing_email" className="text-white text-sm">
+                                                        <Label htmlFor="existing_email" className="text-white text-sm font-medium">
                                                             {t.email} <span className="text-red-400">*</span>
                                                         </Label>
                                                         <Input
@@ -786,7 +829,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                             type="email"
                                                             value={existingUserData.email}
                                                             onChange={(e) => setExistingUserData('email', e.target.value)}
-                                                            className="bg-white/90 border-white/30"
+                                                            className="bg-white/90 border-white/30 h-12 text-base mt-1"
                                                             placeholder="your@email.com"
                                                             required
                                                         />
@@ -796,16 +839,16 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                     </div>
 
                                                     <div>
-                                                        <Label htmlFor="password" className="text-white text-sm">
+                                                        <Label htmlFor="password" className="text-white text-sm font-medium">
                                                             {t.password} <span className="text-red-400">*</span>
                                                         </Label>
-                                                        <div className="relative">
+                                                        <div className="relative mt-1">
                                                             <Input
                                                                 id="password"
                                                                 type={showPassword ? "text" : "password"}
                                                                 value={existingUserData.password}
                                                                 onChange={(e) => setExistingUserData('password', e.target.value)}
-                                                                className="bg-white/90 border-white/30 pr-10"
+                                                                className="bg-white/90 border-white/30 h-12 text-base pr-12"
                                                                 placeholder="Your password"
                                                                 required
                                                             />
@@ -814,7 +857,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                                 onClick={() => setShowPassword(!showPassword)}
                                                                 className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
                                                             >
-                                                                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                                             </button>
                                                         </div>
                                                         {existingUserErrors.password && (
@@ -822,7 +865,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                         )}
                                                     </div>
 
-                                                    <div className="flex items-center space-x-2">
+                                                    <div className="flex items-center space-x-3">
                                                         <Checkbox
                                                             id="remember"
                                                             checked={existingUserData.remember}
@@ -846,30 +889,30 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                     <Button
                                                         type="submit"
                                                         disabled={processingExisting}
-                                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-12 font-semibold"
+                                                        className="w-full bg-blue-600 hover:bg-blue-700 text-white h-14 text-lg font-semibold"
                                                     >
                                                         {processingExisting ? (
                                                             <>
-                                                                <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                                                                <Loader2 className="h-5 w-5 mr-2 animate-spin" />
                                                                 Signing in...
                                                             </>
                                                         ) : (
                                                             <>
-                                                                <User className="h-4 w-4 mr-2" />
+                                                                <User className="h-5 w-5 mr-2" />
                                                                 {t.loginDownload}
                                                             </>
                                                         )}
                                                     </Button>
 
                                                     {/* Forgot Password Link */}
-                                                    <div className="text-center space-y-2">
+                                                    <div className="text-center space-y-3 border-t border-white/20 pt-5">
                                                         <Link
                                                             href="/forgot-password"
-                                                            className="text-cyan-300 hover:text-cyan-200 text-sm underline"
+                                                            className="text-cyan-300 hover:text-cyan-200 text-sm underline block"
                                                         >
                                                             Forgot your password?
                                                         </Link>
-                                                        <div className="text-white/60 text-xs">
+                                                        <div className="text-white/60 text-sm">
                                                             Don't have an account?{' '}
                                                             <button
                                                                 type="button"
@@ -884,8 +927,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                         </div>
                                                     </div>
                                                 </form>
-                                            )}
-                                        </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             )}

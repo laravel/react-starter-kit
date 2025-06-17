@@ -6,8 +6,11 @@ use App\Http\Controllers\AssessmentToolsController;
 use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
+use App\Http\Controllers\PaddleWebhookController;
 use App\Http\Controllers\UserRegistrationController;
 use App\Http\Controllers\FreeUserController;
+use App\Http\Controllers\ToolDiscoveryController;
+use App\Http\Controllers\ToolSubscriptionController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -90,12 +93,46 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('free-user.submit');
 
     // ========================================
-    // ASSESSMENT TOOLS - FIXED ROUTING
+    // TOOL DISCOVERY - FOR ALL USERS (ESPECIALLY FREE USERS)
     // ========================================
 
-    // Assessment Tools - Use AssessmentToolsController for all users
-    Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
-        ->name('assessment-tools');
+    // Tool discovery page - allows free users to browse and subscribe to individual tools
+    Route::get('/discover-tools', [ToolDiscoveryController::class, 'index'])
+        ->name('tools.discover');
+
+    // Individual tool details
+    Route::get('/tools/{tool}/details', [ToolDiscoveryController::class, 'show'])
+        ->name('tools.show');
+
+    // ========================================
+    // TOOL SUBSCRIPTION MANAGEMENT - FOR ALL USERS
+    // ========================================
+
+    // Individual tool subscription page
+    Route::get('/tools/{tool}/subscribe', [ToolSubscriptionController::class, 'show'])
+        ->name('tools.subscribe');
+
+    // Subscribe to specific tool
+    Route::post('/tools/{tool}/subscribe', [ToolSubscriptionController::class, 'subscribe'])
+        ->name('tools.subscribe.store');
+
+    // User's tool subscriptions management
+    Route::get('/my-tool-subscriptions', [ToolSubscriptionController::class, 'index'])
+        ->name('tools.subscriptions');
+
+    // Cancel tool subscription
+    Route::delete('/tool-subscriptions/{subscription}', [ToolSubscriptionController::class, 'cancel'])
+        ->name('tools.subscriptions.cancel');
+
+    // ========================================
+    // ASSESSMENT TOOLS - PREMIUM ACCESS ONLY
+    // ========================================
+
+    // Assessment Tools - Restricted to premium users and admins only
+    Route::middleware('checkAccess:premium')->group(function () {
+        Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
+            ->name('assessment-tools');
+    });
 
     // Assessment routes for authenticated users
     Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
@@ -109,7 +146,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('assessment.results');
 
     // ========================================
-    // ASSESSMENT HISTORY - FIXED ROUTING
+    // ASSESSMENT HISTORY - UPDATED ROUTING
     // ========================================
 
     // Assessment history - Route to appropriate controller based on user type
@@ -121,8 +158,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
             // For premium/admin users, use AssessmentController
             return app(AssessmentController::class)->index(request());
         } else {
-            // For free users, use FreeUserController
-            return app(FreeUserController::class)->index();
+            // For free users, redirect to tool discovery
+            return redirect()->route('tools.discover')
+                ->with('info', 'Browse and subscribe to assessment tools below to get started!');
         }
     })->name('assessments.index');
 
@@ -130,6 +168,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/my-assessments', function() {
         return redirect()->route('assessments.index');
     })->name('assessments');
+
+    // ========================================
+    // REDIRECTS FOR FREE USERS TRYING TO ACCESS RESTRICTED AREAS
+    // ========================================
+
+    // Redirect free users trying to access assessment tools directly
+    Route::get('/assessment-tools-redirect', function() {
+        $user = auth()->user();
+
+        if ($user->isPremium() || $user->isAdmin()) {
+            return redirect()->route('assessment-tools');
+        }
+
+        // Redirect free users to tool discovery
+        return redirect()->route('tools.discover')
+            ->with('info', 'Browse our assessment tools below. Subscribe to individual tools to get started!');
+    })->name('assessment-tools.redirect');
 
     // ========================================
     // SUBSCRIPTION ROUTES - AVAILABLE FOR ALL USERS
@@ -311,6 +366,19 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    // Create checkout
+    Route::post('/tools/{tool}/paddle-checkout', [ToolSubscriptionController::class, 'createCheckout'])
+        ->name('tools.paddle.checkout');
+
+    // Payment success callback
+    Route::get('/tools/{tool}/payment/success', [ToolSubscriptionController::class, 'paymentSuccess'])
+        ->name('tools.payment.success');
+});
+
+// Paddle webhooks (no auth middleware)
+Route::post('/paddle/webhook', [PaddleWebhookController::class, 'handleWebhook'])
+    ->name('paddle.webhook');
 use App\Http\Controllers\ReportController;
 
 Route::get('/cmo-report', [ReportController::class, 'generateReport'])->name('cmo.report');

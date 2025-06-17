@@ -8,6 +8,7 @@ use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Laravel\Paddle\Billable;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -17,6 +18,7 @@ class User extends Authenticatable implements FilamentUser
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
     use HasRoles;
+    use Billable;
 
     /**
      * The attributes that are mass assignable.
@@ -34,6 +36,25 @@ class User extends Authenticatable implements FilamentUser
         // Only allow actual admins to access Filament
         return $this->hasRole(['admin', 'super_admin']);
     }
+    public function paddleName(): string
+    {
+        return $this->name;
+    }
+
+    /**
+     * Get the customer email that should be synced to Paddle.
+     */
+    public function paddleEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * Determine if the entity has a given ability.
+     */
+
+
+
 
     /**
      * The attributes that should be hidden for serialization.
@@ -311,5 +332,59 @@ class User extends Authenticatable implements FilamentUser
                 'newsletter_subscription' => false,
             ]);
         }
+    }
+
+
+    public function toolSubscriptions()
+    {
+        return $this->hasMany(ToolSubscription::class);
+    }
+
+    public function hasAccessToTool(int $toolId): bool
+    {
+        // Check if user is admin
+        if ($this->isAdmin()) {
+            return true;
+        }
+
+        // Check if user has active subscription to this tool
+        $subscription = $this->toolSubscriptions()
+            ->where('tool_id', $toolId)
+            ->where('status', 'active')
+            ->first();
+
+        if ($subscription) {
+            return true;
+        }
+
+        // Check if user has global premium subscription
+        return $this->isPremium();
+    }
+
+
+    public function getToolSubscription(int $toolId): ?ToolSubscription
+    {
+        return $this->toolSubscriptions()
+            ->where('tool_id', $toolId)
+            ->where('status', 'active')
+            ->first();
+    }
+
+    public function subscribeToTool(int $toolId, string $planType = 'premium'): ToolSubscription
+    {
+        return $this->toolSubscriptions()->updateOrCreate(
+            ['tool_id' => $toolId],
+            [
+                'plan_type' => $planType,
+                'status' => 'active',
+                'started_at' => now(),
+                'expires_at' => $planType === 'premium' ? now()->addYear() : null,
+                'features' => [
+                    'assessments_limit' => $planType === 'premium' ? null : 1,
+                    'pdf_reports' => $planType === 'premium' ? 'detailed' : 'basic',
+                    'advanced_analytics' => $planType === 'premium',
+                ]
+            ]
+        );
     }
 }
