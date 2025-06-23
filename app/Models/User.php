@@ -123,12 +123,12 @@ class User extends Authenticatable implements FilamentUser
     /**
      * Check if user is premium
      */
-    public function isPremium(): bool
-    {
-        // Your existing logic
-        $subscription = $this->subscription;
-        return $subscription && $subscription->isPremium() && $subscription->isActive();
-    }
+//    public function isPremium(): bool
+//    {
+//        // Your existing logic
+//        $subscription = $this->subscription;
+//        return $subscription && $subscription->isPremium() && $subscription->isActive();
+//    }
 
     /**
      * Check if user is admin
@@ -177,11 +177,28 @@ class User extends Authenticatable implements FilamentUser
     /**
      * Can access dashboard
      */
-    public function canAccessDashboard(): bool
+//    public function canAccessDashboard(): bool
+//    {
+//        return $this->isPremium() || $this->isAdmin();
+//    }
+    public function canAccessAssessmentTools(): bool
     {
-        return $this->isPremium() || $this->isAdmin();
+        // Only if they have bought at least one tool or are admin
+        return $this->hasAnyToolSubscription() || $this->isAdmin();
     }
 
+    public function getAccessLevel(): string
+    {
+        if ($this->isAdmin()) {
+            return 'admin';
+        }
+
+        if ($this->hasAnyToolSubscription()) {
+            return 'premium'; // Has bought at least one tool
+        }
+
+        return 'free'; // No tool subscriptions
+    }
     /**
      * Can access advanced features
      */
@@ -223,6 +240,94 @@ class User extends Authenticatable implements FilamentUser
         }
 
         return $this->assessments()->count() < $limit;
+    }
+
+//    public function toolSubscriptions()
+//    {
+//        return $this->hasMany(ToolSubscription::class);
+//    }
+
+    /**
+     * Get active tool subscriptions
+     */
+    public function activeToolSubscriptions()
+    {
+        return $this->toolSubscriptions()->active();
+    }
+
+    /**
+     * Get subscription for specific tool
+     */
+//    public function getToolSubscription(int $toolId): ?ToolSubscription
+//    {
+//        return $this->toolSubscriptions()
+//            ->where('tool_id', $toolId)
+//            ->active()
+//            ->first();
+//    }
+
+    /**
+     * Check if user has access to specific tool
+     */
+//    public function hasAccessToTool(int $toolId): bool
+//    {
+//        if ($this->isAdmin()) {
+//            return true;
+//        }
+//
+//        return $this->getToolSubscription($toolId) !== null;
+//    }
+
+    /**
+     * Get user's assessment limit for specific tool
+     */
+    public function getAssessmentLimitForTool(int $toolId): ?int
+    {
+        $subscription = $this->getToolSubscription($toolId);
+
+        if (!$subscription) {
+            return 0;
+        }
+
+        return $subscription->getFeature('assessments_limit');
+    }
+
+    /**
+     * Check if user can create assessment for specific tool
+     */
+    public function canCreateAssessmentForTool(int $toolId): bool
+    {
+        $subscription = $this->getToolSubscription($toolId);
+
+        if (!$subscription) {
+            return false;
+        }
+
+        return $subscription->canCreateAssessment();
+    }
+
+    /**
+     * Get user subscription summary
+     */
+    public function getSubscriptionSummary(): array
+    {
+        $activeSubscriptions = $this->activeToolSubscriptions()
+            ->with('tool')
+            ->get();
+
+        return [
+            'total_subscriptions' => $activeSubscriptions->count(),
+            'free_subscriptions' => $activeSubscriptions->where('plan_type', 'free')->count(),
+            'premium_subscriptions' => $activeSubscriptions->where('plan_type', 'premium')->count(),
+            'subscriptions' => $activeSubscriptions->map(function($subscription) {
+                return [
+                    'tool_name' => $subscription->tool->name_en,
+                    'plan_type' => $subscription->plan_type,
+                    'remaining_assessments' => $subscription->getRemainingAssessments(),
+                    'expires_at' => $subscription->expires_at,
+                ];
+            }),
+        ];
     }
 
     /**
@@ -340,6 +445,16 @@ class User extends Authenticatable implements FilamentUser
         return $this->hasMany(ToolSubscription::class);
     }
 
+    public function isPremium(): bool
+    {
+        // User is premium if they have any active tool subscription
+        return $this->hasAnyToolSubscription() || $this->isAdmin();
+    }
+    public function canAccessDashboard(): bool
+    {
+        // Only if they have bought at least one tool or are admin
+        return $this->hasAnyToolSubscription() || $this->isAdmin();
+    }
     public function hasAccessToTool(int $toolId): bool
     {
         // Check if user is admin
@@ -360,7 +475,24 @@ class User extends Authenticatable implements FilamentUser
         // Check if user has global premium subscription
         return $this->isPremium();
     }
+    public function hasTakenFreeAssessment(): bool
+    {
+        return $this->assessments()
+            ->where('assessment_type', 'free')
+            ->exists();
+    }
 
+    public function canTakeFreeAssessment(): bool
+    {
+        // Can take if they haven't taken one yet
+        return !$this->hasTakenFreeAssessment();
+    }
+    public function hasAnyToolSubscription(): bool
+    {
+        return $this->toolSubscriptions()
+            ->where('status', 'active')
+            ->exists();
+    }
 
     public function getToolSubscription(int $toolId): ?ToolSubscription
     {

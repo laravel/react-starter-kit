@@ -3,7 +3,8 @@
 
 import React, { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
-import AuthenticatedLayout from '@/layouts/AuthenticatedLayout';
+import AuthLayout from '@/layouts/auth-layout';
+import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -186,7 +187,7 @@ export default function ToolSubscription({ tool, currentSubscription, user, pric
     );
 
     return (
-        <AuthenticatedLayout>
+        <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`Subscribe to ${tool.name_en}`} />
 
             <div className="py-12">
@@ -367,6 +368,6 @@ export default function ToolSubscription({ tool, currentSubscription, user, pric
                     )}
                 </div>
             </div>
-        </AuthenticatedLayout>
+        </AppLayout>
     );
 }

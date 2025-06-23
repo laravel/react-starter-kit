@@ -27,6 +27,45 @@ class Tool extends Model
         return $this->hasMany(Domain::class)->orderBy('order');
     }
 
+    public function hasFreeAccess(): bool
+    {
+        return $this->has_free_plan ?? false;
+    }
+
+    /**
+     * Get total criteria count for this tool
+     */
+    public function getAllCriteriaCount(): int
+    {
+        return $this->domains()
+            ->withCount(['categories' => function($query) {
+                $query->withCount('criteria');
+            }])
+            ->get()
+            ->sum(function($domain) {
+                return $domain->categories->sum('criteria_count');
+            });
+    }
+
+    /**
+     * Get estimated completion time
+     */
+    public function getEstimatedTime(): int
+    {
+        $criteriaCount = $this->getAllCriteriaCount();
+        return max(10, ceil($criteriaCount * 0.5)); // Minimum 10 minutes, 0.5 minutes per criterion
+    }
+
+    /**
+     * Get tools available for free assessment
+     */
+    public static function getAvailableForFreeAssessment()
+    {
+        return static::where('is_active', true)
+            ->where('has_free_plan', true)
+            ->orderBy('name_en')
+            ->get();
+    }
     public function assessments(): HasMany
     {
         return $this->hasMany(Assessment::class);

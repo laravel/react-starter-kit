@@ -1,61 +1,50 @@
 <?php
 
-// Update app/Http/Middleware/CheckUserAccess.php
-// Replace the existing middleware with this enhanced version
-
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class CheckUserAccess
 {
     /**
      * Handle an incoming request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure  $next
+     * @param  string  $level  ('free', 'premium', 'admin')
+     * @return mixed
      */
-    public function handle(Request $request, Closure $next, string $accessType = 'authenticated')
+    public function handle(Request $request, Closure $next, string $level = 'free')
     {
-        if (!Auth::check()) {
+        $user = auth()->user();
+
+        if (!$user) {
             return redirect()->route('login');
         }
 
-        $user = Auth::user();
-
-        // Load necessary relationships
-        $user->load(['subscription', 'details', 'roles']);
-
-        // Create default subscription/details if missing
-        if (!$user->subscription || !$user->details) {
-            $user->createDefaultSubscriptionAndDetails();
-            $user->refresh();
-        }
-
-        switch ($accessType) {
+        switch ($level) {
             case 'admin':
                 if (!$user->isAdmin()) {
-                    return redirect()->route('assessment-tools.redirect')
+                    return redirect()->route('free-assessment.index')
                         ->with('error', 'Admin access required.');
                 }
                 break;
 
             case 'premium':
-                if (!$user->isPremium() && !$user->isAdmin()) {
-                    return redirect()->route('tools.discover')
-                        ->with('info', 'Premium subscription required to access assessment tools. Browse available tools below and subscribe to get started!');
+                if (!$user->hasAnyToolSubscription() && !$user->isAdmin()) {
+                    return redirect()->route('free-assessment.index')
+                        ->with('info', 'Subscribe to tools to access premium features.');
                 }
                 break;
 
-            case 'dashboard':
-                if (!$user->canAccessDashboard()) {
-                    return redirect()->route('tools.discover')
-                        ->with('info', 'Dashboard access requires premium subscription. Upgrade to unlock advanced features!');
+            case 'free':
+                // Free users can't access premium features if they have subscriptions
+                if ($request->routeIs('free-assessment.*') &&
+                    ($user->hasAnyToolSubscription() || $user->isAdmin())) {
+                    return redirect()->route('dashboard')
+                        ->with('info', 'You have premium access. Use the dashboard instead.');
                 }
-                break;
-
-            case 'authenticated':
-            default:
-                // Just require authentication - already checked above
                 break;
         }
 

@@ -24,6 +24,7 @@ class Assessment extends Model
         'completed_at',
         'title_en',
         'title_ar',
+        'assessment_type',
         'created_at',
         'updated_at',
     ];
@@ -36,6 +37,65 @@ class Assessment extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function isFreeAssessment(): bool
+    {
+        return $this->assessment_type === 'free';
+    }
+
+    /**
+     * Check if this is a premium assessment
+     */
+    public function isPremiumAssessment(): bool
+    {
+        return $this->assessment_type === 'premium';
+    }
+
+    /**
+     * Get simplified results for free assessments
+     */
+    public function getSimplifiedResults(): array
+    {
+        if (!$this->isFreeAssessment()) {
+            return $this->getFullResults();
+        }
+
+        $responses = $this->responses;
+        $totalCriteria = $this->tool->getAllCriteriaCount();
+
+        $yesCount = $responses->where('response', 'yes')->count();
+        $noCount = $responses->where('response', 'no')->count();
+        $naCount = $responses->where('response', 'na')->count();
+
+        return [
+            'assessment_type' => 'free',
+            'total_criteria' => $totalCriteria,
+            'responses' => [
+                'yes' => $yesCount,
+                'no' => $noCount,
+                'na' => $naCount,
+            ],
+            'completion_rate' => $totalCriteria > 0 ? round((($yesCount + $noCount + $naCount) / $totalCriteria) * 100, 1) : 0,
+            'compliance_rate' => ($yesCount + $noCount) > 0 ? round(($yesCount / ($yesCount + $noCount)) * 100, 1) : 0,
+            'message' => 'Upgrade to premium for detailed domain analysis and comprehensive reports.',
+        ];
+    }
+
+    /**
+     * Scope for free assessments
+     */
+    public function scopeFreeAssessments($query)
+    {
+        return $query->where('assessment_type', 'free');
+    }
+
+    /**
+     * Scope for premium assessments
+     */
+    public function scopePremiumAssessments($query)
+    {
+        return $query->where('assessment_type', 'premium');
     }
 
     public function guestSession(): HasOne

@@ -1,5 +1,9 @@
 <?php
 
+// =====================================================================
+// REVISED ROUTES/WEB.PHP - FIXED FREE ASSESSMENT IMPLEMENTATION
+// =====================================================================
+
 use App\Http\Controllers\AssessmentPDFController;
 use App\Http\Controllers\AssessmentReportController;
 use App\Http\Controllers\AssessmentToolsController;
@@ -7,8 +11,15 @@ use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\PaddleWebhookController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserRegistrationController;
 use App\Http\Controllers\FreeUserController;
+use App\Http\Controllers\FreeAssessmentController;
+
+// NEW CONTROLLER
+use App\Http\Controllers\NavigationController;
+
+// NEW CONTROLLER
 use App\Http\Controllers\ToolDiscoveryController;
 use App\Http\Controllers\ToolSubscriptionController;
 use App\Models\Tool;
@@ -16,27 +27,43 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 // ========================================
-// PUBLIC HOME ROUTE - Updated for Admin Redirect
+// PUBLIC HOME ROUTE - UPDATED FOR FREE ASSESSMENT REDIRECT
 // ========================================
 
 Route::get('/', function () {
-    // Check if user is authenticated and is admin
-//    if (auth()->check() && auth()->user()->isAdmin()) {
-//        return redirect('/dashboard');
-//    }
+    if (auth()->check()) {
+        $user = auth()->user();
 
-    // For all other users (non-authenticated, premium, or free), show the Welcome2 page
+        // Admin users go to dashboard
+        if ($user->isAdmin()) {
+            return redirect()->route('dashboard');
+        }
+
+        // Premium users (with tool subscriptions) go to dashboard
+        if ($user->hasAnyToolSubscription()) {
+            return redirect()->route('dashboard');
+        }
+
+        // Free users go to free assessment
+        return redirect()->route('free-assessment.index');
+    }
+
+    // Guest users see welcome page
     return app(GuestAssessmentController::class)->index2();
 })->name('home');
 
 // Alternative home route for compatibility
 Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
 
+// ========================================
+// GUEST ROUTES (PUBLIC - NO AUTH REQUIRED)
+// ========================================
+
 // Free user registration route (public)
 Route::post('/user/register-free', [UserRegistrationController::class, 'registerFreeUser'])
     ->name('user.register-free');
 
-// Guest routes (for non-authenticated users)
+// Guest assessment routes
 Route::get('/assessment/tool/{tool}', [GuestAssessmentController::class, 'create'])
     ->name('assessment.create');
 
@@ -69,132 +96,178 @@ Route::get('/contact/sales', [ContactSalesController::class, 'show'])->name('con
 Route::get('/guest/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->name('guest.assessments.report.download');
 
-// Authenticated routes - ACCESSIBLE TO ALL AUTHENTICATED USERS
+// Guest API access (limited)
+Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
+    ->middleware(['throttle:10,1']);
+
+// Paddle webhooks (no auth middleware)
+Route::post('/paddle/webhook', [PaddleWebhookController::class, 'handleWebhook'])
+    ->name('paddle.webhook');
+
+// ========================================
+// AUTHENTICATED USER ROUTES
+// ========================================
+
 Route::middleware(['auth', 'verified'])->group(function () {
 
     // ========================================
-    // FREE USER ROUTES - SEPARATE CONTROLLER
+    // API ROUTES FOR NAVIGATION
     // ========================================
 
-    // Free User Assessment Management - Using dedicated FreeUserController
-    Route::get('/free-user/assessments', [FreeUserController::class, 'index'])
-        ->name('free-user.index');
-
-    Route::get('/free-user/assessments/{assessment}/results', [FreeUserController::class, 'results'])
-        ->name('free-user.results');
-
-    Route::get('/free-user/assessments/{assessment}/edit', [FreeUserController::class, 'edit'])
-        ->name('free-user.edit');
-
-    Route::put('/free-user/assessments/{assessment}', [FreeUserController::class, 'update'])
-        ->name('free-user.update');
-
-    Route::post('/free-user/assessments/submit', [FreeUserController::class, 'submit'])
-        ->name('free-user.submit');
+    Route::get('/api/navigation', [NavigationController::class, 'getNavigationItems'])
+        ->name('api.navigation');
 
     // ========================================
-    // TOOL DISCOVERY - FOR ALL USERS (ESPECIALLY FREE USERS)
+    // FREE ASSESSMENT ROUTES - ONLY for users WITHOUT tool subscriptions
     // ========================================
 
-    // Tool discovery page - allows free users to browse and subscribe to individual tools
-    Route::get('/discover-tools', [ToolDiscoveryController::class, 'index'])
+    Route::middleware(['checkAccess:free'])->group(function () {
+
+        Route::get('/free-assessment', [FreeAssessmentController::class, 'index'])
+            ->name('free-assessment.index');
+
+        Route::post('/free-assessment/start', [FreeAssessmentController::class, 'start'])
+            ->name('free-assessment.start');
+
+        Route::get('/free-assessment/{assessment}/take', [FreeAssessmentController::class, 'take'])
+            ->name('free-assessment.take')
+            ->where('assessment', '[0-9]+');
+
+        Route::post('/free-assessment/{assessment}/save-response', [FreeAssessmentController::class, 'saveResponse'])
+            ->name('free-assessment.save-response');
+
+        Route::post('/free-assessment/{assessment}/submit', [FreeAssessmentController::class, 'submit'])
+            ->name('free-assessment.submit');
+
+        Route::get('/free-assessment/{assessment}/results', [FreeAssessmentController::class, 'results'])
+            ->name('free-assessment.results');
+
+        Route::get('/free-assessment/{assessment}/edit', [FreeAssessmentController::class, 'edit'])
+            ->name('free-assessment.edit');
+    });
+
+    // ========================================
+    // TOOL DISCOVERY AND SUBSCRIPTION ROUTES - Available to ALL authenticated users
+    // ========================================
+
+    Route::get('/tools/discover', [ToolDiscoveryController::class, 'index'])
         ->name('tools.discover');
 
-    // Individual tool details
     Route::get('/tools/{tool}/details', [ToolDiscoveryController::class, 'show'])
         ->name('tools.show');
 
-    // ========================================
-    // TOOL SUBSCRIPTION MANAGEMENT - FOR ALL USERS
-    // ========================================
-
-    // Individual tool subscription page
     Route::get('/tools/{tool}/subscribe', [ToolSubscriptionController::class, 'show'])
         ->name('tools.subscribe');
 
-    // Subscribe to specific tool
     Route::post('/tools/{tool}/subscribe', [ToolSubscriptionController::class, 'subscribe'])
         ->name('tools.subscribe.store');
+
+    // Paddle checkout routes
+    Route::post('/tools/{tool}/paddle-checkout', [ToolSubscriptionController::class, 'createCheckout'])
+        ->name('tools.paddle.checkout');
+
+    Route::get('/tools/{tool}/payment/success', [ToolSubscriptionController::class, 'paymentSuccess'])
+        ->name('tools.payment.success');
 
     // User's tool subscriptions management
     Route::get('/my-tool-subscriptions', [ToolSubscriptionController::class, 'index'])
         ->name('tools.subscriptions');
 
-    // Cancel tool subscription
     Route::delete('/tool-subscriptions/{subscription}', [ToolSubscriptionController::class, 'cancel'])
         ->name('tools.subscriptions.cancel');
 
     // ========================================
-    // ASSESSMENT TOOLS - PREMIUM ACCESS ONLY
+    // PREMIUM ROUTES - ONLY for users WITH tool subscriptions
     // ========================================
 
-    // Assessment Tools - Restricted to premium users and admins only
-    Route::middleware('checkAccess:premium')->group(function () {
+    Route::middleware(['checkAccess:premium'])->group(function () {
+
+        // Dashboard access
+        Route::get('/dashboard', function () {
+            return Inertia::render('Dashboard');
+        })->name('dashboard');
+
+        // Assessment tools access
         Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
             ->name('assessment-tools');
+
+        // Premium assessment routes
+        Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
+            ->name('assessment.start');
+
+        Route::get('/assessment/{assessment}/take', [AssessmentController::class, 'take'])
+            ->name('assessment.take');
+
+        Route::post('/assessment/{assessment}/submit', [AssessmentController::class, 'submit'])
+            ->name('assessment.submit');
+
+        Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
+            ->name('assessment.results');
+
+        // Assessment history
+        Route::get('/assessments', [AssessmentController::class, 'index'])
+            ->name('assessments.index');
+
+        // Alternative route for backward compatibility
+        Route::get('/my-assessments', function () {
+            return redirect()->route('assessments.index');
+        })->name('assessments');
+
+        // Premium PDF Reports
+        Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
+            ->name('assessments.report.download');
+
+        // Assessment saving and exiting
+        Route::post('/assessment/{assessment}/save-exit', function (\App\Models\Assessment $assessment) {
+            $user = auth()->user();
+
+            // Check if user owns this assessment
+            if ($assessment->user_id !== $user->id) {
+                abort(403);
+            }
+
+            // Update assessment status to draft if it's in progress
+            if ($assessment->status === 'in_progress') {
+                $assessment->update(['status' => 'draft']);
+            }
+
+            return redirect()->route('assessments.index')
+                ->with('success', 'Assessment progress saved successfully!');
+        })->name('assessment.save-exit');
     });
 
-    // Assessment routes for authenticated users
-    Route::get('/assessment/start/{tool}', [AssessmentToolsController::class, 'start'])
-        ->name('assessment.start');
-
-    Route::post('/assessment/submit', [AssessmentController::class, 'submit'])
-        ->name('assessment.submit');
-
-    // Assessment results - Different views based on user type
-    Route::get('/assessment/results/{assessment}', [AssessmentController::class, 'results'])
-        ->name('assessment.results');
-
     // ========================================
-    // ASSESSMENT HISTORY - UPDATED ROUTING
+    // LEGACY FREE USER ROUTES - REDIRECT TO NEW SYSTEM
     // ========================================
 
-    // Assessment history - Route to appropriate controller based on user type
-    Route::get('/assessments', function() {
+    // Redirect old free user routes to new free assessment system
+    Route::get('/free-user/assessments', function () {
         $user = auth()->user();
 
-        // Route to appropriate controller based on user type
-        if ($user->isPremium() || $user->isAdmin()) {
-            // For premium/admin users, use AssessmentController
-            return app(AssessmentController::class)->index(request());
-        } else {
-            // For free users, redirect to tool discovery
-            return redirect()->route('tools.discover')
-                ->with('info', 'Browse and subscribe to assessment tools below to get started!');
+        if ($user->hasAnyToolSubscription() || $user->isAdmin()) {
+            return redirect()->route('dashboard');
         }
-    })->name('assessments.index');
 
-    // Alternative route for backward compatibility
-    Route::get('/my-assessments', function() {
-        return redirect()->route('assessments.index');
-    })->name('assessments');
+        return redirect()->route('free-assessment.index');
+    })->name('free-user.index');
 
-    // ========================================
-    // REDIRECTS FOR FREE USERS TRYING TO ACCESS RESTRICTED AREAS
-    // ========================================
-
-    // Redirect free users trying to access assessment tools directly
-    Route::get('/assessment-tools-redirect', function() {
+    Route::get('/free-user/assessments/{assessment}/results', function ($assessmentId) {
         $user = auth()->user();
 
-        if ($user->isPremium() || $user->isAdmin()) {
-            return redirect()->route('assessment-tools');
+        if ($user->hasAnyToolSubscription() || $user->isAdmin()) {
+            return redirect()->route('dashboard');
         }
 
-        // Redirect free users to tool discovery
-        return redirect()->route('tools.discover')
-            ->with('info', 'Browse our assessment tools below. Subscribe to individual tools to get started!');
-    })->name('assessment-tools.redirect');
+        return redirect()->route('free-assessment.results', $assessmentId);
+    })->name('free-user.results');
 
     // ========================================
-    // SUBSCRIPTION ROUTES - AVAILABLE FOR ALL USERS
+    // SUBSCRIPTION AND UPGRADE ROUTES
     // ========================================
 
-    // Subscription routes - Available for all users (NO MIDDLEWARE BLOCKING)
     Route::get('/subscription', [UserRegistrationController::class, 'showSubscription'])
         ->name('subscription.show');
 
-    // Alternative route name for compatibility
     Route::get('/upgrade', [UserRegistrationController::class, 'showSubscription'])
         ->name('subscription');
 
@@ -202,114 +275,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('subscription.request');
 
     // ========================================
-    // PDF REPORTS - ROUTE TO APPROPRIATE CONTROLLER
+    // CATCH-ALL REDIRECTS FOR BLOCKED ACCESS
     // ========================================
 
-    // Free User PDF Reports
-    Route::get('/assessments/{assessment}/free-report', [App\Http\Controllers\FreeUserPDFController::class, 'downloadFreeUserReport'])
-        ->name('assessments.free-report.download');
-
-    // Premium PDF Reports
-    Route::get('/assessments/{assessment}/report', [AssessmentPDFController::class, 'downloadReport'])
-        ->name('assessments.report.download');
-
-    // ========================================
-    // ASSESSMENT SAVING AND EXITING
-    // ========================================
-
-    // Save and exit route - saves current progress and redirects to assessments
-    Route::post('/assessment/{assessment}/save-exit', function(\App\Models\Assessment $assessment) {
-        $user = auth()->user();
-
-        // Check if user owns this assessment
-        if ($assessment->user_id !== $user->id) {
-            abort(403);
-        }
-
-        // Update assessment status to draft if it's in progress
-        if ($assessment->status === 'in_progress') {
-            $assessment->update(['status' => 'draft']);
-        }
-
-        return redirect()->route('assessments.index')
-            ->with('success', 'Assessment progress saved successfully!');
-    })->name('assessment.save-exit');
-
-    // Alternative save and exit that accepts form data
-    Route::post('/assessment/save-and-exit', function(\Illuminate\Http\Request $request) {
-        $user = auth()->user();
-
-        $assessmentId = $request->input('assessment_id');
-        if (!$assessmentId) {
-            return redirect()->route('assessments.index')
-                ->with('info', 'Redirected to assessments.');
-        }
-
-        $assessment = \App\Models\Assessment::find($assessmentId);
-
-        if ($assessment && $assessment->user_id === $user->id) {
-            // Save any pending responses if provided
-            if ($request->has('responses')) {
-                foreach ($request->input('responses', []) as $criterionId => $responseValue) {
-                    if ($responseValue !== null) {
-                        $responseString = match ((int)$responseValue) {
-                            100 => 'yes',
-                            0 => 'no',
-                            50 => 'na',
-                            default => 'na'
-                        };
-
-                        \App\Models\AssessmentResponse::updateOrCreate(
-                            [
-                                'assessment_id' => $assessment->id,
-                                'criterion_id' => $criterionId,
-                            ],
-                            [
-                                'response' => $responseString,
-                                'notes' => $request->input("notes.{$criterionId}"),
-                            ]
-                        );
-                    }
-                }
-            }
-
-            // Update status to draft
-            $assessment->update(['status' => 'draft']);
-        }
-
-        return redirect()->route('assessments.index')
-            ->with('success', 'Assessment progress saved successfully!');
-    })->name('assessment.save-and-exit');
-
-    // ========================================
-    // PREMIUM USER ROUTES (Dashboard Access)
-    // ========================================
-
-    // Dashboard - Only for premium and admin users
-    Route::middleware('checkAccess:dashboard')->group(function () {
-        Route::get('/dashboard', function () {
-            return Inertia::render('dashboard');
-        })->name('dashboard');
-
-        // Premium Assessment Tools (dashboard version)
-        Route::get('/dashboard/assessment-tools', [AssessmentToolsController::class, 'premiumIndex'])
-            ->name('dashboard.assessment-tools');
-    });
-
-    // Advanced features - Premium only
-    Route::middleware('checkAccess:premium')->group(function () {
-        Route::get('/advanced-analytics', function () {
-            return Inertia::render('analytics/advanced');
-        })->name('analytics.advanced');
-
-        Route::get('/team-management', function () {
-            return Inertia::render('team/management');
-        })->name('team.management');
-
-        Route::get('/api-access', function () {
-            return Inertia::render('api/access');
-        })->name('api.access');
-    });
+    // These routes catch users trying to access restricted areas and redirect appropriately
+    // They are placed at the end to avoid conflicts with the protected routes above
 });
 
 // ========================================
@@ -317,79 +287,20 @@ Route::middleware(['auth', 'verified'])->group(function () {
 // ========================================
 
 Route::middleware(['auth', 'verified', 'checkAccess:admin'])->group(function () {
-    // Admin-specific routes can be added here
+    // Admin-specific routes
     // Filament admin panel routes are handled by FilamentServiceProvider
-
-    // You can add custom admin routes here if needed
-    Route::get('/admin/custom', function () {
-        return Inertia::render('admin/custom');
-    })->name('admin.custom');
 });
 
-// API routes for authenticated users
-Route::middleware(['auth'])->group(function () {
-    Route::post('/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadReport']);
+// ========================================
+// ADDITIONAL ROUTES FROM YOUR EXISTING SETUP
+// ========================================
 
-    Route::get('/reports/templates', function () {
-        return response()->json([
-            'success' => true,
-            'data' => [
-                [
-                    'id' => 'comprehensive',
-                    'name' => 'Comprehensive Report',
-                    'name_ar' => 'تقرير شامل',
-                    'description' => 'Complete assessment report with all details',
-                    'description_ar' => 'تقرير تقييم كامل مع جميع التفاصيل',
-                    'pages' => '8-12',
-                    'includes' => ['client_info', 'results', 'charts', 'recommendations', 'action_plan']
-                ],
-                [
-                    'id' => 'summary',
-                    'name' => 'Executive Summary',
-                    'name_ar' => 'ملخص تنفيذي',
-                    'description' => 'Brief overview with key findings',
-                    'description_ar' => 'نظرة عامة موجزة مع النتائج الرئيسية',
-                    'pages' => '3-5',
-                    'includes' => ['client_info', 'overall_score', 'key_recommendations']
-                ],
-                [
-                    'id' => 'detailed',
-                    'name' => 'Detailed Analysis',
-                    'name_ar' => 'تحليل مفصل',
-                    'description' => 'In-depth analysis with category breakdowns',
-                    'description_ar' => 'تحليل متعمق مع تفصيل الفئات',
-                    'pages' => '10-15',
-                    'includes' => ['client_info', 'results', 'category_breakdown', 'charts', 'detailed_recommendations']
-                ]
-            ]
-        ]);
-    });
-});
-
-Route::middleware(['auth', 'verified'])->group(function () {
-    // Create checkout
-    Route::post('/tools/{tool}/paddle-checkout', [ToolSubscriptionController::class, 'createCheckout'])
-        ->name('tools.paddle.checkout');
-
-    // Payment success callback
-    Route::get('/tools/{tool}/payment/success', [ToolSubscriptionController::class, 'paymentSuccess'])
-        ->name('tools.payment.success');
-});
-
-// Paddle webhooks (no auth middleware)
-Route::post('/paddle/webhook', [PaddleWebhookController::class, 'handleWebhook'])
-    ->name('paddle.webhook');
-use App\Http\Controllers\ReportController;
-
+// CMO Report routes (if needed)
 Route::get('/cmo-report', [ReportController::class, 'generateReport'])->name('cmo.report');
 Route::get('/cmo-report/preview', [ReportController::class, 'previewReport'])->name('cmo.report.preview');
-
-// Guest API access (limited)
-Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
-    ->middleware(['throttle:10,1']);
-
 Route::get('/report/landscape', [ReportController::class, 'landscapeChart']);
 
+// Include settings and auth routes
+require __DIR__ . '/settings.php';
+require __DIR__ . '/auth.php';
 
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';

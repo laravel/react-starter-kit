@@ -31,6 +31,10 @@ return Application::configure(basePath: dirname(__DIR__))
             'checkToolAccess' => CheckToolAccess::class,
             'filamentAccess' => CheckFilamentAccess::class,
             'checkAssessmentLimits' => CheckAssessmentLimits::class,
+        ])->validateCsrfTokens(except: [
+
+            'paddle/*',
+
         ]);
 
     })

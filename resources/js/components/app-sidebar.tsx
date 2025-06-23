@@ -39,6 +39,32 @@ const footerNavItems: NavItem[] = [
     },
 ];
 
+const getNavigationItems = (user) => {
+    if (user.access_level === 'admin') {
+        return [
+            { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+            { title: 'Assessment Tools', href: '/assessment-tools', icon: ClipboardCheck },
+            { title: 'My Assessments', href: '/assessments', icon: FileText },
+            { title: 'Admin Panel', href: '/admin', icon: Settings },
+        ];
+    }
+
+    if (user.access_level === 'premium') {
+        return [
+            { title: 'Dashboard', href: '/dashboard', icon: LayoutGrid },
+            { title: 'Assessment Tools', href: '/assessment-tools', icon: ClipboardCheck },
+            { title: 'My Assessments', href: '/assessments', icon: FileText },
+            { title: 'Tool Subscriptions', href: '/my-tool-subscriptions', icon: Crown },
+        ];
+    }
+
+    // Free users
+    return [
+        { title: 'Free Assessment', href: '/free-assessment', icon: FileText },
+        { title: 'Browse Tools', href: '/tools/discover', icon: ShoppingCart },
+    ];
+};
+
 export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">

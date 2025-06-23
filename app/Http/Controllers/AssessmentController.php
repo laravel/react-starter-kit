@@ -249,4 +249,128 @@ class AssessmentController extends Controller
             ]);
         }
     }
+    public function take(Assessment $assessment)
+    {
+        $user = auth()->user();
+
+        // Ensure user owns this assessment or is admin
+        if ($assessment->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403, 'Unauthorized to access this assessment.');
+        }
+
+        // Load assessment with tool and all related data
+        $assessment->load([
+            'tool.domains.categories.criteria',
+            'responses'
+        ]);
+
+        // Prepare assessment data for frontend
+        $assessmentData = [
+            'id' => $assessment->id,
+            'name' => $assessment->name,
+            'email' => $assessment->email,
+            'organization' => $assessment->organization,
+            'status' => $assessment->status,
+            'started_at' => $assessment->started_at,
+            'tool' => [
+                'id' => $assessment->tool->id,
+                'name_en' => $assessment->tool->name_en,
+                'name_ar' => $assessment->tool->name_ar,
+                'description_en' => $assessment->tool->description_en,
+                'description_ar' => $assessment->tool->description_ar,
+                'domains' => $assessment->tool->domains->map(function ($domain) {
+                    return [
+                        'id' => $domain->id,
+                        'name_en' => $domain->name_en,
+                        'name_ar' => $domain->name_ar,
+                        'categories' => $domain->categories->map(function ($category) {
+                            return [
+                                'id' => $category->id,
+                                'name_en' => $category->name_en,
+                                'name_ar' => $category->name_ar,
+                                'criteria' => $category->criteria->map(function ($criterion) {
+                                    return [
+                                        'id' => $criterion->id,
+                                        'text_en' => $criterion->text_en,
+                                        'text_ar' => $criterion->text_ar,
+                                        'requires_file' => $criterion->requires_file,
+                                        'order' => $criterion->order,
+                                    ];
+                                })
+                            ];
+                        })
+                    ];
+                })
+            ],
+            'responses' => $assessment->responses->keyBy('criterion_id')
+        ];
+
+        return Inertia::render('assessment/Take', [
+            'assessmentData' => $assessmentData,
+            'locale' => app()->getLocale(),
+            'auth' => [
+                'user' => [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                ]
+            ]
+        ]);
+    }
+
+    /**
+     * Save assessment response
+     */
+    public function saveResponse(Request $request, Assessment $assessment)
+    {
+        $user = auth()->user();
+
+        // Ensure user owns this assessment
+        if ($assessment->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403, 'Unauthorized to modify this assessment.');
+        }
+
+        $request->validate([
+            'criterion_id' => 'required|exists:criteria,id',
+            'response' => 'required|in:yes,no,na',
+            'notes' => 'nullable|string',
+            'file_path' => 'nullable|string',
+        ]);
+
+        // Save or update response
+        $assessment->responses()->updateOrCreate(
+            ['criterion_id' => $request->criterion_id],
+            [
+                'response' => $request->response,
+                'notes' => $request->notes,
+                'file_path' => $request->file_path,
+            ]
+        );
+
+        return response()->json(['success' => true]);
+    }
+
+    /**
+     * Review assessment before submission
+     */
+    public function review(Assessment $assessment)
+    {
+        $user = auth()->user();
+
+        // Ensure user owns this assessment
+        if ($assessment->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403, 'Unauthorized to access this assessment.');
+        }
+
+        // Load assessment with responses
+        $assessment->load([
+            'tool',
+            'responses.criterion'
+        ]);
+
+        return Inertia::render('assessment/Review', [
+            'assessment' => $assessment,
+            'locale' => app()->getLocale(),
+        ]);
+    }
 }

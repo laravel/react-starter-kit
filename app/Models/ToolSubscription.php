@@ -1,5 +1,4 @@
 <?php
-// app/Models/ToolSubscription.php
 
 namespace App\Models;
 
@@ -16,10 +15,6 @@ class ToolSubscription extends Model
         'started_at',
         'expires_at',
         'features',
-        'paddle_subscription_id', // Add this
-        'paddle_customer_id',     // Add this
-        'amount',
-        'currency',
     ];
 
     protected $casts = [
@@ -28,6 +23,7 @@ class ToolSubscription extends Model
         'expires_at' => 'datetime',
     ];
 
+    // Relationships
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -38,28 +34,75 @@ class ToolSubscription extends Model
         return $this->belongsTo(Tool::class);
     }
 
-    /**
-     * Check if subscription is active
-     */
+    // Scopes
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active')
+            ->where(function($q) {
+                $q->whereNull('expires_at')
+                    ->orWhere('expires_at', '>', now());
+            });
+    }
+
+    public function scopeFree($query)
+    {
+        return $query->where('plan_type', 'free');
+    }
+
+    public function scopePremium($query)
+    {
+        return $query->where('plan_type', 'premium');
+    }
+
+    // Methods
     public function isActive(): bool
     {
         return $this->status === 'active' &&
             ($this->expires_at === null || $this->expires_at->isFuture());
     }
 
-    /**
-     * Check if subscription is premium
-     */
+    public function isFree(): bool
+    {
+        return $this->plan_type === 'free';
+    }
+
     public function isPremium(): bool
     {
         return $this->plan_type === 'premium';
     }
 
-    /**
-     * Get feature value
-     */
-    public function getFeature(string $key, $default = null)
+    public function getFeature(string $feature, $default = null)
     {
-        return data_get($this->features, $key, $default);
+        return $this->features[$feature] ?? $default;
+    }
+
+    public function hasFeature(string $feature): bool
+    {
+        return isset($this->features[$feature]) && $this->features[$feature] === true;
+    }
+
+    public function getRemainingAssessments(): ?int
+    {
+        $limit = $this->getFeature('assessments_limit');
+
+        if ($limit === null) {
+            return null; // Unlimited
+        }
+
+        $used = $this->user->assessments()
+            ->where('tool_id', $this->tool_id)
+            ->count();
+
+        return max(0, $limit - $used);
+    }
+
+    public function canCreateAssessment(): bool
+    {
+        if (!$this->isActive()) {
+            return false;
+        }
+
+        $remaining = $this->getRemainingAssessments();
+        return $remaining === null || $remaining > 0;
     }
 }
