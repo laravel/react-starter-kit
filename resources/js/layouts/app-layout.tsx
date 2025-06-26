@@ -1,20 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import { Head } from '@inertiajs/react';
-import AppSidebar from '@/components/app-sidebar';
+import AppLayoutTemplate from '@/layouts/app/app-sidebar-layout';
+import { type BreadcrumbItem } from '@/types';
+import { type ReactNode } from 'react';
 
 interface AppLayoutProps {
-    children: React.ReactNode;
-    title?: string;
+    children: ReactNode;
+    breadcrumbs?: BreadcrumbItem[];
 }
 
-export default function AppLayout({ children, title }: AppLayoutProps) {
-    return (
-        <div className="min-h-screen bg-gray-50 flex">
-            <AppSidebar />
-            <main className="flex-1">
-                {title && <Head title={title} />}
-                {children}
-            </main>
-        </div>
-    );
-}
+export default ({ children, breadcrumbs, ...props }: AppLayoutProps) => (
+    <AppLayoutTemplate breadcrumbs={breadcrumbs} {...props}>
+        {children}
+    </AppLayoutTemplate>
+);

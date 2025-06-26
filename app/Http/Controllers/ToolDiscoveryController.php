@@ -15,7 +15,7 @@ class ToolDiscoveryController extends Controller
     {
         $user = auth()->user();
 
-        $tools = Tool::where('is_active', true)
+        $tools = Tool::where('status', 'active')
             ->withCount(['assessments', 'domains'])
             ->with(['domains' => function($query) {
                 $query->withCount(['categories' => function($q) {
@@ -73,9 +73,10 @@ class ToolDiscoveryController extends Controller
             'tool_subscriptions' => [],
         ];
 
-        return Inertia::render('ToolDiscovery', [
+        return Inertia::render('ToolDiscover', [
             'tools' => $tools,
             'user' => $userInfo,
+            'message' => 'hiii',
             'locale' => app()->getLocale(),
         ]);
     }

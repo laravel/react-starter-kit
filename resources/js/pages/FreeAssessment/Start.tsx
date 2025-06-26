@@ -27,7 +27,7 @@ interface Criterion {
     id: number;
     text_en: string;
     text_ar: string;
-    requires_attachment: boolean;
+    requires_file: boolean;
 }
 
 interface Category {
@@ -80,9 +80,29 @@ interface TakeProps {
     };
 }
 
-export default function Take({ assessmentData, locale, auth }: TakeProps) {
-    const [responses, setResponses] = useState<Record<number, 'yes' | 'no' | 'na'>>({});
-    const [notes, setNotes] = useState<Record<number, string>>({});
+export default function Start({ assessmentData, locale, auth, existingNotes }: TakeProps) {
+    const [responses, setResponses] = useState<Record<number, 'yes' | 'no' | 'na'>>(
+        // Initialize with existing responses if in edit mode
+        () => {
+            const initial: Record<number, 'yes' | 'no' | 'na'> = {};
+            if (assessmentData.responses) {
+                Object.entries(assessmentData.responses).forEach(([criterionId, response]) => {
+                    // Handle both string responses and any other format
+                    const criterionIdNum = parseInt(criterionId);
+                    if (typeof response === 'string' && ['yes', 'no', 'na'].includes(response)) {
+                        initial[criterionIdNum] = response as 'yes' | 'no' | 'na';
+                    } else if (typeof response === 'number') {
+                        // Convert score to response format as fallback
+                        if (response === 100) initial[criterionIdNum] = 'yes';
+                        else if (response === 0) initial[criterionIdNum] = 'no';
+                        else if (response === 50) initial[criterionIdNum] = 'na';
+                    }
+                });
+            }
+            return initial;
+        }
+    );
+    const [notes, setNotes] = useState<Record<number, string>>(existingNotes || {});
     const [files, setFiles] = useState<Record<number, File | null>>({});
     const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
     const [showScrollTop, setShowScrollTop] = useState(false);
@@ -124,9 +144,8 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
     // Check if assessment is complete
     const isComplete = useMemo(() => {
         return allCriteria.every(criterion => {
-
             const hasResponse = responses[criterion.id];
-            const hasRequiredFile = !criterion.requires_attachment ||
+            const hasRequiredFile = !criterion.requires_file ||
                 responses[criterion.id] !== 'yes' ||
                 files[criterion.id];
             return hasResponse && hasRequiredFile;
@@ -219,7 +238,7 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
 
         // Clear file if response is not 'yes' for criteria requiring files
         const criterion = allCriteria.find(c => c.id === criterionId);
-        if (criterion?.requires_attachment && response !== 'yes') {
+        if (criterion?.requires_file && response !== 'yes') {
             setFiles(prev => ({ ...prev, [criterionId]: null }));
         }
     };
@@ -245,7 +264,9 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
             files: files
         });
 
-        post(route('assessment.submit', assessmentData.id));
+
+        // Use the correct route with assessment ID from your existing routes
+        post(route('free-assessment.submit', assessmentData.id));
     };
 
     const scrollToTop = () => {
@@ -309,7 +330,7 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
                 <div className="py-12 px-4 sm:px-6 lg:px-8">
                     <div className="max-w-4xl mx-auto">
                         <Card className="mb-8 border-0 shadow-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white overflow-hidden">
-                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 to-purple-600/20"></div>
+
                             <CardContent className="relative p-8 md:p-12">
                                 <div className="text-center">
                                     <div className="flex items-center justify-center mb-6">
@@ -345,21 +366,21 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
                             {assessmentData.tool.domains.map((domain) => (
                                 <div key={domain.id} className="space-y-6">
                                     {/* Domain Header */}
-                                    {/*<div className="text-center py-6">*/}
-                                    {/*    <h2 className="text-3xl font-bold text-gray-900 mb-2">*/}
-                                    {/*        {language === 'ar' ? domain.name_ar : domain.name_en}*/}
-                                    {/*    </h2>*/}
-                                    {/*    <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>*/}
-                                    {/*</div>*/}
+                                    <div className="text-center py-6">
+                                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                                            {language === 'ar' ? domain.name_ar : domain.name_en}
+                                        </h2>
+                                        <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
+                                    </div>
 
                                     {domain.categories.map((category) => (
                                         <div key={category.id} className="space-y-4">
                                             {/* Category Header */}
-                                            {/*<div className="sticky top-24 z-40 bg-white/90 backdrop-blur-md rounded-xl p-4 shadow-lg border border-blue-200/50 mb-6">*/}
-                                            {/*    <h3 className="text-xl font-semibold text-gray-800 text-center">*/}
-                                            {/*        {language === 'ar' ? category.name_ar : category.name_en}*/}
-                                            {/*    </h3>*/}
-                                            {/*</div>*/}
+                                            <div className="sticky top-24 z-40 bg-white/90 backdrop-blur-md rounded-xl p-4 shadow-lg border border-blue-200/50 mb-6">
+                                                <h3 className="text-xl font-semibold text-gray-800 text-center">
+                                                    {language === 'ar' ? category.name_ar : category.name_en}
+                                                </h3>
+                                            </div>
 
                                             {/* Questions in this category */}
                                             {category.criteria.map((criterion, index) => (
@@ -375,7 +396,7 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
                                                                         {language === 'ar' ? criterion.text_ar : criterion.text_en}
                                                                     </CardTitle>
                                                                     <div className="flex items-center space-x-2">
-                                                                        {criterion.requires_attachment && (
+                                                                        {criterion.requires_file && (
                                                                             <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
                                                                                 <Paperclip className="w-3 h-3 mr-1" />
                                                                                 {t.attachmentRequired}
@@ -461,9 +482,8 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
                                                                 </Button>
                                                             </div>
 
-                                                            {/* File Upload Section - Only show when requires_attachment is true AND response is 'yes' */  }
-                                                            {criterion.requires_attachment && responses[criterion.id] === 'yes' && (
-
+                                                            {/* File Upload Section - Only show when requires_file is true AND response is 'yes' */}
+                                                            {criterion.requires_file && responses[criterion.id] === 'yes' && (
                                                                 <div className="space-y-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
                                                                     <div className="flex items-center space-x-3 mb-4">
                                                                         <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
@@ -607,7 +627,7 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
 
                         {/* Floating Progress Indicator */}
                         {!isComplete && (
-                         <div className="fixed bottom-6 right-6 z-50">
+                            <div className="fixed bottom-6 right-6 z-50">
                                 <Card className="bg-white/95 backdrop-blur-sm shadow-2xl border-0 p-4">
                                     <div className="flex items-center space-x-3">
                                         <Clock className="w-5 h-5 text-blue-600" />

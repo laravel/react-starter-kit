@@ -290,10 +290,11 @@ class AssessmentController extends Controller
                                 'name_ar' => $category->name_ar,
                                 'criteria' => $category->criteria->map(function ($criterion) {
                                     return [
+
                                         'id' => $criterion->id,
-                                        'text_en' => $criterion->text_en,
-                                        'text_ar' => $criterion->text_ar,
-                                        'requires_file' => $criterion->requires_file,
+                                        'text_en' => $criterion->name_en,
+                                        'text_ar' => $criterion->name_ar,
+                                        'requires_attachment' => $criterion->requires_attachment,
                                         'order' => $criterion->order,
                                     ];
                                 })

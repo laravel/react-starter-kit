@@ -61,7 +61,7 @@ class Tool extends Model
      */
     public static function getAvailableForFreeAssessment()
     {
-        return static::where('is_active', true)
+        return static::where('status', 'active')
             ->where('has_free_plan', true)
             ->orderBy('name_en')
             ->get();

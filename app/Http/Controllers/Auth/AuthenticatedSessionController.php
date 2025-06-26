@@ -8,6 +8,7 @@ use App\Providers\RouteServiceProvider;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -31,49 +32,70 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-
         $request->session()->regenerate();
 
         $user = $request->user();
+        Log::info('User logged in', ['user_id' => $user->id, 'email' => $user->email]);
 
-        // Load user relationships to ensure methods work properly
-        $user->load(['subscription', 'details']);
-
-        // Create default subscription and details if missing
-        if (!$user->subscription || !$user->details) {
-            $user->createDefaultSubscriptionAndDetails();
-            $user->refresh(); // Reload the user with new data
-        }
-
-        // Determine redirect based on user type
-        $intendedUrl = $request->session()->get('url.intended');
-
-        // If there's an intended URL, use it (but avoid admin panel for non-admins)
-        if ($intendedUrl && !str_contains($intendedUrl, '/admin') && !str_contains($intendedUrl, '/filament')) {
-            return redirect($intendedUrl);
-        }
-
-        // Smart redirect based on user subscription
+        // Load user relationships safely
         try {
-            if ($user->isAdmin()) {
-                // Admin users can go to dashboard or admin panel
-                return redirect()->route('dashboard');
-            } elseif ($user->isPremium()) {
-                // Premium users go to dashboard
-                return redirect()->route('dashboard');
-            } else {
-                // Free users go to assessment tools (standalone page)
-                return redirect()->route('assessment-tools');
+            $user->load(['subscription', 'details', 'roles']);
+
+            // Create default subscription and details if missing
+            if (method_exists($user, 'createDefaultSubscriptionAndDetails')) {
+                if (!$user->subscription || !$user->details) {
+                    $user->createDefaultSubscriptionAndDetails();
+                    $user->refresh();
+                }
             }
         } catch (\Exception $e) {
-            // Fallback if user methods fail
-            \Log::error('Login redirect failed', [
+            Log::warning('Could not load user relationships or create defaults', [
                 'user_id' => $user->id,
                 'error' => $e->getMessage()
             ]);
+        }
 
-            // Safe fallback
-            return redirect()->route('assessment-tools');
+        // FIXED: Determine redirect based on user type
+        try {
+            // Check if user is admin
+            $isAdmin = false;
+            if (method_exists($user, 'isAdmin')) {
+                $isAdmin = $user->isAdmin();
+            } elseif ($user->roles) {
+                $isAdmin = $user->roles->contains('name', 'super_admin');
+            }
+
+            // Check if user has tool subscriptions (premium)
+            $hasToolSubscriptions = false;
+            if (method_exists($user, 'hasAnyToolSubscription')) {
+                $hasToolSubscriptions = $user->hasAnyToolSubscription();
+            } elseif (method_exists($user, 'isPremium')) {
+                $hasToolSubscriptions = $user->isPremium();
+            } elseif ($user->subscription) {
+                $hasToolSubscriptions = $user->subscription->plan_type === 'premium';
+            }
+
+            if ($isAdmin) {
+                Log::info('Redirecting admin user to dashboard', ['user_id' => $user->id]);
+                return redirect('/dashboard');
+            } elseif ($hasToolSubscriptions) {
+                Log::info('Redirecting premium user to dashboard', ['user_id' => $user->id]);
+                return redirect('/dashboard');
+            } else {
+                Log::info('Redirecting free user to tools discovery', ['user_id' => $user->id]);
+                // FIXED: Use correct URL
+                return redirect('/tools/discover');
+            }
+        } catch (\Exception $e) {
+            // Fallback if user methods fail
+            Log::error('Login redirect failed', [
+                'user_id' => $user->id,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            // FIXED: Safe fallback with correct URL
+            return redirect('/tools/discover');
         }
     }
 
