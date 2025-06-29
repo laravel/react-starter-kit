@@ -52,6 +52,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             className="mt-1 block w-full"
                             readOnly
                             onChange={(e) => setData('email', e.target.value)}
+                            placeholder="email@example.com"
                         />
                         <InputError message={errors.email} className="mt-2" />
                     </div>
