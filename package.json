@@ -51,6 +51,7 @@
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^1.0",
         "lucide-react": "^0.475.0",
+        "puppeteer": "^24.10.2",
         "react": "^19.0.0",
         "react-apexcharts": "^1.7.0",
         "react-dom": "^19.0.0",

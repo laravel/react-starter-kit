@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Models\Assessment;
-use App\Models\Tool;
 use App\Models\AssessmentResponse;
+use App\Models\Tool;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Inertia\Inertia;
-use Exception;
-use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 class FreeAssessmentController extends Controller
 {
@@ -79,59 +78,54 @@ class FreeAssessmentController extends Controller
                 ->with('error', 'You have already used your free assessment.');
         }
 
-        // Get the free tool directly (since there's only one)
-        $tool = Tool::where('has_free_plan', true)->first();
+        $validated = $request->validate([
+            'tool_id' => 'required|exists:tools,id'
+        ]);
 
-        if (!$tool) {
-            return redirect()->route('free-assessment.index')
-                ->with('error', 'No free assessment tool available.');
-        }
+        // Get the tool
+        $tool = Tool::findOrFail($validated['tool_id']);
 
         try {
             DB::beginTransaction();
 
-            // Check if user already has an assessment for this tool
-            $existingAssessment = $user->assessments()
+            // Create or find existing assessment
+            $assessment = $user->assessments()
                 ->where('tool_id', $tool->id)
                 ->where('assessment_type', 'free')
                 ->first();
 
-            if ($existingAssessment) {
-                DB::commit();
-                // Redirect to take with edit flag
-                return redirect()->route('free-assessment.take', $existingAssessment);
+            if (!$assessment) {
+                $assessment = Assessment::create([
+                    'tool_id' => $tool->id,
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'organization' => null,
+                    'assessment_type' => 'free',
+                    'status' => 'in_progress',
+                    'started_at' => now(),
+                ]);
             }
-
-            // Create new free assessment
-            $assessment = Assessment::create([
-                'user_id' => $user->id,
-                'tool_id' => $tool->id,
-                'name' => $user->name . ' - Free Assessment',
-                'email' => $user->email,
-                'organization' => 'Free Assessment',
-                'status' => 'in_progress',
-                'assessment_type' => 'free',
-                'started_at' => now(),
-            ]);
 
             DB::commit();
 
+            // Redirect to the assessment form
             return redirect()->route('free-assessment.take', $assessment);
 
         } catch (Exception $e) {
             DB::rollBack();
-            Log::error('Failed to start free assessment', [
+            Log::error('Failed to start assessment', [
                 'user_id' => $user->id,
                 'tool_id' => $tool->id,
                 'error' => $e->getMessage()
             ]);
 
-            return back()->withErrors(['error' => 'Failed to start assessment. Please try again.']);
+            return back()->withErrors(['start' => 'Failed to start assessment. Please try again.']);
         }
     }
 
     /**
-     * Take assessment - renders Start.tsx
+     * Show the take assessment form
      */
     public function take(Assessment $assessment)
     {
@@ -142,88 +136,61 @@ class FreeAssessmentController extends Controller
             abort(403, 'Unauthorized access to assessment.');
         }
 
-        // Load tool with full structure
-        $tool = $assessment->tool;
-        $tool->load([
-            'domains' => function ($query) {
-                $query->orderBy('order');
-            },
-            'domains.categories' => function ($query) {
-                $query->orderBy('order');
-            },
-            'domains.categories.criteria' => function ($query) {
-                $query->orderBy('order');
-            }
-        ]);
+        // Load tool with all related data
+        $tool = Tool::with(['domains.categories.criteria' => function ($query) {
+            $query->where('status', 'active')->orderBy('order');
+        }])->findOrFail($assessment->tool_id);
 
-        // Get existing responses and convert scores back to yes/no/na format
+        // Load existing responses
         $existingResponses = [];
         $existingNotes = [];
 
-        // Load responses with error handling
-        try {
-            $responses = $assessment->responses()->get();
+        $responses = $assessment->responses()->with('criterion')->get();
 
-            foreach ($responses as $response) {
-                // Convert score back to response format or use response field directly
-                if (isset($response->response) && in_array($response->response, ['yes', 'no', 'na'])) {
-                    // If response field exists and is valid, use it directly
-                    $existingResponses[$response->criterion_id] = $response->response;
-                } else {
-                    // Convert score to response format
-                    $responseValue = match($response->score ?? 0) {
-                        100 => 'yes',
-                        0 => 'no',
-                        50 => 'na',
-                        default => 'no'
-                    };
-                    $existingResponses[$response->criterion_id] = $responseValue;
-                }
+        foreach ($responses as $response) {
+            // Store the actual response value (yes/no/na)
+            $existingResponses[$response->criterion_id] = $response->response;
 
-                if ($response->notes) {
-                    $existingNotes[$response->criterion_id] = $response->notes;
-                }
+            if ($response->notes) {
+                $existingNotes[$response->criterion_id] = $response->notes;
             }
-
-            Log::info('Loaded existing responses for edit', [
-                'assessment_id' => $assessment->id,
-                'responses_count' => count($existingResponses),
-                'sample_responses' => array_slice($existingResponses, 0, 3, true)
-            ]);
-
-        } catch (Exception $e) {
-            Log::error('Error loading existing responses', [
-                'assessment_id' => $assessment->id,
-                'error' => $e->getMessage()
-            ]);
         }
 
-        // Build assessment data structure for Start.tsx
         $assessmentData = [
             'id' => $assessment->id,
-            'name' => $assessment->name,
-            'email' => $assessment->email,
-            'status' => $assessment->status,
             'tool' => [
                 'id' => $tool->id,
                 'name_en' => $tool->name_en,
                 'name_ar' => $tool->name_ar,
+                'description_en' => $tool->description_en,
+                'description_ar' => $tool->description_ar,
+                'image' => $tool->image ? asset('storage/' . $tool->image) : null,
                 'domains' => $tool->domains->map(function ($domain) {
                     return [
                         'id' => $domain->id,
                         'name_en' => $domain->name_en,
                         'name_ar' => $domain->name_ar,
+                        'description_en' => $domain->description_en,
+                        'description_ar' => $domain->description_ar,
+                        'order' => $domain->order,
                         'categories' => $domain->categories->map(function ($category) {
                             return [
                                 'id' => $category->id,
                                 'name_en' => $category->name_en,
                                 'name_ar' => $category->name_ar,
+                                'description_en' => $category->description_en,
+                                'description_ar' => $category->description_ar,
+                                'order' => $category->order,
                                 'criteria' => $category->criteria->map(function ($criterion) {
                                     return [
                                         'id' => $criterion->id,
-                                        'text_en' => $criterion->name_en,
-                                        'text_ar' => $criterion->name_ar,
-                                        'requires_file' => $criterion->requires_attachment ?? false,
+                                        'text_en' => $criterion->text_en,
+                                        'text_ar' => $criterion->text_ar,
+                                        'description_en' => $criterion->description_en,
+                                        'description_ar' => $criterion->description_ar,
+                                        'order' => $criterion->order,
+                                        'weight' => $criterion->weight ?? 1,
+                                        'requires_file' => $criterion->requires_file ?? false,
                                     ];
                                 })->toArray(),
                             ];
@@ -231,7 +198,7 @@ class FreeAssessmentController extends Controller
                     ];
                 })->toArray(),
             ],
-            'responses' => $existingResponses, // Pass existing responses as 'yes', 'no', 'na'
+            'responses' => $existingResponses, // Pass responses as 'yes', 'no', 'na'
         ];
 
         return Inertia::render('FreeAssessment/Start', [
@@ -245,12 +212,12 @@ class FreeAssessmentController extends Controller
                 ]
             ],
             'existingNotes' => $existingNotes,
-            'isEdit' => count($existingResponses) > 0, // Set to true if there are existing responses
+            'isEdit' => count($existingResponses) > 0,
         ]);
     }
 
     /**
-     * Submit assessment
+     * Submit assessment - FIXED: Proper database field and Inertia redirect
      */
     public function submit(Assessment $assessment, Request $request)
     {
@@ -272,24 +239,15 @@ class FreeAssessmentController extends Controller
         try {
             DB::beginTransaction();
 
-
-
-            // Clear existing responses
+            // Clear existing responses to avoid duplicates
             $assessment->responses()->delete();
 
-            // Store new responses
+            // Store new responses - FIXED: Use 'response' field not 'score'
             foreach ($validated['responses'] as $criterionId => $response) {
-                $score = match($response) {
-                    'yes' => 100,
-                    'no' => 0,
-                    'na' => 50,
-                    default => 0
-                };
-
                 AssessmentResponse::create([
                     'assessment_id' => $assessment->id,
                     'criterion_id' => $criterionId,
-                    'score' => $score,
+                    'response' => $response, // Store as 'yes', 'no', 'na' string
                     'notes' => $validated['notes'][$criterionId] ?? null,
                 ]);
             }
@@ -305,24 +263,26 @@ class FreeAssessmentController extends Controller
 
             DB::commit();
 
+            // FIXED: Use proper Inertia redirect
             return redirect()->route('free-assessment.results', $assessment)
                 ->with('success', 'Assessment completed successfully!');
 
         } catch (Exception $e) {
             DB::rollBack();
-
             Log::error('Free assessment submission failed', [
+                'error' => $e->getMessage(),
                 'assessment_id' => $assessment->id,
-                'user_id' => $user->id,
-                'error' => $e->getMessage()
+                'user_id' => $user->id
             ]);
 
-            return back()->withErrors(['submit' => 'There was an error submitting your assessment. Please try again.']);
+            return back()->withErrors([
+                'submit' => 'There was an error submitting your assessment. Please try again.'
+            ]);
         }
     }
 
     /**
-     * Show assessment results - renders Results.tsx for free users
+     * Show assessment results
      */
     public function results(Assessment $assessment)
     {
@@ -333,67 +293,72 @@ class FreeAssessmentController extends Controller
             abort(403, 'Unauthorized access to assessment results.');
         }
 
-        // Check if assessment is completed
+        // Ensure assessment is completed
         if ($assessment->status !== 'completed') {
             return redirect()->route('free-assessment.take', $assessment)
                 ->with('info', 'Please complete the assessment first.');
         }
 
-        // Load assessment with relationships
-        $assessment->load([
-            'tool',
-            'responses.criterion.category.domain'
-        ]);
+        // Load tool and responses with proper relationships
+        $tool = Tool::with(['domains.categories.criteria'])->findOrFail($assessment->tool_id);
+        $responses = $assessment->responses()->with('criterion.category.domain')->get();
 
-        // Try to get results using the existing getResults method, fallback to manual calculation
-        try {
-            $results = $assessment->getResults();
-            $domainScores = collect($results['domain_results'] ?? [])->map(function ($domainResult) {
-                return [
-                    'domain_name' => $domainResult['domain_name'],
-                    'score' => $domainResult['score_percentage'],
-                    'max_score' => 100,
-                    'percentage' => $domainResult['score_percentage'],
-                ];
+        // Calculate statistics
+        $totalQuestions = $responses->count();
+        $yesAnswers = $responses->where('response', 'yes')->count();
+        $noAnswers = $responses->where('response', 'no')->count();
+        $naAnswers = $responses->where('response', 'na')->count();
+
+        // Calculate overall score
+        $totalScore = 0;
+        $maxPossibleScore = 0;
+
+        foreach ($responses as $response) {
+            $weight = $response->criterion->weight ?? 1;
+            $maxPossibleScore += (100 * $weight);
+
+            if ($response->response === 'yes') {
+                $totalScore += (100 * $weight);
+            } elseif ($response->response === 'na') {
+                // N/A responses don't count towards max score
+                $maxPossibleScore -= (100 * $weight);
+            }
+        }
+
+        $overallScore = $maxPossibleScore > 0 ? ($totalScore / $maxPossibleScore) * 100 : 0;
+
+        // Calculate domain scores
+        $domainScores = collect();
+
+        foreach ($tool->domains as $domain) {
+            $domainResponses = $responses->filter(function ($response) use ($domain) {
+                return $response->criterion->category->domain_id === $domain->id;
             });
-            $overallScore = $results['overall_percentage'] ?? 0;
-            $yesAnswers = $results['yes_count'] ?? 0;
-            $noAnswers = $results['no_count'] ?? 0;
-            $naAnswers = $results['na_count'] ?? 0;
-            $totalQuestions = $results['total_criteria'] ?? 0;
-        } catch (Exception $e) {
-            // Fallback to manual calculation using scores
-            Log::warning('getResults failed, using fallback calculation', [
-                'assessment_id' => $assessment->id,
-                'error' => $e->getMessage()
-            ]);
 
-            $responses = $assessment->responses;
-            $yesAnswers = $responses->where('score', 100)->count();
-            $noAnswers = $responses->where('score', 0)->count();
-            $naAnswers = $responses->where('score', 50)->count();
-            $totalQuestions = $responses->count();
-            $applicableAnswers = $yesAnswers + $noAnswers;
+            if ($domainResponses->count() > 0) {
+                $domainTotal = 0;
+                $domainMax = 0;
 
-            $overallScore = $applicableAnswers > 0 ? ($yesAnswers / $applicableAnswers) * 100 : 0;
+                foreach ($domainResponses as $response) {
+                    $weight = $response->criterion->weight ?? 1;
+                    $domainMax += (100 * $weight);
 
-            // Calculate domain scores manually
-            $domainScores = $responses->groupBy(function ($response) {
-                return $response->criterion->category->domain->id;
-            })->map(function ($domainResponses, $domainId) {
-                $domain = $domainResponses->first()->criterion->category->domain;
-                $domainYes = $domainResponses->where('score', 100)->count();
-                $domainNo = $domainResponses->where('score', 0)->count();
-                $domainApplicable = $domainYes + $domainNo;
-                $domainPercentage = $domainApplicable > 0 ? ($domainYes / $domainApplicable) * 100 : 0;
+                    if ($response->response === 'yes') {
+                        $domainTotal += (100 * $weight);
+                    } elseif ($response->response === 'na') {
+                        $domainMax -= (100 * $weight);
+                    }
+                }
 
-                return [
+                $domainPercentage = $domainMax > 0 ? ($domainTotal / $domainMax) * 100 : 0;
+
+                $domainScores->push([
                     'domain_name' => $domain->name_en,
                     'score' => round($domainPercentage, 1),
                     'max_score' => 100,
                     'percentage' => round($domainPercentage, 1),
-                ];
-            })->values();
+                ]);
+            }
         }
 
         // Check if user is premium for upgrade prompts
@@ -431,7 +396,7 @@ class FreeAssessmentController extends Controller
     }
 
     /**
-     * Edit assessment - renders Start.tsx in edit mode
+     * Edit assessment - redirects to take route
      */
     public function edit(Assessment $assessment)
     {
@@ -444,141 +409,5 @@ class FreeAssessmentController extends Controller
 
         // Redirect to take route which handles both new and edit modes
         return redirect()->route('free-assessment.take', $assessment);
-    }
-
-    /**
-     * Show premium results page (for premium users or upgrade prompt)
-     */
-    public function premiumResults(Assessment $assessment)
-    {
-        $user = auth()->user();
-
-        // Check ownership and type
-        if ($assessment->user_id !== $user->id || $assessment->assessment_type !== 'free') {
-            abort(403, 'Unauthorized access to assessment results.');
-        }
-
-        // Check if user is premium
-        if (!$user->isPremium()) {
-            return redirect()->route('free-assessment.results', $assessment)
-                ->with('info', 'Upgrade to premium to access detailed analytics.');
-        }
-
-        // Load detailed data for premium users
-        $assessment->load([
-            'tool',
-            'responses.criterion.category.domain',
-            'domainScores'
-        ]);
-
-        // Premium analytics data
-        $detailedAnalytics = [
-            'trend_analysis' => $this->calculateTrendAnalysis($assessment),
-            'benchmark_comparison' => $this->getBenchmarkComparison($assessment),
-            'improvement_recommendations' => $this->getImprovementRecommendations($assessment),
-            'detailed_breakdown' => $this->getDetailedBreakdown($assessment),
-        ];
-
-        return Inertia::render('FreeAssessment/Premium', [
-            'assessment' => $assessment,
-            'analytics' => $detailedAnalytics,
-            'user' => [
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                'is_premium' => true,
-            ],
-            'locale' => app()->getLocale(),
-        ]);
-    }
-
-    /**
-     * Generate and download PDF report for free users
-     */
-    public function downloadPDF(Assessment $assessment)
-    {
-        $user = auth()->user();
-
-        // Check ownership and type
-        if ($assessment->user_id !== $user->id || $assessment->assessment_type !== 'free') {
-            abort(403, 'Unauthorized access to assessment PDF.');
-        }
-
-        // Check if assessment is completed
-        if ($assessment->status !== 'completed') {
-            return redirect()->route('free-assessment.take', $assessment)
-                ->with('info', 'Please complete the assessment first.');
-        }
-
-        // Load assessment with relationships
-        $assessment->load([
-            'tool',
-            'responses.criterion.category.domain'
-        ]);
-
-        // Get results
-        try {
-            $results = $assessment->getResults();
-        } catch (Exception $e) {
-            // Fallback calculation
-            $responses = $assessment->responses;
-            $yesAnswers = $responses->where('score', 100)->count();
-            $noAnswers = $responses->where('score', 0)->count();
-            $naAnswers = $responses->where('score', 50)->count();
-            $totalQuestions = $responses->count();
-            $applicableAnswers = $yesAnswers + $noAnswers;
-
-            $overallScore = $applicableAnswers > 0 ? ($yesAnswers / $applicableAnswers) * 100 : 0;
-
-            $domainScores = $responses->groupBy(function ($response) {
-                return $response->criterion->category->domain->id;
-            })->map(function ($domainResponses, $domainId) {
-                $domain = $domainResponses->first()->criterion->category->domain;
-                $domainYes = $domainResponses->where('score', 100)->count();
-                $domainNo = $domainResponses->where('score', 0)->count();
-                $domainApplicable = $domainYes + $domainNo;
-                $domainPercentage = $domainApplicable > 0 ? ($domainYes / $domainApplicable) * 100 : 0;
-
-                return [
-                    'domain_name' => $domain->name_en,
-                    'score_percentage' => round($domainPercentage, 1),
-                    'yes_count' => $domainYes,
-                    'no_count' => $domainNo,
-                    'na_count' => $domainResponses->where('score', 50)->count(),
-                ];
-            })->values();
-
-            $results = [
-                'overall_percentage' => round($overallScore, 1),
-                'yes_count' => $yesAnswers,
-                'no_count' => $noAnswers,
-                'na_count' => $naAnswers,
-                'total_criteria' => $totalQuestions,
-                'domain_results' => $domainScores->toArray(),
-            ];
-        }
-
-        // Prepare data for PDF
-        $data = [
-            'assessment' => $assessment,
-            'results' => $results,
-            'user' => $user,
-            'generated_at' => now(),
-        ];
-
-        // Generate PDF
-        $pdf = PDF::loadView('pdf.free-assessment-report', $data);
-
-        // Set PDF options for better quality
-        $pdf->setPaper('A4', 'portrait');
-        $pdf->setOptions([
-            'dpi' => 150,
-            'defaultFont' => 'sans-serif',
-            'isRemoteEnabled' => true,
-        ]);
-
-        $filename = 'assessment-report-' . $assessment->id . '-' . now()->format('Y-m-d') . '.pdf';
-
-        return $pdf->download($filename);
     }
 }

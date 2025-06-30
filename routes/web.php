@@ -11,6 +11,7 @@ use App\Http\Controllers\ContactSalesController;
 use App\Http\Controllers\GuestAssessmentController;
 use App\Http\Controllers\AssessmentController;
 use App\Http\Controllers\PaddleWebhookController;
+use App\Http\Controllers\PDFController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserRegistrationController;
 use App\Http\Controllers\FreeUserController;
@@ -219,6 +220,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/assessments/{assessment}/save-exit', function($assessmentId) {
             return response()->json(['success' => true, 'message' => 'Progress saved']);
         })->name('assessment.save-exit');
+
+        Route::prefix('assessment/{assessment}/pdf')->name('assessment.pdf.')->group(function () {
+
+            // Download PDF directly
+            Route::get('/download', [AssessmentPDFController::class, 'downloadAssessmentPDF'])
+                ->name('download');
+
+            // Save PDF to storage and get URL
+            Route::post('/save', [AssessmentPDFController::class, 'saveAssessmentPDF'])
+                ->name('save');
+
+            // Preview PDF in browser (HTML version)
+            Route::get('/preview', [AssessmentPDFController::class, 'previewAssessmentPDF'])
+                ->name('preview');
+        });
     });
 
     // ========================================
@@ -250,6 +266,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/freeUserAssessmentPage', function () {
         return redirect()->route('tools.discover');
     });
+
+//    Route::get('/pdf', function () {
+//        // Simple usage
+//        $generator = new GartnerPDFGenerator();
+//      return  $generator->saveToPDF('my_gartner_clone.pdf');
+//
+//// Or stream directly to browser
+////        $generator->streamToBrowser();
+//    });
 
     // ========================================
     // SUBSCRIPTION AND UPGRADE ROUTES
@@ -287,3 +312,85 @@ Route::get('/report/landscape', [ReportController::class, 'landscapeChart']);
 // Include settings and auth routes
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
+
+use App\Services\GartnerPDFGenerator;
+
+Route::get('/pdf', function () {
+    try {
+        // Simple usage
+        $generator = new GartnerPDFGenerator();
+
+        // Option 1: Save to file and return download
+        $filename = $generator->saveToPDF('my_gartner_clone.pdf');
+        return response()->download($filename);
+
+        // Option 2: Stream directly to browser (uncomment to use instead)
+        // return response()->stream(function() use ($generator) {
+        //     $generator->streamToBrowser();
+        // }, 200, [
+        //     'Content-Type' => 'application/pdf',
+        //     'Content-Disposition' => 'inline; filename="gartner_cmo_playbook.pdf"'
+        // ]);
+
+    } catch (Exception $e) {
+        // Better error handling for production
+        return response()->json([
+            'error' => 'PDF generation failed',
+            'message' => $e->getMessage()
+        ], 500);
+    }
+});
+
+// Alternative approach if you want more control:
+Route::get('/pdf-custom', function () {
+    $generator = new GartnerPDFGenerator();
+
+    // Generate the PDF content
+    $pdfContent = $generator->generate();
+
+    // Return as direct response
+    return response($pdfContent, 200, [
+        'Content-Type' => 'application/pdf',
+        'Content-Disposition' => 'inline; filename="gartner_clone.pdf"'
+    ]);
+});
+
+// For testing purposes - simple text response
+//Route::get('/pdf-test', function () {
+//    try {
+//        $generator = new GartnerPDFGenerator();
+//        return "PDF Generator class loaded successfully!";
+//    } catch (Exception $e) {
+//        return "Error: " . $e->getMessage();
+//    }
+//});
+
+
+// File: routes/web.php
+
+
+// PDF Generation Routes
+Route::prefix('pdf')->group(function () {
+    // Download PDF directly
+    Route::get('/gartner/download', [PDFController::class, 'downloadGartnerPDF'])
+        ->name('pdf.gartner.download');
+
+    // Preview in browser
+    Route::get('/gartner/preview', [PDFController::class, 'previewGartnerPDF'])
+        ->name('pdf.gartner.preview');
+
+    // Save PDF to storage
+    Route::post('/gartner/save', [PDFController::class, 'saveGartnerPDF'])
+        ->name('pdf.gartner.save');
+
+    // Get generation statistics
+    Route::get('/stats', [PDFController::class, 'getPDFStats'])
+        ->name('pdf.stats');
+});
+
+Route::get('/pdf/test', [PDFController::class, 'testSimplePDF']);
+// API Routes (add to routes/api.php if you want API access)
+Route::prefix('api/pdf')->group(function () {
+    Route::get('/gartner', [PDFController::class, 'getGartnerPDFAPI']);
+    Route::post('/gartner/bulk', [PDFController::class, 'bulkGenerateGartnerPDFs']);
+});

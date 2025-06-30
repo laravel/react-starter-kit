@@ -4,6 +4,8 @@ import { createInertiaApp } from '@inertiajs/react';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
+// 👇 UPDATED IMPORT - Note the .tsx extension
+import { ToastProvider } from './components/ui/use-toast';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -14,7 +16,12 @@ createInertiaApp({
     setup({ el, App, props }) {
         const root = createRoot(el);
 
-        root.render(<App {...props} />);
+        // 👇 WRAP THE APP WITH TOAST PROVIDER
+        root.render(
+            <ToastProvider>
+                <App {...props} />
+            </ToastProvider>
+        );
     },
     progress: {
         color: '#4B5563',
