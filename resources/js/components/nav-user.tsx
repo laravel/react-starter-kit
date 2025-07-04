@@ -26,7 +26,7 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                 <Menu.Target>
                     <SidebarMenuButton
                         component="button"
-                        className={cn('h-12! p-0.5! px-1!', collapsed && 'p-1!')}
+                        className={cn('group h-12! p-0.5! px-1!', collapsed && 'p-1!')}
                         classNames={{
                             inner: 'items-stretch! justify-between!',
                         }}

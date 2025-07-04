@@ -51,7 +51,7 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                                         key={item.href}
                                         component={Link}
                                         href={item.href}
-                                        isActive={currentPath === item.href}
+                                        isActive={currentPath.startsWith(item.href)}
                                         leftSection={item.icon && <item.icon size={20} />}
                                     >
                                         {item.title}

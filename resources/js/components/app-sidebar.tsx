@@ -26,7 +26,7 @@ const footerNavItems: NavItem[] = [
     },
     {
         title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits',
+        href: 'https://laravel.com/docs/starter-kits#react',
         icon: IconBook,
     },
 ];

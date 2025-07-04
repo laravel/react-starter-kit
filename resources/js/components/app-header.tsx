@@ -12,7 +12,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs, toggleDesktop, toggleMobile }: AppHeaderProps) {
     return (
-        <div className="bg-background flex h-full w-full flex-1 items-center justify-start gap-x-4 px-2">
+        <div className="bg-background border-b border-sidebar-border/80 flex h-full w-full flex-1 items-center justify-start gap-x-4 px-2">
             <Button
                 variant="subtle"
                 className="p-0"

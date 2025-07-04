@@ -42,7 +42,7 @@ const Shell = ({ children, breadcrumbs = [] }: AppShellProps) => {
                 <AppSidebar toggleMobile={toggleMobile} className="group peer" collapsed={collapsed} />
             </AppShell.Navbar>
             <AppShell.Main className="flex h-full w-full flex-col">
-                <AppContent>{children}</AppContent>
+                <AppContent className="overflow-x-hidden">{children}</AppContent>
             </AppShell.Main>
         </AppShell>
     );
