@@ -8,6 +8,7 @@ use App\Http\Controllers\Auth\NewPasswordController;
 use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Auth\TwoFactorAuthChallengeController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware('guest')->group(function () {
@@ -53,4 +54,10 @@ Route::middleware('auth')->group(function () {
 
     Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
+});
+
+// Two-factor challenge routes with the ensure-two-factor-challenge-session middleware
+Route::middleware('ensure-two-factor-challenge-session')->group(function () {
+    Route::inertia('two-factor-challenge', 'auth/two-factor-challenge')->name('two-factor.challenge');
+    Route::post('two-factor-challenge', [TwoFactorAuthChallengeController::class, 'store']);
 });
