@@ -26,6 +26,7 @@ interface Tool {
     description_en?: string;
     description_ar?: string;
     image?: string;
+    existing_assessment: ExistingAssessment | null;
 }
 
 interface User {
@@ -43,27 +44,21 @@ interface ExistingAssessment {
 }
 
 interface IndexProps {
-    tool: Tool;
+    tools: Tool[];
     user: User;
-    existingAssessment: ExistingAssessment | null;
     locale: string;
 }
 
-export default function Index({ tool, user, existingAssessment, locale }: IndexProps) {
-    const { data, setData, post, processing, errors } = useForm({
-        tool_id: tool.id
-    });
+export default function Index({ tools, user, locale }: IndexProps) {
+    const { post, processing } = useForm({});
+    const [isSubmitting, setIsSubmitting] = React.useState<number | null>(null);
     const isArabic = locale === 'ar';
 
-    const startAssessment = () => {
-        console.log('Sending tool_id:', tool.id); // Debug log
+    const startAssessment = (toolId: number) => {
+        setIsSubmitting(toolId);
         post(route('free-assessment.start'), {
-            onSuccess: (page) => {
-                console.log('Success:', page);
-            },
-            onError: (errors) => {
-                console.log('Errors:', errors);
-            }
+            data: { tool_id: toolId },
+            onFinish: () => setIsSubmitting(null),
         });
     };
 
@@ -78,7 +73,7 @@ export default function Index({ tool, user, existingAssessment, locale }: IndexP
 
     return (
         <>
-            <Head title={`Free Assessment - ${getName(tool)}`} />
+            <Head title="Free Assessment" />
 
             <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
                 {/* Header */}
@@ -129,129 +124,134 @@ export default function Index({ tool, user, existingAssessment, locale }: IndexP
                             </CardContent>
                         </Card>
 
-                        {/* Existing Assessment Status */}
-                        {existingAssessment && (
-                            <Card className="mb-8 border-0 shadow-xl">
-                                <CardHeader>
-                                    <CardTitle className="flex items-center gap-3">
-                                        <FileText className="w-6 h-6 text-blue-600" />
-                                        Your Assessment Status
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="grid md:grid-cols-2 gap-6">
-                                        <div className="space-y-4">
-                                            <div className="flex items-center space-x-3">
-                                                <div className={`w-3 h-3 rounded-full ${
-                                                    existingAssessment.status === 'completed' ? 'bg-green-500' :
-                                                        existingAssessment.status === 'in_progress' ? 'bg-yellow-500' : 'bg-gray-500'
-                                                }`}></div>
-                                                <span className="font-medium">
-                                                    Status: {existingAssessment.status === 'completed' ? 'Completed' : 'In Progress'}
-                                                </span>
+                        {tools.map((tool) => {
+                            const existingAssessment = tool.existing_assessment;
+                            return (
+                                <React.Fragment key={tool.id}>
+                                    {existingAssessment && (
+                                        <Card className="mb-8 border-0 shadow-xl">
+                                            <CardHeader>
+                                                <CardTitle className="flex items-center gap-3">
+                                                    <FileText className="w-6 h-6 text-blue-600" />
+                                                    {getName(tool)} - Your Assessment Status
+                                                </CardTitle>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <div className="grid md:grid-cols-2 gap-6">
+                                                    <div className="space-y-4">
+                                                        <div className="flex items-center space-x-3">
+                                                            <div className={`w-3 h-3 rounded-full ${
+                                                                existingAssessment.status === 'completed' ? 'bg-green-500' :
+                                                                existingAssessment.status === 'in_progress' ? 'bg-yellow-500' : 'bg-gray-500'
+                                                            }`}></div>
+                                                            <span className="font-medium">
+                                                                Status: {existingAssessment.status === 'completed' ? 'Completed' : 'In Progress'}
+                                                            </span>
+                                                        </div>
+                                                        {existingAssessment.completed_at && (
+                                                            <div className="flex items-center space-x-3">
+                                                                <Clock className="w-4 h-4 text-gray-500" />
+                                                                <span className="text-gray-600">
+                                                                    Completed: {new Date(existingAssessment.completed_at).toLocaleDateString()}
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-col space-y-3">
+                                                        {existingAssessment.status === 'in_progress' && (
+                                                            <Button
+                                                                onClick={() => startAssessment(tool.id)}
+                                                                disabled={processing}
+                                                                className="bg-blue-600 hover:bg-blue-700"
+                                                            >
+                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                Continue Assessment
+                                                            </Button>
+                                                        )}
+                                                        {existingAssessment.can_access_results && (
+                                                            <Button
+                                                                onClick={() => window.location.href = route('free-assessment.results', existingAssessment.id)}
+                                                                variant="outline"
+                                                                className="border-green-600 text-green-600 hover:bg-green-50"
+                                                            >
+                                                                <Eye className="w-4 h-4 mr-2" />
+                                                                View Results
+                                                            </Button>
+                                                        )}
+                                                        {existingAssessment.status === 'completed' && (
+                                                            <Button
+                                                                onClick={() => startAssessment(tool.id)}
+                                                                variant="outline"
+                                                                disabled={processing}
+                                                            >
+                                                                <Edit className="w-4 h-4 mr-2" />
+                                                                Edit Assessment
+                                                            </Button>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </CardContent>
+                                        </Card>
+                                    )}
+
+                                    <Card className="mb-8 border-0 shadow-xl">
+                                        <CardHeader>
+                                            <CardTitle className="flex items-center gap-3">
+                                                <Target className="w-6 h-6 text-blue-600" />
+                                                {getName(tool)}
+                                            </CardTitle>
+                                        </CardHeader>
+                                        <CardContent>
+                                            {getDescription(tool) && (
+                                                <p className="text-gray-600 mb-6">{getDescription(tool)}</p>
+                                            )}
+
+                                            <div className="grid md:grid-cols-3 gap-6 mb-8">
+                                                <div className="text-center p-6 bg-blue-50 rounded-xl border border-blue-200">
+                                                    <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
+                                                    <h3 className="font-semibold text-gray-900 mb-2">Duration</h3>
+                                                    <p className="text-sm text-gray-600">15-30 minutes</p>
+                                                </div>
+                                                <div className="text-center p-6 bg-green-50 rounded-xl border border-green-200">
+                                                    <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-3" />
+                                                    <h3 className="font-semibold text-gray-900 mb-2">Comprehensive</h3>
+                                                    <p className="text-sm text-gray-600">Complete evaluation</p>
+                                                </div>
+                                                <div className="text-center p-6 bg-purple-50 rounded-xl border border-purple-200">
+                                                    <BarChart3 className="w-8 h-8 text-purple-600 mx-auto mb-3" />
+                                                    <h3 className="font-semibold text-gray-900 mb-2">Results</h3>
+                                                    <p className="text-sm text-gray-600">Detailed report</p>
+                                                </div>
                                             </div>
-                                            {existingAssessment.completed_at && (
-                                                <div className="flex items-center space-x-3">
-                                                    <Clock className="w-4 h-4 text-gray-500" />
-                                                    <span className="text-gray-600">
-                                                        Completed: {new Date(existingAssessment.completed_at).toLocaleDateString()}
-                                                    </span>
+
+                                            {!existingAssessment && (
+                                                <div className="text-center">
+                                                    <Button
+                                                        onClick={() => startAssessment(tool.id)}
+                                                        disabled={isSubmitting === tool.id}
+                                                        size="lg"
+                                                        className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
+                                                    >
+                                                        {isSubmitting === tool.id ? (
+                                                            <>
+                                                                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
+                                                                Starting Assessment...
+                                                            </>
+                                                        ) : (
+                                                            <>
+                                                                <Play className="w-5 h-5 mr-3" />
+                                                                Start Free Assessment
+                                                                <ArrowRight className="w-5 h-5 ml-3" />
+                                                            </>
+                                                        )}
+                                                    </Button>
                                                 </div>
                                             )}
-                                        </div>
-                                        <div className="flex flex-col space-y-3">
-                                            {existingAssessment.status === 'in_progress' && (
-                                                <Button
-                                                    onClick={startAssessment}
-                                                    disabled={processing}
-                                                    className="bg-blue-600 hover:bg-blue-700"
-                                                >
-                                                    <Edit className="w-4 h-4 mr-2" />
-                                                    Continue Assessment
-                                                </Button>
-                                            )}
-                                            {existingAssessment.can_access_results && (
-                                                <Button
-                                                    onClick={() => window.location.href = route('free-assessment.results', existingAssessment.id)}
-                                                    variant="outline"
-                                                    className="border-green-600 text-green-600 hover:bg-green-50"
-                                                >
-                                                    <Eye className="w-4 h-4 mr-2" />
-                                                    View Results
-                                                </Button>
-                                            )}
-                                            {existingAssessment.status === 'completed' && (
-                                                <Button
-                                                    onClick={startAssessment}
-                                                    variant="outline"
-                                                    disabled={processing}
-                                                >
-                                                    <Edit className="w-4 h-4 mr-2" />
-                                                    Edit Assessment
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* Tool Information */}
-                        <Card className="mb-8 border-0 shadow-xl">
-                            <CardHeader>
-                                <CardTitle className="flex items-center gap-3">
-                                    <Target className="w-6 h-6 text-blue-600" />
-                                    {getName(tool)}
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                {getDescription(tool) && (
-                                    <p className="text-gray-600 mb-6">{getDescription(tool)}</p>
-                                )}
-
-                                <div className="grid md:grid-cols-3 gap-6 mb-8">
-                                    <div className="text-center p-6 bg-blue-50 rounded-xl border border-blue-200">
-                                        <Clock className="w-8 h-8 text-blue-600 mx-auto mb-3" />
-                                        <h3 className="font-semibold text-gray-900 mb-2">Duration</h3>
-                                        <p className="text-sm text-gray-600">15-30 minutes</p>
-                                    </div>
-                                    <div className="text-center p-6 bg-green-50 rounded-xl border border-green-200">
-                                        <CheckCircle className="w-8 h-8 text-green-600 mx-auto mb-3" />
-                                        <h3 className="font-semibold text-gray-900 mb-2">Comprehensive</h3>
-                                        <p className="text-sm text-gray-600">Complete evaluation</p>
-                                    </div>
-                                    <div className="text-center p-6 bg-purple-50 rounded-xl border border-purple-200">
-                                        <BarChart3 className="w-8 h-8 text-purple-600 mx-auto mb-3" />
-                                        <h3 className="font-semibold text-gray-900 mb-2">Results</h3>
-                                        <p className="text-sm text-gray-600">Detailed report</p>
-                                    </div>
-                                </div>
-
-                                {!existingAssessment && (
-                                    <div className="text-center">
-                                        <Button
-                                            onClick={startAssessment}
-                                            disabled={isSubmitting}
-                                            size="lg"
-                                            className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-4 text-lg font-semibold shadow-lg transform hover:scale-105 transition-all duration-200"
-                                        >
-                                            {isSubmitting ? (
-                                                <>
-                                                    <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white mr-3"></div>
-                                                    Starting Assessment...
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Play className="w-5 h-5 mr-3" />
-                                                    Start Free Assessment
-                                                    <ArrowRight className="w-5 h-5 ml-3" />
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-                                )}
-                            </CardContent>
-                        </Card>
+                                        </CardContent>
+                                    </Card>
+                                </React.Fragment>
+                            );
+                        })}
 
                         {/* What to Expect */}
                         <Card className="mb-8 border-0 shadow-lg">
