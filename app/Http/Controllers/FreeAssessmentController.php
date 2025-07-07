@@ -26,41 +26,44 @@ class FreeAssessmentController extends Controller
                 ->with('info', 'You have already used your free assessment. Browse tools below to purchase more assessments.');
         }
 
-        // Get a sample tool for free assessment
-        $sampleTool = Tool::where('has_free_plan', true)->first();
+        // Get all tools available for free assessment
+        $freeTools = Tool::where('has_free_plan', true)->get();
 
-        if (!$sampleTool) {
+        if ($freeTools->isEmpty()) {
             return redirect()->route('subscription.show')
                 ->with('error', 'No free assessment available. Please subscribe to access tools.');
         }
 
-        // Check if user has existing assessment
-        $existingAssessment = $user->assessments()
-            ->where('tool_id', $sampleTool->id)
-            ->where('assessment_type', 'free')
-            ->first();
+        $tools = $freeTools->map(function ($tool) use ($user) {
+            $existing = $user->assessments()
+                ->where('tool_id', $tool->id)
+                ->where('assessment_type', 'free')
+                ->first();
+
+            return [
+                'id' => $tool->id,
+                'name_en' => $tool->name_en,
+                'name_ar' => $tool->name_ar,
+                'description_en' => $tool->description_en,
+                'description_ar' => $tool->description_ar,
+                'image' => $tool->image,
+                'existing_assessment' => $existing ? [
+                    'id' => $existing->id,
+                    'status' => $existing->status,
+                    'completed_at' => $existing->completed_at,
+                    'can_access_results' => $existing->status === 'completed',
+                ] : null,
+            ];
+        });
 
         return Inertia::render('FreeAssessment/Index', [
-            'tool' => [
-                'id' => $sampleTool->id,
-                'name_en' => $sampleTool->name_en,
-                'name_ar' => $sampleTool->name_ar,
-                'description_en' => $sampleTool->description_en,
-                'description_ar' => $sampleTool->description_ar,
-                'image' => $sampleTool->image,
-            ],
+            'tools' => $tools,
             'user' => [
                 'id' => $user->id,
                 'name' => $user->name,
                 'email' => $user->email,
                 'access_level' => $user->getAccessLevel(),
             ],
-            'existingAssessment' => $existingAssessment ? [
-                'id' => $existingAssessment->id,
-                'status' => $existingAssessment->status,
-                'completed_at' => $existingAssessment->completed_at,
-                'can_access_results' => $existingAssessment->status === 'completed',
-            ] : null,
             'locale' => app()->getLocale(),
         ]);
     }
@@ -82,8 +85,13 @@ class FreeAssessmentController extends Controller
             'tool_id' => 'required|exists:tools,id'
         ]);
 
-        // Get the tool
+        // Get the tool and ensure it is available for free
         $tool = Tool::findOrFail($validated['tool_id']);
+
+        if (!$tool->hasFreeAccess()) {
+            return redirect()->route('free-assessment.index')
+                ->with('error', 'Selected tool is not available for free.');
+        }
 
         try {
             DB::beginTransaction();

@@ -20,6 +20,7 @@ class Tool extends Model
         'description_ar',
         'image',
         'status',
+        'has_free_plan',
     ];
 
     public function domains(): HasMany
