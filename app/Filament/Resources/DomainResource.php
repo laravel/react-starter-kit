@@ -16,48 +16,68 @@ class DomainResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-folder';
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.domain.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.domain.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.domain.plural_label');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
                 Forms\Components\Select::make('tool_id')
+                    ->label(__('filament.fields.tool'))
                     ->relationship('tool', 'name_en')
                     ->required(),
-                Forms\Components\Tabs::make('Translations')
+                Forms\Components\Tabs::make(__('filament.form.translations'))
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('English')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.english'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_en')
-                                    ->label('Name (English)')
+                                    ->label(__('filament.fields.name_en'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_en')
-                                    ->label('Description (English)')
+                                    ->label(__('filament.fields.description_en'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
-                        Forms\Components\Tabs\Tab::make('Arabic')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.arabic'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_ar')
-                                    ->label('Name (Arabic)')
+                                    ->label(__('filament.fields.name_ar'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_ar')
-                                    ->label('Description (Arabic)')
+                                    ->label(__('filament.fields.description_ar'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
                     ])
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('order')
+                    ->label(__('filament.fields.order'))
                     ->required()
                     ->numeric()
-                    ->default(0), Forms\Components\TextInput::make('weight_percentage')
+                    ->default(0),
+                Forms\Components\TextInput::make('weight_percentage')
+                    ->label(__('filament.fields.weight_percentage'))
                     ->required(),
                 Forms\Components\Select::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ])
                     ->default('active')
                     ->required(),
@@ -69,14 +89,15 @@ class DomainResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('tool.name_en')
-                    ->label('Tool')
+                    ->label(__('filament.fields.tool'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name_en')
-                    ->label('Name (English)')
+                    ->label(__('filament.fields.name_en'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('weight_percentage'),
+                Tables\Columns\TextColumn::make('weight_percentage')
+                    ->label(__('filament.fields.weight_percentage')),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
                         'danger' => 'inactive',
@@ -93,11 +114,13 @@ class DomainResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('tool')
+                    ->label(__('filament.fields.tool'))
                     ->relationship('tool', 'name_en'),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ]),
             ])
             ->actions([

@@ -106,6 +106,16 @@ return [
         'guest_email' => 'بريد الضيف الإلكتروني',
         'title_en' => 'العنوان (بالإنجليزية)',
         'title_ar' => 'العنوان (بالعربية)',
+        'excerpt_ar' => 'الملخص (بالعربية)',
+        'content_ar' => 'المحتوى (بالعربية)',
+        'published_at' => 'تاريخ ووقت النشر',
+        'author' => 'الكاتب',
+        'author_name' => 'اسم الكاتب (زائر)',
+        'author_email' => 'بريد الكاتب (زائر)',
+        'reply_to' => 'الرد على',
+        'views' => 'المشاهدات',
+        'likes' => 'الإعجابات',
+        'comments' => 'التعليقات',
         'started_at' => 'تاريخ البدء',
         'completed_at' => 'تاريخ الإكمال',
 
@@ -121,6 +131,7 @@ return [
         'plan_type' => 'نوع الخطة',
         'subscription_status' => 'حالة الاشتراك',
         'assessments_count' => 'عدد التقييمات',
+        'reply' => 'رد',
 
         // Guest Session fields
         'session_id' => 'معرف الجلسة',
@@ -150,6 +161,8 @@ return [
         'completed' => 'مكتمل',
         'archived' => 'مؤرشف',
         'pending' => 'معلق',
+        'approved' => 'مقبول',
+        'rejected' => 'مرفوض',
         'expired' => 'منتهي الصلاحية',
         'cancelled' => 'ملغي',
     ],
@@ -231,6 +244,8 @@ return [
         'contact_user' => 'التواصل مع المستخدم',
         'view_assessment' => 'عرض التقييم',
         'view_user_in_admin' => 'عرض المستخدم في لوحة الإدارة',
+        'approve_selected' => 'الموافقة على المحدد',
+        'reject_selected' => 'رفض المحدد',
     ],
 
     /*
@@ -278,6 +293,9 @@ return [
         'contact_details' => 'تفاصيل الاتصال',
         'subscription_information' => 'معلومات الاشتراك',
         'user_details' => 'تفاصيل المستخدم',
+        'content' => 'المحتوى',
+        'media_settings' => 'الوسائط والإعدادات',
+        'seo_meta_data' => 'سيو والبيانات الوصفية',
         'assessment_information' => 'معلومات التقييم',
         'session_information' => 'معلومات الجلسة',
         'technical_details' => 'التفاصيل التقنية',
@@ -289,6 +307,7 @@ return [
         'select_option' => 'اختر خيار...',
         'upload_file' => 'رفع ملف',
         'drag_drop_file' => 'اسحب وأفلت الملف هنا أو انقر للتصفح',
+        'comment_details' => 'تفاصيل التعليق',
     ],
 
     /*
@@ -331,6 +350,7 @@ return [
         'last_24_hours' => 'آخر 24 ساعة',
         'last_week' => 'الأسبوع الماضي',
         'last_month' => 'الشهر الماضي',
+        'replies_only' => 'الردود فقط',
     ],
 
     /*
