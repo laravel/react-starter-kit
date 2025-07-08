@@ -144,14 +144,24 @@ export default function FreeUserEdit({
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
+        // Update local state for UI feedback
         setData('action', 'save');
-        put(route('free-user.update', assessment.id));
+        // Explicitly pass updated action to ensure it's sent with the request
+        put(route('free-user.update', assessment.id), {
+            ...data,
+            action: 'save',
+        });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Update local state for UI feedback
         setData('action', 'submit');
-        put(route('free-user.update', assessment.id));
+        // Explicitly pass updated action to ensure it's sent with the request
+        put(route('free-user.update', assessment.id), {
+            ...data,
+            action: 'submit',
+        });
     };
 
     const getCompletionPercentage = (): number => {
