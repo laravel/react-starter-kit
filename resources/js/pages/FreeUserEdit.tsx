@@ -146,8 +146,7 @@ export default function FreeUserEdit({
         e.preventDefault();
         // Update local state for UI feedback
         setData('action', 'save');
-        // Use router.put to send the updated action immediately
-        router.put(route('free-user.update', assessment.id), {
+
             ...data,
             action: 'save',
         });
@@ -157,8 +156,7 @@ export default function FreeUserEdit({
         e.preventDefault();
         // Update local state for UI feedback
         setData('action', 'submit');
-        // Use router.put to send the updated action immediately
-        router.put(route('free-user.update', assessment.id), {
+
             ...data,
             action: 'submit',
         });
