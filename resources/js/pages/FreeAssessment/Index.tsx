@@ -1,5 +1,5 @@
 import React from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -44,16 +44,18 @@ interface IndexProps {
 }
 
 export default function Index({ tools, user, locale }: IndexProps) {
-    const { post, processing } = useForm({});
     const [isSubmitting, setIsSubmitting] = React.useState<number | null>(null);
     const isArabic = locale === 'ar';
 
     const startAssessment = (toolId: number) => {
         setIsSubmitting(toolId);
-        post(route('free-assessment.start'), {
-            data: { tool_id: toolId },
-            onFinish: () => setIsSubmitting(null),
-        });
+        router.post(
+            route('free-assessment.start'),
+            { tool_id: toolId },
+            {
+                onFinish: () => setIsSubmitting(null),
+            }
+        );
     };
 
     const getName = (item: { name_en: string; name_ar: string }): string => {
