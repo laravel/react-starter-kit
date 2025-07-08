@@ -92,6 +92,22 @@ export default function ToolsDiscover({ user, tools = [], message }: ToolsDiscov
 
                     {/* Assessment Tools Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        {/* Free Assessment CTA */}
+                        <Link
+                            href="/free-assessment"
+                            className="flex flex-col items-center justify-between bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+                        >
+                            <div className="flex flex-col items-center text-center gap-4">
+                                <div className="text-5xl">🎁</div>
+                                <h3 className="text-2xl font-bold">Get Your Free Assessment</h3>
+                                <p className="text-blue-100 max-w-xs">
+                                    Try a complimentary assessment to see how our tools can help your organisation grow.
+                                </p>
+                            </div>
+                            <span className="mt-6 inline-block bg-white/20 text-white px-4 py-2 rounded-lg font-semibold">
+                                Start For Free
+                            </span>
+                        </Link>
                         {/* Strategic Assessment Tool */}
                         <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
                             <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
@@ -123,9 +139,9 @@ export default function ToolsDiscover({ user, tools = [], message }: ToolsDiscov
                                         30-45 minutes
                                     </div>
                                 </div>
-                                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold">
+                                <Link href="/free-assessment" className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-center">
                                     Start Assessment
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
@@ -160,9 +176,9 @@ export default function ToolsDiscover({ user, tools = [], message }: ToolsDiscov
                                         10-15 minutes
                                     </div>
                                 </div>
-                                <button className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold">
+                                <Link href="/free-assessment" className="block w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-center">
                                     Start Quick Check
-                                </button>
+                                </Link>
                             </div>
                         </div>
 
