@@ -86,12 +86,12 @@ class CriterionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category.name_en')
+                Tables\Columns\TextColumn::make('category.name')
                     ->label(__('filament.fields.category'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name_en')
-                    ->label(__('filament.fields.name_en'))
-                    ->searchable(),
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('filament.fields.name'))
+                    ->searchable(['name_en','name_ar']),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')

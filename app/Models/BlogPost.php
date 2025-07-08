@@ -130,4 +130,28 @@ class BlogPost extends Model
         $locale = $locale ?? app()->getLocale();
         return $locale === 'ar' && $this->content_ar ? $this->content_ar : $this->content;
     }
+
+    /**
+     * Accessor for localized title attribute.
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->getLocalizedTitle();
+    }
+
+    /**
+     * Accessor for localized excerpt attribute.
+     */
+    public function getExcerptAttribute(): string
+    {
+        return $this->getLocalizedExcerpt();
+    }
+
+    /**
+     * Accessor for localized content attribute.
+     */
+    public function getContentAttribute(): string
+    {
+        return $this->getLocalizedContent();
+    }
 }

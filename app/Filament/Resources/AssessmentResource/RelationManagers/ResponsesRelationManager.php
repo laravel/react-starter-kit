@@ -32,16 +32,12 @@ class ResponsesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('criterion.name_en')
+            ->recordTitleAttribute('criterion.name')
             ->columns([
-                Tables\Columns\TextColumn::make('criterion.name_en')
-                    ->label('Criterion (EN)'),
-                Tables\Columns\TextColumn::make('criterion.name_ar')
-                    ->label('Criterion (AR)'),
-                Tables\Columns\TextColumn::make('criterion.category.name_en')
-                    ->label('Category (EN)'),
-                Tables\Columns\TextColumn::make('criterion.category.name_ar')
-                    ->label('Category (AR)'),
+                Tables\Columns\TextColumn::make('criterion.name')
+                    ->label('Criterion'),
+                Tables\Columns\TextColumn::make('criterion.category.name')
+                    ->label('Category'),
                 Tables\Columns\TextColumn::make('value')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')

@@ -119,6 +119,25 @@ class Assessment extends Model
     }
 
     /**
+     * Get localized title for this assessment.
+     */
+    public function getTitle(string $locale = null): string
+    {
+        $locale = $locale ?: app()->getLocale();
+        $field = "title_{$locale}";
+
+        return $this->{$field} ?: $this->tool?->getName($locale);
+    }
+
+    /**
+     * Accessor for localized title attribute.
+     */
+    public function getTitleAttribute(): string
+    {
+        return $this->getTitle();
+    }
+
+    /**
      * Check if this is a guest assessment (no user_id)
      */
     public function isGuestAssessment(): bool
