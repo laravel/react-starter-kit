@@ -152,20 +152,6 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
         });
     }, [responses, files, allCriteria]);
 
-    // Group criteria by domain and category for better organization
-    const groupedCriteria = useMemo(() => {
-        const grouped: Record<number, Record<number, typeof allCriteria>> = {};
-        allCriteria.forEach(criterion => {
-            if (!grouped[criterion.domainId]) {
-                grouped[criterion.domainId] = {};
-            }
-            if (!grouped[criterion.domainId][criterion.categoryId]) {
-                grouped[criterion.domainId][criterion.categoryId] = [];
-            }
-            grouped[criterion.domainId][criterion.categoryId].push(criterion);
-        });
-        return grouped;
-    }, [allCriteria]);
 
     const t = {
         en: {
@@ -361,215 +347,199 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
                             </CardContent>
                         </Card>
 
-                        {/* Questions by Domain and Category */}
+                        {/* Assessment Questions */}
                         <div className="space-y-8">
-                            {assessmentData.tool.domains.map((domain) => (
-                                <div key={domain.id} className="space-y-6">
-                                    {/* Domain Header */}
-                                    <div className="text-center py-6">
-                                        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                                            {language === 'ar' ? domain.name_ar : domain.name_en}
-                                        </h2>
-                                        <div className="w-24 h-1 bg-gradient-to-r from-blue-600 to-purple-600 mx-auto rounded-full"></div>
-                                    </div>
+                            {allCriteria.map((criterion, index) => (
+                                <Card
+                                    key={criterion.id}
+                                    className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1"
+                                >
+                                    <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-blue-100">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-start space-x-4 flex-1">
+                                                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
+                                                    {index + 1}
+                                                </div>
+                                                <div className="flex-1">
+                                                    <CardTitle className="text-lg leading-relaxed text-gray-900 mb-3">
+                                                        {language === 'ar' ? criterion.text_ar : criterion.text_en}
+                                                    </CardTitle>
+                                                    <div className="flex items-center space-x-2">
+                                                        {criterion.requires_file && (
+                                                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
+                                                                <Paperclip className="w-3 h-3 mr-1" />
+                                                                {t.attachmentRequired}
+                                                            </Badge>
+                                                        )}
+                                                        {responses[criterion.id] && (
+                                                            <Badge
+                                                                variant="secondary"
+                                                                className={
+                                                                    responses[criterion.id] === 'yes'
+                                                                        ? 'bg-green-100 text-green-800'
+                                                                        : responses[criterion.id] === 'no'
+                                                                        ? 'bg-red-100 text-red-800'
+                                                                        : 'bg-gray-100 text-gray-800'
+                                                                }
+                                                            >
+                                                                <CheckCheck className="w-3 h-3 mr-1" />
+                                                                Answered
+                                                            </Badge>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            {responses[criterion.id] && (
+                                                <div className="flex items-center ml-4">
+                                                    {responses[criterion.id] === 'yes' && (
+                                                        <CheckCircle className="w-8 h-8 text-green-600" />
+                                                    )}
+                                                    {responses[criterion.id] === 'no' && (
+                                                        <XCircle className="w-8 h-8 text-red-600" />
+                                                    )}
+                                                    {responses[criterion.id] === 'na' && (
+                                                        <MinusCircle className="w-8 h-8 text-gray-600" />
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </CardHeader>
 
-                                    {domain.categories.map((category) => (
-                                        <div key={category.id} className="space-y-4">
-                                            {/* Category Header */}
-                                            <div className="sticky top-24 z-40 bg-white/90 backdrop-blur-md rounded-xl p-4 shadow-lg border border-blue-200/50 mb-6">
-                                                <h3 className="text-xl font-semibold text-gray-800 text-center">
-                                                    {language === 'ar' ? category.name_ar : category.name_en}
-                                                </h3>
+                                    <CardContent className="p-8">
+                                        <div className="space-y-6">
+                                            {/* Response Buttons */}
+                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                                <Button
+                                                    variant={responses[criterion.id] === 'yes' ? 'default' : 'outline'}
+                                                    size="lg"
+                                                    onClick={() => handleResponseChange(criterion.id, 'yes')}
+                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
+                                                        responses[criterion.id] === 'yes'
+                                                            ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200'
+                                                            : 'hover:bg-green-50 hover:border-green-300 hover:shadow-lg'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <CheckCircle className="w-6 h-6" />
+                                                        <span className="text-lg font-medium">{t.yes}</span>
+                                                    </div>
+                                                </Button>
+                                                <Button
+                                                    variant={responses[criterion.id] === 'no' ? 'default' : 'outline'}
+                                                    size="lg"
+                                                    onClick={() => handleResponseChange(criterion.id, 'no')}
+                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
+                                                        responses[criterion.id] === 'no'
+                                                            ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200'
+                                                            : 'hover:bg-red-50 hover:border-red-300 hover:shadow-lg'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <XCircle className="w-6 h-6" />
+                                                        <span className="text-lg font-medium">{t.no}</span>
+                                                    </div>
+                                                </Button>
+                                                <Button
+                                                    variant={responses[criterion.id] === 'na' ? 'default' : 'outline'}
+                                                    size="lg"
+                                                    onClick={() => handleResponseChange(criterion.id, 'na')}
+                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
+                                                        responses[criterion.id] === 'na'
+                                                            ? 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg shadow-gray-200'
+                                                            : 'hover:bg-gray-50 hover:border-gray-300 hover:shadow-lg'
+                                                    }`}
+                                                >
+                                                    <div className="flex items-center space-x-3">
+                                                        <MinusCircle className="w-6 h-6" />
+                                                        <span className="text-lg font-medium">{t.notApplicable}</span>
+                                                    </div>
+                                                </Button>
                                             </div>
 
-                                            {/* Questions in this category */}
-                                            {category.criteria.map((criterion, index) => (
-                                                <Card key={criterion.id} className="border-0 shadow-xl hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
-                                                    <CardHeader className="bg-gradient-to-r from-gray-50 to-blue-50 border-b border-blue-100">
-                                                        <div className="flex items-start justify-between">
-                                                            <div className="flex items-start space-x-4 flex-1">
-                                                                <div className="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0">
-                                                                    {allCriteria.findIndex(c => c.id === criterion.id) + 1}
-                                                                </div>
-                                                                <div className="flex-1">
-                                                                    <CardTitle className="text-lg leading-relaxed text-gray-900 mb-3">
-                                                                        {language === 'ar' ? criterion.text_ar : criterion.text_en}
-                                                                    </CardTitle>
-                                                                    <div className="flex items-center space-x-2">
-                                                                        {criterion.requires_file && (
-                                                                            <Badge variant="secondary" className="bg-amber-100 text-amber-800 border-amber-200">
-                                                                                <Paperclip className="w-3 h-3 mr-1" />
-                                                                                {t.attachmentRequired}
-                                                                            </Badge>
-                                                                        )}
-                                                                        {responses[criterion.id] && (
-                                                                            <Badge variant="secondary" className={
-                                                                                responses[criterion.id] === 'yes' ? 'bg-green-100 text-green-800' :
-                                                                                    responses[criterion.id] === 'no' ? 'bg-red-100 text-red-800' :
-                                                                                        'bg-gray-100 text-gray-800'
-                                                                            }>
-                                                                                <CheckCheck className="w-3 h-3 mr-1" />
-                                                                                Answered
-                                                                            </Badge>
-                                                                        )}
+                                            {/* File Upload Section - Only show when requires_file is true AND response is 'yes' */}
+                                            {criterion.requires_file && responses[criterion.id] === 'yes' && (
+                                                <div className="space-y-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
+                                                    <div className="flex items-center space-x-3 mb-4">
+                                                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                                                            <Upload className="w-5 h-5 text-white" />
+                                                        </div>
+                                                        <div>
+                                                            <h4 className="text-lg font-semibold text-blue-900">{t.uploadFile}</h4>
+                                                            <p className="text-sm text-blue-700">Please provide supporting documentation</p>
+                                                        </div>
+                                                    </div>
+
+                                                    {!files[criterion.id] ? (
+                                                        <div className="relative">
+                                                            <input
+                                                                type="file"
+                                                                id={`file-${criterion.id}`}
+                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                onChange={(e) => {
+                                                                    const file = e.target.files?.[0];
+                                                                    if (file) handleFileUpload(criterion.id, file);
+                                                                }}
+                                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                                            />
+                                                            <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-25 transition-all duration-300 cursor-pointer group">
+                                                                <Cloud className="w-16 h-16 text-blue-400 mx-auto mb-4 group-hover:scale-110 transition-transform duration-200" />
+                                                                <p className="text-blue-800 font-medium mb-2 text-lg">{t.dragDropFile}</p>
+                                                                <p className="text-blue-600">PDF, DOC, DOCX, JPG, PNG (Max 10MB)</p>
+                                                            </div>
+                                                        </div>
+                                                    ) : (
+                                                        <div className="bg-white border-2 border-blue-200 rounded-xl p-6 shadow-lg">
+                                                            <div className="flex items-center justify-between">
+                                                                <div className="flex items-center space-x-4">
+                                                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
+                                                                        <File className="w-6 h-6 text-green-600" />
                                                                     </div>
+                                                                    <div>
+                                                                        <p className="font-semibold text-gray-900 text-lg">{files[criterion.id]?.name}</p>
+                                                                        <p className="text-sm text-gray-500">
+                                                                            {((files[criterion.id]?.size || 0) / 1024 / 1024).toFixed(2)} MB
+                                                                        </p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center space-x-3">
+                                                                    <Badge variant="secondary" className="bg-green-100 text-green-800 px-3 py-1">
+                                                                        <CheckCircle className="w-4 h-4 mr-1" />
+                                                                        {t.fileUploaded}
+                                                                    </Badge>
+                                                                    <Button
+                                                                        variant="ghost"
+                                                                        size="sm"
+                                                                        onClick={() => handleFileRemove(criterion.id)}
+                                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"
+                                                                    >
+                                                                        <X className="w-4 h-4" />
+                                                                    </Button>
                                                                 </div>
                                                             </div>
-                                                            {responses[criterion.id] && (
-                                                                <div className="flex items-center ml-4">
-                                                                    {responses[criterion.id] === 'yes' && (
-                                                                        <CheckCircle className="w-8 h-8 text-green-600" />
-                                                                    )}
-                                                                    {responses[criterion.id] === 'no' && (
-                                                                        <XCircle className="w-8 h-8 text-red-600" />
-                                                                    )}
-                                                                    {responses[criterion.id] === 'na' && (
-                                                                        <MinusCircle className="w-8 h-8 text-gray-600" />
-                                                                    )}
-                                                                </div>
-                                                            )}
                                                         </div>
-                                                    </CardHeader>
+                                                    )}
+                                                </div>
+                                            )}
 
-                                                    <CardContent className="p-8">
-                                                        <div className="space-y-6">
-                                                            {/* Response Buttons */}
-                                                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                                                <Button
-                                                                    variant={responses[criterion.id] === 'yes' ? 'default' : 'outline'}
-                                                                    size="lg"
-                                                                    onClick={() => handleResponseChange(criterion.id, 'yes')}
-                                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
-                                                                        responses[criterion.id] === 'yes'
-                                                                            ? 'bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-200'
-                                                                            : 'hover:bg-green-50 hover:border-green-300 hover:shadow-lg'
-                                                                    }`}
-                                                                >
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <CheckCircle className="w-6 h-6" />
-                                                                        <span className="text-lg font-medium">{t.yes}</span>
-                                                                    </div>
-                                                                </Button>
-                                                                <Button
-                                                                    variant={responses[criterion.id] === 'no' ? 'default' : 'outline'}
-                                                                    size="lg"
-                                                                    onClick={() => handleResponseChange(criterion.id, 'no')}
-                                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
-                                                                        responses[criterion.id] === 'no'
-                                                                            ? 'bg-red-600 hover:bg-red-700 text-white shadow-lg shadow-red-200'
-                                                                            : 'hover:bg-red-50 hover:border-red-300 hover:shadow-lg'
-                                                                    }`}
-                                                                >
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <XCircle className="w-6 h-6" />
-                                                                        <span className="text-lg font-medium">{t.no}</span>
-                                                                    </div>
-                                                                </Button>
-                                                                <Button
-                                                                    variant={responses[criterion.id] === 'na' ? 'default' : 'outline'}
-                                                                    size="lg"
-                                                                    onClick={() => handleResponseChange(criterion.id, 'na')}
-                                                                    className={`h-16 transition-all duration-300 transform hover:scale-105 ${
-                                                                        responses[criterion.id] === 'na'
-                                                                            ? 'bg-gray-600 hover:bg-gray-700 text-white shadow-lg shadow-gray-200'
-                                                                            : 'hover:bg-gray-50 hover:border-gray-300 hover:shadow-lg'
-                                                                    }`}
-                                                                >
-                                                                    <div className="flex items-center space-x-3">
-                                                                        <MinusCircle className="w-6 h-6" />
-                                                                        <span className="text-lg font-medium">{t.notApplicable}</span>
-                                                                    </div>
-                                                                </Button>
-                                                            </div>
-
-                                                            {/* File Upload Section - Only show when requires_file is true AND response is 'yes' */}
-                                                            {criterion.requires_file && responses[criterion.id] === 'yes' && (
-                                                                <div className="space-y-4 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl">
-                                                                    <div className="flex items-center space-x-3 mb-4">
-                                                                        <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                                                                            <Upload className="w-5 h-5 text-white" />
-                                                                        </div>
-                                                                        <div>
-                                                                            <h4 className="text-lg font-semibold text-blue-900">{t.uploadFile}</h4>
-                                                                            <p className="text-sm text-blue-700">Please provide supporting documentation</p>
-                                                                        </div>
-                                                                    </div>
-
-                                                                    {!files[criterion.id] ? (
-                                                                        <div className="relative">
-                                                                            <input
-                                                                                type="file"
-                                                                                id={`file-${criterion.id}`}
-                                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                                                onChange={(e) => {
-                                                                                    const file = e.target.files?.[0];
-                                                                                    if (file) handleFileUpload(criterion.id, file);
-                                                                                }}
-                                                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                                            />
-                                                                            <div className="border-2 border-dashed border-blue-300 rounded-xl p-8 text-center hover:border-blue-400 hover:bg-blue-25 transition-all duration-300 cursor-pointer group">
-                                                                                <Cloud className="w-16 h-16 text-blue-400 mx-auto mb-4 group-hover:scale-110 transition-transform duration-200" />
-                                                                                <p className="text-blue-800 font-medium mb-2 text-lg">{t.dragDropFile}</p>
-                                                                                <p className="text-blue-600">PDF, DOC, DOCX, JPG, PNG (Max 10MB)</p>
-                                                                            </div>
-                                                                        </div>
-                                                                    ) : (
-                                                                        <div className="bg-white border-2 border-blue-200 rounded-xl p-6 shadow-lg">
-                                                                            <div className="flex items-center justify-between">
-                                                                                <div className="flex items-center space-x-4">
-                                                                                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-                                                                                        <File className="w-6 h-6 text-green-600" />
-                                                                                    </div>
-                                                                                    <div>
-                                                                                        <p className="font-semibold text-gray-900 text-lg">{files[criterion.id]?.name}</p>
-                                                                                        <p className="text-sm text-gray-500">
-                                                                                            {((files[criterion.id]?.size || 0) / 1024 / 1024).toFixed(2)} MB
-                                                                                        </p>
-                                                                                    </div>
-                                                                                </div>
-                                                                                <div className="flex items-center space-x-3">
-                                                                                    <Badge variant="secondary" className="bg-green-100 text-green-800 px-3 py-1">
-                                                                                        <CheckCircle className="w-4 h-4 mr-1" />
-                                                                                        {t.fileUploaded}
-                                                                                    </Badge>
-                                                                                    <Button
-                                                                                        variant="ghost"
-                                                                                        size="sm"
-                                                                                        onClick={() => handleFileRemove(criterion.id)}
-                                                                                        className="text-red-600 hover:text-red-700 hover:bg-red-50 p-2"
-                                                                                    >
-                                                                                        <X className="w-4 h-4" />
-                                                                                    </Button>
-                                                                                </div>
-                                                                            </div>
-                                                                        </div>
-                                                                    )}
-                                                                </div>
-                                                            )}
-
-                                                            {/* Notes Section */}
-                                                            {responses[criterion.id] && (
-                                                                <div className="space-y-4 p-6 bg-gray-50 border border-gray-200 rounded-xl">
-                                                                    <div className="flex items-center space-x-2">
-                                                                        <FileText className="w-5 h-5 text-gray-600" />
-                                                                        <label className="text-base font-medium text-gray-900">{t.notes}</label>
-                                                                    </div>
-                                                                    <Textarea
-                                                                        value={notes[criterion.id] || ''}
-                                                                        onChange={(e) => handleNotesChange(criterion.id, e.target.value)}
-                                                                        placeholder={t.notesPlaceholder}
-                                                                        rows={3}
-                                                                        className="resize-none text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
-                                                                    />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </CardContent>
-                                                </Card>
-                                            ))}
+                                            {/* Notes Section */}
+                                            {responses[criterion.id] && (
+                                                <div className="space-y-4 p-6 bg-gray-50 border border-gray-200 rounded-xl">
+                                                    <div className="flex items-center space-x-2">
+                                                        <FileText className="w-5 h-5 text-gray-600" />
+                                                        <label className="text-base font-medium text-gray-900">{t.notes}</label>
+                                                    </div>
+                                                    <Textarea
+                                                        value={notes[criterion.id] || ''}
+                                                        onChange={(e) => handleNotesChange(criterion.id, e.target.value)}
+                                                        placeholder={t.notesPlaceholder}
+                                                        rows={3}
+                                                        className="resize-none text-base border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                                                    />
+                                                </div>
+                                            )}
                                         </div>
-                                    ))}
-                                </div>
+                                    </CardContent>
+                                </Card>
                             ))}
                         </div>
 
