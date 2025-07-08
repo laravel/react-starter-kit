@@ -36,7 +36,7 @@ class GuestSessionResource extends Resource
                             ->maxLength(255),
                         Forms\Components\Select::make('assessment_id')
                             ->relationship('assessment', 'id')
-                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->tool->name_en} - {$record->name}")
+                            ->getOptionLabelFromRecordUsing(fn ($record) => "{$record->tool->name} - {$record->name}")
                             ->required(),
                     ]),
 
@@ -92,7 +92,7 @@ class GuestSessionResource extends Resource
                 Tables\Columns\TextColumn::make('email')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('assessment.tool.name_en')
+                Tables\Columns\TextColumn::make('assessment.tool.name')
                     ->label('Assessment Tool')
                     ->sortable()
                     ->limit(30),
@@ -198,7 +198,7 @@ class GuestSessionResource extends Resource
                     ->schema([
                         Infolists\Components\TextEntry::make('name'),
                         Infolists\Components\TextEntry::make('email'),
-                        Infolists\Components\TextEntry::make('assessment.tool.name_en')
+                        Infolists\Components\TextEntry::make('assessment.tool.name')
                             ->label('Assessment Tool'),
                         Infolists\Components\TextEntry::make('assessment.organization')
                             ->label('Organization')

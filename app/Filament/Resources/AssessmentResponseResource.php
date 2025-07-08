@@ -56,13 +56,13 @@ class AssessmentResponseResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('tool.name_en')
+                Tables\Columns\TextColumn::make('tool.name')
                     ->label(__('filament.resources.assessment.label'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('criterion.name_en')
+                Tables\Columns\TextColumn::make('criterion.name')
                     ->label(__('filament.fields.criterion'))
                     ->sortable(),
-                Tables\Columns\TextColumn::make('criterion.category.name_en')
+                Tables\Columns\TextColumn::make('criterion.category.name')
                     ->label(__('filament.fields.category'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('value')
