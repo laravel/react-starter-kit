@@ -22,29 +22,44 @@ class BlogCommentResource extends Resource
 
     protected static ?int $navigationSort = 2;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.blog_comment.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.blog_comment.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.blog_comment.plural_label');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Comment Details')
+                Forms\Components\Section::make(__('filament.form.comment_details'))
                     ->schema([
                         Forms\Components\Select::make('blog_post_id')
-                            ->label('Blog Post')
+                            ->label(__('filament.resources.blog_post.label'))
                             ->relationship('blogPost', 'title')
                             ->required()
                             ->searchable(),
 
                         Forms\Components\Select::make('user_id')
-                            ->label('User')
+                            ->label(__('filament.fields.user'))
                             ->relationship('user', 'name')
                             ->searchable(),
 
                         Forms\Components\TextInput::make('author_name')
-                            ->label('Author Name (Guest)')
+                            ->label(__('filament.fields.author_name'))
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('author_email')
-                            ->label('Author Email (Guest)')
+                            ->label(__('filament.fields.author_email'))
                             ->email()
                             ->maxLength(255),
 
@@ -53,16 +68,17 @@ class BlogCommentResource extends Resource
                             ->rows(4),
 
                         Forms\Components\Select::make('status')
+                            ->label(__('filament.fields.status'))
                             ->options([
-                                'pending' => 'Pending',
-                                'approved' => 'Approved',
-                                'rejected' => 'Rejected',
+                                'pending' => __('filament.status.pending'),
+                                'approved' => __('filament.status.approved'),
+                                'rejected' => __('filament.status.rejected'),
                             ])
                             ->default('pending')
                             ->required(),
 
                         Forms\Components\Select::make('parent_id')
-                            ->label('Reply To')
+                            ->label(__('filament.fields.reply_to'))
                             ->relationship('parent', 'content')
                             ->getOptionLabelFromRecordUsing(fn (BlogComment $record): string =>
                             Str::limit($record->content, 50)
@@ -77,7 +93,7 @@ class BlogCommentResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('blogPost.title')
-                    ->label('Blog Post')
+                    ->label(__('filament.resources.blog_post.label'))
                     ->sortable()
                     ->searchable()
                     ->limit(30),
@@ -99,7 +115,7 @@ class BlogCommentResource extends Resource
                     ]),
 
                 Tables\Columns\IconColumn::make('is_reply')
-                    ->label('Reply')
+                    ->label(__('filament.fields.reply'))
                     ->getStateUsing(fn (BlogComment $record): bool => $record->isReply())
                     ->boolean(),
 
@@ -109,17 +125,19 @@ class BlogCommentResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'pending' => 'Pending',
-                        'approved' => 'Approved',
-                        'rejected' => 'Rejected',
+                        'pending' => __('filament.status.pending'),
+                        'approved' => __('filament.status.approved'),
+                        'rejected' => __('filament.status.rejected'),
                     ]),
 
                 Tables\Filters\SelectFilter::make('blog_post')
+                    ->label(__('filament.resources.blog_post.label'))
                     ->relationship('blogPost', 'title'),
 
                 Tables\Filters\Filter::make('is_reply')
-                    ->label('Replies Only')
+                    ->label(__('filament.filters.replies_only'))
                     ->query(fn (Builder $query): Builder => $query->whereNotNull('parent_id')),
             ])
             ->actions([
@@ -148,7 +166,7 @@ class BlogCommentResource extends Resource
                     Tables\Actions\DeleteBulkAction::make(),
 
                     Tables\Actions\BulkAction::make('approve')
-                        ->label('Approve Selected')
+                        ->label(__('filament.actions.approve_selected'))
                         ->icon('heroicon-o-check')
                         ->color('success')
                         ->action(function ($records) {
@@ -156,7 +174,7 @@ class BlogCommentResource extends Resource
                         }),
 
                     Tables\Actions\BulkAction::make('reject')
-                        ->label('Reject Selected')
+                        ->label(__('filament.actions.reject_selected'))
                         ->icon('heroicon-o-x-mark')
                         ->color('danger')
                         ->action(function ($records) {

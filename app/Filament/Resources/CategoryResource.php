@@ -16,6 +16,21 @@ class CategoryResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-tag';
     protected static ?int $navigationSort = 3;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.category.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.category.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.category.plural_label');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
@@ -23,27 +38,27 @@ class CategoryResource extends Resource
                 Forms\Components\Select::make('domain_id')
                     ->relationship('domain', 'name_en')
                     ->required(),
-                Forms\Components\Tabs::make('Translations')
+                Forms\Components\Tabs::make(__('filament.form.translations'))
                     ->tabs([
-                        Forms\Components\Tabs\Tab::make('English')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.english'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_en')
-                                    ->label('Name (English)')
+                                    ->label(__('filament.fields.name_en'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_en')
-                                    ->label('Description (English)')
+                                    ->label(__('filament.fields.description_en'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
-                        Forms\Components\Tabs\Tab::make('Arabic')
+                        Forms\Components\Tabs\Tab::make(__('filament.form.arabic'))
                             ->schema([
                                 Forms\Components\TextInput::make('name_ar')
-                                    ->label('Name (Arabic)')
+                                    ->label(__('filament.fields.name_ar'))
                                     ->required()
                                     ->maxLength(255),
                                 Forms\Components\Textarea::make('description_ar')
-                                    ->label('Description (Arabic)')
+                                    ->label(__('filament.fields.description_ar'))
                                     ->maxLength(65535)
                                     ->columnSpanFull(),
                             ]),
@@ -56,9 +71,10 @@ class CategoryResource extends Resource
                 Forms\Components\TextInput::make('weight_percentage')
                     ->required(),
                 Forms\Components\Select::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ])
                     ->default('active')
                     ->required(),
@@ -70,14 +86,15 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('domain.name_en')
-                    ->label('Domain')
+                    ->label(__('filament.fields.domain'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name_en')
-                    ->label('Name (English)')
+                    ->label(__('filament.fields.name_en'))
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('weight_percentage'),
+                Tables\Columns\TextColumn::make('weight_percentage')
+                    ->label(__('filament.fields.weight_percentage')),
                 Tables\Columns\BadgeColumn::make('status')
                     ->colors([
                         'danger' => 'inactive',
@@ -94,11 +111,13 @@ class CategoryResource extends Resource
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('domain')
+                    ->label(__('filament.fields.domain'))
                     ->relationship('domain', 'name_en'),
                 Tables\Filters\SelectFilter::make('status')
+                    ->label(__('filament.fields.status'))
                     ->options([
-                        'active' => 'Active',
-                        'inactive' => 'Inactive',
+                        'active' => __('filament.status.active'),
+                        'inactive' => __('filament.status.inactive'),
                     ]),
             ])
             ->actions([

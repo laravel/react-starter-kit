@@ -23,11 +23,26 @@ class BlogPostResource extends Resource
 
     protected static ?int $navigationSort = 1;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.blog_post.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.blog_post.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.blog_post.plural_label');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                Forms\Components\Section::make('Basic Information')
+                Forms\Components\Section::make(__('filament.form.basic_information'))
                     ->schema([
                         Forms\Components\TextInput::make('title')
                             ->required()
@@ -40,7 +55,7 @@ class BlogPostResource extends Resource
                             }),
 
                         Forms\Components\TextInput::make('title_ar')
-                            ->label('Title (Arabic)')
+                            ->label(__('filament.fields.title_ar'))
                             ->maxLength(255),
 
                         Forms\Components\TextInput::make('slug')
@@ -55,12 +70,12 @@ class BlogPostResource extends Resource
                             ->maxLength(500),
 
                         Forms\Components\Textarea::make('excerpt_ar')
-                            ->label('Excerpt (Arabic)')
+                            ->label(__('filament.fields.excerpt_ar'))
                             ->rows(3)
                             ->maxLength(500),
                     ])->columns(2),
 
-                Forms\Components\Section::make('Content')
+                Forms\Components\Section::make(__('filament.form.content'))
                     ->schema([
                         Forms\Components\RichEditor::make('content')
                             ->required()
@@ -82,7 +97,7 @@ class BlogPostResource extends Resource
                             ]),
 
                         Forms\Components\RichEditor::make('content_ar')
-                            ->label('Content (Arabic)')
+                            ->label(__('filament.fields.content_ar'))
                             ->toolbarButtons([
                                 'attachFiles',
                                 'blockquote',
@@ -101,7 +116,7 @@ class BlogPostResource extends Resource
                             ]),
                     ]),
 
-                Forms\Components\Section::make('Media & Settings')
+                Forms\Components\Section::make(__('filament.form.media_settings'))
                     ->schema([
                         Forms\Components\FileUpload::make('featured_image')
                             ->image()
@@ -136,17 +151,17 @@ class BlogPostResource extends Resource
                             ->required(),
 
                         Forms\Components\DateTimePicker::make('published_at')
-                            ->label('Publish Date & Time')
+                            ->label(__('filament.fields.published_at'))
                             ->native(false),
 
                         Forms\Components\Select::make('author_id')
-                            ->label('Author')
+                            ->label(__('filament.fields.author'))
                             ->relationship('author', 'name')
                             ->default(auth()->id())
                             ->required(),
                     ])->columns(2),
 
-                Forms\Components\Section::make('SEO & Meta Data')
+                Forms\Components\Section::make(__('filament.form.seo_meta_data'))
                     ->schema([
                         Forms\Components\KeyValue::make('meta_data')
                             ->label('Meta Data')
@@ -187,17 +202,17 @@ class BlogPostResource extends Resource
                     ]),
 
                 Tables\Columns\TextColumn::make('views_count')
-                    ->label('Views')
+                    ->label(__('filament.fields.views'))
                     ->sortable()
                     ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('likes_count')
-                    ->label('Likes')
+                    ->label(__('filament.fields.likes'))
                     ->sortable()
                     ->alignCenter(),
 
                 Tables\Columns\TextColumn::make('comments_count')
-                    ->label('Comments')
+                    ->label(__('filament.fields.comments'))
                     ->sortable()
                     ->alignCenter(),
 

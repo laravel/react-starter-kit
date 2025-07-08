@@ -16,12 +16,28 @@ class AssessmentResponseResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-clipboard-document-check';
     protected static ?int $navigationSort = 6;
 
+    public static function getNavigationLabel(): string
+    {
+        return __('filament.resources.assessment_response.navigation_label');
+    }
+
+    public static function getModelLabel(): string
+    {
+        return __('filament.resources.assessment_response.label');
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return __('filament.resources.assessment_response.plural_label');
+    }
+
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
 
                 Forms\Components\Select::make('criterion_id')
+                    ->label(__('filament.fields.criterion'))
                     ->relationship('criterion', 'name_en')
                     ->required(),
                 Forms\Components\TextInput::make('value')
@@ -30,6 +46,7 @@ class AssessmentResponseResource extends Resource
                     ->minValue(0)
                     ->maxValue(100),
                 Forms\Components\Textarea::make('notes')
+                    ->label(__('filament.fields.notes'))
                     ->maxLength(65535)
                     ->columnSpanFull(),
             ]);
@@ -40,13 +57,13 @@ class AssessmentResponseResource extends Resource
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('tool.name_en')
-                    ->label('Assessment')
+                    ->label(__('filament.resources.assessment.label'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('criterion.name_en')
-                    ->label('Criterion')
+                    ->label(__('filament.fields.criterion'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('criterion.category.name_en')
-                    ->label('Category')
+                    ->label(__('filament.fields.category'))
                     ->sortable(),
                 Tables\Columns\TextColumn::make('value')
                     ->sortable(),
@@ -62,6 +79,7 @@ class AssessmentResponseResource extends Resource
             ->filters([
 
                 Tables\Filters\SelectFilter::make('criterion')
+                    ->label(__('filament.fields.criterion'))
                     ->relationship('criterion', 'name_en'),
             ])
             ->actions([
