@@ -250,6 +250,10 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
             files,
         });
 
+        setTimeout(() => {
+            post(route('free-assessment.submit', assessmentData.id), {
+                forceFormData: true,
+            });
         router.post(
             route('free-assessment.submit', assessmentData.id),
             { responses, notes, files },
