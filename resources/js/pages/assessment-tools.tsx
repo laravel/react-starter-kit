@@ -41,7 +41,64 @@ interface AssessmentToolsProps {
     locale: string;
 }
 
+<<<<<<< HEAD
 const translations = {
+=======
+interface Translations {
+    en: {
+        title: string;
+        subtitle: string;
+        selectTool: string;
+        startAssessment: string;
+        noTools: string;
+        searchPlaceholder: string;
+        upgradeRequired: string;
+        limitReached: string;
+        unlimited: string;
+        currentUsage: string;
+        upgradeNow: string;
+        requestAccess: string;
+        freePlan: string;
+        premiumPlan: string;
+        assessmentLimit: string;
+        estimatedTime: string;
+        minutes: string;
+        criteria: string;
+        domains: string;
+        viewDetails: string;
+        popular: string;
+        new: string;
+        recommended: string;
+    };
+    ar: {
+        title: string;
+        subtitle: string;
+        selectTool: string;
+        startAssessment: string;
+        noTools: string;
+        searchPlaceholder: string;
+        upgradeRequired: string;
+        limitReached: string;
+        unlimited: string;
+        currentUsage: string;
+        upgradeNow: string;
+        requestAccess: string;
+        freePlan: string;
+        premiumPlan: string;
+        assessmentLimit: string;
+        estimatedTime: string;
+        minutes: string;
+        criteria: string;
+        domains: string;
+        viewDetails: string;
+        popular: string;
+        new: string;
+        recommended: string;
+    };
+}
+
+const translations: Translations = {
+>>>>>>> 25c9c33af4c90bdbcae5e426e58d2a7f2ecf7dde
     en: {
         title: "Assessment Tools",
         subtitle: "Choose the perfect assessment tool for your evaluation needs",
@@ -49,6 +106,13 @@ const translations = {
         noTools: "No assessment tools are currently available.",
         searchPlaceholder: "Search assessment tools...",
         upgradeNow: "Upgrade Now",
+<<<<<<< HEAD
+=======
+        requestAccess: "Request Access",
+        freePlan: "Free Plan",
+        premiumPlan: "Premium Plan",
+        assessmentLimit: "Assessment Limit",
+>>>>>>> 25c9c33af4c90bdbcae5e426e58d2a7f2ecf7dde
         estimatedTime: "Estimated Time",
         minutes: "minutes",
         criteria: "criteria",
@@ -61,6 +125,13 @@ const translations = {
         noTools: "لا توجد أدوات تقييم متاحة حالياً.",
         searchPlaceholder: "البحث في أدوات التقييم...",
         upgradeNow: "ترقية الآن",
+<<<<<<< HEAD
+=======
+        requestAccess: "طلب الوصول",
+        freePlan: "الخطة المجانية",
+        premiumPlan: "الخطة المدفوعة",
+        assessmentLimit: "حد التقييمات",
+>>>>>>> 25c9c33af4c90bdbcae5e426e58d2a7f2ecf7dde
         estimatedTime: "الوقت المقدر",
         minutes: "دقيقة",
         criteria: "معايير",
@@ -127,7 +198,11 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                                 userLimits.can_create_more &&
                                 tool.status === 'active' &&
                                 tool.has_access;
+<<<<<<< HEAD
 
+=======
+                            const showRequest = tool.status === 'active' && !tool.has_access;
+>>>>>>> 25c9c33af4c90bdbcae5e426e58d2a7f2ecf7dde
                             return (
                                 <Card key={tool.id} className="flex flex-col overflow-hidden shadow-md">
                                     {tool.image && (
@@ -157,6 +232,12 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                                                     <Button className="w-full mt-4">
                                                         <Play className="w-4 h-4 mr-2" />
                                                         {t.startAssessment}
+                                                    </Button>
+                                                </Link>
+                                            ) : showRequest ? (
+                                                <Link href={`/tools/request/${tool.id}`}>
+                                                    <Button variant="secondary" className="w-full">
+                                                        {t.requestAccess}
                                                     </Button>
                                                 </Link>
                                             ) : (
