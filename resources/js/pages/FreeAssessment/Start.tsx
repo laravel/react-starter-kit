@@ -255,6 +255,10 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
             { responses, notes, files },
             { forceFormData: true }
         );
+        // Wait for state to update before posting to avoid stale data
+        setTimeout(() => {
+            post(route('free-assessment.submit', assessmentData.id));
+        }, 0);
     };
 
     const scrollToTop = () => {

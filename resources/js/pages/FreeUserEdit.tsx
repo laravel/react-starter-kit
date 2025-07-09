@@ -148,6 +148,7 @@ export default function FreeUserEdit({
         setData('action', 'save');
         // Use router.put to send the updated action immediately
         router.put(route('free-user.update', assessment.id), {
+
             ...data,
             action: 'save',
         });
