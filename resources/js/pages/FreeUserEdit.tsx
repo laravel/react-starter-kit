@@ -145,13 +145,17 @@ export default function FreeUserEdit({
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
         setData('action', 'save');
-        put(route('free-user.update', assessment.id));
+        setTimeout(() => {
+            put(route('free-user.update', assessment.id));
+        }, 0);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         setData('action', 'submit');
-        put(route('free-user.update', assessment.id));
+        setTimeout(() => {
+            put(route('free-user.update', assessment.id));
+        }, 0);
     };
 
     const getCompletionPercentage = (): number => {

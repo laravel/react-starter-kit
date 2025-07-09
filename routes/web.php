@@ -162,11 +162,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::post('/free-assessment/{assessment}/submit', [FreeAssessmentController::class, 'submit'])
             ->name('free-assessment.submit');
 
-        // 5. View basic results (Results.tsx)
+        // 5. Completion page before showing results
+        Route::get('/free-assessment/{assessment}/complete', [FreeAssessmentController::class, 'complete'])
+            ->name('free-assessment.complete');
+
+        // 6. View basic results (Results.tsx)
         Route::get('/free-assessment/{assessment}/results', [FreeAssessmentController::class, 'results'])
             ->name('free-assessment.results');
 
-        // 6. Edit assessment (redirects to take route)
+        // 7. Edit assessment (redirects to take route)
         Route::get('/free-assessment/{assessment}/edit', [FreeAssessmentController::class, 'edit'])
             ->name('free-assessment.edit');
 

@@ -245,14 +245,16 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
         if (!isComplete || processing) return;
 
         setData({
-            responses: responses,
-            notes: notes,
-            files: files
+            responses,
+            notes,
+            files,
         });
 
-
-        // Use the correct route with assessment ID from your existing routes
-        post(route('free-assessment.submit', assessmentData.id));
+        setTimeout(() => {
+            post(route('free-assessment.submit', assessmentData.id), {
+                forceFormData: true,
+            });
+        }, 0);
     };
 
     const scrollToTop = () => {
