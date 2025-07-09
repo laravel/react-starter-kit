@@ -209,6 +209,7 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                                 userLimits.can_create_more &&
                                 tool.status === 'active' &&
                                 tool.has_access;
+                            const canStart = userLimits.can_create_more && tool.status === 'active';
                             return (
                                 <Card key={tool.id} className="flex flex-col overflow-hidden">
                                     {tool.image && (

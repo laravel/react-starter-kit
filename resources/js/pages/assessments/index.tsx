@@ -80,6 +80,7 @@ const translations: Translations = {
         noAssessments: 'No assessments found.',
         completion: 'Completion',
         score: 'Score'
+        noAssessments: 'No assessments found.'
     },
     ar: {
         title: 'تقييماتي',
@@ -89,6 +90,7 @@ const translations: Translations = {
         noAssessments: 'لا توجد تقييمات.',
         completion: 'مكتمل',
         score: 'النتيجة'
+        noAssessments: 'لا توجد تقييمات.'
     }
 };
 
@@ -112,6 +114,10 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
     const getText = (item: any, field: string): string =>
         language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
 
+
+    const getText = (item: any, field: string): string =>
+        language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
+
     const filtered = assessments.filter(
         (a) =>
             getText(a.tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -119,6 +125,9 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
     );
 
     const continueUrl = (a: Assessment) => route('assessment.take', a.id);
+    const isUserAssessment = (a: Assessment) => a.user_id === auth.user.id;
+    const continueUrl = (a: Assessment) =>
+        isUserAssessment(a) ? route('assessment.start', a.tool.id) : route('assessment.take', a.id);
     const resultsUrl = (a: Assessment) => route('assessment.results', a.id);
 
     return (
@@ -135,6 +144,17 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                         <span>{language === 'en' ? 'عربي' : 'English'}</span>
                     </Button>
                 </div>
+
+                <div className="relative mb-6 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        placeholder={t.searchPlaceholder}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9"
+                    />
+                </div>
+
 
                 <div className="relative mb-6 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
@@ -189,6 +209,19 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                                     </div>
                                                 )}
                                             </div>
+                                        </div>
+                                        <div className="mt-auto">
+                                            <Link href={url}>
+                                                <Button className="w-full">
+                                                    {isComplete ? (
+                                                        <Award className="w-4 h-4 mr-2" />
+                                                    ) : (
+                                                        <Play className="w-4 h-4 mr-2" />
+                                                    )}
+                                                    {isComplete ? t.viewResults : t.continueAssessment}
+                                                </Button>
+                                            </Link>
+                                        </div>
                                         </div>
                                         <div className="mt-auto">
                                             <Link href={url}>
