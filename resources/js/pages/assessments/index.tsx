@@ -29,6 +29,13 @@ interface Assessment {
     overall_score?: number;
     completion_percentage?: number;
     user_id?: number;
+    results?: {
+        yes_count: number;
+        no_count: number;
+        na_count: number;
+        score_percentage: number;
+        weighted_score: number;
+    };
 }
 
 interface AssessmentsIndexProps {
@@ -107,12 +114,17 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
     const getText = (item: any, field: string): string =>
         language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
 
+
+    const getText = (item: any, field: string): string =>
+        language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
+
     const filtered = assessments.filter(
         (a) =>
             getText(a.tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
             a.guest_name.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
+    const continueUrl = (a: Assessment) => route('assessment.take', a.id);
     const isUserAssessment = (a: Assessment) => a.user_id === auth.user.id;
     const continueUrl = (a: Assessment) =>
         isUserAssessment(a) ? route('assessment.start', a.tool.id) : route('assessment.take', a.id);
@@ -187,6 +199,14 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                                         </div>
                                                         <Progress value={a.completion_percentage} className="h-2" />
                                                     </>
+                                                )}
+                                                {a.results && isComplete && (
+                                                    <div className="text-xs text-gray-600 grid grid-cols-2 gap-1 mt-2">
+                                                        <span>Yes: {a.results.yes_count}</span>
+                                                        <span>No: {a.results.no_count}</span>
+                                                        <span>N/A: {a.results.na_count}</span>
+                                                        <span>Weighted: {Math.round(a.results.weighted_score)}%</span>
+                                                    </div>
                                                 )}
                                             </div>
                                         </div>
