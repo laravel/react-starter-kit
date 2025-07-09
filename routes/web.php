@@ -206,7 +206,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/assessments/{assessment}/take', [AssessmentController::class, 'take'])
             ->name('assessment.take');
 
-        Route::post('/assessments/{assessment}/response', [AssessmentController::class, 'storeResponse'])
+        Route::post('/assessments/{assessment}/response', [AssessmentController::class, 'saveResponse'])
             ->name('assessment.response');
 
         Route::post('/assessments/{assessment}/submit', [AssessmentController::class, 'submit'])
