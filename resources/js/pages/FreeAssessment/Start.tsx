@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -108,7 +108,7 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     // Form for submission
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, processing } = useForm({
         responses: {},
         notes: {},
         files: {}
@@ -245,14 +245,16 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
         if (!isComplete || processing) return;
 
         setData({
-            responses: responses,
-            notes: notes,
-            files: files
+            responses,
+            notes,
+            files,
         });
 
-
-        // Use the correct route with assessment ID from your existing routes
-        post(route('free-assessment.submit', assessmentData.id));
+        router.post(
+            route('free-assessment.submit', assessmentData.id),
+            { responses, notes, files },
+            { forceFormData: true }
+        );
     };
 
     const scrollToTop = () => {
