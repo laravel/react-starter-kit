@@ -1,4 +1,5 @@
 import BlogLayout from '@/layouts/blog-layout';
+import AppLayout from '@/layouts/app-layout';
 import { Post, Comment } from '@/types/post';
 import { Head, router } from '@inertiajs/react';
 import { useState } from 'react';
@@ -21,6 +22,9 @@ export default function PostShow({ post, comments: initial }: Props) {
     return (
         <BlogLayout title={post.title}>
             <div className="max-w-3xl mx-auto space-y-6">
+        <AppLayout>
+            <Head title={post.title} />
+            <div className="max-w-3xl mx-auto space-y-6 p-4">
                 <h1 className="text-3xl font-bold">{post.title}</h1>
                 {post.published_at && (
                     <p className="text-gray-500">
@@ -36,5 +40,6 @@ export default function PostShow({ post, comments: initial }: Props) {
                 <CommentList comments={comments} />
             </div>
         </BlogLayout>
+        </AppLayout>
     );
 }

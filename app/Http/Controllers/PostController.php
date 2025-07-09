@@ -27,6 +27,7 @@ class PostController extends Controller
         }
 
         $comments = $post->comments()->where('approved', true)->latest()->get();
+        $comments = $post->comments()->latest()->get();
 
         return Inertia::render('posts/Show', [
             'post' => $post,
@@ -42,6 +43,7 @@ class PostController extends Controller
         ]);
 
         $post->comments()->create($data + ['approved' => false]);
+        $post->comments()->create($data);
 
         return redirect()->back();
     }

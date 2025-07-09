@@ -21,43 +21,38 @@ class ToolSubscriptionResource extends Resource
         return $form->schema([
             Forms\Components\Select::make('user_id')
                 ->relationship('user', 'name')
-                ->searchable()
-                ->required(),
+//                ->searchable()
+                ->required()
+                ->native(false),
             Forms\Components\Select::make('tool_id')
                 ->relationship('tool', 'name_en')
-                ->searchable()
-                ->required(),
+//                ->searchable()
+                ->required()
+                ->native(false),
             Forms\Components\Select::make('plan_type')
                 ->options([
                     'free' => 'Free',
                     'premium' => 'Premium',
                 ])
-                ->required(),
+                ->required()->native(false),
             Forms\Components\Select::make('status')
                 ->options([
                     'active' => 'Active',
                     'inactive' => 'Inactive',
                     'expired' => 'Expired',
-                ])
+                ])->native(false)
                 ->required(),
             Forms\Components\DateTimePicker::make('started_at')
-                ->required(),
-            Forms\Components\DateTimePicker::make('expires_at'),
+                ->required()->native(false),
+            Forms\Components\DateTimePicker::make('expires_at')
+                ->native(false),
             Forms\Components\KeyValue::make('features')
-                ->columnSpanFull(),
-            Forms\Components\TextInput::make('paddle_subscription_id')
-                ->maxLength(255)
-                ->columnSpanFull(),
-            Forms\Components\TextInput::make('paddle_customer_id')
-                ->maxLength(255)
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('amount')
                 ->numeric()
                 ->columnSpanFull(),
             Forms\Components\TextInput::make('currency')
                 ->maxLength(3)
-                ->columnSpanFull(),
-            Forms\Components\KeyValue::make('paddle_data')
                 ->columnSpanFull(),
         ]);
     }

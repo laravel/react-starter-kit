@@ -35,10 +35,18 @@ class FreeUserController extends Controller
             ->get()
             ->map(function ($assessment) use ($locale) {
                 $overallScore = null;
+                $resultsData = null;
                 if ($assessment->status === 'completed') {
                     try {
                         $results = $assessment->getResults();
                         $overallScore = $results['overall_percentage'] ?? null;
+                        $resultsData = [
+                            'yes_count' => $results['yes_count'] ?? 0,
+                            'no_count' => $results['no_count'] ?? 0,
+                            'na_count' => $results['na_count'] ?? 0,
+                            'score_percentage' => $results['overall_percentage'] ?? 0,
+                            'weighted_score' => $results['overall_percentage'] ?? 0,
+                        ];
                     } catch (Exception $e) {
                         Log::warning('Failed to get results for assessment', [
                             'assessment_id' => $assessment->id,
@@ -69,6 +77,7 @@ class FreeUserController extends Controller
                     'overall_score' => $overallScore,
                     'completion_percentage' => $assessment->getCompletionPercentage(),
                     'user_id' => $assessment->user_id,
+                    'results' => $resultsData,
                 ];
             });
 
