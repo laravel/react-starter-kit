@@ -208,7 +208,7 @@ export default function AssessmentResults({ assessment, results, locale = 'en' }
             href: '/assessment-tools',
         },
         {
-            title: isArabic ? 'النتائج' : 'Results',
+            title: isArabic ? 'النتائج' : 'Result',
             href: `/assessment/${assessment.id}/results`,
         },
     ];

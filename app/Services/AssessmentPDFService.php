@@ -7,7 +7,7 @@
  * using Laravel and browser-based PDF generation for maximum quality.
  *
  * This is a dynamic service that works with any tool and generates results
- * based on domains with percentages.
+ * based on domains with percentages. Now supports both English and Arabic.
  *
  * Installation Requirements:
  * 1. composer require spatie/browsershot
@@ -15,7 +15,7 @@
  * 3. npm install -g puppeteer
  *
  * Usage in Controller:
- * $service = new AssessmentPDFService();
+ * $service = new AssessmentPDFService('ar'); // For Arabic
  * $service->setAssessmentData($assessment, $results, $user);
  * return $service->generatePDF();
  */
@@ -29,9 +29,16 @@ use Illuminate\Http\Response;
 class AssessmentPDFService
 {
     private array $data;
+    private string $language;
+    private bool $isArabic;
+    private array $translations;
 
-    public function __construct()
+    public function __construct(string $language = 'ar')
     {
+        $this->language = $language;
+        $this->isArabic = $language === 'ar';
+        $this->initializeTranslations();
+
         // Initialize with empty data structure
         $this->data = [
             'tool_name' => '',
@@ -42,6 +49,7 @@ class AssessmentPDFService
             'overall_percentage' => 0,
             'certification_level' => '',
             'certification_color' => '',
+            'certification_text' => '',
             'total_criteria' => 0,
             'applicable_criteria' => 0,
             'yes_count' => 0,
@@ -52,6 +60,101 @@ class AssessmentPDFService
     }
 
     /**
+     * Initialize translations for both languages
+     */
+    private function initializeTranslations(): void
+    {
+        $this->translations = [
+            'en' => [
+                'assessment_results' => 'Assessment Results',
+                'completed_on' => 'Completed on',
+                'assessment_completed_by' => 'Assessment completed by',
+                'for' => 'for',
+                'using_tool' => 'using the',
+                'assessment_tool' => 'assessment tool',
+                'domain_performance_overview' => 'Domain Performance Overview',
+                'performance_analysis' => 'Performance Analysis',
+                'response_breakdown' => 'Response Breakdown',
+                'this_domain_achieved' => 'This domain achieved a score of',
+                'which_is_considered' => 'which is considered',
+                'based_on_criteria' => 'Based on',
+                'applicable_criteria' => 'applicable criteria out of',
+                'total_criteria' => 'total criteria',
+                'recommendation' => 'Recommendation',
+                'yes' => 'Yes',
+                'no' => 'No',
+                'not_applicable' => 'Not Applicable',
+                'criteria_marked_na' => 'criteria marked as Not Applicable',
+                'score' => 'Score',
+                'excellent_performance' => 'Excellent Performance',
+                'good_performance' => 'Good Performance',
+                'satisfactory_performance' => 'Satisfactory Performance',
+                'needs_improvement' => 'Needs Improvement',
+                'excellent' => 'excellent',
+                'good' => 'good',
+                'satisfactory' => 'satisfactory',
+                'needing_improvement' => 'needing improvement',
+                'outstanding_recommendation' => 'Outstanding performance! Continue maintaining these high standards and consider sharing best practices with other domains.',
+                'good_recommendation' => 'Good performance with room for optimization. Focus on addressing the remaining gaps to achieve excellence.',
+                'satisfactory_recommendation' => 'Satisfactory performance but significant improvement opportunities exist. Consider developing an action plan to address key gaps.',
+                'poor_recommendation' => 'This domain requires immediate attention. Develop a comprehensive improvement strategy and consider additional resources or training.'
+            ],
+            'ar' => [
+                'assessment_results' => 'نتائج التقييم',
+                'completed_on' => 'اكتمل في',
+                'assessment_completed_by' => 'تم إكمال التقييم بواسطة',
+                'for' => 'لـ',
+                'using_tool' => 'باستخدام أداة',
+                'assessment_tool' => 'التقييم',
+                'domain_performance_overview' => 'نظرة عامة على أداء المجالات',
+                'performance_analysis' => 'تحليل الأداء',
+                'response_breakdown' => 'تفصيل الإجابات',
+                'this_domain_achieved' => 'حقق هذا المجال نتيجة',
+                'which_is_considered' => 'والتي تعتبر',
+                'based_on_criteria' => 'بناءً على',
+                'applicable_criteria' => 'معايير قابلة للتطبيق من أصل',
+                'total_criteria' => 'إجمالي المعايير',
+                'recommendation' => 'التوصية',
+                'yes' => 'نعم',
+                'no' => 'لا',
+                'not_applicable' => 'غير قابل للتطبيق',
+                'criteria_marked_na' => 'معايير مُحددة كغير قابلة للتطبيق',
+                'score' => 'النتيجة',
+                'excellent_performance' => 'أداء ممتاز',
+                'good_performance' => 'أداء جيد',
+                'satisfactory_performance' => 'أداء مُرضي',
+                'needs_improvement' => 'يحتاج تحسين',
+                'excellent' => 'ممتاز',
+                'good' => 'جيد',
+                'satisfactory' => 'مُرضي',
+                'needing_improvement' => 'يحتاج تحسين',
+                'outstanding_recommendation' => 'أداء متميز! استمر في الحفاظ على هذه المعايير العالية وفكر في مشاركة أفضل الممارسات مع المجالات الأخرى.',
+                'good_recommendation' => 'أداء جيد مع مجال للتحسين. ركز على معالجة الثغرات المتبقية لتحقيق التميز.',
+                'satisfactory_recommendation' => 'أداء مُرضي ولكن توجد فرص تحسين كبيرة. فكر في وضع خطة عمل لمعالجة الثغرات الرئيسية.',
+                'poor_recommendation' => 'يتطلب هذا المجال اهتماماً فورياً. ضع استراتيجية تحسين شاملة وفكر في موارد أو تدريب إضافي.'
+            ]
+        ];
+    }
+
+    /**
+     * Get translation for a key
+     */
+    private function t(string $key): string
+    {
+        return $this->translations[$this->language][$key] ?? $key;
+    }
+
+    /**
+     * Set language and reinitialize translations
+     */
+    public function setLanguage(string $language): void
+    {
+
+        $this->language = $language;
+        $this->isArabic = $language === 'ar';
+    }
+
+    /**
      * Set assessment data from assessment model and results
      */
     public function setAssessmentData($assessment, $results, $user = null): void
@@ -59,12 +162,17 @@ class AssessmentPDFService
         // Get certification info based on overall percentage
         $certificationInfo = $this->getCertificationInfo($results['overall_percentage'] ?? 0);
 
+        // Get tool name based on language
+        $toolName = $this->isArabic
+            ? ($assessment->tool->name_ar ?? $assessment->tool->name_en ?? 'أداة التقييم')
+            : ($assessment->tool->name_en ?? 'Assessment Tool');
+
         $this->data = [
-            'tool_name' => $assessment->tool->name_en ?? 'Assessment Tool',
-            'company_name' => $user && $user->details ? $user->details->company_name : ($assessment->organization ?? 'Your Organization'),
+            'tool_name' => $toolName,
+            'company_name' => $user && $user->details ? $user->details->company_name : ($assessment->organization ?? ($this->isArabic ? 'مؤسستك' : 'Your Organization')),
             'assessment_name' => $assessment->name,
             'assessment_email' => $assessment->email,
-            'completion_date' => $assessment->completed_at ? $assessment->completed_at->format('F d, Y') : now()->format('F d, Y'),
+            'completion_date' => $this->formatDate($assessment->completed_at ?? now()),
             'overall_percentage' => $results['overall_percentage'] ?? 0,
             'certification_level' => $certificationInfo['level'],
             'certification_color' => $certificationInfo['color'],
@@ -76,6 +184,22 @@ class AssessmentPDFService
             'na_count' => $results['na_count'] ?? 0,
             'domain_results' => $results['domain_results'] ?? []
         ];
+    }
+
+    /**
+     * Format date according to language
+     */
+    private function formatDate($date): string
+    {
+        if (!$date) {
+            $date = now();
+        }
+
+        if ($this->isArabic) {
+            return $date->locale('ar')->translatedFormat('d F Y');
+        } else {
+            return $date->format('F d, Y');
+        }
     }
 
     /**
@@ -160,6 +284,8 @@ class AssessmentPDFService
      */
     private function buildCompleteHTML(): string
     {
+        $lang = $this->language;
+        $dir = $this->isArabic ? 'rtl' : 'ltr';
         $css = $this->getAdvancedCSS();
         $coverPage = $this->generateCoverPage();
         $summaryPage = $this->generateSummaryPage();
@@ -167,11 +293,11 @@ class AssessmentPDFService
 
         return "
         <!DOCTYPE html>
-        <html lang=\"en\">
+        <html lang=\"{$lang}\" dir=\"{$dir}\">
         <head>
             <meta charset=\"UTF-8\">
             <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-            <title>{$this->data['tool_name']} Assessment Results</title>
+            <title>{$this->data['tool_name']} {$this->t('assessment_results')}</title>
             <style>{$css}</style>
         </head>
         <body>
@@ -183,11 +309,21 @@ class AssessmentPDFService
     }
 
     /**
-     * Professional CSS styling optimized for assessment results
+     * Professional CSS styling optimized for assessment results with RTL support
      */
     private function getAdvancedCSS(): string
     {
+        $fontFamily = $this->isArabic
+            ? "'Amiri', 'Noto Sans Arabic', 'Tahoma', 'Arial Unicode MS', sans-serif"
+            : "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif";
+
+        $textAlign = $this->isArabic ? 'right' : 'left';
+        $marginDirection = $this->isArabic ? 'margin-left' : 'margin-right';
+
         return "
+        /* Import Arabic fonts */
+        @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+
         /* Reset and base styles */
         * {
             margin: 0;
@@ -196,11 +332,12 @@ class AssessmentPDFService
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
+            font-family: {$fontFamily};
+            font-size: " . ($this->isArabic ? '16px' : '14px') . ";
+            line-height: " . ($this->isArabic ? '1.8' : '1.5') . ";
             color: #2c3e50;
             background: white;
+            direction: " . ($this->isArabic ? 'rtl' : 'ltr') . ";
         }
 
         /* Page structure */
@@ -247,7 +384,7 @@ class AssessmentPDFService
         }
 
         .company-logo {
-            font-size: 24px;
+            font-size: " . ($this->isArabic ? '28px' : '24px') . ";
             font-weight: 600;
             margin-bottom: 40px;
             z-index: 10;
@@ -256,7 +393,7 @@ class AssessmentPDFService
         }
 
         .cover-title {
-            font-size: 56px;
+            font-size: " . ($this->isArabic ? '48px' : '56px') . ";
             font-weight: 800;
             line-height: 1.1;
             margin-bottom: 24px;
@@ -266,7 +403,7 @@ class AssessmentPDFService
         }
 
         .cover-subtitle {
-            font-size: 28px;
+            font-size: " . ($this->isArabic ? '24px' : '28px') . ";
             font-weight: 400;
             opacity: 0.95;
             z-index: 10;
@@ -275,7 +412,7 @@ class AssessmentPDFService
         }
 
         .cover-date {
-            font-size: 18px;
+            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
             opacity: 0.8;
             z-index: 10;
             position: relative;
@@ -284,10 +421,11 @@ class AssessmentPDFService
         /* Content pages */
         .content-page {
             padding: 60px;
+            text-align: {$textAlign};
         }
 
         .section-title {
-            font-size: 32px;
+            font-size: " . ($this->isArabic ? '28px' : '32px') . ";
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 24px;
@@ -295,10 +433,10 @@ class AssessmentPDFService
         }
 
         .section-subtitle {
-            font-size: 16px;
+            font-size: " . ($this->isArabic ? '18px' : '16px') . ";
             color: #546e7a;
             margin-bottom: 32px;
-            line-height: 1.6;
+            line-height: " . ($this->isArabic ? '1.8' : '1.6') . ";
         }
 
         /* Overall results section */
@@ -322,11 +460,11 @@ class AssessmentPDFService
             display: inline-block;
             padding: 12px 24px;
             border-radius: 25px;
-            font-size: 18px;
+            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
             font-weight: 700;
             margin-bottom: 24px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+            text-transform: " . ($this->isArabic ? 'none' : 'uppercase') . ";
+            letter-spacing: " . ($this->isArabic ? '0' : '1px') . ";
         }
 
         .cert-excellent { background: #4caf50; color: white; }
@@ -359,7 +497,7 @@ class AssessmentPDFService
         }
 
         .stat-label {
-            font-size: 14px;
+            font-size: " . ($this->isArabic ? '16px' : '14px') . ";
             color: #6c757d;
             font-weight: 500;
         }
@@ -381,8 +519,9 @@ class AssessmentPDFService
             padding: 24px;
             background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
             border-radius: 12px;
-            border-left: 6px solid #007bff;
+            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #007bff;
             box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . "
         }
 
         .domain-number {
@@ -396,16 +535,17 @@ class AssessmentPDFService
             justify-content: center;
             font-weight: 800;
             font-size: 24px;
-            margin-right: 24px;
+            {$marginDirection}: 24px;
             box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
         }
 
         .domain-content {
             flex: 1;
+            text-align: {$textAlign};
         }
 
         .domain-title {
-            font-size: 20px;
+            font-size: " . ($this->isArabic ? '22px' : '20px') . ";
             font-weight: 600;
             color: #2c3e50;
             margin-bottom: 8px;
@@ -414,14 +554,15 @@ class AssessmentPDFService
         .domain-score {
             font-size: 32px;
             font-weight: 800;
-            margin-left: auto;
+            margin-" . ($this->isArabic ? 'right' : 'left') . ": auto;
             min-width: 100px;
-            text-align: right;
+            text-align: " . ($this->isArabic ? 'left' : 'right') . ";
         }
 
         /* Individual domain pages */
         .domain-page {
             padding: 60px;
+            text-align: {$textAlign};
         }
 
         .domain-header {
@@ -429,6 +570,7 @@ class AssessmentPDFService
             align-items: center;
             margin-bottom: 48px;
             gap: 24px;
+            " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . "
         }
 
         .domain-icon {
@@ -450,7 +592,7 @@ class AssessmentPDFService
         }
 
         .domain-main-title {
-            font-size: 36px;
+            font-size: " . ($this->isArabic ? '32px' : '36px') . ";
             font-weight: 700;
             color: #2c3e50;
             line-height: 1.2;
@@ -458,7 +600,7 @@ class AssessmentPDFService
         }
 
         .domain-percentage {
-            font-size: 24px;
+            font-size: " . ($this->isArabic ? '26px' : '24px') . ";
             font-weight: 600;
             color: #6c757d;
         }
@@ -475,6 +617,7 @@ class AssessmentPDFService
             border-radius: 12px;
             overflow: hidden;
             margin: 16px 0;
+            direction: ltr; /* Progress bars always LTR */
         }
 
         .progress-fill {
@@ -516,24 +659,24 @@ class AssessmentPDFService
 
         .performance-card {
             background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-left: 6px solid #2196f3;
+            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #2196f3;
         }
 
         .breakdown-card {
             background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-left: 6px solid #ff9800;
+            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #ff9800;
         }
 
         .card-title {
-            font-size: 18px;
+            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
             font-weight: 700;
             color: #2c3e50;
             margin-bottom: 16px;
         }
 
         .card-content {
-            font-size: 15px;
-            line-height: 1.6;
+            font-size: " . ($this->isArabic ? '17px' : '15px') . ";
+            line-height: " . ($this->isArabic ? '1.8' : '1.6') . ";
             color: #37474f;
         }
 
@@ -548,6 +691,24 @@ class AssessmentPDFService
             body { margin: 0; }
             .page { margin: 0; width: 100%; min-height: 100vh; }
         }
+
+        /* RTL specific adjustments */
+        " . ($this->isArabic ? "
+        .domain-item {
+            text-align: right;
+        }
+
+        .domain-score {
+            margin-right: auto;
+            margin-left: 0;
+            text-align: left;
+        }
+
+        .progress-text {
+            right: auto;
+            left: 12px;
+        }
+        " : "") . "
         ";
     }
 
@@ -558,10 +719,10 @@ class AssessmentPDFService
     {
         return "
         <div class=\"page cover-page\">
-            <div class=\"company-logo\">{$this->data['company_name']}This is the name</div>
+            <div class=\"company-logo\">{$this->data['company_name']}</div>
             <div class=\"cover-title\">{$this->data['tool_name']}</div>
-            <div class=\"cover-subtitle\">Assessment Results</div>
-            <div class=\"cover-date\">Completed on {$this->data['completion_date']}</div>
+            <div class=\"cover-subtitle\">{$this->t('assessment_results')}</div>
+            <div class=\"cover-date\">{$this->t('completed_on')} {$this->data['completion_date']}</div>
         </div>";
     }
 
@@ -586,10 +747,10 @@ class AssessmentPDFService
 
         return "
         <div class=\"page content-page\">
-            <div class=\"section-title\">Assessment Results Summary</div>
+            <div class=\"section-title\">{$this->t('assessment_results')}</div>
             <div class=\"section-subtitle\">
-                Assessment completed by {$this->data['assessment_name']} ({$this->data['assessment_email']})
-                for {$this->data['company_name']} using the {$this->data['tool_name']} assessment tool.
+                {$this->t('assessment_completed_by')} {$this->data['assessment_name']} ({$this->data['assessment_email']})
+                {$this->t('for')} {$this->data['company_name']} {$this->t('using_tool')} {$this->data['tool_name']} {$this->t('assessment_tool')}.
             </div>
 
             <div class=\"overall-results\">
@@ -599,11 +760,9 @@ class AssessmentPDFService
                 <div class=\"certification-badge cert-{$this->data['certification_level']}\">
                     {$this->data['certification_text']}
                 </div>
-
-
             </div>
 
-            <div class=\"section-title\">Domain Performance Overview</div>
+            <div class=\"section-title\">{$this->t('domain_performance_overview')}</div>
             <div class=\"domains-overview\">
                 {$domainsHTML}
             </div>
@@ -638,7 +797,7 @@ class AssessmentPDFService
                 <div class=\"domain-icon\">{$domainNumber}</div>
                 <div class=\"domain-info\">
                     <div class=\"domain-main-title\">{$domain['domain_name']}</div>
-                    <div class=\"domain-percentage\">Score: " . number_format($domain['score_percentage'], 1) . "%</div>
+                    <div class=\"domain-percentage\">{$this->t('score')}: " . number_format($domain['score_percentage'], 1) . "%</div>
                 </div>
             </div>
 
@@ -652,33 +811,33 @@ class AssessmentPDFService
 
             <div class=\"domain-details\">
                 <div class=\"detail-card performance-card\">
-                    <div class=\"card-title\">Performance Analysis</div>
+                    <div class=\"card-title\">{$this->t('performance_analysis')}</div>
                     <div class=\"card-content\">
-                        <p>This domain achieved a score of <strong>" . number_format($domain['score_percentage'], 1) . "%</strong>,
-                        which is considered <strong>" . $this->getPerformanceLevel($domain['score_percentage']) . "</strong>.</p>
+                        <p>{$this->t('this_domain_achieved')} <strong>" . number_format($domain['score_percentage'], 1) . "%</strong>،
+                        {$this->t('which_is_considered')} <strong>" . $this->getPerformanceLevel($domain['score_percentage']) . "</strong>.</p>
 
-                        <p class=\"mb-4\">Based on {$domain['applicable_criteria']} applicable criteria out of {$domain['total_criteria']} total criteria.</p>
+                        <p class=\"mb-4\">{$this->t('based_on_criteria')} {$domain['applicable_criteria']} {$this->t('applicable_criteria')} {$domain['total_criteria']} {$this->t('total_criteria')}.</p>
 
                         " . $this->getPerformanceRecommendation($domain['score_percentage']) . "
                     </div>
                 </div>
 
                 <div class=\"detail-card breakdown-card\">
-                    <div class=\"card-title\">Response Breakdown</div>
+                    <div class=\"card-title\">{$this->t('response_breakdown')}</div>
                     <div class=\"card-content\">
                         <div class=\"stats-grid\" style=\"grid-template-columns: 1fr 1fr; gap: 16px;\">
                             <div class=\"stat-card stat-yes\">
                                 <div class=\"stat-number\">{$domain['yes_count']}</div>
-                                <div class=\"stat-label\">Yes</div>
+                                <div class=\"stat-label\">{$this->t('yes')}</div>
                             </div>
                             <div class=\"stat-card stat-no\">
                                 <div class=\"stat-number\">{$domain['no_count']}</div>
-                                <div class=\"stat-label\">No</div>
+                                <div class=\"stat-label\">{$this->t('no')}</div>
                             </div>
                         </div>
 
                         <p style=\"margin-top: 16px; text-align: center; color: #6c757d;\">
-                            {$domain['na_count']} criteria marked as Not Applicable
+                            {$domain['na_count']} {$this->t('criteria_marked_na')}
                         </p>
                     </div>
                 </div>
@@ -692,13 +851,13 @@ class AssessmentPDFService
     private function getCertificationInfo(float $percentage): array
     {
         if ($percentage >= 90) {
-            return ['level' => 'excellent', 'color' => '#28a745', 'text' => 'Excellent Performance'];
+            return ['level' => 'excellent', 'color' => '#28a745', 'text' => $this->t('excellent_performance')];
         } elseif ($percentage >= 75) {
-            return ['level' => 'good', 'color' => '#007bff', 'text' => 'Good Performance'];
+            return ['level' => 'good', 'color' => '#007bff', 'text' => $this->t('good_performance')];
         } elseif ($percentage >= 60) {
-            return ['level' => 'satisfactory', 'color' => '#ffc107', 'text' => 'Satisfactory Performance'];
+            return ['level' => 'satisfactory', 'color' => '#ffc107', 'text' => $this->t('satisfactory_performance')];
         } else {
-            return ['level' => 'needs-improvement', 'color' => '#dc3545', 'text' => 'Needs Improvement'];
+            return ['level' => 'needs-improvement', 'color' => '#dc3545', 'text' => $this->t('needs_improvement')];
         }
     }
 
@@ -729,10 +888,10 @@ class AssessmentPDFService
      */
     private function getPerformanceLevel(float $percentage): string
     {
-        if ($percentage >= 90) return 'excellent';
-        if ($percentage >= 75) return 'good';
-        if ($percentage >= 60) return 'satisfactory';
-        return 'needing improvement';
+        if ($percentage >= 90) return $this->t('excellent');
+        if ($percentage >= 75) return $this->t('good');
+        if ($percentage >= 60) return $this->t('satisfactory');
+        return $this->t('needing_improvement');
     }
 
     /**
@@ -740,15 +899,18 @@ class AssessmentPDFService
      */
     private function getPerformanceRecommendation(float $percentage): string
     {
+        $recommendation = '';
         if ($percentage >= 90) {
-            return '<p><strong>Recommendation:</strong> Outstanding performance! Continue maintaining these high standards and consider sharing best practices with other domains.</p>';
+            $recommendation = $this->t('outstanding_recommendation');
         } elseif ($percentage >= 75) {
-            return '<p><strong>Recommendation:</strong> Good performance with room for optimization. Focus on addressing the remaining gaps to achieve excellence.</p>';
+            $recommendation = $this->t('good_recommendation');
         } elseif ($percentage >= 60) {
-            return '<p><strong>Recommendation:</strong> Satisfactory performance but significant improvement opportunities exist. Consider developing an action plan to address key gaps.</p>';
+            $recommendation = $this->t('satisfactory_recommendation');
         } else {
-            return '<p><strong>Recommendation:</strong> This domain requires immediate attention. Develop a comprehensive improvement strategy and consider additional resources or training.</p>';
+            $recommendation = $this->t('poor_recommendation');
         }
+
+        return '<p><strong>' . $this->t('recommendation') . ':</strong> ' . $recommendation . '</p>';
     }
 
     /**
@@ -756,11 +918,12 @@ class AssessmentPDFService
      */
     private function generateFilename(): string
     {
-        $toolName = preg_replace('/[^A-Za-z0-9_-]/', '_', $this->data['tool_name']);
-        $companyName = preg_replace('/[^A-Za-z0-9_-]/', '_', $this->data['company_name']);
+        $toolName = preg_replace('/[^A-Za-z0-9_\u0600-\u06FF-]/', '_', $this->data['tool_name']);
+        $companyName = preg_replace('/[^A-Za-z0-9_\u0600-\u06FF-]/', '_', $this->data['company_name']);
         $date = now()->format('Y-m-d');
+        $lang = $this->language;
 
-        return "{$toolName}_{$companyName}_Assessment_Results_{$date}.pdf";
+        return "{$toolName}_{$companyName}_Assessment_Results_{$date}_{$lang}.pdf";
     }
 
     /**

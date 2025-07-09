@@ -266,7 +266,14 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
 
 
         // Use the correct route with assessment ID from your existing routes
-        post(route('free-assessment.submit', assessmentData.id));
+        post(route('free-assessment.submit', assessmentData.id), {
+            onSuccess: () => {
+                console.log("Redirected to results");
+            },
+            onError: (errors) => {
+                console.error(errors);
+            }
+        });
     };
 
     const scrollToTop = () => {

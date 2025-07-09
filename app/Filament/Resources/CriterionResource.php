@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\App;
 
 class CriterionResource extends Resource
 {
@@ -86,11 +87,19 @@ class CriterionResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('category.name_en')
+                Tables\Columns\TextColumn::make('category.name')
                     ->label(__('filament.fields.category'))
+                    ->getStateUsing(function ($record) {
+                        return App::getLocale() === 'ar'
+                            ? $record->category->name_ar
+                            : $record->category->name_en;
+                    })
                     ->sortable(),
-                Tables\Columns\TextColumn::make('name_en')
-                    ->label(__('filament.fields.name_en'))
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('filament.fields.name'))
+                    ->getStateUsing(function ($record) {
+                        return App::getLocale() === 'ar' ? $record->name_ar : $record->name_en;
+                    })
                     ->searchable(),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),

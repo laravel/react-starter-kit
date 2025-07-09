@@ -21,10 +21,10 @@ class FreeAssessmentController extends Controller
         $user = auth()->user();
 
         // Check if user can take free assessment
-        if (!$user->canTakeFreeAssessment()) {
-            return redirect()->route('tools.discover')
-                ->with('info', 'You have already used your free assessment. Browse tools below to purchase more assessments.');
-        }
+//        if (!$user->canTakeFreeAssessment()) {
+//            return redirect()->route('tools.discover')
+//                ->with('info', 'You have already used your free assessment. Browse tools below to purchase more assessments.');
+//        }
 
         // Get all tools available for free assessment
         $freeTools = Tool::where('has_free_plan', true)->get();
@@ -76,10 +76,10 @@ class FreeAssessmentController extends Controller
         $user = auth()->user();
 
         // Check if user can take free assessment
-        if (!$user->canTakeFreeAssessment()) {
-            return redirect()->route('tools.discover')
-                ->with('error', 'You have already used your free assessment.');
-        }
+//        if (!$user->canTakeFreeAssessment()) {
+//            return redirect()->route('tools.discover')
+//                ->with('error', 'You have already used your free assessment.');
+//        }
 
         $validated = $request->validate([
             'tool_id' => 'required|exists:tools,id'

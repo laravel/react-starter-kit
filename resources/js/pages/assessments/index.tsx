@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Progress } from '@/components/ui/progress';
+import ThemeToggle from '@/components/theme-toggle';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import {
@@ -399,7 +400,10 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.pageTitle} />
 
-            <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${language === 'ar' ? 'rtl' : 'ltr'}`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <div
+                className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-300 ${language === 'ar' ? 'rtl' : 'ltr'}`}
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
+            >
                 <div className="flex h-full flex-1 flex-col gap-8 p-6 lg:p-8">
                     {/* Enhanced Header */}
                     <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6">
@@ -430,6 +434,8 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                 <span>{language === 'en' ? 'عربي' : 'English'}</span>
                             </Button>
 
+                            <ThemeToggle variant="button" size="sm" className="backdrop-blur-sm bg-white/50 border-white/30 hover:bg-white/70" />
+
                             <Link href="/assessment-tools">
                                 <Button className="flex items-center gap-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 shadow-lg">
                                     <Plus className="h-4 w-4" />
@@ -442,7 +448,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     {/* Dashboard Stats */}
                     {totalAssessments > 0 && (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50">
+                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-gray-700">
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -456,7 +462,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                 </CardContent>
                             </Card>
 
-                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-emerald-50">
+                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-emerald-50 dark:from-gray-800 dark:to-emerald-900">
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -470,7 +476,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                 </CardContent>
                             </Card>
 
-                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-purple-50">
+                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-purple-50 dark:from-gray-800 dark:to-purple-900">
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -484,7 +490,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                 </CardContent>
                             </Card>
 
-                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-amber-50">
+                            <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-amber-50 dark:from-gray-800 dark:to-amber-900">
                                 <CardContent className="p-6">
                                     <div className="flex items-center justify-between">
                                         <div>
@@ -503,7 +509,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     )}
 
                     {/* Enhanced Filters and Search */}
-                    <Card className="border-0 shadow-xl bg-white/80 backdrop-blur-sm">
+                    <Card className="border-0 shadow-xl bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
                         <CardContent className="p-6">
                             <div className="flex flex-col lg:flex-row gap-6">
                                 {/* Search */}
@@ -561,7 +567,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
 
                     {/* Content */}
                     {filteredAndSortedAssessments.length === 0 ? (
-                        <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50">
+                        <Card className="border-0 shadow-2xl bg-gradient-to-br from-white to-gray-50 dark:from-gray-800 dark:to-gray-700">
                             <CardContent className="flex flex-col items-center justify-center py-20">
                                 <div className="text-center space-y-6">
                                     <div className="w-24 h-24 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto">
@@ -590,7 +596,10 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     ) : (
                         <div className="grid gap-6">
                             {filteredAndSortedAssessments.map((assessment) => (
-                                <Card key={assessment.id} className="border-0 shadow-xl bg-white/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden group">
+                                <Card
+                                    key={assessment.id}
+                                    className="border-0 shadow-xl bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm hover:shadow-2xl transition-all duration-300 hover:scale-[1.02] overflow-hidden group"
+                                >
                                     <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500"></div>
 
                                     <CardContent className="p-8">
@@ -794,7 +803,7 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
 
                     {/* Enhanced Footer Stats */}
                     {totalAssessments > 0 && (
-                        <Card className="border-0 shadow-xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+                        <Card className="border-0 shadow-xl bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50 dark:from-gray-800 dark:via-gray-700 dark:to-gray-800">
                             <CardContent className="p-6">
                                 <div className="text-center space-y-4">
                                     <h3 className="text-lg font-semibold text-gray-800">{t.myProgress}</h3>
