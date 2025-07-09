@@ -18,6 +18,7 @@ class CommentsRelationManager extends RelationManager
             ->schema([
                 Forms\Components\TextInput::make('author_name')->required()->maxLength(255),
                 Forms\Components\Textarea::make('content')->required()->columnSpanFull(),
+                Forms\Components\Toggle::make('approved')->label('Approved'),
             ]);
     }
 
@@ -28,6 +29,7 @@ class CommentsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('author_name')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('content')->limit(50),
                 Tables\Columns\TextColumn::make('created_at')->dateTime()->sortable(),
+                Tables\Columns\IconColumn::make('approved')->boolean(),
             ])
             ->headerActions([
                 Tables\Actions\CreateAction::make(),

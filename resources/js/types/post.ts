@@ -18,4 +18,5 @@ export interface Comment {
     author_name: string;
     content: string;
     created_at: string;
+    approved: boolean;
 }

@@ -5,6 +5,7 @@ export function CommentForm({ postSlug }: { postSlug: string }) {
     const [author, setAuthor] = useState('');
     const [content, setContent] = useState('');
     const [loading, setLoading] = useState(false);
+    const [submitted, setSubmitted] = useState(false);
 
     const submit = () => {
         setLoading(true);
@@ -17,6 +18,7 @@ export function CommentForm({ postSlug }: { postSlug: string }) {
                     setAuthor('');
                     setContent('');
                     setLoading(false);
+                    setSubmitted(true);
                 },
             }
         );
@@ -53,6 +55,9 @@ export function CommentForm({ postSlug }: { postSlug: string }) {
             >
                 {loading ? 'Posting...' : 'Post Comment'}
             </button>
+            {submitted && (
+                <p className="text-sm text-gray-600">Your comment will appear once approved.</p>
+            )}
         </form>
     );
 }

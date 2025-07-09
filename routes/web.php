@@ -87,6 +87,7 @@ Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFCo
     ->middleware(['throttle:10,1']);
 
 // Blog posts
+Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
 Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
 Route::post('/posts/{post:slug}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
 

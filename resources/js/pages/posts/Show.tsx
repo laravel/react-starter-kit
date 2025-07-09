@@ -1,3 +1,4 @@
+import BlogLayout from '@/layouts/blog-layout';
 import AppLayout from '@/layouts/app-layout';
 import { Post, Comment } from '@/types/post';
 import { Head, router } from '@inertiajs/react';
@@ -19,6 +20,8 @@ export default function PostShow({ post, comments: initial }: Props) {
     };
 
     return (
+        <BlogLayout title={post.title}>
+            <div className="max-w-3xl mx-auto space-y-6">
         <AppLayout>
             <Head title={post.title} />
             <div className="max-w-3xl mx-auto space-y-6 p-4">
@@ -36,6 +39,7 @@ export default function PostShow({ post, comments: initial }: Props) {
                 <CommentForm postSlug={post.slug} />
                 <CommentList comments={comments} />
             </div>
+        </BlogLayout>
         </AppLayout>
     );
 }

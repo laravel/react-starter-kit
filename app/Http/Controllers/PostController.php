@@ -9,12 +9,24 @@ use Inertia\Inertia;
 
 class PostController extends Controller
 {
+    public function index()
+    {
+        $posts = Post::where('status', 'published')
+            ->latest('published_at')
+            ->get();
+
+        return Inertia::render('posts/Index', [
+            'posts' => $posts,
+        ]);
+    }
+
     public function show(Post $post)
     {
         if ($post->status !== 'published') {
             abort(404);
         }
 
+        $comments = $post->comments()->where('approved', true)->latest()->get();
         $comments = $post->comments()->latest()->get();
 
         return Inertia::render('posts/Show', [
@@ -30,6 +42,7 @@ class PostController extends Controller
             'content' => 'required|string',
         ]);
 
+        $post->comments()->create($data + ['approved' => false]);
         $post->comments()->create($data);
 
         return redirect()->back();

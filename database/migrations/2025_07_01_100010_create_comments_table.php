@@ -12,6 +12,7 @@ return new class extends Migration {
             $table->foreignId('post_id')->constrained('posts')->cascadeOnDelete();
             $table->string('author_name');
             $table->text('content');
+            $table->boolean('approved')->default(false);
             $table->timestamps();
         });
     }

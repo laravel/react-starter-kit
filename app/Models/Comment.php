@@ -14,6 +14,7 @@ class Comment extends Model
         'post_id',
         'author_name',
         'content',
+        'approved',
     ];
 
     public function post(): BelongsTo
