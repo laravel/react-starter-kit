@@ -413,15 +413,20 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                         </div>
 
                         {/* Language Toggle */}
-                        <Button
-                            onClick={() => setCurrentLang(prev => prev === 'en' ? 'ar' : 'en')}
-                            variant="outline"
-                            size="sm"
-                            className="border-blue-200 text-blue-700 hover:bg-blue-50"
-                        >
-                            <Globe className="h-4 w-4 mr-1" />
-                            {currentLang.toUpperCase()}
-                        </Button>
+                        <div className="flex items-center space-x-4">
+                            <Link href={route('posts.index')} className="text-blue-700 font-medium hover:text-blue-900">
+                                Blog
+                            </Link>
+                            <Button
+                                onClick={() => setCurrentLang(prev => prev === 'en' ? 'ar' : 'en')}
+                                variant="outline"
+                                size="sm"
+                                className="border-blue-200 text-blue-700 hover:bg-blue-50"
+                            >
+                                <Globe className="h-4 w-4 mr-1" />
+                                {currentLang.toUpperCase()}
+                            </Button>
+                        </div>
                     </div>
                 </header>
 
