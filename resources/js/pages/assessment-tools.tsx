@@ -56,6 +56,7 @@ interface Translations {
         unlimited: string;
         currentUsage: string;
         upgradeNow: string;
+        requestAccess: string;
         freePlan: string;
         premiumPlan: string;
         assessmentLimit: string;
@@ -80,6 +81,7 @@ interface Translations {
         unlimited: string;
         currentUsage: string;
         upgradeNow: string;
+        requestAccess: string;
         freePlan: string;
         premiumPlan: string;
         assessmentLimit: string;
@@ -107,6 +109,7 @@ const translations: Translations = {
         unlimited: "Unlimited",
         currentUsage: "Current Usage",
         upgradeNow: "Upgrade Now",
+        requestAccess: "Request Access",
         freePlan: "Free Plan",
         premiumPlan: "Premium Plan",
         assessmentLimit: "Assessment Limit",
@@ -131,6 +134,7 @@ const translations: Translations = {
         unlimited: "غير محدود",
         currentUsage: "الاستخدام الحالي",
         upgradeNow: "ترقية الآن",
+        requestAccess: "طلب الوصول",
         freePlan: "الخطة المجانية",
         premiumPlan: "الخطة المدفوعة",
         assessmentLimit: "حد التقييمات",
@@ -209,7 +213,7 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                                 userLimits.can_create_more &&
                                 tool.status === 'active' &&
                                 tool.has_access;
-                            const canStart = userLimits.can_create_more && tool.status === 'active';
+                            const showRequest = tool.status === 'active' && !tool.has_access;
                             return (
                                 <Card key={tool.id} className="flex flex-col overflow-hidden">
                                     {tool.image && (
@@ -226,6 +230,12 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                                                     <Button className="w-full">
                                                         <Play className="w-4 h-4 mr-2" />
                                                         {t.startAssessment}
+                                                    </Button>
+                                                </Link>
+                                            ) : showRequest ? (
+                                                <Link href={`/tools/request/${tool.id}`}>
+                                                    <Button variant="secondary" className="w-full">
+                                                        {t.requestAccess}
                                                     </Button>
                                                 </Link>
                                             ) : (
