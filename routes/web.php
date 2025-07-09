@@ -19,6 +19,7 @@ use App\Http\Controllers\FreeAssessmentController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\ToolDiscoveryController;
 use App\Http\Controllers\ToolSubscriptionController;
+use App\Http\Controllers\ToolRequestController;
 use App\Http\Controllers\PostController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
@@ -81,6 +82,10 @@ Route::post('/user/register-free', [UserRegistrationController::class, 'register
 
 // Contact sales
 Route::post('/contact-sales', [ContactSalesController::class, 'store'])->name('contact.sales');
+
+// Tool access requests
+Route::get('/tools/request/{tool}', [ToolRequestController::class, 'create'])->name('tool-request.create');
+Route::post('/tool-requests', [ToolRequestController::class, 'store'])->name('tool-request.store');
 
 // Guest PDF report generation
 Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
