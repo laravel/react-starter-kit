@@ -271,8 +271,8 @@ class FreeAssessmentController extends Controller
 
             DB::commit();
 
-            // FIXED: Use proper Inertia redirect
-            return redirect()->route('free-assessment.results', $assessment)
+            // Redirect to completion page before showing results
+            return redirect()->route('free-assessment.complete', $assessment)
                 ->with('success', 'Assessment completed successfully!');
 
         } catch (Exception $e) {
@@ -399,6 +399,29 @@ class FreeAssessmentController extends Controller
                 'is_premium' => $isPremium,
             ],
             'canEdit' => true,
+            'locale' => app()->getLocale(),
+        ]);
+    }
+
+    /**
+     * Show completion thank you page
+     */
+    public function complete(Assessment $assessment)
+    {
+        $user = auth()->user();
+
+        if ($assessment->user_id !== $user->id || $assessment->assessment_type !== 'free') {
+            abort(403, 'Unauthorized access to assessment.');
+        }
+
+        return Inertia::render('FreeAssessment/Complete', [
+            'assessment' => [
+                'id' => $assessment->id,
+                'tool' => [
+                    'name_en' => $assessment->tool->name_en,
+                    'name_ar' => $assessment->tool->name_ar,
+                ],
+            ],
             'locale' => app()->getLocale(),
         ]);
     }

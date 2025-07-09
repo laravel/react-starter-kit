@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Head, useForm } from '@inertiajs/react';
+import { Head, useForm, router } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -108,7 +108,7 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     // Form for submission
-    const { data, setData, post, processing } = useForm({
+    const { data, setData, processing } = useForm({
         responses: {},
         notes: {},
         files: {}
@@ -244,27 +244,23 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
     const submitAssessment = () => {
         if (!isComplete || processing) return;
 
+        // Prepare data for submission
         setData({
-            responses: responses,
-            notes: notes,
-            files: files
+            responses,
+            notes,
+            files,
         });
 
-
-        // Use the correct route with assessment ID from your existing routes
-        post(route('free-assessment.submit', assessmentData.id), {
-            onSuccess: () => {
-                console.log("Redirected to results");
-            },
-            onError: (errors) => {
-                console.error(errors);
-            }
-        });
-        // Wait for state to update before posting to avoid stale data
+        // Wait a tick to ensure state updates (if needed)
         setTimeout(() => {
-            post(route('free-assessment.submit', assessmentData.id));
+            router.post(
+                route('free-assessment.submit', assessmentData.id),
+                { responses, notes, files },
+                { forceFormData: true }
+            );
         }, 0);
     };
+
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });

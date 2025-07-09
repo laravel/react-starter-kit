@@ -265,7 +265,9 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
         });
 
 
-        router.put(route('free-user.update', AssessmentData.id), {...data, action: 'save',});    };
+        // Use the correct route with assessment ID from your existing routes
+        router.visit(`${route('free-assessment.edit', assessmentData.id)}`);
+    };
 
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
