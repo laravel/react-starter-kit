@@ -26,6 +26,7 @@ interface Tool {
     total_criteria: number;
     total_domains: number;
     estimated_time: number;
+    has_access: boolean;
 }
 
 interface UserLimits {
@@ -204,6 +205,10 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredTools.length ? (
                         filteredTools.map((tool) => {
+                            const canStart =
+                                userLimits.can_create_more &&
+                                tool.status === 'active' &&
+                                tool.has_access;
                             const canStart = userLimits.can_create_more && tool.status === 'active';
                             return (
                                 <Card key={tool.id} className="flex flex-col overflow-hidden">

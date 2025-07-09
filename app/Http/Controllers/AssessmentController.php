@@ -15,60 +15,45 @@ class AssessmentController extends Controller
     /**
      * Submit assessment with user limits
      */
-    public function submit(Request $request)
+    public function submit(Assessment $assessment, Request $request)
     {
         $user = auth()->user();
 
-        // Double-check assessment limits
-        if (!$user->canCreateAssessment()) {
-            return response()->json([
-                'error' => 'Assessment limit exceeded. Please upgrade to premium.'
-            ], 403);
+        // Ensure the assessment belongs to the user (or user is admin)
+        if ($assessment->user_id !== $user->id && !$user->isAdmin()) {
+            abort(403, 'Unauthorized access to assessment.');
         }
 
         Log::info('Assessment submission started', $request->all());
 
         $validated = $request->validate([
-            'tool_id' => 'required|exists:tools,id',
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|max:255',
-            'organization' => 'nullable|string|max:255',
             'responses' => 'required|array',
-            'notes' => 'array',
+            'responses.*' => 'required|in:yes,no,na',
+            'notes' => 'nullable|array',
+            'notes.*' => 'nullable|string|max:1000',
         ]);
 
         try {
             DB::beginTransaction();
 
-            // Create the assessment
-            $assessment = Assessment::create([
-                'tool_id' => $validated['tool_id'],
-                'user_id' => $user->id,
-                'name' => $validated['name'],
-                'email' => $validated['email'],
-                'organization' => $validated['organization'],
-                'status' => 'completed',
-                'started_at' => now(),
-                'completed_at' => now(),
-            ]);
+            // Remove any existing responses to avoid duplicates
+            $assessment->responses()->delete();
 
-            // Process responses
-            foreach ($validated['responses'] as $criterionId => $responseValue) {
-                // Convert numeric response back to string
-                $responseString = match ((int)$responseValue) {
-                    100 => 'yes',
-                    0 => 'no',
-                    50 => 'na',
-                    default => 'na'
-                };
-
+            // Save new responses
+            foreach ($validated['responses'] as $criterionId => $response) {
                 AssessmentResponse::create([
                     'assessment_id' => $assessment->id,
                     'criterion_id' => $criterionId,
-                    'response' => $responseString,
+                    'response' => $response,
                     'notes' => $validated['notes'][$criterionId] ?? null,
                 ]);
             }
+
+            // Mark assessment as completed
+            $assessment->update([
+                'status' => 'completed',
+                'completed_at' => now(),
+            ]);
 
             // Calculate results
             $assessment->calculateResults();
@@ -111,9 +96,17 @@ class AssessmentController extends Controller
             ->get()
             ->map(function ($assessment) use ($locale) {
                 $overallScore = null;
+                $resultsData = null;
                 if ($assessment->status === 'completed') {
                     $results = $assessment->getResults();
                     $overallScore = $results['overall_percentage'] ?? null;
+                    $resultsData = [
+                        'yes_count' => $results['yes_count'] ?? 0,
+                        'no_count' => $results['no_count'] ?? 0,
+                        'na_count' => $results['na_count'] ?? 0,
+                        'score_percentage' => $results['overall_percentage'] ?? 0,
+                        'weighted_score' => $results['overall_percentage'] ?? 0,
+                    ];
                 }
 
                 return [
@@ -137,6 +130,7 @@ class AssessmentController extends Controller
                     'overall_score' => $overallScore,
                     'completion_percentage' => $assessment->getCompletionPercentage(),
                     'user_id' => $assessment->user_id,
+                    'results' => $resultsData,
                 ];
             });
 

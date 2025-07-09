@@ -19,6 +19,7 @@ use App\Http\Controllers\FreeAssessmentController;
 use App\Http\Controllers\NavigationController;
 use App\Http\Controllers\ToolDiscoveryController;
 use App\Http\Controllers\ToolSubscriptionController;
+use App\Http\Controllers\PostController;
 use App\Models\Tool;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -84,6 +85,10 @@ Route::post('/contact-sales', [ContactSalesController::class, 'store'])->name('c
 // Guest PDF report generation
 Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->middleware(['throttle:10,1']);
+
+// Blog posts
+Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+Route::post('/posts/{post:slug}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
 
 // Paddle webhooks (no auth middleware)
 Route::post('/paddle/webhook', [PaddleWebhookController::class, 'handleWebhook'])
@@ -196,7 +201,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/assessments/{assessment}/take', [AssessmentController::class, 'take'])
             ->name('assessment.take');
 
-        Route::post('/assessments/{assessment}/response', [AssessmentController::class, 'storeResponse'])
+        Route::post('/assessments/{assessment}/response', [AssessmentController::class, 'saveResponse'])
             ->name('assessment.response');
 
         Route::post('/assessments/{assessment}/submit', [AssessmentController::class, 'submit'])

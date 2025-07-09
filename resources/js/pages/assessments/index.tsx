@@ -136,22 +136,9 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     {filtered.length ? (
                         filtered.map((a) => {
                             const isComplete = a.status === 'completed';
-                            const isInProgress = a.status === 'in_progress';
-                            const isNotStarted = a.status === 'not_started';
-                            const userOwns = isUserAssessment(a);
                             const url = isComplete ? resultsUrl(a) : continueUrl(a);
-
-                            const borderColor = isComplete
-                                ? 'border-green-500'
-                                : isInProgress
-                                    ? 'border-orange-400'
-                                    : 'border-gray-300';
-
                             return (
-                                <Card
-                                    key={a.id}
-                                    className={`flex flex-col overflow-hidden border-t-4 ${borderColor} shadow-sm hover:shadow-md transition`}
-                                >
+                                <Card key={a.id} className="flex flex-col overflow-hidden">
                                     {a.tool.image && (
                                         <img
                                             src={a.tool.image}
@@ -160,47 +147,10 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                         />
                                     )}
                                     <CardContent className="flex flex-col flex-1 p-4 space-y-4">
-                                        <div className="space-y-2">
-                                            <CardTitle className="text-lg flex justify-between items-center">
-                                                <span>{getText(a.tool, 'name')}</span>
-                                                {userOwns && (
-                                                    <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded">
-                                                        My Assessment
-                                                    </span>
-                                                )}
-                                            </CardTitle>
+                                        <div>
+                                            <CardTitle className="text-lg">{getText(a.tool, 'name')}</CardTitle>
                                             {a.organization && <CardDescription>{a.organization}</CardDescription>}
-
-                                            {/* Status badge */}
-                                            <div>
-                                                {isComplete && (
-                                                    <span className="text-xs font-medium bg-green-100 text-green-800 px-2 py-0.5 rounded">
-                                                        Completed
-                                                    </span>
-                                                )}
-                                                {isInProgress && (
-                                                    <div className="space-y-1">
-                                                        <span className="text-xs font-medium bg-orange-100 text-orange-800 px-2 py-0.5 rounded">
-                                                            In Progress
-                                                        </span>
-                                                        {a.completion_percentage !== undefined && (
-                                                            <div className="w-full bg-gray-200 rounded-full h-1">
-                                                                <div
-                                                                    className="bg-orange-500 h-1 rounded-full"
-                                                                    style={{ width: `${a.completion_percentage}%` }}
-                                                                ></div>
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                )}
-                                                {isNotStarted && (
-                                                    <span className="text-xs font-medium bg-gray-100 text-gray-800 px-2 py-0.5 rounded">
-                                                        Not Started
-                                                    </span>
-                                                )}
-                                            </div>
                                         </div>
-
                                         <div className="mt-auto">
                                             <Link href={url}>
                                                 <Button className="w-full">
