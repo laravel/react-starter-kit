@@ -102,16 +102,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/api/navigation', [NavigationController::class, 'getNavigationItems'])
         ->name('api.navigation');
 
-    // ========================================
-    // TOOL DISCOVERY AND SUBSCRIPTION ROUTES - Available to ALL authenticated users
-    // ========================================
-
-//    Route::get('/tools/discover', function () {
-//        // If you don't have ToolDiscoveryController, use a simple view
-//        return inertia('ToolDiscovery', [
-//            'message' => 'Welcome! Browse our assessment tools below.'
-//        ]);
-//    })->middleware(['auth'])->name('tools.discover');
 
     Route::get('/tools/discover', [ToolDiscoveryController::class, 'index'])
         ->name('tools.discover');
