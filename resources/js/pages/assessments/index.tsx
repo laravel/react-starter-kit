@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
@@ -49,6 +50,8 @@ interface Translations {
         continueAssessment: string;
         viewResults: string;
         noAssessments: string;
+        completion: string;
+        score: string;
     };
     ar: {
         title: string;
@@ -56,6 +59,8 @@ interface Translations {
         continueAssessment: string;
         viewResults: string;
         noAssessments: string;
+        completion: string;
+        score: string;
     };
 }
 
@@ -65,6 +70,9 @@ const translations: Translations = {
         searchPlaceholder: 'Search assessments...',
         continueAssessment: 'Continue',
         viewResults: 'View Results',
+        noAssessments: 'No assessments found.',
+        completion: 'Completion',
+        score: 'Score'
         noAssessments: 'No assessments found.'
     },
     ar: {
@@ -72,6 +80,9 @@ const translations: Translations = {
         searchPlaceholder: 'البحث في التقييمات...',
         continueAssessment: 'متابعة',
         viewResults: 'عرض النتائج',
+        noAssessments: 'لا توجد تقييمات.',
+        completion: 'مكتمل',
+        score: 'النتيجة'
         noAssessments: 'لا توجد تقييمات.'
     }
 };
@@ -132,6 +143,17 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     />
                 </div>
 
+
+                <div className="relative mb-6 max-w-md">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                    <Input
+                        placeholder={t.searchPlaceholder}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-9"
+                    />
+                </div>
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
                     {filtered.length ? (
                         filtered.map((a) => {
@@ -150,6 +172,36 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                                         <div>
                                             <CardTitle className="text-lg">{getText(a.tool, 'name')}</CardTitle>
                                             {a.organization && <CardDescription>{a.organization}</CardDescription>}
+                                            <div className="mt-2 space-y-1">
+                                                {a.completion_percentage !== undefined && (
+                                                    <>
+                                                        <div className="flex items-center justify-between text-sm text-gray-600">
+                                                            <span>
+                                                                {t.completion}: {Math.round(a.completion_percentage)}%
+                                                            </span>
+                                                            {a.overall_score !== undefined && isComplete && (
+                                                                <span>
+                                                                    {t.score}: {Math.round(a.overall_score)}%
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        <Progress value={a.completion_percentage} className="h-2" />
+                                                    </>
+                                                )}
+                                            </div>
+                                        </div>
+                                        <div className="mt-auto">
+                                            <Link href={url}>
+                                                <Button className="w-full">
+                                                    {isComplete ? (
+                                                        <Award className="w-4 h-4 mr-2" />
+                                                    ) : (
+                                                        <Play className="w-4 h-4 mr-2" />
+                                                    )}
+                                                    {isComplete ? t.viewResults : t.continueAssessment}
+                                                </Button>
+                                            </Link>
+                                        </div>
                                         </div>
                                         <div className="mt-auto">
                                             <Link href={url}>
