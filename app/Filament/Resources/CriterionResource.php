@@ -97,10 +97,11 @@ class CriterionResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
                     ->label(__('filament.fields.name'))
+
                     ->getStateUsing(function ($record) {
                         return App::getLocale() === 'ar' ? $record->name_ar : $record->name_en;
                     })
-                    ->searchable(),
+                    ->searchable(['name_en','name_ar']),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')

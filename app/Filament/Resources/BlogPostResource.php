@@ -186,7 +186,7 @@ class BlogPostResource extends Resource
                     ->size(50),
 
                 Tables\Columns\TextColumn::make('title')
-                    ->searchable()
+                    ->searchable(['title', 'title_ar'])
                     ->sortable()
                     ->limit(50),
 

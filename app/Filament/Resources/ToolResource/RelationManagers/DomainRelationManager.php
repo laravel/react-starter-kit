@@ -60,10 +60,10 @@ class DomainRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('name_en')
+            ->recordTitleAttribute('name')
             ->columns([
-                Tables\Columns\TextColumn::make('name_en')
-                    ->label('Name (English)'),
+                Tables\Columns\TextColumn::make('name')
+                    ->label('Name'),
                 Tables\Columns\TextColumn::make('order')
                     ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')

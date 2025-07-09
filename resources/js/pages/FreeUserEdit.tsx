@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Head, Link, useForm } from '@inertiajs/react';
+import { Head, Link, useForm, router } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -104,7 +104,7 @@ export default function FreeUserEdit({
     const [showUserMenu, setShowUserMenu] = useState(false);
     const isArabic = locale === 'ar';
 
-    const { data, setData, put, processing, errors } = useForm({
+    const { data, setData, processing, errors } = useForm({
         name: assessment.name,
         email: assessment.email,
         organization: assessment.organization || '',
@@ -144,14 +144,22 @@ export default function FreeUserEdit({
 
     const handleSave = (e: React.FormEvent) => {
         e.preventDefault();
+        // Update local state for UI feedback
         setData('action', 'save');
-        put(route('free-user.update', assessment.id));
+
+            ...data,
+            action: 'save',
+        });
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Update local state for UI feedback
         setData('action', 'submit');
-        put(route('free-user.update', assessment.id));
+
+            ...data,
+            action: 'submit',
+        });
     };
 
     const getCompletionPercentage = (): number => {

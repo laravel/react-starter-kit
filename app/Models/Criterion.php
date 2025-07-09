@@ -77,4 +77,20 @@ class Criterion extends Model
 
         return $this->{$field};
     }
+
+    /**
+     * Accessor for localized name attribute.
+     */
+    public function getNameAttribute(): string
+    {
+        return $this->getName();
+    }
+
+    /**
+     * Accessor for localized description attribute.
+     */
+    public function getDescriptionAttribute(): ?string
+    {
+        return $this->getDescription();
+    }
 }
