@@ -472,8 +472,9 @@ class User extends Authenticatable implements FilamentUser
             return true;
         }
 
+        return false;
         // Check if user has global premium subscription
-        return $this->isPremium();
+//        return $this->isPremium();
     }
     public function hasTakenFreeAssessment(): bool
     {
