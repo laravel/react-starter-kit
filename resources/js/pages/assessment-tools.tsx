@@ -1,5 +1,3 @@
-// Enhanced assessment-tools.tsx with user limits and subscription prompts
-
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
@@ -43,105 +41,30 @@ interface AssessmentToolsProps {
     locale: string;
 }
 
-interface Translations {
-    en: {
-        title: string;
-        subtitle: string;
-        selectTool: string;
-        startAssessment: string;
-        noTools: string;
-        searchPlaceholder: string;
-        upgradeRequired: string;
-        limitReached: string;
-        unlimited: string;
-        currentUsage: string;
-        upgradeNow: string;
-        freePlan: string;
-        premiumPlan: string;
-        assessmentLimit: string;
-        estimatedTime: string;
-        minutes: string;
-        criteria: string;
-        domains: string;
-        viewDetails: string;
-        popular: string;
-        new: string;
-        recommended: string;
-    };
-    ar: {
-        title: string;
-        subtitle: string;
-        selectTool: string;
-        startAssessment: string;
-        noTools: string;
-        searchPlaceholder: string;
-        upgradeRequired: string;
-        limitReached: string;
-        unlimited: string;
-        currentUsage: string;
-        upgradeNow: string;
-        freePlan: string;
-        premiumPlan: string;
-        assessmentLimit: string;
-        estimatedTime: string;
-        minutes: string;
-        criteria: string;
-        domains: string;
-        viewDetails: string;
-        popular: string;
-        new: string;
-        recommended: string;
-    };
-}
-
-const translations: Translations = {
+const translations = {
     en: {
         title: "Assessment Tools",
         subtitle: "Choose the perfect assessment tool for your evaluation needs",
-        selectTool: "Select an Assessment Tool",
         startAssessment: "Start Assessment",
         noTools: "No assessment tools are currently available.",
         searchPlaceholder: "Search assessment tools...",
-        upgradeRequired: "Upgrade Required",
-        limitReached: "Assessment Limit Reached",
-        unlimited: "Unlimited",
-        currentUsage: "Current Usage",
         upgradeNow: "Upgrade Now",
-        freePlan: "Free Plan",
-        premiumPlan: "Premium Plan",
-        assessmentLimit: "Assessment Limit",
         estimatedTime: "Estimated Time",
         minutes: "minutes",
         criteria: "criteria",
-        domains: "domains",
-        viewDetails: "View Details",
-        popular: "Popular",
-        new: "New",
-        recommended: "Recommended"
+        domains: "domains"
     },
     ar: {
         title: "أدوات التقييم",
         subtitle: "اختر أداة التقييم المثالية لاحتياجات التقييم الخاصة بك",
-        selectTool: "اختر أداة التقييم",
         startAssessment: "بدء التقييم",
         noTools: "لا توجد أدوات تقييم متاحة حالياً.",
         searchPlaceholder: "البحث في أدوات التقييم...",
-        upgradeRequired: "الترقية مطلوبة",
-        limitReached: "تم الوصول لحد التقييمات",
-        unlimited: "غير محدود",
-        currentUsage: "الاستخدام الحالي",
         upgradeNow: "ترقية الآن",
-        freePlan: "الخطة المجانية",
-        premiumPlan: "الخطة المدفوعة",
-        assessmentLimit: "حد التقييمات",
         estimatedTime: "الوقت المقدر",
         minutes: "دقيقة",
         criteria: "معايير",
-        domains: "مجالات",
-        viewDetails: "عرض التفاصيل",
-        popular: "شائع",
-        new: "جديد",
-        recommended: "موصى به"
+        domains: "مجالات"
     }
 };
 
@@ -155,82 +78,90 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function AssessmentTools({ tools, userLimits, locale }: AssessmentToolsProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
-
     const t = translations[language];
 
     const toggleLanguage = () => {
-        setLanguage(prev => prev === 'en' ? 'ar' : 'en');
+        setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
     };
 
-    const getToolName = (tool: Tool): string => {
-        return language === 'ar' ? tool.name_ar : tool.name_en;
+    const getText = (tool: Tool, field: 'name' | 'description') => {
+        const en = field === 'name' ? tool.name_en : tool.description_en;
+        const ar = field === 'name' ? tool.name_ar : tool.description_ar;
+        return language === 'ar' ? ar || '' : en || '';
     };
 
-    const getToolDescription = (tool: Tool): string => {
-        const description = language === 'ar' ? tool.description_ar : tool.description_en;
-        return description || (language === 'ar' ? 'لا يوجد وصف متاح.' : 'No description available.');
-    };
-
-    // Filter tools
-    const filteredTools = tools.filter(tool =>
-        getToolName(tool).toLowerCase().includes(searchTerm.toLowerCase()) ||
-        getToolDescription(tool).toLowerCase().includes(searchTerm.toLowerCase())
+    const filteredTools = tools.filter((tool) =>
+        getText(tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getText(tool, 'description').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
-
             <div className={`${language === 'ar' ? 'rtl' : 'ltr'} p-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Target className="w-5 h-5 text-primary" /> {t.title}
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-3xl font-bold flex items-center gap-2">
+                        <Target className="w-6 h-6 text-blue-600" />
+                        {t.title}
                     </h1>
-                    <Button variant="outline" size="sm" onClick={toggleLanguage} className="flex items-center gap-2">
-                        <Globe className="w-4 h-4" />
-                        <span>{language === 'en' ? 'عربي' : 'English'}</span>
+                    <Button variant="outline" size="sm" onClick={toggleLanguage}>
+                        <Globe className="w-4 h-4 mr-1" />
+                        {language === 'en' ? 'عربي' : 'English'}
                     </Button>
                 </div>
 
-                <div className="relative mb-6 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                <div className="relative mb-8 max-w-md">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                         placeholder={t.searchPlaceholder}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9"
+                        className="pl-10"
                     />
                 </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {filteredTools.length ? (
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                    {filteredTools.length > 0 ? (
                         filteredTools.map((tool) => {
                             const canStart =
                                 userLimits.can_create_more &&
                                 tool.status === 'active' &&
                                 tool.has_access;
-                            const canStart = userLimits.can_create_more && tool.status === 'active';
+
                             return (
-                                <Card key={tool.id} className="flex flex-col overflow-hidden">
+                                <Card key={tool.id} className="flex flex-col overflow-hidden shadow-md">
                                     {tool.image && (
-                                        <img src={tool.image} alt={getToolName(tool)} className="h-32 w-full object-cover" />
+                                        <img
+                                            src={tool.image}
+                                            alt={getText(tool, 'name')}
+                                            className="h-40 w-full object-cover"
+                                        />
                                     )}
                                     <CardContent className="flex flex-col flex-1 p-4 space-y-4">
                                         <div>
-                                            <CardTitle className="text-lg">{getToolName(tool)}</CardTitle>
-                                            <CardDescription>{getToolDescription(tool)}</CardDescription>
+                                            <CardTitle className="text-lg font-semibold">{getText(tool, 'name')}</CardTitle>
+                                            <CardDescription className="text-sm text-gray-600">
+                                                {getText(tool, 'description')}
+                                            </CardDescription>
                                         </div>
+
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>{tool.total_domains} {t.domains}</span>
+                                            <span>{tool.total_criteria} {t.criteria}</span>
+                                            <span>{tool.estimated_time} {t.minutes}</span>
+                                        </div>
+
                                         <div className="mt-auto">
                                             {canStart ? (
                                                 <Link href={route('assessment.start', tool.id)}>
-                                                    <Button className="w-full">
+                                                    <Button className="w-full mt-4">
                                                         <Play className="w-4 h-4 mr-2" />
                                                         {t.startAssessment}
                                                     </Button>
                                                 </Link>
                                             ) : (
                                                 <Link href="/subscription">
-                                                    <Button variant="secondary" className="w-full">
+                                                    <Button variant="secondary" className="w-full mt-4">
                                                         <Lock className="w-4 h-4 mr-2" />
                                                         {t.upgradeNow}
                                                     </Button>
