@@ -12,7 +12,6 @@ import AppLayout from '@/layouts/app-layout';
 import InputError from '@/components/input-error';
 import { type BreadcrumbItem } from '@/types';
 import {
-    Globe,
     User,
     Mail,
     Building,
@@ -37,6 +36,7 @@ import {
     HelpCircle,
     AlertCircle
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Tool {
     id: number;
@@ -91,7 +91,6 @@ interface User {
 
 interface AssessmentStartProps {
     assessmentData: AssessmentData;
-    locale: string;
     prefillData?: {           // Add this
         name: string;
         email: string;
@@ -331,8 +330,8 @@ const translations: Translations = {
     }
 };
 
-export default function AssessmentStart({ assessmentData, locale, prefillData, auth }: AssessmentStartProps) {
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+export default function AssessmentStart({ assessmentData, prefillData, auth }: AssessmentStartProps) {
+    const { language } = useLanguage();
     const [currentStep, setCurrentStep] = useState<'info' | 'preview' | 'assessment'>('info');
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
 
@@ -366,9 +365,6 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
         return language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
     }
 
-    const toggleLanguage = () => {
-        setLanguage(prev => prev === 'en' ? 'ar' : 'en');
-    };
 
     const handleResponseChange = (criterionId: number, response: 'yes' | 'no' | 'na') => {
         setData('responses', {
@@ -536,15 +532,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                         </div>
                                     </div>
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={toggleLanguage}
-                                    className="backdrop-blur-sm bg-white/50 border-white/30 hover:bg-white/70 transition-all duration-300"
-                                >
-                                    <Globe className="w-4 h-4 mr-2" />
-                                    <span>{language === 'en' ? 'عربي' : 'English'}</span>
-                                </Button>
+                                
                             </div>
                         </div>
                     </header>
@@ -786,15 +774,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                         </div>
                                     </div>
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={toggleLanguage}
-                                    className="backdrop-blur-sm bg-white/50 border-white/30 hover:bg-white/70 transition-all duration-300"
-                                >
-                                    <Globe className="w-4 h-4 mr-2" />
-                                    <span>{language === 'en' ? 'عربي' : 'English'}</span>
-                                </Button>
+
                             </div>
                         </div>
                     </header>
@@ -976,15 +956,7 @@ export default function AssessmentStart({ assessmentData, locale, prefillData, a
                                         />
                                     </div>
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={toggleLanguage}
-                                    className="backdrop-blur-sm bg-white/50 border-white/30 hover:bg-white/70 transition-all duration-300"
-                                >
-                                    <Globe className="w-4 h-4 mr-2" />
-                                    <span>{language === 'en' ? 'عربي' : 'English'}</span>
-                                </Button>
+
                             </div>
                         </div>
                     </div>
