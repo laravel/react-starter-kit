@@ -22,6 +22,7 @@ import {
     Clock,
     Users
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Criterion {
     id: number;
@@ -70,7 +71,6 @@ interface AssessmentData {
 
 interface TakeProps {
     assessmentData: AssessmentData;
-    locale: string;
     auth: {
         user: {
             id: number;
@@ -80,11 +80,11 @@ interface TakeProps {
     };
 }
 
-export default function Take({ assessmentData, locale, auth }: TakeProps) {
+export default function Take({ assessmentData, auth }: TakeProps) {
     const [responses, setResponses] = useState<Record<number, 'yes' | 'no' | 'na'>>({});
     const [notes, setNotes] = useState<Record<number, string>>({});
     const [files, setFiles] = useState<Record<number, File | null>>({});
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { language } = useLanguage();
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     // Form for submission
@@ -252,9 +252,6 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const toggleLanguage = () => {
-        setLanguage(prev => prev === 'en' ? 'ar' : 'en');
-    };
 
     return (
         <>
@@ -292,14 +289,6 @@ export default function Take({ assessmentData, locale, auth }: TakeProps) {
                                     </div>
                                     <Progress value={completionPercentage} className="w-24 h-2" />
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={toggleLanguage}
-                                    className="border-blue-200 hover:bg-blue-50"
-                                >
-                                    {language === 'en' ? 'عربي' : 'English'}
-                                </Button>
                             </div>
                         </div>
                     </div>
