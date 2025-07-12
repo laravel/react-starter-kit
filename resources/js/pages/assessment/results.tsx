@@ -30,6 +30,7 @@ import {
     Crown
 } from 'lucide-react';
 import PDFGeneratorComponent from '@/components/PDFGeneratorComponent';
+import { useLanguage } from '@/hooks/use-language';
 
 // Language text content
 const content = {
@@ -165,38 +166,6 @@ interface AssessmentResults {
     category_results: Record<string, CategoryResult[]>;
 }
 
-// Language Toggle Component
-const LanguageToggle: React.FC<{
-    currentLang: 'en' | 'ar';
-    onLanguageChange: (lang: 'en' | 'ar') => void;
-}> = ({ currentLang, onLanguageChange }) => {
-    return (
-        <div className="relative">
-            <div className="flex items-center bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-                <button
-                    onClick={() => onLanguageChange('en')}
-                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                        currentLang === 'en'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                >
-                    English
-                </button>
-                <button
-                    onClick={() => onLanguageChange('ar')}
-                    className={`px-4 py-2 text-sm font-medium transition-all duration-200 ${
-                        currentLang === 'ar'
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'text-gray-600 hover:bg-gray-50'
-                    }`}
-                >
-                    عربي
-                </button>
-            </div>
-        </div>
-    );
-};
 
 // Enhanced Circular Progress Component
 const CircularProgress: React.FC<{
@@ -396,7 +365,7 @@ export default function AssessmentResults({
                                               locale = 'en',
                                               isGuest = false
                                           }: AssessmentResultsProps) {
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { language } = useLanguage();
     const isArabic = language === 'ar';
     const t = content[language];
 
@@ -500,10 +469,6 @@ export default function AssessmentResults({
                             </div>
 
                             <div className="flex items-center gap-4">
-                                <LanguageToggle
-                                    currentLang={language}
-                                    onLanguageChange={setLanguage}
-                                />
                                 <Button variant="outline" size="sm">
                                     <Share2 className="h-4 w-4 mr-2" />
                                     {t.share}

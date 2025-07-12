@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Search, Globe, Play, Award } from 'lucide-react';
+import { Search, Play, Award } from 'lucide-react';
 
 interface Assessment {
     id: number;
@@ -32,7 +32,6 @@ interface Assessment {
 
 interface AssessmentsIndexProps {
     assessments: Assessment[];
-    locale: string;
     auth: {
         user: {
             id: number;
@@ -76,9 +75,9 @@ const translations: Translations = {
     }
 };
 
-export default function AssessmentsIndex({ assessments, locale, auth }: AssessmentsIndexProps) {
+export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { language } = useLanguage();
 
     const t = translations[language];
 
@@ -88,10 +87,6 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
             href: '/assessments',
         },
     ];
-
-    const toggleLanguage = () => {
-        setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
-    };
 
     const getText = (item: any, field: string): string =>
         language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
@@ -116,10 +111,6 @@ export default function AssessmentsIndex({ assessments, locale, auth }: Assessme
                     <h1 className="text-2xl font-bold flex items-center gap-2">
                         <Award className="w-5 h-5 text-primary" /> {t.title}
                     </h1>
-                    <Button variant="outline" size="sm" onClick={toggleLanguage} className="flex items-center gap-2">
-                        <Globe className="w-4 h-4" />
-                        <span>{language === 'en' ? 'عربي' : 'English'}</span>
-                    </Button>
                 </div>
 
                 <div className="relative mb-6 max-w-md">

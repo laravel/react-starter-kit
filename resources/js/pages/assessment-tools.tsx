@@ -9,9 +9,9 @@ import {
     Search,
     Play,
     Target,
-    Globe,
     Lock
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Tool {
     id: number;
@@ -38,7 +38,6 @@ interface UserLimits {
 interface AssessmentToolsProps {
     tools: Tool[];
     userLimits: UserLimits;
-    locale: string;
 }
 
 
@@ -146,14 +145,10 @@ const breadcrumbs: BreadcrumbItem[] = [
     },
 ];
 
-export default function AssessmentTools({ tools, userLimits, locale }: AssessmentToolsProps) {
+export default function AssessmentTools({ tools, userLimits }: AssessmentToolsProps) {
     const [searchTerm, setSearchTerm] = useState('');
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { language } = useLanguage();
     const t = translations[language];
-
-    const toggleLanguage = () => {
-        setLanguage((prev) => (prev === 'en' ? 'ar' : 'en'));
-    };
 
     const getText = (tool: Tool, field: 'name' | 'description') => {
         const en = field === 'name' ? tool.name_en : tool.description_en;
@@ -175,10 +170,6 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                         <Target className="w-6 h-6 text-blue-600" />
                         {t.title}
                     </h1>
-                    <Button variant="outline" size="sm" onClick={toggleLanguage}>
-                        <Globe className="w-4 h-4 mr-1" />
-                        {language === 'en' ? 'عربي' : 'English'}
-                    </Button>
                 </div>
 
                 <div className="relative mb-8 max-w-md">
