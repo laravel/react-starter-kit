@@ -1,11 +1,17 @@
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Head, Link } from '@inertiajs/react';
-import { Globe, Lock, Play, Search, Target } from 'lucide-react';
-import { useState } from 'react';
+import {
+    Search,
+    Play,
+    Target,
+    Globe,
+    Lock
+} from 'lucide-react';
 
 interface Tool {
     id: number;
@@ -34,6 +40,7 @@ interface AssessmentToolsProps {
     userLimits: UserLimits;
     locale: string;
 }
+
 
 interface Translations {
     en: {
@@ -88,43 +95,48 @@ interface Translations {
     };
 }
 
+
+
 const translations: Translations = {
+
     en: {
-        title: 'Assessment Tools',
-        subtitle: 'Choose the perfect assessment tool for your evaluation needs',
-        startAssessment: 'Start Assessment',
-        noTools: 'No assessment tools are currently available.',
-        searchPlaceholder: 'Search assessment tools...',
-        upgradeNow: 'Upgrade Now',
+        title: "Assessment Tools",
+        subtitle: "Choose the perfect assessment tool for your evaluation needs",
+        startAssessment: "Start Assessment",
+        noTools: "No assessment tools are currently available.",
+        searchPlaceholder: "Search assessment tools...",
+        upgradeNow: "Upgrade Now",
 
-        requestAccess: 'Request Access',
-        freePlan: 'Free Plan',
-        premiumPlan: 'Premium Plan',
-        assessmentLimit: 'Assessment Limit',
 
-        estimatedTime: 'Estimated Time',
-        minutes: 'minutes',
-        criteria: 'criteria',
-        domains: 'domains',
+        requestAccess: "Request Access",
+        freePlan: "Free Plan",
+        premiumPlan: "Premium Plan",
+        assessmentLimit: "Assessment Limit",
+
+        estimatedTime: "Estimated Time",
+        minutes: "minutes",
+        criteria: "criteria",
+        domains: "domains"
     },
     ar: {
-        title: 'أدوات التقييم',
-        subtitle: 'اختر أداة التقييم المثالية لاحتياجات التقييم الخاصة بك',
-        startAssessment: 'بدء التقييم',
-        noTools: 'لا توجد أدوات تقييم متاحة حالياً.',
-        searchPlaceholder: 'البحث في أدوات التقييم...',
-        upgradeNow: 'ترقية الآن',
+        title: "أدوات التقييم",
+        subtitle: "اختر أداة التقييم المثالية لاحتياجات التقييم الخاصة بك",
+        startAssessment: "بدء التقييم",
+        noTools: "لا توجد أدوات تقييم متاحة حالياً.",
+        searchPlaceholder: "البحث في أدوات التقييم...",
+        upgradeNow: "ترقية الآن",
 
-        requestAccess: 'طلب الوصول',
-        freePlan: 'الخطة المجانية',
-        premiumPlan: 'الخطة المدفوعة',
-        assessmentLimit: 'حد التقييمات',
 
-        estimatedTime: 'الوقت المقدر',
-        minutes: 'دقيقة',
-        criteria: 'معايير',
-        domains: 'مجالات',
-    },
+        requestAccess: "طلب الوصول",
+        freePlan: "الخطة المجانية",
+        premiumPlan: "الخطة المدفوعة",
+        assessmentLimit: "حد التقييمات",
+
+        estimatedTime: "الوقت المقدر",
+        minutes: "دقيقة",
+        criteria: "معايير",
+        domains: "مجالات"
+    }
 };
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -149,88 +161,86 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
         return language === 'ar' ? ar || '' : en || '';
     };
 
-    const filteredTools = tools.filter(
-        (tool) =>
-            getText(tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
-            getText(tool, 'description').toLowerCase().includes(searchTerm.toLowerCase()),
+    const filteredTools = tools.filter((tool) =>
+        getText(tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
+        getText(tool, 'description').toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
-            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} bg-black p-6 text-white`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="mb-6 flex items-center justify-between">
-                    <h1 className="flex items-center gap-2 text-3xl font-bold">
-                        <Target className="h-6 w-6 text-white" />
+            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} p-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="flex items-center justify-between mb-6">
+                    <h1 className="text-3xl font-bold flex items-center gap-2">
+                        <Target className="w-6 h-6 text-blue-600" />
                         {t.title}
                     </h1>
-                    <Button variant="outline" size="sm" className="border-gray-600 text-gray-300" onClick={toggleLanguage}>
-                        <Globe className="mr-1 h-4 w-4" />
+                    <Button variant="outline" size="sm" onClick={toggleLanguage}>
+                        <Globe className="w-4 h-4 mr-1" />
                         {language === 'en' ? 'عربي' : 'English'}
                     </Button>
                 </div>
 
                 <div className="relative mb-8 max-w-md">
-                    <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 transform text-gray-400" />
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                     <Input
                         placeholder={t.searchPlaceholder}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="border-gray-700 bg-transparent pl-10 text-white"
+                        className="pl-10"
                     />
                 </div>
 
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {filteredTools.length > 0 ? (
                         filteredTools.map((tool) => {
-                            const canStart = userLimits.can_create_more && tool.status === 'active' && tool.has_access;
+                            const canStart =
+                                userLimits.can_create_more &&
+                                tool.status === 'active' &&
+                                tool.has_access;
 
                             const showRequest = tool.status === 'active' && !tool.has_access;
                             return (
-                                <Card key={tool.id} className="flex flex-col overflow-hidden border-gray-700 bg-gray-900 text-white shadow-md">
-                                    {tool.image && <img src={tool.image} alt={getText(tool, 'name')} className="h-40 w-full object-cover" />}
-                                    <CardContent className="flex flex-1 flex-col space-y-4 p-4">
+                                <Card key={tool.id} className="flex flex-col overflow-hidden shadow-md">
+                                    {tool.image && (
+                                        <img
+                                            src={tool.image}
+                                            alt={getText(tool, 'name')}
+                                            className="h-40 w-full object-cover"
+                                        />
+                                    )}
+                                    <CardContent className="flex flex-col flex-1 p-4 space-y-4">
                                         <div>
                                             <CardTitle className="text-lg font-semibold">{getText(tool, 'name')}</CardTitle>
-                                            <CardDescription className="text-sm text-gray-400">{getText(tool, 'description')}</CardDescription>
+                                            <CardDescription className="text-sm text-gray-600">
+                                                {getText(tool, 'description')}
+                                            </CardDescription>
                                         </div>
 
-                                        <div className="flex justify-between text-xs text-gray-400">
-                                            <span>
-                                                {tool.total_domains} {t.domains}
-                                            </span>
-                                            <span>
-                                                {tool.total_criteria} {t.criteria}
-                                            </span>
-                                            <span>
-                                                {tool.estimated_time} {t.minutes}
-                                            </span>
+                                        <div className="flex justify-between text-xs text-gray-500">
+                                            <span>{tool.total_domains} {t.domains}</span>
+                                            <span>{tool.total_criteria} {t.criteria}</span>
+                                            <span>{tool.estimated_time} {t.minutes}</span>
                                         </div>
 
                                         <div className="mt-auto">
                                             {canStart ? (
                                                 <Link href={route('assessment.start', tool.id)}>
-                                                    <Button className="mt-4 w-full bg-white text-black hover:bg-gray-200">
-                                                        <Play className="mr-2 h-4 w-4" />
+                                                    <Button className="w-full mt-4">
+                                                        <Play className="w-4 h-4 mr-2" />
                                                         {t.startAssessment}
                                                     </Button>
                                                 </Link>
                                             ) : showRequest ? (
                                                 <Link href={`/tools/request/${tool.id}`}>
-                                                    <Button
-                                                        variant="secondary"
-                                                        className="w-full border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
-                                                    >
+                                                    <Button variant="secondary" className="w-full">
                                                         {t.requestAccess}
                                                     </Button>
                                                 </Link>
                                             ) : (
                                                 <Link href="/subscription">
-                                                    <Button
-                                                        variant="secondary"
-                                                        className="mt-4 w-full border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
-                                                    >
-                                                        <Lock className="mr-2 h-4 w-4" />
+                                                    <Button variant="secondary" className="w-full mt-4">
+                                                        <Lock className="w-4 h-4 mr-2" />
                                                         {t.upgradeNow}
                                                     </Button>
                                                 </Link>
@@ -241,7 +251,7 @@ export default function AssessmentTools({ tools, userLimits, locale }: Assessmen
                             );
                         })
                     ) : (
-                        <p className="col-span-full text-center text-gray-400">{t.noTools}</p>
+                        <p className="col-span-full text-center text-gray-600">{t.noTools}</p>
                     )}
                 </div>
             </div>
