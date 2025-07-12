@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { Search, Play, Award } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Assessment {
     id: number;
