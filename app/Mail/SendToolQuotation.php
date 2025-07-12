@@ -1,6 +1,7 @@
 <?php
 namespace App\Mail;
 
+use App\Models\Account;
 use App\Models\ToolRequest;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
@@ -15,9 +16,12 @@ class SendToolQuotation extends Mailable
     public ToolRequest $toolRequest;
     public array $data;
 
-    public function __construct(ToolRequest $toolRequest, array $data)
+    public Account $account;
+
+    public function __construct(ToolRequest $toolRequest, Account $account, array $data)
     {
         $this->toolRequest = $toolRequest;
+        $this->account = $account;
         $this->data = $data;
     }
 
@@ -31,12 +35,14 @@ class SendToolQuotation extends Mailable
     public function content(): Content
     {
         return new Content(
-            markdown: 'emails.tool-quotation',
+            view: 'emails.tool-quotation',
             with: [
                 'request' => $this->toolRequest,
+                'account' => $this->account,
                 'data' => $this->data,
             ]
         );
+
     }
 
     public function attachments(): array

@@ -11,6 +11,7 @@ class ToolRequest extends Model
 
     protected $fillable = [
         'user_id',
+        'account_id',
         'tool_id',
         'name',
         'email',
@@ -33,4 +34,11 @@ class ToolRequest extends Model
     {
         return $this->belongsTo(Tool::class);
     }
+
+
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(Account::class, 'account_id');
+    }
+
 }

@@ -3,6 +3,7 @@ namespace App\Filament\Resources\ToolRequestResource\Pages;
 
 use App\Filament\Resources\ToolRequestResource;
 use Filament\Actions;
+use Filament\Forms\Components\Select;
 use Filament\Resources\Pages\ViewRecord;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -17,6 +18,8 @@ class ViewToolRequest extends ViewRecord
 {
     protected static string $resource = ToolRequestResource::class;
 
+
+
     protected function getHeaderActions(): array
     {
         return [
@@ -26,19 +29,27 @@ class ViewToolRequest extends ViewRecord
                     TextInput::make('amount')
                         ->numeric()
                         ->required(),
-                    TextInput::make('bank_name')
-                        ->required(),
-                    TextInput::make('iban')
+                    Select::make('account_id')
+                        ->label('Select Bank Account')
+                        ->relationship('account', 'bank_name')
+                            ->native(false)
                         ->required(),
                     Textarea::make('note'),
                 ])
                 ->action(function (array $data) {
                     $record = $this->record;
-                    Mail::to($record->email)->send(new SendToolQuotation($record, $data));
+
+                    $account = \App\Models\Account::findOrFail($data['account_id']);
+
+                    // Update the relation
                     $record->update([
+                        'account_id' => $account->id,
                         'status' => 'quoted',
                         'quotation_sent_at' => now(),
                     ]);
+
+                    Mail::to($record->email)->send(new SendToolQuotation($record, $account, $data));
+
                     Notification::make()
                         ->title('Quotation sent')
                         ->success()
@@ -47,6 +58,7 @@ class ViewToolRequest extends ViewRecord
                 ->visible(fn ($record) => $record->status === 'pending'),
         ];
     }
+
     public function infolist(\Filament\Infolists\Infolist $infolist): \Filament\Infolists\Infolist
     {
         return $infolist->schema([

@@ -21,9 +21,11 @@ export default function PostShow({ post, comments: initial }: Props) {
     return (
         <BlogLayout title={post.title}>
             <Head title={post.title} />
-            <article className="max-w-3xl mx-auto py-12 px-4 sm:px-6 lg:px-8 space-y-8">
-                <div className="space-y-4 text-center">
-                    <h1 className="text-4xl font-extrabold text-blue-900">{post.title}</h1>
+
+            <article className="max-w-4xl mx-auto py-16 px-4 sm:px-6 lg:px-8 space-y-14">
+                {/* Post Header */}
+                <header className="text-center space-y-3">
+                    <h1 className="text-4xl md:text-5xl font-extrabold text-gray-900">{post.title}</h1>
                     {post.published_at && (
                         <p className="text-sm text-gray-500">
                             {new Date(post.published_at).toLocaleDateString(undefined, {
@@ -33,23 +35,31 @@ export default function PostShow({ post, comments: initial }: Props) {
                             })}
                         </p>
                     )}
-                </div>
+                </header>
 
+                {/* Media */}
                 <PostMedia post={post} />
 
+                {/* Content */}
                 <div
-                    className="prose max-w-none prose-blue prose-lg lg:prose-xl prose-img:rounded-xl prose-a:text-blue-600"
+                    className="prose max-w-none prose-blue prose-lg lg:prose-xl prose-img:rounded-xl prose-img:mx-auto prose-img:shadow-md prose-a:text-blue-600"
                     dangerouslySetInnerHTML={{ __html: post.content }}
                 />
 
-                <section className="pt-12">
-                    <h2 className="text-2xl font-semibold text-blue-900 mb-4">Leave a comment</h2>
-                    <CommentForm postSlug={post.slug} />
+                {/* Leave a Comment */}
+                <section className="pt-10 border-t border-gray-200">
+                    <h2 className="text-2xl font-semibold text-blue-900 mb-6 text-center">Leave a Comment</h2>
+                    <div className="bg-gray-50 p-6 rounded-xl shadow-sm">
+                        <CommentForm postSlug={post.slug} />
+                    </div>
                 </section>
 
-                <section className="pt-8">
+                {/* Comments */}
+                <section className="pt-12">
                     <h3 className="text-xl font-semibold text-gray-800 mb-4">Comments</h3>
-                    <CommentList comments={comments} />
+                    <div className="space-y-4">
+                        <CommentList comments={comments} />
+                    </div>
                 </section>
             </article>
         </BlogLayout>

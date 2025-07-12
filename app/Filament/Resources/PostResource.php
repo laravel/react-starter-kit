@@ -34,11 +34,15 @@ class PostResource extends Resource
                     ->columnSpanFull(),
                 Forms\Components\FileUpload::make('thumbnail')
                     ->image()
-                    ->directory('thumbnails'),
+                    ->directory('thumbnails')
+                    ->disk('public'),
+
                 Forms\Components\FileUpload::make('image_gallery')
                     ->image()
                     ->multiple()
-                    ->directory('gallery'),
+                    ->directory('gallery')
+                    ->disk('public'),
+
                 Forms\Components\FileUpload::make('audio')
                     ->acceptedFileTypes(['audio/mpeg','audio/ogg'])
                     ->directory('audio'),

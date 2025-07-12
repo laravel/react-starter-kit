@@ -3,10 +3,10 @@
 namespace App\Policies;
 
 use App\Models\User;
-use App\Models\ToolRequest;
+use App\Models\Post;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class ToolRequestPolicy
+class PostPolicy
 {
     use HandlesAuthorization;
 
@@ -15,15 +15,15 @@ class ToolRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('view_any_tool::request');
+        return $user->can('view_any_post');
     }
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, ToolRequest $toolRequest): bool
+    public function view(User $user, Post $post): bool
     {
-        return $user->can('view_tool::request');
+        return $user->can('view_post');
     }
 
     /**
@@ -31,23 +31,23 @@ class ToolRequestPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('create_tool::request');
+        return $user->can('create_post');
     }
 
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, ToolRequest $toolRequest): bool
+    public function update(User $user, Post $post): bool
     {
-        return $user->can('update_tool::request');
+        return $user->can('update_post');
     }
 
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, ToolRequest $toolRequest): bool
+    public function delete(User $user, Post $post): bool
     {
-        return $user->can('delete_tool::request');
+        return $user->can('delete_post');
     }
 
     /**
@@ -55,15 +55,15 @@ class ToolRequestPolicy
      */
     public function deleteAny(User $user): bool
     {
-        return $user->can('delete_any_tool::request');
+        return $user->can('delete_any_post');
     }
 
     /**
      * Determine whether the user can permanently delete.
      */
-    public function forceDelete(User $user, ToolRequest $toolRequest): bool
+    public function forceDelete(User $user, Post $post): bool
     {
-        return $user->can('force_delete_tool::request');
+        return $user->can('force_delete_post');
     }
 
     /**
@@ -71,15 +71,15 @@ class ToolRequestPolicy
      */
     public function forceDeleteAny(User $user): bool
     {
-        return $user->can('force_delete_any_tool::request');
+        return $user->can('force_delete_any_post');
     }
 
     /**
      * Determine whether the user can restore.
      */
-    public function restore(User $user, ToolRequest $toolRequest): bool
+    public function restore(User $user, Post $post): bool
     {
-        return $user->can('restore_tool::request');
+        return $user->can('restore_post');
     }
 
     /**
@@ -87,15 +87,15 @@ class ToolRequestPolicy
      */
     public function restoreAny(User $user): bool
     {
-        return $user->can('restore_any_tool::request');
+        return $user->can('restore_any_post');
     }
 
     /**
      * Determine whether the user can replicate.
      */
-    public function replicate(User $user, ToolRequest $toolRequest): bool
+    public function replicate(User $user, Post $post): bool
     {
-        return $user->can('replicate_tool::request');
+        return $user->can('replicate_post');
     }
 
     /**
@@ -103,6 +103,6 @@ class ToolRequestPolicy
      */
     public function reorder(User $user): bool
     {
-        return $user->can('reorder_tool::request');
+        return $user->can('reorder_post');
     }
 }

@@ -14,6 +14,8 @@ class ToolRequestResource extends Resource
 {
     protected static ?string $model = ToolRequest::class;
     protected static ?string $navigationIcon = 'heroicon-o-envelope';
+    protected static ?string $navigationGroup = 'User Management';
+    protected static ?int $navigationSort =9;
 
     public static function table(Table $table): Table
     {
