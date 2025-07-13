@@ -1,11 +1,20 @@
 import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
-import { Card, CardContent, CardDescription, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Search, Play, Award } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+    Search,
+    Play,
+    Award,
+    Calendar,
+    Building,
+    Target,
+    BarChart3
+} from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/use-language';
 
 interface Assessment {
@@ -42,45 +51,34 @@ interface AssessmentsIndexProps {
     };
 }
 
-interface Translations {
-    en: {
-        title: string;
-        searchPlaceholder: string;
-        continueAssessment: string;
-        viewResults: string;
-        noAssessments: string;
-    };
-    ar: {
-        title: string;
-        searchPlaceholder: string;
-        continueAssessment: string;
-        viewResults: string;
-        noAssessments: string;
-    };
-}
-
-const translations: Translations = {
+const translations = {
     en: {
         title: 'My Assessments',
         searchPlaceholder: 'Search assessments...',
         continueAssessment: 'Continue',
         viewResults: 'View Results',
-        noAssessments: 'No assessments found.'
+        noAssessments: 'No assessments found.',
+        completed: 'Completed',
+        inProgress: 'In Progress',
+        createdAt: 'Created on'
     },
     ar: {
         title: 'تقييماتي',
         searchPlaceholder: 'البحث في التقييمات...',
         continueAssessment: 'متابعة',
         viewResults: 'عرض النتائج',
-        noAssessments: 'لا توجد تقييمات.'
+        noAssessments: 'لا توجد تقييمات.',
+        completed: 'مكتمل',
+        inProgress: 'قيد المعالجة',
+        createdAt: 'تاريخ الإنشاء'
     }
 };
 
 export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const { language } = useLanguage();
-
     const t = translations[language];
+    const isArabic = language === 'ar';
 
     const breadcrumbs: BreadcrumbItem[] = [
         {
@@ -107,61 +105,92 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
 
-            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} p-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Award className="w-5 h-5 text-primary" /> {t.title}
-                    </h1>
-                </div>
+            <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
+                {/* Page Header */}
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    <div className="flex justify-between items-center mb-8">
+                        <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
+                            <Award className="w-6 h-6 text-blue-600" />
+                            {t.title}
+                        </h1>
+                    </div>
 
-                <div className="relative mb-6 max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                    <Input
-                        placeholder={t.searchPlaceholder}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-9"
-                    />
-                </div>
+                    {/* Search */}
+                    <div className="relative mb-8 max-w-xl">
+                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Input
+                            placeholder={t.searchPlaceholder}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="pl-9"
+                        />
+                    </div>
 
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    {filtered.length ? (
-                        filtered.map((a) => {
-                            const isComplete = a.status === 'completed';
-                            const url = isComplete ? resultsUrl(a) : continueUrl(a);
-                            return (
-                                <Card key={a.id} className="flex flex-col overflow-hidden">
-                                    {a.tool.image && (
-                                        <img
-                                            src={a.tool.image}
-                                            alt={getText(a.tool, 'name')}
-                                            className="h-32 w-full object-cover"
-                                        />
-                                    )}
-                                    <CardContent className="flex flex-col flex-1 p-4 space-y-4">
-                                        <div>
-                                            <CardTitle className="text-lg">{getText(a.tool, 'name')}</CardTitle>
-                                            {a.organization && <CardDescription>{a.organization}</CardDescription>}
-                                        </div>
-                                        <div className="mt-auto">
+                    {/* Assessments Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {filtered.length ? (
+                            filtered.map((a) => {
+                                const isComplete = a.status === 'completed';
+                                const url = isComplete ? resultsUrl(a) : continueUrl(a);
+                                return (
+                                    <Card key={a.id} className="overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-100 rounded-xl">
+                                        {a.tool.image && (
+                                            <img
+                                                src={a.tool.image}
+                                                alt={getText(a.tool, 'name')}
+                                                className="h-40 w-full object-cover"
+                                            />
+                                        )}
+                                        <CardHeader className="bg-white border-b">
+                                            <CardTitle className="text-lg text-gray-900">
+                                                {getText(a.tool, 'name')}
+                                            </CardTitle>
+                                            <div className="flex flex-wrap items-center gap-2 mt-2 text-sm text-gray-600">
+                                                <Calendar className="w-4 h-4" />
+                                                {t.createdAt}:{' '}
+                                                {new Date(a.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric'
+                                                })}
+                                                {a.organization && (
+                                                    <>
+                                                        <span className="mx-2">•</span>
+                                                        <Building className="w-4 h-4" />
+                                                        {a.organization}
+                                                    </>
+                                                )}
+                                            </div>
+                                        </CardHeader>
+                                        <CardContent className="p-5">
+                                            <div className="flex justify-between items-center mb-4">
+                                                <Badge className={`px-3 py-1 ${isComplete ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                                                    {isComplete ? t.completed : t.inProgress}
+                                                </Badge>
+                                                {a.overall_score && (
+                                                    <span className="text-sm text-gray-500 font-medium">
+                                                        {Math.round(a.overall_score)}%
+                                                    </span>
+                                                )}
+                                            </div>
                                             <Link href={url}>
                                                 <Button className="w-full">
                                                     {isComplete ? (
-                                                        <Award className="w-4 h-4 mr-2" />
+                                                        <BarChart3 className="w-4 h-4 mr-2" />
                                                     ) : (
                                                         <Play className="w-4 h-4 mr-2" />
                                                     )}
                                                     {isComplete ? t.viewResults : t.continueAssessment}
                                                 </Button>
                                             </Link>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })
-                    ) : (
-                        <p className="col-span-full text-center text-gray-600">{t.noAssessments}</p>
-                    )}
+                                        </CardContent>
+                                    </Card>
+                                );
+                            })
+                        ) : (
+                            <p className="col-span-full text-center text-gray-600">{t.noAssessments}</p>
+                        )}
+                    </div>
                 </div>
             </div>
         </AppLayout>
