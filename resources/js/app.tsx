@@ -6,6 +6,7 @@ import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 // 👇 UPDATED IMPORT - Note the .tsx extension
 import { ToastProvider } from './components/ui/use-toast';
+import { LanguageProvider } from './hooks/use-language';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -19,7 +20,9 @@ createInertiaApp({
         // 👇 WRAP THE APP WITH TOAST PROVIDER
         root.render(
             <ToastProvider>
-                <App {...props} />
+                <LanguageProvider>
+                    <App {...props} />
+                </LanguageProvider>
             </ToastProvider>
         );
     },

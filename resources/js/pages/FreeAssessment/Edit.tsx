@@ -22,6 +22,7 @@ import {
     Clock,
     Users
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Criterion {
     id: number;
@@ -104,7 +105,7 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
     );
     const [notes, setNotes] = useState<Record<number, string>>(existingNotes || {});
     const [files, setFiles] = useState<Record<number, File | null>>({});
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
+    const { language } = useLanguage();
     const [showScrollTop, setShowScrollTop] = useState(false);
 
     // Form for submission
@@ -273,9 +274,6 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
         window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
-    const toggleLanguage = () => {
-        setLanguage(prev => prev === 'en' ? 'ar' : 'en');
-    };
 
     return (
         <>
@@ -313,14 +311,7 @@ export default function Start({ assessmentData, locale, auth, existingNotes }: T
                                     </div>
                                     <Progress value={completionPercentage} className="w-24 h-2" />
                                 </div>
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={toggleLanguage}
-                                    className="border-blue-200 hover:bg-blue-50"
-                                >
-                                    {language === 'en' ? 'عربي' : 'English'}
-                                </Button>
+
                             </div>
                         </div>
                     </div>

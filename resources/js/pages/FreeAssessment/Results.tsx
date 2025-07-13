@@ -19,6 +19,7 @@ import {
     Calendar,
     Share2
 } from 'lucide-react';
+import { useLanguage } from '@/hooks/use-language';
 
 interface Assessment {
     id: number;
@@ -64,8 +65,8 @@ interface ResultsProps {
 }
 
 export default function Results({ assessment, statistics, domainScores, user, canEdit, locale }: ResultsProps) {
-    const [language, setLanguage] = useState<'en' | 'ar'>(locale === 'ar' ? 'ar' : 'en');
-    const isArabic = locale === 'ar';
+    const { language } = useLanguage();
+    const isArabic = language === 'ar';
 
     const getScoreGrade = (score: number) => {
         if (score >= 90) return { grade: 'A+', color: 'text-green-600', bg: 'bg-green-100' };
