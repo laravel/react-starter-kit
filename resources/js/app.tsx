@@ -7,6 +7,7 @@ import { initializeTheme } from './hooks/use-appearance';
 // 👇 UPDATED IMPORT - Note the .tsx extension
 import { ToastProvider } from './components/ui/use-toast';
 import { LanguageProvider } from './hooks/use-language';
+import AppWrapper from './AppWrapper';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -21,7 +22,9 @@ createInertiaApp({
         root.render(
             <ToastProvider>
                 <LanguageProvider>
-                    <App {...props} />
+                    <AppWrapper>
+                        <App {...props} />
+                    </AppWrapper>
                 </LanguageProvider>
             </ToastProvider>
         );
