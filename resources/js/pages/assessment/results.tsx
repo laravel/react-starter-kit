@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -20,11 +20,8 @@ import {
     Calendar,
     User,
     Building,
-    Globe,
-    ChevronDown,
+    // Remove unused icons
     ArrowLeft,
-    ExternalLink,
-    Info,
     Lightbulb,
     AlertCircle,
     Crown
@@ -445,7 +442,10 @@ export default function AssessmentResults({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t.assessmentResults} - ${getName(assessment.tool)}`} />
 
-            <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
+            <div
+                className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl text-right' : 'ltr'}`}
+                dir={isArabic ? 'rtl' : 'ltr'}
+            >
                 {/* Header */}
                 <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-white/20 sticky top-0 z-40">
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -453,7 +453,7 @@ export default function AssessmentResults({
                             <div className="flex items-center gap-4">
                                 <Link href="/assessment-tools">
                                     <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                                        <ArrowLeft className="w-4 h-4 mr-2" />
+                                        <ArrowLeft className={`w-4 h-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
                                         Back
                                     </Button>
                                 </Link>
@@ -470,7 +470,7 @@ export default function AssessmentResults({
 
                             <div className="flex items-center gap-4">
                                 <Button variant="outline" size="sm">
-                                    <Share2 className="h-4 w-4 mr-2" />
+                                    <Share2 className={`h-4 w-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
                                     {t.share}
                                 </Button>
                             </div>
@@ -565,7 +565,7 @@ export default function AssessmentResults({
 
                     {/* Key Insights */}
                     <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3">
+                        <h2 className={`text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3 ${isArabic ? 'justify-end text-right' : ''}`}> 
                             <Lightbulb className="h-6 w-6 text-amber-500" />
                             {t.insights}
                         </h2>
@@ -774,13 +774,13 @@ export default function AssessmentResults({
                     <div className="flex justify-center gap-6 pt-8">
                         <Link href="/assessment-tools">
                             <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-                                <FileText className="h-5 w-5 mr-3" />
+                                <FileText className={`h-5 w-5 ${isArabic ? 'ml-3' : 'mr-3'}`} />
                                 {t.newAssessment}
                             </Button>
                         </Link>
                         <Link href={route('assessments.index')}>
                             <Button size="lg" className="px-8 py-3 text-lg bg-blue-600 hover:bg-blue-700">
-                                <BarChart3 className="h-5 w-5 mr-3" />
+                                <BarChart3 className={`h-5 w-5 ${isArabic ? 'ml-3' : 'mr-3'}`} />
                                 {t.viewAllAssessments}
                             </Button>
                         </Link>
