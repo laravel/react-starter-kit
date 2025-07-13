@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
+import { Search, Play, Award } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -77,6 +78,7 @@ const translations = {
 export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const { language } = useLanguage();
+
     const t = translations[language];
     const isArabic = language === 'ar';
 
@@ -105,6 +107,12 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
 
+            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} p-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="flex items-center justify-between mb-4">
+                    <h1 className="text-2xl font-bold flex items-center gap-2">
+                        <Award className="w-5 h-5 text-primary" /> {t.title}
+                    </h1>
+                </div>
             <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
                 {/* Page Header */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
