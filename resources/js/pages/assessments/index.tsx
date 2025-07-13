@@ -2,18 +2,16 @@ import React, { useState } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
-import { Search, Play, Award } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
 import {
     Search,
     Play,
     Award,
     Calendar,
     Building,
-    Target,
     BarChart3
 } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/use-language';
@@ -78,7 +76,6 @@ const translations = {
 export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndexProps) {
     const [searchTerm, setSearchTerm] = useState('');
     const { language } = useLanguage();
-
     const t = translations[language];
     const isArabic = language === 'ar';
 
@@ -107,15 +104,9 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.title} />
 
-            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} p-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="flex items-center justify-between mb-4">
-                    <h1 className="text-2xl font-bold flex items-center gap-2">
-                        <Award className="w-5 h-5 text-primary" /> {t.title}
-                    </h1>
-                </div>
             <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`} dir={isArabic ? 'rtl' : 'ltr'}>
-                {/* Page Header */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+                    {/* Page Header */}
                     <div className="flex justify-between items-center mb-8">
                         <h1 className="text-3xl font-bold text-gray-800 flex items-center gap-3">
                             <Award className="w-6 h-6 text-blue-600" />
@@ -125,12 +116,12 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
 
                     {/* Search */}
                     <div className="relative mb-8 max-w-xl">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                        <Search className="absolute start-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
                         <Input
                             placeholder={t.searchPlaceholder}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-9"
+                            className="ps-9"
                         />
                     </div>
 
@@ -141,7 +132,10 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
                                 const isComplete = a.status === 'completed';
                                 const url = isComplete ? resultsUrl(a) : continueUrl(a);
                                 return (
-                                    <Card key={a.id} className="overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-100 rounded-xl">
+                                    <Card
+                                        key={a.id}
+                                        className="overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-200 border border-gray-100 rounded-xl"
+                                    >
                                         {a.tool.image && (
                                             <img
                                                 src={a.tool.image}
@@ -159,7 +153,7 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
                                                 {new Date(a.created_at).toLocaleDateString(isArabic ? 'ar-SA' : 'en-US', {
                                                     year: 'numeric',
                                                     month: 'short',
-                                                    day: 'numeric'
+                                                    day: 'numeric',
                                                 })}
                                                 {a.organization && (
                                                     <>
@@ -172,7 +166,13 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
                                         </CardHeader>
                                         <CardContent className="p-5">
                                             <div className="flex justify-between items-center mb-4">
-                                                <Badge className={`px-3 py-1 ${isComplete ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}`}>
+                                                <Badge
+                                                    className={`px-3 py-1 ${
+                                                        isComplete
+                                                            ? 'bg-emerald-100 text-emerald-800'
+                                                            : 'bg-amber-100 text-amber-800'
+                                                    }`}
+                                                >
                                                     {isComplete ? t.completed : t.inProgress}
                                                 </Badge>
                                                 {a.overall_score && (
@@ -182,11 +182,11 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
                                                 )}
                                             </div>
                                             <Link href={url}>
-                                                <Button className="w-full">
+                                                <Button className={`w-full flex items-center justify-center ${isArabic ? 'flex-row-reverse' : ''}`}>
                                                     {isComplete ? (
-                                                        <BarChart3 className="w-4 h-4 mr-2" />
+                                                        <BarChart3 className="w-4 h-4 me-2" />
                                                     ) : (
-                                                        <Play className="w-4 h-4 mr-2" />
+                                                        <Play className="w-4 h-4 me-2" />
                                                     )}
                                                     {isComplete ? t.viewResults : t.continueAssessment}
                                                 </Button>

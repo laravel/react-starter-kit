@@ -7,7 +7,13 @@ interface LanguageContextValue {
     setLanguage: (lang: Language) => void;
     toggleLanguage: () => void;
 }
+export function useDirectionEffect() {
+    const { language } = useLanguage(); // make sure `language` is 'en' or 'ar'
 
+    useEffect(() => {
+        document.documentElement.setAttribute('dir', language === 'ar' ? 'rtl' : 'ltr');
+    }, [language]);
+}
 const LanguageContext = React.createContext<LanguageContextValue | null>(null);
 
 const getStoredLanguage = (): Language => {
