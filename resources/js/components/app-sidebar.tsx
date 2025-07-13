@@ -6,39 +6,38 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid  , FileText, ClipboardCheck} from 'lucide-react';
 import AppLogo from './app-logo';
+import { useLanguage } from '@/hooks/use-language';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: '/dashboard',
-        icon: LayoutGrid,
+const translations = {
+    en: {
+        dashboard: 'Dashboard',
+        tools: 'Assessment Tools',
+        assessments: 'My Assessments',
+        repository: 'Repository',
+        documentation: 'Documentation',
     },
-    {
-        title: 'Assessment Tools',
-        href: '/assessment-tools',
-        icon: ClipboardCheck,
+    ar: {
+        dashboard: 'لوحة التحكم',
+        tools: 'أدوات التقييم',
+        assessments: 'تقييماتي',
+        repository: 'المستودع',
+        documentation: 'التوثيق',
     },
-    {
-        title: 'My Assessments',
-        href: '/assessments',
-        icon: FileText,
-    }
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    }
-];
-
+};
 export function AppSidebar() {
+    const { language } = useLanguage();
+    const t = translations[language];
+
+    const mainNavItems: NavItem[] = [
+        { title: t.dashboard, href: '/dashboard', icon: LayoutGrid },
+        { title: t.tools, href: '/assessment-tools', icon: ClipboardCheck },
+        { title: t.assessments, href: '/assessments', icon: FileText },
+    ];
+
+    const footerNavItems: NavItem[] = [
+        { title: t.repository, href: 'https://github.com/laravel/react-starter-kit', icon: Folder },
+        { title: t.documentation, href: 'https://laravel.com/docs/starter-kits#react', icon: BookOpen },
+    ];
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
