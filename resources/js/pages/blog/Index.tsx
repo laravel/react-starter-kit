@@ -2,9 +2,10 @@
 
 import { BlogList } from '@/components/blog/blog-list';
 import { BlogSearch } from '@/components/blog/blog-search';
+import { PlaceholderPattern } from '@/components/ui/placeholder-pattern';
 import AppLayout from '@/layouts/app-layout';
-import { BlogPost } from '@/types/blog';
 import { type BreadcrumbItem } from '@/types';
+import { BlogPost } from '@/types/blog';
 import { Head } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -32,24 +33,20 @@ export default function BlogIndex({ posts, availableTags, filters }: Props) {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Blog" />
 
-            <div className="flex h-full flex-1 flex-col gap-6 rounded-xl p-4">
-                {/* Header Section */}
-                <div className="mb-6">
-                    <h1 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
-                        AFAQCM Blog
-                    </h1>
-                    <p className="text-lg text-gray-600 dark:text-gray-300">
-                        Insights, tips, and updates from our assessment and quality management platform
-                    </p>
+            <div className="flex h-full flex-1 flex-col gap-10 p-4">
+                {/* Hero */}
+                <div className="relative mb-8 overflow-hidden rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white">
+                    <PlaceholderPattern className="absolute inset-0 h-full w-full text-white/20" />
+                    <div className="relative z-10 px-6 py-16 text-center md:px-12">
+                        <h1 className="mb-4 text-4xl font-extrabold drop-shadow-md md:text-6xl">AFAQCM Blog</h1>
+                        <p className="mx-auto max-w-3xl text-lg md:text-xl">
+                            Insights, tips, and updates from our assessment and quality management platform
+                        </p>
+                    </div>
                 </div>
 
                 {/* Search Component */}
-                <BlogSearch
-                    initialQuery={filters.search}
-                    initialTags={filters.tags || []}
-                    availableTags={availableTags}
-                    className="mb-6"
-                />
+                <BlogSearch initialQuery={filters.search} initialTags={filters.tags || []} availableTags={availableTags} className="mb-6" />
 
                 {/* Posts Content */}
                 {posts.data.length > 0 ? (
@@ -64,12 +61,12 @@ export default function BlogIndex({ posts, availableTags, filters }: Props) {
                                         <a
                                             key={index}
                                             href={link.url || '#'}
-                                            className={`px-3 py-2 rounded-md text-sm transition-colors ${
+                                            className={`rounded-md px-3 py-2 text-sm transition-colors ${
                                                 link.active
                                                     ? 'bg-primary text-primary-foreground'
                                                     : link.url
-                                                        ? 'bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
-                                                        : 'text-gray-400 dark:text-gray-600 cursor-not-allowed'
+                                                      ? 'bg-gray-100 text-gray-700 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700'
+                                                      : 'cursor-not-allowed text-gray-400 dark:text-gray-600'
                                             }`}
                                             dangerouslySetInnerHTML={{ __html: link.label }}
                                         />
@@ -79,10 +76,8 @@ export default function BlogIndex({ posts, availableTags, filters }: Props) {
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg">
-                        <h3 className="text-lg font-medium mb-2 text-gray-900 dark:text-white">
-                            No blog posts found
-                        </h3>
+                    <div className="rounded-lg bg-gray-50 py-12 text-center dark:bg-gray-800/50">
+                        <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">No blog posts found</h3>
                         <p className="text-gray-600 dark:text-gray-400">
                             {filters.search || (filters.tags && filters.tags.length > 0)
                                 ? 'Try adjusting your search criteria.'
