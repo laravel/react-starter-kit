@@ -1,6 +1,5 @@
 import React from 'react';
 import { Head, useForm, usePage } from '@inertiajs/react';
-import { useLanguage } from '@/hooks/use-language';
 import AppLayout from '@/layouts/app-layout';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -23,31 +22,8 @@ interface ToolRequestFormProps {
     } | null;
 }
 
-const translations = {
-    en: {
-        title: 'Request Tool Access',
-        fullName: 'Full Name',
-        email: 'Email',
-        organization: 'Organization (optional)',
-        message: 'Message',
-        submit: 'Submit Request',
-        submitting: 'Submitting...'
-    },
-    ar: {
-        title: 'طلب الوصول للأداة',
-        fullName: 'الاسم الكامل',
-        email: 'البريد الإلكتروني',
-        organization: 'المؤسسة (اختياري)',
-        message: 'رسالة',
-        submit: 'إرسال الطلب',
-        submitting: 'جاري الإرسال...'
-    }
-};
-
 export default function ToolRequestForm({ tool, user }: ToolRequestFormProps) {
     const { flash } = usePage().props as any;
-    const { language } = useLanguage();
-    const t = translations[language];
     const { data, setData, post, processing, errors } = useForm({
         tool_id: tool.id,
         name: user?.name || '',
@@ -63,8 +39,8 @@ export default function ToolRequestForm({ tool, user }: ToolRequestFormProps) {
 
     return (
         <AppLayout>
-            <Head title={t.title} />
-            <div className={`${language === 'ar' ? 'rtl' : 'ltr'} max-w-2xl mx-auto p-6 space-y-6`} dir={language === 'ar' ? 'rtl' : 'ltr'}>
+            <Head title="Request Tool Access" />
+            <div className="max-w-2xl mx-auto p-6 space-y-6">
                 {flash?.success && (
                     <div className="p-4 bg-green-100 text-green-800 rounded">
                         {flash.success}
@@ -81,27 +57,27 @@ export default function ToolRequestForm({ tool, user }: ToolRequestFormProps) {
                         <p className="mb-4 text-gray-700">{tool.description}</p>
                         <form onSubmit={submit} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="name">{t.fullName}</Label>
-                                <Input id="name" value={data.name} placeholder={t.fullName} onChange={e => setData('name', e.target.value)} required />
+                                <Label htmlFor="name">Full Name</Label>
+                                <Input id="name" value={data.name} onChange={e => setData('name', e.target.value)} required />
                                 <InputError message={errors.name} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="email">{t.email}</Label>
-                                <Input id="email" type="email" value={data.email} placeholder={t.email} onChange={e => setData('email', e.target.value)} required />
+                                <Label htmlFor="email">Email</Label>
+                                <Input id="email" type="email" value={data.email} onChange={e => setData('email', e.target.value)} required />
                                 <InputError message={errors.email} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="organization">{t.organization}</Label>
-                                <Input id="organization" value={data.organization} placeholder={t.organization} onChange={e => setData('organization', e.target.value)} />
+                                <Label htmlFor="organization">Organization (optional)</Label>
+                                <Input id="organization" value={data.organization} onChange={e => setData('organization', e.target.value)} />
                                 <InputError message={errors.organization} />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="message">{t.message}</Label>
-                                <Textarea id="message" value={data.message} placeholder={t.message} onChange={e => setData('message', e.target.value)} rows={4} />
+                                <Label htmlFor="message">Message</Label>
+                                <Textarea id="message" value={data.message} onChange={e => setData('message', e.target.value)} rows={4} />
                                 <InputError message={errors.message} />
                             </div>
                             <Button type="submit" disabled={processing} className="w-full">
-                                {processing ? t.submitting : t.submit}
+                                {processing ? 'Submitting...' : 'Submit Request'}
                             </Button>
                         </form>
                     </CardContent>
