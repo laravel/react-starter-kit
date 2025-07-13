@@ -453,7 +453,7 @@ export default function AssessmentResults({
                             <div className="flex items-center gap-4">
                                 <Link href="/assessment-tools">
                                     <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                                        <ArrowLeft className={`w-4 h-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
+                                        <ArrowLeft className="w-4 h-4 me-2" />
                                         Back
                                     </Button>
                                 </Link>
@@ -470,7 +470,7 @@ export default function AssessmentResults({
 
                             <div className="flex items-center gap-4">
                                 <Button variant="outline" size="sm">
-                                    <Share2 className={`h-4 w-4 ${isArabic ? 'ml-2' : 'mr-2'}`} />
+                                    <Share2 className="h-4 w-4 me-2" />
                                     {t.share}
                                 </Button>
                             </div>
@@ -774,13 +774,13 @@ export default function AssessmentResults({
                     <div className="flex justify-center gap-6 pt-8">
                         <Link href="/assessment-tools">
                             <Button variant="outline" size="lg" className="px-8 py-3 text-lg">
-                                <FileText className={`h-5 w-5 ${isArabic ? 'ml-3' : 'mr-3'}`} />
+                                <FileText className="h-5 w-5 me-3" />
                                 {t.newAssessment}
                             </Button>
                         </Link>
                         <Link href={route('assessments.index')}>
                             <Button size="lg" className="px-8 py-3 text-lg bg-blue-600 hover:bg-blue-700">
-                                <BarChart3 className={`h-5 w-5 ${isArabic ? 'ml-3' : 'mr-3'}`} />
+                                <BarChart3 className="h-5 w-5 me-3" />
                                 {t.viewAllAssessments}
                             </Button>
                         </Link>
