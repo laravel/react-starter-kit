@@ -1,14 +1,13 @@
-# Use an official PHP image with Apache
+# Use PHP 8.3 with Apache
 FROM php:8.3-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl unzip zip \
-    libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libzip-dev libicu-dev \
+    git curl unzip zip libpng-dev libjpeg-dev libfreetype6-dev \
+    libonig-dev libzip-dev libicu-dev libxml2-dev \
     nodejs npm \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo_mysql gd intl zip
+    && docker-php-ext-install pdo pdo_mysql gd intl zip
 
 # Enable Apache mod_rewrite
 RUN a2enmod rewrite
@@ -19,20 +18,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy app source
+# Copy app files
 COPY . .
 
-# Install PHP dependencies
+# Install Laravel backend dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Install Node dependencies and build front-end (Vite)
+# Install frontend dependencies & build Vite
 RUN npm install && npm run build
 
-# Set permissions for Laravel
-RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+# Set permissions
+RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Expose port 80 (Apache)
+# Expose Apache
 EXPOSE 80
 
-# Run Laravel migrations before starting
+# Start with migration and Apache
 CMD php artisan migrate --force && apache2-foreground
+
