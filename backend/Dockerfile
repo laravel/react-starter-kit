@@ -1,31 +1,38 @@
-# Use official PHP image with Apache
+# Use an official PHP image with Apache
 FROM php:8.3-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    zip unzip git curl libpng-dev libonig-dev libxml2-dev libzip-dev \
-    && docker-php-ext-install pdo pdo_mysql zip
+    git curl unzip zip \
+    libpng-dev libjpeg-dev libfreetype6-dev \
+    libonig-dev libzip-dev libicu-dev \
+    nodejs npm \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql gd intl zip
 
-# Enable Apache Rewrite Module
+# Enable Apache mod_rewrite
 RUN a2enmod rewrite
 
 # Install Composer
-COPY --from=composer:2.6 /usr/bin/composer /usr/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy Laravel files
-COPY .. .
+# Copy app source
+COPY . .
 
 # Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Laravel permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+# Install Node dependencies and build front-end (Vite)
+RUN npm install && npm run build
 
-# Expose port 80
+# Set permissions for Laravel
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
+
+# Expose port 80 (Apache)
 EXPOSE 80
 
-# Start Laravel
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=80"]
+# Run Laravel migrations before starting
+CMD php artisan migrate --force && apache2-foreground
