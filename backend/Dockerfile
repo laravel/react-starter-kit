@@ -1,38 +1,37 @@
-# Use PHP 8.3 with Apache
-FROM php:8.3-apache
+FROM php:8.3-fpm
+
+# Set working directory
+WORKDIR /var/www
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
-    git curl unzip zip libpng-dev libjpeg-dev libfreetype6-dev \
-    libonig-dev libzip-dev libicu-dev libxml2-dev \
-    nodejs npm \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_mysql gd intl zip
-
-# Enable Apache mod_rewrite
-RUN a2enmod rewrite
+    git \
+    curl \
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    zip \
+    unzip \
+    libpq-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install pdo pdo_pgsql zip
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Set working directory
-WORKDIR /var/www/html
-
-# Copy app files
+# Copy project files
 COPY . .
 
-# Install Laravel backend dependencies
+# Install Laravel dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Install frontend dependencies & build Vite
-RUN npm install && npm run build
-
 # Set permissions
-RUN chown -R www-data:www-data storage bootstrap/cache
+RUN chown -R www-data:www-data /var/www && chmod -R 755 /var/www
 
-# Expose Apache
-EXPOSE 80
+# Expose port
+EXPOSE 8000
 
-# Start with migration and Apache
-CMD php artisan migrate --force && apache2-foreground
-
+# Run Laravel server
+CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
