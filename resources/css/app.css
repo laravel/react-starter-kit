@@ -111,6 +111,10 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
 }
 
 .dark {
@@ -156,4 +160,16 @@
     body {
         @apply bg-background text-foreground;
     }
+}
+
+
+@media (max-width: 768px) {
+    :root {
+        --sidebar-width: 18rem; /* optional mobile override */
+    }
+}
+
+html[dir="rtl"] {
+    --sidebar-width: 16rem;
+    --sidebar-width-icon: 3rem;
 }

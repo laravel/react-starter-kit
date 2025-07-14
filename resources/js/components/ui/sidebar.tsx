@@ -215,15 +215,24 @@ function Sidebar({
           {/* This is what handles the sidebar gap on desktop */}
           <div
               className={cn(
-                  'relative h-svh transition-[width] duration-200 ease-linear',
-                  'ltr:w-[--sidebar-width]',
-                  'rtl:hidden',
-                  'group-data-[collapsible=offcanvas]:w-0',
-                  'group-data-[side=right]:rotate-180',
-                  variant === 'floating' || variant === 'inset'
-                      ? 'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+(--spacing(4)))]'
-                      : 'group-data-[collapsible=icon]:w-(--sidebar-width-icon)'
+                  'relative h-svh transition-[width,margin] duration-200 ease-linear',
+                  // Use margin to create space instead of width (for clearer RTL handling)
+                  side === 'left' && [
+                      'ltr:ml-0 ltr:mr-[var(--sidebar-width)]',
+                      'rtl:mr-0 rtl:ml-[var(1rem)]',
+                      'ltr:group-data-[collapsible=icon]:mr-[var(--sidebar-width-icon)]',
+                      'rtl:group-data-[collapsible=icon]:ml-[var(--sidebar-width-icon)]'
+                  ],
+                  side === 'right' && [
+                      'ltr:mr-0 ltr:ml-[var(--sidebar-width)]',
+                      'rtl:ml-0 rtl:mr-[var(3rem)]',
+                      'ltr:group-data-[collapsible=icon]:ml-[var(--sidebar-width-icon)]',
+                      'rtl:group-data-[collapsible=icon]:mr-[var(--sidebar-width-icon)]'
+                  ],
+                  (variant === 'floating' || variant === 'inset') &&
+                  'group-data-[collapsible=icon]:w-[calc(var(--sidebar-width-icon)+theme(spacing.4))]'
               )}
+              data-side={side}
           />
 
 
@@ -274,23 +283,23 @@ function SidebarTrigger({
         >
             <PanelLeftIcon />
             <span className="sr-only">Toggle Sidebar</span>
-    </Button>
-  )
+        </Button>
+    );
 }
 
-function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
-  const { toggleSidebar } = useSidebar()
+function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
+    const { toggleSidebar } = useSidebar();
 
-  return (
-    <button
-      data-sidebar="rail"
-      data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
-      tabIndex={-1}
-      onClick={toggleSidebar}
-      title="Toggle Sidebar"
-      className={cn(
-        "hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex",
+    return (
+        <button
+            data-sidebar="rail"
+            data-slot="sidebar-rail"
+            aria-label="Toggle Sidebar"
+            tabIndex={-1}
+            onClick={toggleSidebar}
+            title="Toggle Sidebar"
+            className={cn(
+                'hover:after:bg-sidebar-border absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex',
         "in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize",
         "[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize",
         "hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full",
@@ -304,55 +313,70 @@ function SidebarRail({ className, ...props }: React.ComponentProps<"button">) {
 }
 
 function SidebarInset({ className, ...props }: React.ComponentProps<"main">) {
-  return (
-    <main
-      data-slot="sidebar-inset"
-      className={cn(
-          "bg-background relative flex max-w-full min-h-svh flex-1 flex-col",
-          "ltr:ml-[--sidebar-width]",
-          "rtl:mr-[--sidebar-width]",
-        "peer-data-[variant=inset]:min-h-[calc(100svh-(--spacing(4)))] md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ml-0 md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm md:peer-data-[variant=inset]:peer-data-[state=collapsed]:ml-0",
-        className
-      )}
-      {...props}
-    />
-  )
+    return (
+        <main
+            data-slot="sidebar-inset"
+            className={cn(
+                'bg-background relative flex max-w-full min-h-svh flex-1 flex-col',
+
+                // ✅ Logical margin start, adjusts for LTR/RTL
+                'ms-[--sidebar-width]',
+
+                // ✅ When collapsed, use icon width instead
+                'peer-data-[collapsible=icon]:ms-[--sidebar-width-icon]',
+                'peer-data-[state=collapsed]:ms-[--sidebar-width-icon]',
+
+                // ✅ When fully hidden
+                'peer-data-[collapsible=offcanvas]:ms-0 peer-data-[state=collapsed]:ms-0',
+
+                // ✅ Inset visual styling
+                'peer-data-[variant=inset]:min-h-[calc(100svh-var(--spacing-4))]',
+                'md:peer-data-[variant=inset]:m-2 md:peer-data-[variant=inset]:ms-0',
+                'md:peer-data-[variant=inset]:rounded-xl md:peer-data-[variant=inset]:shadow-sm',
+
+                className
+            )}
+            {...props}
+        />
+
+    )
 }
+
 
 function SidebarInput({
-  className,
-  ...props
-}: React.ComponentProps<typeof Input>) {
-  return (
-    <Input
-      data-slot="sidebar-input"
-      data-sidebar="input"
-      className={cn("bg-background h-8 w-full shadow-none", className)}
-      {...props}
-    />
-  )
+                          className,
+                          ...props
+                      }: React.ComponentProps<typeof Input>) {
+    return (
+        <Input
+            data-slot="sidebar-input"
+            data-sidebar="input"
+            className={cn('bg-background h-8 w-full shadow-none', className)}
+            {...props}
+        />
+    );
 }
 
-function SidebarHeader({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sidebar-header"
-      data-sidebar="header"
-      className={cn("flex flex-col gap-2 p-2", className)}
-      {...props}
-    />
-  )
+function SidebarHeader({ className, ...props }: React.ComponentProps<'div'>) {
+    return (
+        <div
+            data-slot="sidebar-header"
+            data-sidebar="header"
+            className={cn('flex flex-col gap-2 p-2', className)}
+            {...props}
+        />
+    );
 }
 
-function SidebarFooter({ className, ...props }: React.ComponentProps<"div">) {
-  return (
-    <div
-      data-slot="sidebar-footer"
-      data-sidebar="footer"
-      className={cn("flex flex-col gap-2 p-2", className)}
-      {...props}
-    />
-  )
+function SidebarFooter({ className, ...props }: React.ComponentProps<'div'>) {
+    return (
+        <div
+            data-slot="sidebar-footer"
+            data-sidebar="footer"
+            className={cn('flex flex-col gap-2 p-2', className)}
+            {...props}
+        />
+    );
 }
 
 function SidebarSeparator({
