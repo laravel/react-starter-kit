@@ -17,8 +17,10 @@ class ToolRequestController extends Controller
         return Inertia::render('ToolRequestForm', [
             'tool' => [
                 'id' => $tool->id,
-                'name' => $tool->name_en,
-                'description' => $tool->description_en,
+                'name_en' => $tool->name_en,
+                'name_ar' => $tool->name_ar,
+                'description_en' => $tool->description_en,
+                'description_ar' => $tool->description_ar,
                 'image' => $tool->image,
             ],
             'user' => auth()->user() ? [
