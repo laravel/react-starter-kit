@@ -26,8 +26,11 @@ class PostController extends Controller
             abort(404);
         }
 
-        $comments = $post->comments()->where('approved', true)->latest()->get();
-        $comments = $post->comments()->latest()->get();
+        // Only display approved comments in newest-first order
+        $comments = $post->comments()
+            ->where('approved', true)
+            ->latest()
+            ->get();
 
         return Inertia::render('posts/Show', [
             'post' => $post,
@@ -42,8 +45,8 @@ class PostController extends Controller
             'content' => 'required|string',
         ]);
 
+        // Always create a pending comment awaiting approval
         $post->comments()->create($data + ['approved' => false]);
-        $post->comments()->create($data);
 
         return redirect()->back();
     }

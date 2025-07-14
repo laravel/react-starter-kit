@@ -8,16 +8,20 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration {
     public function up(): void
     {
-        Schema::table('tool_requests', function (Blueprint $table) {
-            $table->foreignId('account_id')->nullable()->constrained()->nullOnDelete();
-        });
+        if (Schema::hasTable('tool_requests')) {
+            Schema::table('tool_requests', function (Blueprint $table) {
+                $table->foreignId('account_id')->nullable()->constrained()->nullOnDelete();
+            });
+        }
     }
 
     public function down(): void
     {
-        Schema::table('tool_requests', function (Blueprint $table) {
-            $table->dropConstrainedForeignId('account_id');
-        });
+        if (Schema::hasTable('tool_requests')) {
+            Schema::table('tool_requests', function (Blueprint $table) {
+                $table->dropConstrainedForeignId('account_id');
+            });
+        }
     }
 };
 

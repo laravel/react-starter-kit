@@ -31,7 +31,9 @@ return new class extends Migration
 
             $table->index(['status', 'published_at']);
             $table->index('author_id');
-            $table->fullText(['title', 'excerpt', 'content']);
+            if (Schema::getConnection()->getDriverName() !== 'sqlite') {
+                $table->fullText(['title', 'excerpt', 'content']);
+            }
         });
     }
 
