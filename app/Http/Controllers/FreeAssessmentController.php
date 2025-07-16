@@ -247,6 +247,13 @@ class FreeAssessmentController extends Controller
         try {
             DB::beginTransaction();
 
+            // Remove any previous free assessments for this tool
+            Assessment::where('user_id', $user->id)
+                ->where('tool_id', $assessment->tool_id)
+                ->where('id', '!=', $assessment->id)
+                ->where('assessment_type', 'free')
+                ->delete();
+
             // Clear existing responses to avoid duplicates
             $assessment->responses()->delete();
 
