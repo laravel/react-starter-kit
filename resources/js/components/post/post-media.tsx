@@ -5,14 +5,14 @@ export function PostMedia({ post }: { post: Post }) {
         <div className="space-y-4">
             {post.thumbnail && (
                 <img
-                    src={post.thumbnail}
-                    alt={post.title}
+                    src={post.thumbnail_url}
+                    alt={post.thumbnail_url}
                     className="rounded-lg shadow"
                 />
             )}
-            {post.image_gallery && post.image_gallery.length > 0 && (
+            {post.image_gallery_urls && post.image_gallery_urls.length > 0 && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    {post.image_gallery.map((img, idx) => (
+                    {post.image_gallery_urls.map((img, idx) => (
                         <img
                             key={idx}
                             src={img}

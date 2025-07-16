@@ -44,10 +44,10 @@ class PostResource extends Resource
                     ->disk('public'),
 
                 Forms\Components\FileUpload::make('audio')
-                    ->acceptedFileTypes(['audio/mpeg','audio/ogg'])
+//                    ->acceptedFileTypes(['audio/mpeg','audio/ogg'])
                     ->directory('audio'),
                 Forms\Components\FileUpload::make('video')
-                    ->acceptedFileTypes(['video/mp4'])
+//                    ->acceptedFileTypes(['video/mp4'])
                     ->directory('video'),
                 Forms\Components\TextInput::make('youtube_url')
                     ->url()

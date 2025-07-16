@@ -102,37 +102,38 @@ export default function Results({ assessment, statistics, domainScores, user, ca
             <div className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'} print:bg-white`} dir={isArabic ? 'rtl' : 'ltr'}>
 
                 {/* OPTIMIZED: Compact Header */}
-                <header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-blue-200/50 print:shadow-none">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex justify-between items-center h-16"> {/* Reduced height from h-20 to h-16 */}
-                            <div className="flex items-center space-x-4"> {/* Reduced spacing */}
-                                <div className="flex items-center space-x-3">
-                                    <Award className="w-6 h-6 text-blue-600" /> {/* Reduced icon size */}
-                                    <div>
-                                        <h1 className="text-lg font-bold text-gray-900">Assessment Results</h1> {/* Reduced text size */}
-                                        <div className="flex items-center space-x-2 text-xs text-gray-600"> {/* Reduced text size */}
-                                            <Users className="w-3 h-3" />
-                                            <span>{user.name}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex items-center space-x-3 print:hidden"> {/* Reduced spacing */}
-                                <Badge className="bg-blue-100 text-blue-800 px-3 py-1 text-xs"> {/* Reduced padding and text size */}
-                                    <Award className="w-3 h-3 mr-1" />
-                                    Free Plan
-                                </Badge>
-                            </div>
-                        </div>
-                    </div>
-                </header>
+                {/*<header className="bg-white/95 backdrop-blur-md shadow-lg border-b border-blue-200/50 print:shadow-none">*/}
+                {/*    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">*/}
+                {/*        <div className="flex justify-between items-center h-16"> /!* Reduced height from h-20 to h-16 *!/*/}
+                {/*            <div className="flex items-center space-x-4"> /!* Reduced spacing *!/*/}
+                {/*                <div className="flex items-center space-x-3">*/}
+                {/*                    <Award className="w-6 h-6 text-blue-600" /> /!* Reduced icon size *!/*/}
+                {/*                    <div>*/}
+                {/*                        <h1 className="text-lg font-bold text-gray-900">Assessment Results</h1> /!* Reduced text size *!/*/}
+                {/*                        <div className="flex items-center space-x-2 text-xs text-gray-600"> /!* Reduced text size *!/*/}
+                {/*                            <Users className="w-3 h-3" />*/}
+                {/*                            <span>{user.name}</span>*/}
+                {/*                        </div>*/}
+                {/*                    </div>*/}
+                {/*                </div>*/}
+                {/*            </div>*/}
+                {/*            <div className="flex items-center space-x-3 print:hidden"> /!* Reduced spacing *!/*/}
+                {/*                <Badge className="bg-blue-100 text-blue-800 px-3 py-1 text-xs"> /!* Reduced padding and text size *!/*/}
+                {/*                    <Award className="w-3 h-3 mr-1" />*/}
+                {/*                    Free Plan*/}
+                {/*                </Badge>*/}
+                {/*            </div>*/}
+                {/*        </div>*/}
+                {/*    </div>*/}
+                {/*</header>*/}
 
                 {/* OPTIMIZED: Single Container with Grid Layout */}
                 <div className="py-6 px-4 sm:px-6 lg:px-8"> {/* Reduced padding */}
                     <div className="max-w-7xl mx-auto">
 
                         {/* OPTIMIZED: Compact Congratulations Banner */}
-                        <Card className="mb-6 border-0 shadow-xl bg-gradient-to-r from-green-600 to-emerald-600 text-white print:shadow-none"> {/* Reduced margin */}
+
+                        <Card className={` mb-6 border-0 shadow-xl  text-white print:shadow-none bg-gradient-to-r ${getScoreColorClass(assessment.overall_score)} `}> {/* Reduced margin */}
                             <CardContent className="p-6"> {/* Reduced padding */}
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center space-x-4">

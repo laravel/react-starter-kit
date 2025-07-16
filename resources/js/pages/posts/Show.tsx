@@ -14,6 +14,7 @@ interface Props {
 export default function PostShow({ post, comments: initial }: Props) {
     const [comments, setComments] = useState<Comment[]>(initial);
 
+    console.log(post);
     const refresh = () => {
         router.reload({ only: ['comments'] });
     };
