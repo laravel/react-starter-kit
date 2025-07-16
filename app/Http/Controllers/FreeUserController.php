@@ -315,11 +315,21 @@ class FreeUserController extends Controller
         try {
             DB::beginTransaction();
 
+            // If submitting, remove any previous free assessments for this tool
+            if ($validated['action'] === 'submit') {
+                Assessment::where('user_id', $user->id)
+                    ->where('tool_id', $assessment->tool_id)
+                    ->where('id', '!=', $assessment->id)
+                    ->where('assessment_type', 'free')
+                    ->delete();
+            }
+
             // Update assessment basic info
             $assessment->update([
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'organization' => $validated['organization'],
+                'assessment_type' => 'free',
                 'status' => $validated['action'] === 'submit' ? 'completed' : 'in_progress',
                 'completed_at' => $validated['action'] === 'submit' ? now() : null,
             ]);
@@ -409,6 +419,12 @@ class FreeUserController extends Controller
         try {
             DB::beginTransaction();
 
+            // Remove any previous free assessments for this tool
+            Assessment::where('user_id', $user->id)
+                ->where('tool_id', $validated['tool_id'])
+                ->where('assessment_type', 'free')
+                ->delete();
+
             // Create the assessment
             $assessment = Assessment::create([
                 'tool_id' => $validated['tool_id'],
@@ -416,6 +432,7 @@ class FreeUserController extends Controller
                 'name' => $validated['name'],
                 'email' => $validated['email'],
                 'organization' => $validated['organization'],
+                'assessment_type' => 'free',
                 'status' => 'completed',
                 'started_at' => now(),
                 'completed_at' => now(),
