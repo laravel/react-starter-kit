@@ -10,12 +10,10 @@ import {
     Award,
     CheckCheck,
     CheckCircle,
-    ChevronDown,
     Cloud,
     File,
     FileText,
     Keyboard,
-    Layers,
     MinusCircle,
     Paperclip,
     Upload,
@@ -168,95 +166,53 @@ const WelcomeSection = ({ t, totalCriteria, answeredCount, completionPercentage 
     </Card>
 );
 
-// --- NEW DomainSection component with accordion functionality ---
-const DomainSection = ({ domain, children, responses, language, t }: any) => {
-    const [isOpen, setIsOpen] = useState(true);
-
-    const domainCriteriaIds = useMemo(() => {
-        return domain.categories.flatMap((cat: Category) => cat.criteria.map((crit: Criterion) => crit.id));
-    }, [domain]);
-
-    const answeredCount = useMemo(() => {
-        return domainCriteriaIds.filter((id: number) => responses[id]).length;
-    }, [responses, domainCriteriaIds]);
-
-    const totalCount = domainCriteriaIds.length;
-    const completionPercentage = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
-
-    return (
-        <Card className="border-0 shadow-lg transition-all duration-300">
-            <CardHeader
-                className="flex cursor-pointer flex-row items-center justify-between p-4"
-                onClick={() => setIsOpen(!isOpen)}
-            >
-                <div className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
-                        <Layers className="h-6 w-6 text-blue-600" />
-                    </div>
-                    <div>
-                        <CardTitle className="text-lg font-bold text-gray-800">
-                            {language === 'ar' ? domain.name_ar : domain.name_en}
-                        </CardTitle>
-                        <p className="text-sm text-gray-500">{answeredCount} / {totalCount} {t.completed}</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-4">
-                    <Progress value={completionPercentage} className="h-2 w-32 hidden sm:block" />
-                    <ChevronDown className={`h-6 w-6 text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
-                </div>
-            </CardHeader>
-            {isOpen && (
-                <CardContent className="border-t border-gray-100 p-4">
-                    {children}
-                </CardContent>
-            )}
-        </Card>
-    );
-};
-
 const CriterionCard = ({ criterion, globalIndex, response, note, file, handlers, t, language }: any) => {
     const { handleResponseChange, handleNotesChange, handleFileUpload, handleFileRemove } = handlers;
     const isYes = response === 'yes';
 
     return (
-        <div className="rounded-lg border border-gray-200 bg-white p-4">
-            <div className="flex items-start justify-between gap-4">
-                <div className="flex flex-1 items-start gap-3">
-                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
-                        {globalIndex}
-                    </div>
-                    <div className="flex-1">
-                        <p className="mb-2 font-medium leading-relaxed text-gray-800">
-                            {language === 'ar' ? criterion.text_ar : criterion.text_en}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-2">
-                            {criterion.requires_file && (
-                                <Badge variant="secondary" className="border-amber-200 bg-amber-100 text-amber-800 text-xs">
-                                    <Paperclip className="mr-1 h-3 w-3 rtl:ml-1 rtl:mr-0" />
-                                    {t.attachmentRequired}
-                                </Badge>
-                            )}
+        <Card className="transform border-0 shadow-lg transition-all duration-300 hover:shadow-xl">
+            <CardHeader className="border-b border-gray-100 bg-white p-4">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-1 items-start gap-3">
+                        <div className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-base font-bold text-white">
+                            {globalIndex}
+                        </div>
+                        <div className="flex-1">
+                            <p className="mb-2 font-semibold leading-relaxed text-gray-800">
+                                {language === 'ar' ? criterion.text_ar : criterion.text_en}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-2">
+                                {criterion.requires_file && (
+                                    <Badge variant="secondary" className="border-amber-200 bg-amber-100 text-amber-800 text-xs">
+                                        <Paperclip className="mr-1 h-3 w-3 rtl:ml-1 rtl:mr-0" />
+                                        {t.attachmentRequired}
+                                    </Badge>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </CardHeader>
 
-            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
-                <div className="flex flex-col gap-2">
-                    <ResponseButton type="yes" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'yes')} t={t} />
-                    <ResponseButton type="no" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'no')} t={t} />
-                    <ResponseButton type="na" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'na')} t={t} />
+            <CardContent className="p-4">
+                <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+                    <div className="flex flex-col gap-2">
+                        <ResponseButton type="yes" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'yes')} t={t} />
+                        <ResponseButton type="no" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'no')} t={t} />
+                        <ResponseButton type="na" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'na')} t={t} />
+                    </div>
+                    <div className="flex flex-col gap-4">
+                        {criterion.requires_file && isYes && (
+                            <FileUploadSection criterionId={criterion.id} file={file} onUpload={handleFileUpload} onRemove={handleFileRemove} t={t} />
+                        )}
+                        {response && (
+                            <NotesSection criterionId={criterion.id} note={note} onNotesChange={handleNotesChange} t={t} />
+                        )}
+                    </div>
                 </div>
-                <div className="flex flex-col gap-4">
-                    {criterion.requires_file && isYes && (
-                        <FileUploadSection criterionId={criterion.id} file={file} onUpload={handleFileUpload} onRemove={handleFileRemove} t={t} />
-                    )}
-                    {response && (
-                        <NotesSection criterionId={criterion.id} note={note} onNotesChange={handleNotesChange} t={t} />
-                    )}
-                </div>
-            </div>
-        </div>
+            </CardContent>
+        </Card>
     );
 };
 
@@ -399,23 +355,11 @@ export default function Start({ assessmentData, locale, auth }: TakeProps) {
     const [showScrollTop, setShowScrollTop] = useState(false);
     const completionCardRef = useRef<HTMLDivElement>(null);
 
-    const { allCriteria, criteriaMap } = useMemo(() => {
-        const flatCriteria: (Criterion & { domainName: string; categoryName: string })[] = [];
-        const map = new Map<number, number>();
-        assessmentData.tool.domains.forEach(domain => {
-            domain.categories.forEach(category => {
-                category.criteria.forEach(criterion => {
-                    map.set(criterion.id, flatCriteria.length + 1);
-                    flatCriteria.push({
-                        ...criterion,
-                        domainName: language === 'ar' ? domain.name_ar : domain.name_en,
-                        categoryName: language === 'ar' ? category.name_ar : category.name_en,
-                    });
-                });
-            });
-        });
-        return { allCriteria: flatCriteria, criteriaMap: map };
-    }, [assessmentData.tool, language]);
+    const allCriteria = useMemo(() => {
+        return assessmentData.tool.domains.flatMap(domain =>
+            domain.categories.flatMap(category => category.criteria)
+        );
+    }, [assessmentData.tool]);
 
     const totalCriteria = allCriteria.length;
 
@@ -514,25 +458,19 @@ export default function Start({ assessmentData, locale, auth }: TakeProps) {
                     <div className="mx-auto max-w-4xl">
                         <WelcomeSection t={t} totalCriteria={totalCriteria} answeredCount={Object.keys(data.responses).length} completionPercentage={completionPercentage} />
 
-                        <div className="space-y-6">
-                            {assessmentData.tool.domains.map((domain) => (
-                                <DomainSection key={domain.id} domain={domain} responses={data.responses} language={language} t={t}>
-                                    <div className="space-y-4">
-                                        {domain.categories.flatMap(cat => cat.criteria).map(criterion => (
-                                            <CriterionCard
-                                                key={criterion.id}
-                                                criterion={criterion}
-                                                globalIndex={criteriaMap.get(criterion.id)}
-                                                response={data.responses[criterion.id]}
-                                                note={data.notes[criterion.id]}
-                                                file={data.files[criterion.id]}
-                                                handlers={{ handleResponseChange, handleNotesChange, handleFileUpload, handleFileRemove }}
-                                                t={t}
-                                                language={language}
-                                            />
-                                        ))}
-                                    </div>
-                                </DomainSection>
+                        <div className="space-y-4">
+                            {allCriteria.map((criterion, index) => (
+                                <CriterionCard
+                                    key={criterion.id}
+                                    criterion={criterion}
+                                    globalIndex={index + 1}
+                                    response={data.responses[criterion.id]}
+                                    note={data.notes[criterion.id]}
+                                    file={data.files[criterion.id]}
+                                    handlers={{ handleResponseChange, handleNotesChange, handleFileUpload, handleFileRemove }}
+                                    t={t}
+                                    language={language}
+                                />
                             ))}
                         </div>
 

@@ -192,8 +192,8 @@ class FreeAssessmentController extends Controller
                                 'criteria' => $category->criteria->map(function ($criterion) {
                                     return [
                                         'id' => $criterion->id,
-                                        'text_en' => $criterion->text_en,
-                                        'text_ar' => $criterion->text_ar,
+                                        'text_en' => $criterion->name_en,
+                                        'text_ar' => $criterion->name_ar,
                                         'description_en' => $criterion->description_en,
                                         'description_ar' => $criterion->description_ar,
                                         'order' => $criterion->order,
