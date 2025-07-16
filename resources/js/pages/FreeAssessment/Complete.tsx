@@ -1,7 +1,8 @@
-import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import { Button } from '@/components/ui/button';
-import { CheckCircle } from 'lucide-react';
+import AssessmentHeader from '@/components/assessment-header';
+import { useLanguage } from '@/hooks/use-language';
+import { Head, router } from '@inertiajs/react';
+import { Loader2 } from 'lucide-react';
+import { useEffect } from 'react';
 
 interface CompleteProps {
     assessment: {
@@ -15,25 +16,30 @@ interface CompleteProps {
 }
 
 export default function Complete({ assessment, locale }: CompleteProps) {
-    const isArabic = locale === 'ar';
-    const message = isArabic
-        ? `تم الانتهاء من تقييم ${assessment.tool.name_ar}`
-        : `Thank you for completing the ${assessment.tool.name_en} assessment`;
-    const buttonLabel = isArabic ? 'عرض النتيجة' : 'Click here to see results';
+    const { language } = useLanguage();
+    const t = {
+        en: { calculating: 'Calculating Results...' },
+        ar: { calculating: 'جاري حساب النتائج...' },
+    }[language];
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            router.visit(route('free-assessment.results', assessment.id));
+        }, 2500);
+        return () => clearTimeout(timer);
+    }, [assessment.id]);
 
     return (
         <>
             <Head title="Assessment Complete" />
+            <AssessmentHeader title={language === 'ar' ? assessment.tool.name_ar : assessment.tool.name_en} />
             <div
-                className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${isArabic ? 'rtl' : 'ltr'}`}
-                dir={isArabic ? 'rtl' : 'ltr'}
+                className={`flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${language === 'ar' ? 'rtl' : 'ltr'}`}
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
             >
-                <div className="text-center space-y-6">
-                    <CheckCircle className="w-16 h-16 text-emerald-600 mx-auto" />
-                    <h1 className="text-2xl font-bold">{message}</h1>
-                    <Button asChild className="bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-700 hover:to-green-700">
-                        <Link href={route('free-assessment.results', assessment.id)}>{buttonLabel}</Link>
-                    </Button>
+                <div className="space-y-6 text-center">
+                    <Loader2 className="mx-auto h-12 w-12 animate-spin text-blue-600" />
+                    <p className="text-xl font-semibold text-gray-700">{t.calculating}</p>
                 </div>
             </div>
         </>
