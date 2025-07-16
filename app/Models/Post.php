@@ -27,6 +27,12 @@ class Post extends Model
     protected $casts = [
         'image_gallery' => 'array',
         'published_at' => 'datetime',
+
+    ];
+
+    protected $appends = [
+        'thumbnail_url',
+        'image_gallery_urls',
     ];
 
     protected static function booted()
@@ -35,6 +41,17 @@ class Post extends Model
             $post->slug = static::generateUniqueSlug($post->title);
         });
     }
+
+    public function getThumbnailUrlAttribute()
+    {
+        return $this->thumbnail ? asset('storage/' . $this->thumbnail) : null;
+    }
+
+    public function getImageGalleryUrlsAttribute()
+    {
+        return collect($this->image_gallery ?? [])->map(fn ($path) => asset('storage/' . $path));
+    }
+
 
     protected static function generateUniqueSlug(string $title): string
     {

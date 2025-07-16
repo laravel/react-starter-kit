@@ -236,10 +236,9 @@ const StackedBarChart: React.FC<{
             <div className="flex items-end justify-between h-full gap-4">
                 {data.map((item, index) => {
                     const total = item.yes + item.no + item.na;
-                    const barHeight = total > 0 ? (total / maxTotal) * 85 : 5;
 
                     return (
-                        <div key={index} className="flex flex-col items-center flex-1 group">
+                        <div key={index} className="flex flex-col items-center flex-1 group h-full">
                             {/* Total count label */}
                             <div className="text-lg font-bold text-gray-900 mb-2 px-2 py-1 bg-white rounded-lg shadow-sm">
                                 {total}
@@ -247,11 +246,7 @@ const StackedBarChart: React.FC<{
 
                             {/* Stacked Bar */}
                             <div
-                                className="w-full rounded-lg transition-all duration-700 ease-out relative overflow-hidden shadow-sm border border-gray-200"
-                                style={{
-                                    height: `${Math.max(barHeight, 10)}%`,
-                                    minHeight: '30px'
-                                }}
+                                className="w-full rounded-lg transition-all duration-700 ease-out relative overflow-hidden shadow-sm border border-gray-200 h-full"
                             >
                                 {/* Yes section */}
                                 {item.yes > 0 && (
@@ -326,6 +321,8 @@ const StackedBarChart: React.FC<{
         </div>
     );
 };
+
+
 
 // Insight Card Component
 const InsightCard: React.FC<{
@@ -481,125 +478,81 @@ export default function AssessmentResults({
                 {/* Main Content */}
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
 
-                    {/* Assessment Info */}
-                    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <div className="flex items-center gap-4">
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <User className="h-4 w-4" />
-                                    <span className="font-medium">{assessment.name}</span>
-                                </div>
-                                {assessment.organization && (
-                                    <div className="flex items-center gap-2 text-gray-600">
-                                        <Building className="h-4 w-4" />
-                                        <span>{assessment.organization}</span>
-                                    </div>
-                                )}
-                                <div className="flex items-center gap-2 text-gray-600">
-                                    <Calendar className="h-4 w-4" />
-                                    <span className="text-sm">{getCompletionText()}</span>
-                                </div>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                        {/* Left: Overall Score Card */}
+                        <div
+                            className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow text-white p-6 space-y-4">
+                            <div className="flex items-center gap-3">
+                                <Award className="h-6 w-6" />
+                                <h2 className="text-xl font-bold">{t.overallScore}</h2>
                             </div>
-                            <Badge className={`${assessment.status === 'completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-800'} px-3 py-1`}>
-                                {assessment.status === 'completed' ? t.completed : t.processing}
-                            </Badge>
-                        </div>
-                    </div>
-
-                    {/* Overall Score Card */}
-                    <div className="bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl shadow-lg text-white p-8">
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                            <div className="text-center lg:text-left">
-                                <h2 className="text-3xl font-bold mb-4 flex items-center gap-3">
-                                    <Award className="h-8 w-8" />
-                                    {t.overallScore}
-                                </h2>
-                                <div className="flex items-center gap-6 justify-center lg:justify-start">
-                                    <CircularProgress value={results.overall_percentage} size={140}>
-                                        <div className="text-center">
-                                            <div className="text-4xl font-bold">
-                                                {Math.round(results.overall_percentage)}%
-                                            </div>
-                                            <div className="text-sm opacity-90 mt-1">
-                                                {getScoreLevel(results.overall_percentage)}
-                                            </div>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:gap-6">
+                                <CircularProgress value={results.overall_percentage} size={100}>
+                                    <div className="text-center">
+                                        <div className="text-2xl font-bold">
+                                            {Math.round(results.overall_percentage)}%
                                         </div>
-                                    </CircularProgress>
-                                    <div className="space-y-3">
-                                        <div className="bg-white/20 rounded-lg p-3">
-                                            <div className="text-2xl font-bold">{results.yes_count}</div>
-                                            <div className="text-sm opacity-90">{t.yesResponses}</div>
+                                        <div className="text-xs mt-1">
+                                            {getScoreLevel(results.overall_percentage)}
                                         </div>
-                                        <div className="bg-white/20 rounded-lg p-3">
-                                            <div className="text-2xl font-bold">{successRate}%</div>
-                                            <div className="text-sm opacity-90">{t.successRate}</div>
-                                        </div>
+                                    </div>
+                                </CircularProgress>
+                                <div className="grid grid-cols-2 gap-2 mt-4 sm:mt-0">
+                                    <div className="bg-white/20 rounded-md p-2 text-center">
+                                        <div className="text-lg font-bold">{results.yes_count}</div>
+                                        <div className="text-xs">{t.yesResponses}</div>
+                                    </div>
+                                    <div className="bg-white/20 rounded-md p-2 text-center">
+                                        <div className="text-lg font-bold">{successRate}%</div>
+                                        <div className="text-xs">{t.successRate}</div>
+                                    </div>
+                                    <div className="bg-white/20 rounded-md p-2 text-center">
+                                        <div className="text-lg font-bold">{results.no_count}</div>
+                                        <div className="text-xs">{t.noResponses}</div>
+                                    </div>
+                                    <div className="bg-white/20 rounded-md p-2 text-center">
+                                        <div className="text-lg font-bold">{results.na_count}</div>
+                                        <div className="text-xs">{t.notApplicable}</div>
                                     </div>
                                 </div>
                             </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="bg-white/10 rounded-lg p-4 text-center">
-                                    <CheckCircle className="h-6 w-6 mx-auto mb-2 text-emerald-300" />
-                                    <div className="text-2xl font-bold">{results.yes_count}</div>
-                                    <div className="text-sm opacity-90">{t.yesResponses}</div>
-                                </div>
-                                <div className="bg-white/10 rounded-lg p-4 text-center">
-                                    <XCircle className="h-6 w-6 mx-auto mb-2 text-red-300" />
-                                    <div className="text-2xl font-bold">{results.no_count}</div>
-                                    <div className="text-sm opacity-90">{t.noResponses}</div>
-                                </div>
-                                <div className="bg-white/10 rounded-lg p-4 text-center">
-                                    <MinusCircle className="h-6 w-6 mx-auto mb-2 text-gray-300" />
-                                    <div className="text-2xl font-bold">{results.na_count}</div>
-                                    <div className="text-sm opacity-90">{t.notApplicable}</div>
-                                </div>
-                                <div className="bg-white/10 rounded-lg p-4 text-center">
-                                    <Target className="h-6 w-6 mx-auto mb-2 text-blue-300" />
-                                    <div className="text-2xl font-bold">{results.applicable_criteria}</div>
-                                    <div className="text-sm opacity-90">{t.applicableCriteria}</div>
-                                </div>
-                            </div>
                         </div>
-                    </div>
 
-                    {/* Key Insights */}
-                    <div>
-                        <h2 className={`text-2xl font-bold text-gray-900 mb-6 flex items-center gap-3 ${isArabic ? 'justify-end text-right' : ''}`}>
-                            <Lightbulb className="h-6 w-6 text-amber-500" />
-                            {t.insights}
-                        </h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {/* Right: Key Insights */}
+                        <div className="grid grid-cols-2 gap-4">
                             <InsightCard
-                                icon={<CheckCircle className="h-5 w-5 text-white" />}
+                                icon={<CheckCircle className="h-4 w-4 text-white" />}
                                 title={t.successRate}
                                 value={`${successRate}%`}
-                                description={`${results.yes_count} out of ${results.applicable_criteria} criteria met`}
+                                description={`${results.yes_count} / ${results.applicable_criteria} ${t.criteriaText}`}
                                 color="bg-emerald-500"
                             />
                             <InsightCard
-                                icon={<BarChart3 className="h-5 w-5 text-white" />}
+                                icon={<BarChart3 className="h-4 w-4 text-white" />}
                                 title={t.overallScore}
                                 value={`${Math.round(results.overall_percentage)}%`}
                                 description={getScoreLevel(results.overall_percentage)}
                                 color="bg-blue-500"
                             />
                             <InsightCard
-                                icon={<Target className="h-5 w-5 text-white" />}
+                                icon={<Target className="h-4 w-4 text-white" />}
                                 title="Domains"
                                 value={results.domain_results.length}
-                                description={`${results.domain_results.filter(d => d.score_percentage >= 70).length} performing well`}
+                                description={`${results.domain_results.filter(d => d.score_percentage >= 70).length} high performing`}
                                 color="bg-purple-500"
                             />
                             <InsightCard
-                                icon={<AlertCircle className="h-5 w-5 text-white" />}
-                                title="Areas for Improvement"
+                                icon={<AlertCircle className="h-4 w-4 text-white" />}
+                                title="Improvements"
                                 value={results.domain_results.filter(d => d.score_percentage < 70).length}
-                                description="Domains needing attention"
+                                description="Needs attention"
                                 color="bg-amber-500"
                             />
                         </div>
                     </div>
+
+
+
 
                     {/* Domain Performance Chart */}
                     <Card className="border-0 shadow-lg">
@@ -612,7 +565,7 @@ export default function AssessmentResults({
                         <CardContent className="p-8">
                             <StackedBarChart
                                 data={domainChartData}
-                                height={400}
+                                height={300}
                                 isArabic={isArabic}
                             />
                         </CardContent>
@@ -634,7 +587,8 @@ export default function AssessmentResults({
                                                 {domain.domain_name}
                                             </CardTitle>
                                             <div className="flex items-center gap-4">
-                                                <Badge className={`${getScoreBadgeColor(domain.score_percentage)} px-4 py-2 text-lg font-bold`}>
+                                                <Badge
+                                                    className={`${getScoreBadgeColor(domain.score_percentage)} px-4 py-2 text-lg font-bold`}>
                                                     {Math.round(domain.score_percentage)}%
                                                 </Badge>
                                                 <div className="text-sm text-gray-600 bg-white px-3 py-1 rounded-full">
@@ -649,20 +603,26 @@ export default function AssessmentResults({
                                     <CardContent className="p-8">
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                                             <div className="text-center p-4 bg-gray-50 rounded-xl">
-                                                <div className="text-2xl font-bold text-gray-900">{domain.total_criteria}</div>
-                                                <div className="text-sm text-gray-600 font-medium">{t.totalCriteria}</div>
+                                                <div
+                                                    className="text-2xl font-bold text-gray-900">{domain.total_criteria}</div>
+                                                <div
+                                                    className="text-sm text-gray-600 font-medium">{t.totalCriteria}</div>
                                             </div>
                                             <div className="text-center p-4 bg-emerald-50 rounded-xl">
-                                                <div className="text-2xl font-bold text-emerald-600">{domain.yes_count}</div>
-                                                <div className="text-sm text-gray-600 font-medium">{t.yesResponses}</div>
+                                                <div
+                                                    className="text-2xl font-bold text-emerald-600">{domain.yes_count}</div>
+                                                <div
+                                                    className="text-sm text-gray-600 font-medium">{t.yesResponses}</div>
                                             </div>
                                             <div className="text-center p-4 bg-red-50 rounded-xl">
                                                 <div className="text-2xl font-bold text-red-600">{domain.no_count}</div>
                                                 <div className="text-sm text-gray-600 font-medium">{t.noResponses}</div>
                                             </div>
                                             <div className="text-center p-4 bg-gray-50 rounded-xl">
-                                                <div className="text-2xl font-bold text-gray-600">{domain.na_count}</div>
-                                                <div className="text-sm text-gray-600 font-medium">{t.notApplicable}</div>
+                                                <div
+                                                    className="text-2xl font-bold text-gray-600">{domain.na_count}</div>
+                                                <div
+                                                    className="text-sm text-gray-600 font-medium">{t.notApplicable}</div>
                                             </div>
                                         </div>
 
@@ -674,26 +634,33 @@ export default function AssessmentResults({
                                                 </h4>
                                                 <div className="grid gap-4">
                                                     {results.category_results[domain.domain_id].map((category) => (
-                                                        <div key={category.category_id} className="p-6 border border-gray-200 rounded-xl bg-white hover:shadow-md transition-shadow">
+                                                        <div key={category.category_id}
+                                                             className="p-6 border border-gray-200 rounded-xl bg-white hover:shadow-md transition-shadow">
                                                             <div className="flex justify-between items-center mb-4">
                                                                 <h5 className="font-semibold text-gray-900 text-lg">{category.category_name}</h5>
-                                                                <Badge className={`${getScoreBadgeColor(category.score_percentage)} px-3 py-1 font-bold`}>
+                                                                <Badge
+                                                                    className={`${getScoreBadgeColor(category.score_percentage)} px-3 py-1 font-bold`}>
                                                                     {Math.round(category.score_percentage)}%
                                                                 </Badge>
                                                             </div>
-                                                            <Progress value={category.score_percentage} className="h-2 mb-4" />
-                                                            <div className="flex justify-between text-sm text-gray-600 bg-gray-50 rounded-lg px-4 py-3">
+                                                            <Progress value={category.score_percentage}
+                                                                      className="h-2 mb-4" />
+                                                            <div
+                                                                className="flex justify-between text-sm text-gray-600 bg-gray-50 rounded-lg px-4 py-3">
                                                                 <span className="flex items-center gap-2">
                                                                     <CheckCircle className="w-4 h-4 text-emerald-600" />
-                                                                    <span className="font-medium">{category.yes_count} {t.yesResponses}</span>
+                                                                    <span
+                                                                        className="font-medium">{category.yes_count} {t.yesResponses}</span>
                                                                 </span>
                                                                 <span className="flex items-center gap-2">
                                                                     <XCircle className="w-4 h-4 text-red-600" />
-                                                                    <span className="font-medium">{category.no_count} {t.noResponses}</span>
+                                                                    <span
+                                                                        className="font-medium">{category.no_count} {t.noResponses}</span>
                                                                 </span>
                                                                 <span className="flex items-center gap-2">
                                                                     <MinusCircle className="w-4 h-4 text-gray-600" />
-                                                                    <span className="font-medium">{category.na_count} {t.notApplicable}</span>
+                                                                    <span
+                                                                        className="font-medium">{category.na_count} {t.notApplicable}</span>
                                                                 </span>
                                                             </div>
                                                         </div>
@@ -721,7 +688,8 @@ export default function AssessmentResults({
                                     .filter(domain => domain.score_percentage < 70)
                                     .sort((a, b) => a.score_percentage - b.score_percentage)
                                     .map((domain) => (
-                                        <div key={domain.domain_id} className="border-l-4 border-amber-500 pl-6 py-4 bg-white rounded-r-lg shadow-sm">
+                                        <div key={domain.domain_id}
+                                             className="border-l-4 border-amber-500 pl-6 py-4 bg-white rounded-r-lg shadow-sm">
                                             <h4 className="font-bold text-amber-900 text-lg mb-2">{domain.domain_name}</h4>
                                             <div className="flex items-center gap-4 mb-3">
                                                 <Badge className="bg-amber-100 text-amber-800 px-3 py-1">
@@ -732,13 +700,16 @@ export default function AssessmentResults({
                                                 </span>
                                             </div>
                                             <p className="text-amber-800 leading-relaxed">
-                                                {t.focusOnImprovement} Consider reviewing the {domain.no_count} criteria that received "No" responses and develop action plans to address these gaps.
+                                                {t.focusOnImprovement} Consider reviewing the {domain.no_count} criteria
+                                                that received "No" responses and develop action plans to address these
+                                                gaps.
                                             </p>
                                         </div>
                                     ))}
 
                                 {results.domain_results.every(domain => domain.score_percentage >= 70) && (
-                                    <div className="border-l-4 border-emerald-500 pl-6 py-4 bg-white rounded-r-lg shadow-sm">
+                                    <div
+                                        className="border-l-4 border-emerald-500 pl-6 py-4 bg-white rounded-r-lg shadow-sm">
                                         <h4 className="font-bold text-emerald-900 text-lg mb-2 flex items-center gap-2">
                                             <Crown className="h-5 w-5" />
                                             {t.excellentPerformance}

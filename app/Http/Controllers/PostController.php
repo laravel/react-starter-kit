@@ -26,6 +26,7 @@ class PostController extends Controller
             abort(404);
         }
 
+
         // Only display approved comments in newest-first order
         $comments = $post->comments()
             ->where('approved', true)
