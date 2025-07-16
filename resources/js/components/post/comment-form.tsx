@@ -1,63 +1,61 @@
-import { useState } from 'react';
-import { router } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react';
+import { FormEvent } from 'react';
 
-export function CommentForm({ postSlug }: { postSlug: string }) {
-    const [author, setAuthor] = useState('');
-    const [content, setContent] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [submitted, setSubmitted] = useState(false);
+interface CommentFormProps {
+    postSlug: string;
+    onSuccess: () => void; // Callback function to trigger a refresh
+}
 
-    const submit = () => {
-        setLoading(true);
-        router.post(
-            `/posts/${postSlug}/comments`,
-            { author_name: author, content },
-            {
-                preserveScroll: true,
-                onFinish: () => {
-                    setAuthor('');
-                    setContent('');
-                    setLoading(false);
-                    setSubmitted(true);
-                },
-            }
-        );
+export function CommentForm({ postSlug, onSuccess }: CommentFormProps) {
+    // useForm is the recommended hook for handling forms in Inertia
+    const { data, setData, post, processing, errors, reset } = useForm({
+        user_name: '',
+        content: '',
+    });
+
+    const handleSubmit = (e: FormEvent) => {
+        e.preventDefault();
+        post(route('posts.comments.store', postSlug), {
+            preserveScroll: true,
+            // On a successful submission...
+            onSuccess: () => {
+                reset(); // Clear the form fields
+                onSuccess(); // Call the parent function to refresh the comment list
+            },
+        });
     };
 
     return (
-        <form
-            onSubmit={(e) => {
-                e.preventDefault();
-                submit();
-            }}
-            className="space-y-2"
-        >
-            <input
-                type="text"
-                value={author}
-                onChange={(e) => setAuthor(e.target.value)}
-                placeholder="Your name"
-                className="w-full rounded border p-2"
-                required
-            />
-            <textarea
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Comment"
-                className="w-full rounded border p-2"
-                rows={4}
-                required
-            />
+        <form onSubmit={handleSubmit} className="space-y-4">
+            <div>
+                <input
+                    type="text"
+                    value={data.user_name}
+                    onChange={(e) => setData('user_name', e.target.value)}
+                    placeholder="Your name"
+                    className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    required
+                />
+                {errors.user_name && <p className="text-sm text-red-500 mt-1">{errors.user_name}</p>}
+            </div>
+            <div>
+                <textarea
+                    value={data.content}
+                    onChange={(e) => setData('content', e.target.value)}
+                    placeholder="Share your thoughts..."
+                    className="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 p-2 shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                    rows={4}
+                    required
+                />
+                {errors.content && <p className="text-sm text-red-500 mt-1">{errors.content}</p>}
+            </div>
             <button
                 type="submit"
-                disabled={loading}
-                className="px-4 py-2 bg-blue-600 text-white rounded"
+                disabled={processing}
+                className="px-4 py-2 bg-blue-600 text-white font-semibold rounded-md shadow-sm hover:bg-blue-700 disabled:opacity-50"
             >
-                {loading ? 'Posting...' : 'Post Comment'}
+                {processing ? 'Posting...' : 'Post Comment'}
             </button>
-            {submitted && (
-                <p className="text-sm text-gray-600">Your comment will appear once approved.</p>
-            )}
         </form>
     );
 }

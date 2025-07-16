@@ -192,8 +192,8 @@ class FreeAssessmentController extends Controller
                                 'criteria' => $category->criteria->map(function ($criterion) {
                                     return [
                                         'id' => $criterion->id,
-                                        'text_en' => $criterion->text_en,
-                                        'text_ar' => $criterion->text_ar,
+                                        'text_en' => $criterion->name_en,
+                                        'text_ar' => $criterion->name_ar,
                                         'description_en' => $criterion->description_en,
                                         'description_ar' => $criterion->description_ar,
                                         'order' => $criterion->order,
@@ -260,6 +260,12 @@ class FreeAssessmentController extends Controller
                 $old->results()->delete();
                 $old->delete();
             }
+            // Remove any previous free assessments for this tool
+            Assessment::where('user_id', $user->id)
+                ->where('tool_id', $assessment->tool_id)
+                ->where('id', '!=', $assessment->id)
+                ->where('assessment_type', 'free')
+                ->delete();
 
             // Clear existing responses to avoid duplicates
             $assessment->responses()->delete();
@@ -375,7 +381,8 @@ class FreeAssessmentController extends Controller
                 $domainPercentage = $domainMax > 0 ? ($domainTotal / $domainMax) * 100 : 0;
 
                 $domainScores->push([
-                    'domain_name' => $domain->name_en,
+                    'domain_name_en' => $domain->name_en,
+                    'domain_name_ar' => $domain->name_ar,
                     'score' => round($domainPercentage, 1),
                     'max_score' => 100,
                     'percentage' => round($domainPercentage, 1),
