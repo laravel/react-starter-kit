@@ -33,6 +33,7 @@ class Post extends Model
     protected $appends = [
         'thumbnail_url',
         'image_gallery_urls',
+        'reading_time',
     ];
 
     protected static function booted()
@@ -64,6 +65,19 @@ class Post extends Model
         }
         return $slug;
     }
+
+    // In app/Models/Post.php
+
+// Add this accessor to calculate reading time
+    public function getReadingTimeAttribute(): int
+    {
+        $wordCount = str_word_count(strip_tags($this->content));
+        $minutes = ceil($wordCount / 200); // 200 is an average reading speed
+        return (int) $minutes;
+    }
+
+// Make sure it's appended to the JSON output
+
 
     public function comments(): HasMany
     {

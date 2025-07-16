@@ -62,13 +62,15 @@ class ToolDiscoveryController extends Controller
 
         $userInfo = $user ? [
             'access_level' => $user->getAccessLevel(),
+            'name_ar' => $user->name_ar,
+            'name_en' => $user->name,
             'current_assessments' => $user->assessments()->count(),
             'tool_subscriptions' => $user->toolSubscriptions()
                 ->where('status', 'active')
                 ->pluck('tool_id', 'tool_id')
                 ->toArray(),
         ] : [
-            'access_level' => 'guest',
+            'access_level' => 'free User',
             'current_assessments' => 0,
             'tool_subscriptions' => [],
         ];

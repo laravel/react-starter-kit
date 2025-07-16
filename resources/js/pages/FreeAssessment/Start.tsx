@@ -1,4 +1,3 @@
-import AssessmentHeader from '@/components/assessment-header';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,21 +8,24 @@ import { Head, router, useForm } from '@inertiajs/react';
 import {
     ArrowUp,
     Award,
-    BarChart3,
     CheckCheck,
     CheckCircle,
-    Clock,
+    ChevronDown,
     Cloud,
     File,
     FileText,
+    Keyboard,
+    Layers,
     MinusCircle,
     Paperclip,
     Upload,
     X,
     XCircle,
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import AssessmentHeader from '@/components/assessment-header';
 
+// --- TYPE DEFINITIONS ---
 interface Criterion {
     id: number;
     text_en: string;
@@ -52,14 +54,6 @@ interface Tool {
     domains: Domain[];
 }
 
-interface Assessment {
-    id: number;
-    name: string;
-    email: string;
-    status: string;
-    tool: Tool;
-}
-
 interface AssessmentData {
     id: number;
     name: string;
@@ -67,6 +61,7 @@ interface AssessmentData {
     status: string;
     tool: Tool;
     responses?: Record<string, any>;
+    notes?: Record<string, string>;
 }
 
 interface TakeProps {
@@ -81,516 +76,475 @@ interface TakeProps {
     };
 }
 
-export default function Start({ assessmentData, locale, auth, existingNotes }: TakeProps) {
-    const [responses, setResponses] = useState<Record<number, 'yes' | 'no' | 'na'>>(
-        // Initialize with existing responses if in edit mode
-        () => {
-            const initial: Record<number, 'yes' | 'no' | 'na'> = {};
-            if (assessmentData.responses) {
-                Object.entries(assessmentData.responses).forEach(([criterionId, response]) => {
-                    // Handle both string responses and any other format
-                    const criterionIdNum = parseInt(criterionId);
-                    if (typeof response === 'string' && ['yes', 'no', 'na'].includes(response)) {
-                        initial[criterionIdNum] = response as 'yes' | 'no' | 'na';
-                    } else if (typeof response === 'number') {
-                        // Convert score to response format as fallback
-                        if (response === 100) initial[criterionIdNum] = 'yes';
-                        else if (response === 0) initial[criterionIdNum] = 'no';
-                        else if (response === 50) initial[criterionIdNum] = 'na';
-                    }
-                });
-            }
-            return initial;
-        },
-    );
-    const [notes, setNotes] = useState<Record<number, string>>(existingNotes || {});
-    const [files, setFiles] = useState<Record<number, File | null>>({});
-    const { language } = useLanguage();
-    const [showScrollTop, setShowScrollTop] = useState(false);
+// --- TRANSLATIONS ---
+const translations = {
+    en: {
+        assessment: 'Assessment',
+        question: 'Question',
+        of: 'of',
+        yes: 'Yes',
+        no: 'No',
+        notApplicable: 'N/A',
+        notes: 'Notes',
+        notesPlaceholder: 'Add any notes or comments here...',
+        complete: 'Complete',
+        completed: 'Completed',
+        progress: 'Progress',
+        submitAssessment: 'Submit Assessment',
+        assessmentComplete: 'Assessment Complete!',
+        submitting: 'Submitting...',
+        totalQuestions: 'Total Questions',
+        attachmentRequired: 'Attachment Required',
+        uploadFile: 'Upload Supporting Document',
+        changeFile: 'Change File',
+        removeFile: 'Remove File',
+        dragDropFile: 'Drag & drop or click to upload',
+        fileUploaded: 'File uploaded',
+        scrollToTop: 'Scroll to top',
+        startAssessment: "Let's Begin Your Assessment",
+        welcomeMessage: 'Answer each question to the best of your ability. Your progress is saved automatically.',
+        answered: 'Answered',
+        shortcutsTitle: 'Shortcuts',
+        submitShortcut: 'Submit Assessment',
+        scrollTopShortcut: 'Scroll to Top',
+        scrollBottomShortcut: 'Scroll to Bottom',
+        blurInputShortcut: 'Deselect Input',
+    },
+    ar: {
+        assessment: 'التقييم',
+        question: 'السؤال',
+        of: 'من',
+        yes: 'نعم',
+        no: 'لا',
+        notApplicable: 'غير قابل للتطبيق',
+        notes: 'ملاحظات',
+        notesPlaceholder: 'أضف أي ملاحظات أو تعليقات هنا...',
+        complete: 'مكتمل',
+        completed: 'مكتمل',
+        progress: 'التقدم',
+        submitAssessment: 'إرسال التقييم',
+        assessmentComplete: 'اكتمل التقييم!',
+        submitting: 'جاري الإرسال...',
+        totalQuestions: 'إجمالي الأسئلة',
+        attachmentRequired: 'مرفق مطلوب',
+        uploadFile: 'رفع وثيقة داعمة',
+        changeFile: 'تغيير الملف',
+        removeFile: 'إزالة الملف',
+        dragDropFile: 'اسحب وأفلت أو انقر للرفع',
+        fileUploaded: 'تم رفع الملف',
+        scrollToTop: 'التمرير إلى الأعلى',
+        startAssessment: 'لنبدأ تقييمك',
+        welcomeMessage: 'أجب عن كل سؤال بأفضل ما لديك. يتم حفظ تقدمك تلقائيًا.',
+        answered: 'تمت الإجابة',
+        shortcutsTitle: 'الاختصارات',
+        submitShortcut: 'إرسال التقييم',
+        scrollTopShortcut: 'الانتقال للأعلى',
+        scrollBottomShortcut: 'الانتقال للأسفل',
+        blurInputShortcut: 'إلغاء تحديد الإدخال',
+    },
+} as const;
 
-    // Form for submission
-    const { data, setData, processing } = useForm({
-        responses: {},
-        notes: {},
-        files: {},
+
+// --- SUB-COMPONENTS ---
+
+const WelcomeSection = ({ t, totalCriteria, answeredCount, completionPercentage }: any) => (
+    <Card className="mb-12 overflow-hidden border-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white shadow-2xl">
+        <CardContent className="relative p-8 text-center md:p-12">
+            <div className="mb-6 flex items-center justify-center">
+                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
+                    <FileText className="h-8 w-8" />
+                </div>
+            </div>
+            <h2 className="mb-4 text-3xl font-bold md:text-4xl">{t.startAssessment}</h2>
+            <p className="mx-auto mb-8 max-w-2xl text-lg text-blue-100/90">{t.welcomeMessage}</p>
+            <div className="mx-auto max-w-2xl">
+                <Progress value={completionPercentage} className="mb-2 h-3 bg-white/20" />
+                <div className="flex justify-between text-sm font-medium text-blue-100">
+                    <span>{t.progress}: {Math.round(completionPercentage)}%</span>
+                    <span>{answeredCount} / {totalCriteria} {t.completed}</span>
+                </div>
+            </div>
+        </CardContent>
+    </Card>
+);
+
+// --- NEW DomainSection component with accordion functionality ---
+const DomainSection = ({ domain, children, responses, language, t }: any) => {
+    const [isOpen, setIsOpen] = useState(true);
+
+    const domainCriteriaIds = useMemo(() => {
+        return domain.categories.flatMap((cat: Category) => cat.criteria.map((crit: Criterion) => crit.id));
+    }, [domain]);
+
+    const answeredCount = useMemo(() => {
+        return domainCriteriaIds.filter((id: number) => responses[id]).length;
+    }, [responses, domainCriteriaIds]);
+
+    const totalCount = domainCriteriaIds.length;
+    const completionPercentage = totalCount > 0 ? (answeredCount / totalCount) * 100 : 0;
+
+    return (
+        <Card className="border-0 shadow-lg transition-all duration-300">
+            <CardHeader
+                className="flex cursor-pointer flex-row items-center justify-between p-4"
+                onClick={() => setIsOpen(!isOpen)}
+            >
+                <div className="flex items-center gap-4">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-100">
+                        <Layers className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                        <CardTitle className="text-lg font-bold text-gray-800">
+                            {language === 'ar' ? domain.name_ar : domain.name_en}
+                        </CardTitle>
+                        <p className="text-sm text-gray-500">{answeredCount} / {totalCount} {t.completed}</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-4">
+                    <Progress value={completionPercentage} className="h-2 w-32 hidden sm:block" />
+                    <ChevronDown className={`h-6 w-6 text-gray-500 transition-transform duration-300 ${isOpen ? 'rotate-180' : ''}`} />
+                </div>
+            </CardHeader>
+            {isOpen && (
+                <CardContent className="border-t border-gray-100 p-4">
+                    {children}
+                </CardContent>
+            )}
+        </Card>
+    );
+};
+
+const CriterionCard = ({ criterion, globalIndex, response, note, file, handlers, t, language }: any) => {
+    const { handleResponseChange, handleNotesChange, handleFileUpload, handleFileRemove } = handlers;
+    const isYes = response === 'yes';
+
+    return (
+        <div className="rounded-lg border border-gray-200 bg-white p-4">
+            <div className="flex items-start justify-between gap-4">
+                <div className="flex flex-1 items-start gap-3">
+                    <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full bg-slate-200 text-sm font-semibold text-slate-600">
+                        {globalIndex}
+                    </div>
+                    <div className="flex-1">
+                        <p className="mb-2 font-medium leading-relaxed text-gray-800">
+                            {language === 'ar' ? criterion.text_ar : criterion.text_en}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                            {criterion.requires_file && (
+                                <Badge variant="secondary" className="border-amber-200 bg-amber-100 text-amber-800 text-xs">
+                                    <Paperclip className="mr-1 h-3 w-3 rtl:ml-1 rtl:mr-0" />
+                                    {t.attachmentRequired}
+                                </Badge>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-2">
+                <div className="flex flex-col gap-2">
+                    <ResponseButton type="yes" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'yes')} t={t} />
+                    <ResponseButton type="no" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'no')} t={t} />
+                    <ResponseButton type="na" currentResponse={response} onClick={() => handleResponseChange(criterion.id, 'na')} t={t} />
+                </div>
+                <div className="flex flex-col gap-4">
+                    {criterion.requires_file && isYes && (
+                        <FileUploadSection criterionId={criterion.id} file={file} onUpload={handleFileUpload} onRemove={handleFileRemove} t={t} />
+                    )}
+                    {response && (
+                        <NotesSection criterionId={criterion.id} note={note} onNotesChange={handleNotesChange} t={t} />
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+};
+
+const ResponseButton = ({ type, currentResponse, onClick, t }: any) => {
+    const isSelected = currentResponse === type;
+    const styles = {
+        yes: { base: 'hover:border-green-400 hover:bg-green-50/50', selected: 'bg-green-600 text-white hover:bg-green-700', icon: <CheckCircle className="h-5 w-5" /> },
+        no: { base: 'hover:border-red-400 hover:bg-red-50/50', selected: 'bg-red-600 text-white hover:bg-red-700', icon: <XCircle className="h-5 w-5" /> },
+        na: { base: 'hover:border-gray-400 hover:bg-gray-100/50', selected: 'bg-gray-600 text-white hover:bg-gray-700', icon: <MinusCircle className="h-5 w-5" /> },
+    };
+    const style = styles[type];
+
+    return (
+        <Button
+            variant={isSelected ? 'default' : 'outline'}
+            onClick={onClick}
+            className={`h-12 w-full justify-start text-left transition-all duration-200 ${isSelected ? style.selected : style.base}`}
+        >
+            <div className="flex items-center gap-3">
+                {style.icon}
+                <span className="font-medium">{t[type === 'na' ? 'notApplicable' : type]}</span>
+            </div>
+        </Button>
+    );
+};
+
+const FileUploadSection = ({ criterionId, file, onUpload, onRemove, t }: any) => (
+    <div className="flex-grow space-y-2 rounded-lg border-2 border-dashed border-blue-200 bg-blue-50/50 p-3">
+        {!file ? (
+            <div className="relative text-center">
+                <input
+                    type="file"
+                    id={`file-${criterionId}`}
+                    className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+                    onChange={(e) => e.target.files?.[0] && onUpload(criterionId, e.target.files[0])}
+                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                />
+                <Cloud className="mx-auto mb-1 h-6 w-6 text-blue-400" />
+                <p className="text-sm font-semibold text-blue-800">{t.dragDropFile}</p>
+                <p className="text-xs text-blue-600">Max 10MB</p>
+            </div>
+        ) : (
+            <div className="flex items-center justify-between rounded-md bg-white p-2 shadow-sm">
+                <div className="flex items-center gap-2">
+                    <File className="h-5 w-5 text-green-600" />
+                    <div>
+                        <p className="text-xs font-semibold text-gray-900">{file.name}</p>
+                        <p className="text-xs text-gray-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                    </div>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => onRemove(criterionId)} className="h-6 w-6 text-red-500 hover:bg-red-50 hover:text-red-600">
+                    <X className="h-4 w-4" />
+                </Button>
+            </div>
+        )}
+    </div>
+);
+
+const NotesSection = ({ criterionId, note, onNotesChange, t }: any) => (
+    <div className="flex-grow">
+        <Textarea
+            value={note || ''}
+            onChange={(e) => onNotesChange(criterionId, e.target.value)}
+            placeholder={t.notesPlaceholder}
+            rows={3}
+            className="h-full resize-none border-gray-300 text-sm focus:border-blue-500 focus:ring-blue-500"
+        />
+    </div>
+);
+
+const CompletionCard = React.forwardRef(({ totalCriteria, submitAssessment, processing, t }: any, ref) => (
+    <Card ref={ref} className="mt-12 border-0 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white shadow-2xl">
+        <CardContent className="p-8 text-center md:p-12">
+            <Award className="mx-auto mb-4 h-16 w-16 animate-pulse" />
+            <h3 className="mb-2 text-4xl font-bold">{t.assessmentComplete}</h3>
+            <p className="mx-auto mb-8 max-w-2xl text-lg text-green-100">
+                Congratulations! You have answered all {totalCriteria} questions.
+            </p>
+            <Button
+                onClick={submitAssessment}
+                size="lg"
+                disabled={processing}
+                className="transform bg-white px-12 py-6 text-xl font-bold text-green-600 shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-gray-100"
+            >
+                {processing ? (
+                    <><div className="mr-4 h-6 w-6 animate-spin rounded-full border-b-2 border-green-600"></div>{t.submitting}</>
+                ) : (
+                    <><Award className="mr-3 h-6 w-6 rtl:ml-3 rtl:mr-0" />{t.submitAssessment}</>
+                )}
+            </Button>
+        </CardContent>
+    </Card>
+));
+
+const ShortcutsPanel = ({ t }: { t: typeof translations['en'] }) => (
+    <div className="fixed top-1/2 left-6 -translate-y-1/2 z-50 hidden lg:block">
+        <Card className="bg-white/80 backdrop-blur-md border-gray-200/80 shadow-lg">
+            <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-base">
+                    <Keyboard className="h-5 w-5 text-blue-600" />
+                    {t.shortcutsTitle}
+                </CardTitle>
+            </CardHeader>
+            <CardContent>
+                <ul className="space-y-3 text-sm">
+                    <li className="flex justify-between items-center gap-4">
+                        <span className="text-gray-600">{t.submitShortcut}</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-md">Ctrl + S</kbd>
+                    </li>
+                    <li className="flex justify-between items-center gap-4">
+                        <span className="text-gray-600">{t.scrollTopShortcut}</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-md">Ctrl + ↑</kbd>
+                    </li>
+                    <li className="flex justify-between items-center gap-4">
+                        <span className="text-gray-600">{t.scrollBottomShortcut}</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-md">Ctrl + X</kbd>
+                    </li>
+                    <li className="flex justify-between items-center gap-4">
+                        <span className="text-gray-600">{t.blurInputShortcut}</span>
+                        <kbd className="px-2 py-1 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-md">Esc</kbd>
+                    </li>
+                </ul>
+            </CardContent>
+        </Card>
+    </div>
+);
+
+
+// --- MAIN COMPONENT ---
+export default function Start({ assessmentData, locale, auth }: TakeProps) {
+    const { language } = useLanguage();
+    const t = translations[language];
+
+    const { data, setData, post, processing } = useForm({
+        responses: assessmentData.responses || {},
+        notes: assessmentData.notes || {},
+        files: {} as Record<number, File | null>,
     });
 
-    // Flatten all criteria into a single array with domain and category info
-    const allCriteria = useMemo(() => {
-        const criteria: (Criterion & { domainName: string; categoryName: string; domainId: number; categoryId: number })[] = [];
-        assessmentData.tool.domains.forEach((domain) => {
-            domain.categories.forEach((category) => {
-                category.criteria.forEach((criterion) => {
-                    criteria.push({
+    const [showScrollTop, setShowScrollTop] = useState(false);
+    const completionCardRef = useRef<HTMLDivElement>(null);
+
+    const { allCriteria, criteriaMap } = useMemo(() => {
+        const flatCriteria: (Criterion & { domainName: string; categoryName: string })[] = [];
+        const map = new Map<number, number>();
+        assessmentData.tool.domains.forEach(domain => {
+            domain.categories.forEach(category => {
+                category.criteria.forEach(criterion => {
+                    map.set(criterion.id, flatCriteria.length + 1);
+                    flatCriteria.push({
                         ...criterion,
                         domainName: language === 'ar' ? domain.name_ar : domain.name_en,
                         categoryName: language === 'ar' ? category.name_ar : category.name_en,
-                        domainId: domain.id,
-                        categoryId: category.id,
                     });
                 });
             });
         });
-        return criteria;
+        return { allCriteria: flatCriteria, criteriaMap: map };
     }, [assessmentData.tool, language]);
 
     const totalCriteria = allCriteria.length;
 
-    // Calculate completion percentage
     const completionPercentage = useMemo(() => {
-        const answeredCount = Object.keys(responses).length;
+        const answeredCount = Object.keys(data.responses).length;
         return totalCriteria > 0 ? (answeredCount / totalCriteria) * 100 : 0;
-    }, [responses, totalCriteria]);
+    }, [data.responses, totalCriteria]);
 
-    // Check if assessment is complete
     const isComplete = useMemo(() => {
-        return allCriteria.every((criterion) => {
-            const hasResponse = responses[criterion.id];
-            const hasRequiredFile = !criterion.requires_file || responses[criterion.id] !== 'yes' || files[criterion.id];
+        return allCriteria.every(criterion => {
+            const hasResponse = !!data.responses[criterion.id];
+            const hasRequiredFile = !criterion.requires_file || data.responses[criterion.id] !== 'yes' || !!data.files[criterion.id];
             return hasResponse && hasRequiredFile;
         });
-    }, [responses, files, allCriteria]);
+    }, [data.responses, data.files, allCriteria]);
 
-    const t = {
-        en: {
-            assessment: 'Assessment',
-            question: 'Question',
-            of: 'of',
-            yes: 'Yes',
-            no: 'No',
-            notApplicable: 'Not Applicable',
-            notes: 'Notes (Optional)',
-            notesPlaceholder: 'Add any notes or comments...',
-            complete: 'Complete',
-            completed: 'Completed',
-            remaining: 'Remaining',
-            progress: 'Progress',
-            submitAssessment: 'Submit Assessment',
-            assessmentComplete: 'Assessment Complete!',
-            submitting: 'Submitting...',
-            totalQuestions: 'Total Questions',
-            attachmentRequired: 'Attachment Required',
-            uploadFile: 'Upload Supporting Document',
-            changeFile: 'Change File',
-            removeFile: 'Remove File',
-            dragDropFile: 'Drag and drop a file here, or click to select',
-            fileUploaded: 'File uploaded successfully',
-            scrollToTop: 'Scroll to top',
-            startAssessment: "Let's get started with your assessment",
-            welcomeMessage: 'Please answer all questions honestly and provide any required documentation.',
-        },
-        ar: {
-            assessment: 'التقييم',
-            question: 'السؤال',
-            of: 'من',
-            yes: 'نعم',
-            no: 'لا',
-            notApplicable: 'غير قابل للتطبيق',
-            notes: 'ملاحظات (اختياري)',
-            notesPlaceholder: 'أضف أي ملاحظات أو تعليقات...',
-            complete: 'مكتمل',
-            completed: 'مكتمل',
-            remaining: 'متبقي',
-            progress: 'التقدم',
-            submitAssessment: 'إرسال التقييم',
-            assessmentComplete: 'اكتمل التقييم!',
-            submitting: 'جاري الإرسال...',
-            totalQuestions: 'إجمالي الأسئلة',
-            attachmentRequired: 'مرفق مطلوب',
-            uploadFile: 'رفع وثيقة داعمة',
-            changeFile: 'تغيير الملف',
-            removeFile: 'إزالة الملف',
-            dragDropFile: 'اسحب وأفلت ملفًا هنا، أو انقر للاختيار',
-            fileUploaded: 'تم رفع الملف بنجاح',
-            scrollToTop: 'التمرير إلى الأعلى',
-            startAssessment: 'لنبدأ بتقييمك',
-            welcomeMessage: 'يرجى الإجابة على جميع الأسئلة بصدق وتقديم أي وثائق مطلوبة.',
-        },
-    }[language];
-
-    // Handle scroll to show/hide scroll to top button
     useEffect(() => {
-        const handleScroll = () => {
-            setShowScrollTop(window.scrollY > 400);
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.ctrlKey || event.metaKey) {
+                switch (event.key.toLowerCase()) {
+                    case 's':
+                        event.preventDefault();
+                        if (isComplete) submitAssessment();
+                        break;
+                    case 'x':
+                        event.preventDefault();
+                        scrollToBottom();
+                        break;
+                    case 'arrowup':
+                        event.preventDefault();
+                        scrollToTop();
+                        break;
+                }
+            } else if (event.key === 'Escape') {
+                if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+            }
         };
+
+        window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isComplete, data]);
+
+    useEffect(() => {
+        const handleScroll = () => setShowScrollTop(window.scrollY > 400);
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
     const handleResponseChange = (criterionId: number, response: 'yes' | 'no' | 'na') => {
-        setResponses((prev) => ({ ...prev, [criterionId]: response }));
-
-        // Clear file if response is not 'yes' for criteria requiring files
-        const criterion = allCriteria.find((c) => c.id === criterionId);
-        if (criterion?.requires_file && response !== 'yes') {
-            setFiles((prev) => ({ ...prev, [criterionId]: null }));
+        setData(prev => ({ ...prev, responses: { ...prev.responses, [criterionId]: response } }));
+        if (allCriteria.find(c => c.id === criterionId)?.requires_file && response !== 'yes') {
+            handleFileRemove(criterionId);
         }
     };
 
-    const handleNotesChange = (criterionId: number, value: string) => {
-        setNotes((prev) => ({ ...prev, [criterionId]: value }));
-    };
-
-    const handleFileUpload = (criterionId: number, file: File) => {
-        setFiles((prev) => ({ ...prev, [criterionId]: file }));
-    };
-
-    const handleFileRemove = (criterionId: number) => {
-        setFiles((prev) => ({ ...prev, [criterionId]: null }));
-    };
+    const handleNotesChange = (criterionId: number, value: string) => setData(prev => ({ ...prev, notes: { ...prev.notes, [criterionId]: value } }));
+    const handleFileUpload = (criterionId: number, file: File) => setData(prev => ({ ...prev, files: { ...prev.files, [criterionId]: file } }));
+    const handleFileRemove = (criterionId: number) => setData(prev => ({ ...prev, files: { ...prev.files, [criterionId]: null } }));
 
     const submitAssessment = () => {
         if (!isComplete || processing) return;
-
-        // Prepare data for submission
-        setData({
-            responses,
-            notes,
-            files,
-        });
-
-        // Wait a tick to ensure state updates (if needed)
-        setTimeout(() => {
-            router.post(route('free-assessment.submit', assessmentData.id), { responses, notes, files }, { forceFormData: true });
-        }, 0);
+        post(route('free-assessment.submit', assessmentData.id), { forceFormData: true });
     };
 
-    const scrollToTop = () => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+    const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+    const scrollToBottom = () => {
+        if (completionCardRef.current) {
+            completionCardRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        } else {
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
     };
 
     return (
         <>
-            <Head title={`${assessmentData.tool.name_en} ${t.assessment}`} />
-
-            <div
-                className={`min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 ${language === 'ar' ? 'rtl' : 'ltr'}`}
-                dir={language === 'ar' ? 'rtl' : 'ltr'}
-            >
+            <Head title={`${language === 'ar' ? assessmentData.tool.name_ar : assessmentData.tool.name_en} ${t.assessment}`} />
+            <div className="min-h-screen bg-slate-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 <AssessmentHeader
                     title={language === 'ar' ? assessmentData.tool.name_ar : assessmentData.tool.name_en}
                     userName={auth.user.name}
+                    language={language}
                     rightContent={
-                        <div className="hidden items-center space-x-4 rounded-full bg-blue-50 px-6 py-3 md:flex">
-                            <BarChart3 className="h-5 w-5 text-blue-600" />
-                            <div className="text-right">
-                                <div className="text-lg font-bold text-blue-900">{Math.round(completionPercentage)}%</div>
-                                <div className="text-xs text-blue-700">
-                                    {Object.keys(responses).length}/{totalCriteria}
-                                </div>
+                        <div className="hidden items-center gap-3 rounded-full bg-blue-50 px-4 py-2 md:flex">
+                            <div className="text-right rtl:text-left">
+                                <div className="text-sm font-bold text-blue-900">{Math.round(completionPercentage)}% {t.complete}</div>
+                                <div className="text-xs text-blue-700">{Object.keys(data.responses).length}/{totalCriteria}</div>
                             </div>
                             <Progress value={completionPercentage} className="h-2 w-24" />
                         </div>
                     }
                 />
 
-                {/* Welcome Section */}
-                <div className="px-4 py-12 sm:px-6 lg:px-8">
+                <ShortcutsPanel t={t} />
+
+                <main className="px-4 py-12 sm:px-6 lg:px-8">
                     <div className="mx-auto max-w-4xl">
-                        <Card className="mb-8 overflow-hidden border-0 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white shadow-2xl">
-                            <CardContent className="relative p-8 md:p-12">
-                                <div className="text-center">
-                                    <div className="mb-6 flex items-center justify-center">
-                                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-white/20">
-                                            <FileText className="h-8 w-8" />
-                                        </div>
+                        <WelcomeSection t={t} totalCriteria={totalCriteria} answeredCount={Object.keys(data.responses).length} completionPercentage={completionPercentage} />
+
+                        <div className="space-y-6">
+                            {assessmentData.tool.domains.map((domain) => (
+                                <DomainSection key={domain.id} domain={domain} responses={data.responses} language={language} t={t}>
+                                    <div className="space-y-4">
+                                        {domain.categories.flatMap(cat => cat.criteria).map(criterion => (
+                                            <CriterionCard
+                                                key={criterion.id}
+                                                criterion={criterion}
+                                                globalIndex={criteriaMap.get(criterion.id)}
+                                                response={data.responses[criterion.id]}
+                                                note={data.notes[criterion.id]}
+                                                file={data.files[criterion.id]}
+                                                handlers={{ handleResponseChange, handleNotesChange, handleFileUpload, handleFileRemove }}
+                                                t={t}
+                                                language={language}
+                                            />
+                                        ))}
                                     </div>
-                                    <h2 className="mb-4 text-3xl font-bold md:text-4xl">{t.startAssessment}</h2>
-                                    <p className="mx-auto mb-8 max-w-2xl text-xl text-blue-100">{t.welcomeMessage}</p>
-
-                                    <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-3">
-                                        <div className="rounded-xl bg-white/10 p-4 text-center backdrop-blur-sm">
-                                            <div className="text-3xl font-bold">{totalCriteria}</div>
-                                            <div className="text-blue-100">{t.totalQuestions}</div>
-                                        </div>
-                                        <div className="rounded-xl bg-white/10 p-4 text-center backdrop-blur-sm">
-                                            <div className="text-3xl font-bold">{Object.keys(responses).length}</div>
-                                            <div className="text-blue-100">{t.completed}</div>
-                                        </div>
-                                        <div className="rounded-xl bg-white/10 p-4 text-center backdrop-blur-sm">
-                                            <div className="text-3xl font-bold">{Math.round(completionPercentage)}%</div>
-                                            <div className="text-blue-100">{t.progress}</div>
-                                        </div>
-                                    </div>
-
-                                    <Progress value={completionPercentage} className="mb-4 h-3 bg-white/20" />
-                                </div>
-                            </CardContent>
-                        </Card>
-
-                        {/* Assessment Questions */}
-                        <div className="space-y-8">
-                            {allCriteria.map((criterion, index) => (
-                                <Card
-                                    key={criterion.id}
-                                    className="transform border-0 shadow-xl transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
-                                >
-                                    <CardHeader className="border-b border-blue-100 bg-gradient-to-r from-gray-50 to-blue-50">
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex flex-1 items-start space-x-4">
-                                                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-blue-600 text-sm font-bold text-white">
-                                                    {index + 1}
-                                                </div>
-                                                <div className="flex-1">
-                                                    <CardTitle className="mb-3 text-lg leading-relaxed text-gray-900">
-                                                        {language === 'ar' ? criterion.text_ar : criterion.text_en}
-                                                    </CardTitle>
-                                                    <div className="flex items-center space-x-2">
-                                                        {criterion.requires_file && (
-                                                            <Badge variant="secondary" className="border-amber-200 bg-amber-100 text-amber-800">
-                                                                <Paperclip className="mr-1 h-3 w-3" />
-                                                                {t.attachmentRequired}
-                                                            </Badge>
-                                                        )}
-                                                        {responses[criterion.id] && (
-                                                            <Badge
-                                                                variant="secondary"
-                                                                className={
-                                                                    responses[criterion.id] === 'yes'
-                                                                        ? 'bg-green-100 text-green-800'
-                                                                        : responses[criterion.id] === 'no'
-                                                                          ? 'bg-red-100 text-red-800'
-                                                                          : 'bg-gray-100 text-gray-800'
-                                                                }
-                                                            >
-                                                                <CheckCheck className="mr-1 h-3 w-3" />
-                                                                Answered
-                                                            </Badge>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            {responses[criterion.id] && (
-                                                <div className="ml-4 flex items-center">
-                                                    {responses[criterion.id] === 'yes' && <CheckCircle className="h-8 w-8 text-green-600" />}
-                                                    {responses[criterion.id] === 'no' && <XCircle className="h-8 w-8 text-red-600" />}
-                                                    {responses[criterion.id] === 'na' && <MinusCircle className="h-8 w-8 text-gray-600" />}
-                                                </div>
-                                            )}
-                                        </div>
-                                    </CardHeader>
-
-                                    <CardContent className="p-8">
-                                        <div className="space-y-6">
-                                            {/* Response Buttons */}
-                                            <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-                                                <Button
-                                                    variant={responses[criterion.id] === 'yes' ? 'default' : 'outline'}
-                                                    size="lg"
-                                                    onClick={() => handleResponseChange(criterion.id, 'yes')}
-                                                    className={`h-16 transform transition-all duration-300 hover:scale-105 ${
-                                                        responses[criterion.id] === 'yes'
-                                                            ? 'bg-green-600 text-white shadow-lg shadow-green-200 hover:bg-green-700'
-                                                            : 'hover:border-green-300 hover:bg-green-50 hover:shadow-lg'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <CheckCircle className="h-6 w-6" />
-                                                        <span className="text-lg font-medium">{t.yes}</span>
-                                                    </div>
-                                                </Button>
-                                                <Button
-                                                    variant={responses[criterion.id] === 'no' ? 'default' : 'outline'}
-                                                    size="lg"
-                                                    onClick={() => handleResponseChange(criterion.id, 'no')}
-                                                    className={`h-16 transform transition-all duration-300 hover:scale-105 ${
-                                                        responses[criterion.id] === 'no'
-                                                            ? 'bg-red-600 text-white shadow-lg shadow-red-200 hover:bg-red-700'
-                                                            : 'hover:border-red-300 hover:bg-red-50 hover:shadow-lg'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <XCircle className="h-6 w-6" />
-                                                        <span className="text-lg font-medium">{t.no}</span>
-                                                    </div>
-                                                </Button>
-                                                <Button
-                                                    variant={responses[criterion.id] === 'na' ? 'default' : 'outline'}
-                                                    size="lg"
-                                                    onClick={() => handleResponseChange(criterion.id, 'na')}
-                                                    className={`h-16 transform transition-all duration-300 hover:scale-105 ${
-                                                        responses[criterion.id] === 'na'
-                                                            ? 'bg-gray-600 text-white shadow-lg shadow-gray-200 hover:bg-gray-700'
-                                                            : 'hover:border-gray-300 hover:bg-gray-50 hover:shadow-lg'
-                                                    }`}
-                                                >
-                                                    <div className="flex items-center space-x-3">
-                                                        <MinusCircle className="h-6 w-6" />
-                                                        <span className="text-lg font-medium">{t.notApplicable}</span>
-                                                    </div>
-                                                </Button>
-                                            </div>
-
-                                            {/* File Upload Section - Only show when requires_file is true AND response is 'yes' */}
-                                            {criterion.requires_file && responses[criterion.id] === 'yes' && (
-                                                <div className="space-y-4 rounded-xl border-2 border-blue-200 bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
-                                                    <div className="mb-4 flex items-center space-x-3">
-                                                        <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-600">
-                                                            <Upload className="h-5 w-5 text-white" />
-                                                        </div>
-                                                        <div>
-                                                            <h4 className="text-lg font-semibold text-blue-900">{t.uploadFile}</h4>
-                                                            <p className="text-sm text-blue-700">Please provide supporting documentation</p>
-                                                        </div>
-                                                    </div>
-
-                                                    {!files[criterion.id] ? (
-                                                        <div className="relative">
-                                                            <input
-                                                                type="file"
-                                                                id={`file-${criterion.id}`}
-                                                                className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
-                                                                onChange={(e) => {
-                                                                    const file = e.target.files?.[0];
-                                                                    if (file) handleFileUpload(criterion.id, file);
-                                                                }}
-                                                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                                                            />
-                                                            <div className="hover:bg-blue-25 group cursor-pointer rounded-xl border-2 border-dashed border-blue-300 p-8 text-center transition-all duration-300 hover:border-blue-400">
-                                                                <Cloud className="mx-auto mb-4 h-16 w-16 text-blue-400 transition-transform duration-200 group-hover:scale-110" />
-                                                                <p className="mb-2 text-lg font-medium text-blue-800">{t.dragDropFile}</p>
-                                                                <p className="text-blue-600">PDF, DOC, DOCX, JPG, PNG (Max 10MB)</p>
-                                                            </div>
-                                                        </div>
-                                                    ) : (
-                                                        <div className="rounded-xl border-2 border-blue-200 bg-white p-6 shadow-lg">
-                                                            <div className="flex items-center justify-between">
-                                                                <div className="flex items-center space-x-4">
-                                                                    <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-green-100">
-                                                                        <File className="h-6 w-6 text-green-600" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-lg font-semibold text-gray-900">
-                                                                            {files[criterion.id]?.name}
-                                                                        </p>
-                                                                        <p className="text-sm text-gray-500">
-                                                                            {((files[criterion.id]?.size || 0) / 1024 / 1024).toFixed(2)} MB
-                                                                        </p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="flex items-center space-x-3">
-                                                                    <Badge variant="secondary" className="bg-green-100 px-3 py-1 text-green-800">
-                                                                        <CheckCircle className="mr-1 h-4 w-4" />
-                                                                        {t.fileUploaded}
-                                                                    </Badge>
-                                                                    <Button
-                                                                        variant="ghost"
-                                                                        size="sm"
-                                                                        onClick={() => handleFileRemove(criterion.id)}
-                                                                        className="p-2 text-red-600 hover:bg-red-50 hover:text-red-700"
-                                                                    >
-                                                                        <X className="h-4 w-4" />
-                                                                    </Button>
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            )}
-
-                                            {/* Notes Section */}
-                                            {responses[criterion.id] && (
-                                                <div className="space-y-4 rounded-xl border border-gray-200 bg-gray-50 p-6">
-                                                    <div className="flex items-center space-x-2">
-                                                        <FileText className="h-5 w-5 text-gray-600" />
-                                                        <label className="text-base font-medium text-gray-900">{t.notes}</label>
-                                                    </div>
-                                                    <Textarea
-                                                        value={notes[criterion.id] || ''}
-                                                        onChange={(e) => handleNotesChange(criterion.id, e.target.value)}
-                                                        placeholder={t.notesPlaceholder}
-                                                        rows={3}
-                                                        className="resize-none border-gray-300 text-base focus:border-blue-500 focus:ring-blue-500"
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                                </DomainSection>
                             ))}
                         </div>
 
-                        {/* Submit Assessment */}
-                        {isComplete && (
-                            <Card className="mt-12 border-0 bg-gradient-to-br from-green-600 via-emerald-600 to-teal-600 text-white shadow-2xl">
-                                <CardContent className="p-12 text-center">
-                                    <div className="space-y-8">
-                                        <div className="flex items-center justify-center">
-                                            <div className="mb-6 flex h-24 w-24 animate-pulse items-center justify-center rounded-full bg-white/20">
-                                                <Award className="h-12 w-12" />
-                                            </div>
-                                        </div>
+                        {isComplete && <CompletionCard ref={completionCardRef} totalCriteria={totalCriteria} submitAssessment={submitAssessment} processing={processing} t={t} />}
 
-                                        <div>
-                                            <h3 className="mb-4 text-4xl font-bold">{t.assessmentComplete}</h3>
-                                            <p className="mx-auto mb-8 max-w-2xl text-xl text-green-100">
-                                                Congratulations! You have successfully completed all {totalCriteria} questions with excellence.
-                                            </p>
-                                        </div>
-
-                                        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2">
-                                            <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
-                                                <div className="mb-2 text-4xl font-bold">{totalCriteria}</div>
-                                                <div className="text-green-100">{t.totalQuestions}</div>
-                                            </div>
-                                            <div className="rounded-2xl bg-white/10 p-6 text-center backdrop-blur-sm">
-                                                <div className="mb-2 text-4xl font-bold">100%</div>
-                                                <div className="text-green-100">{t.complete}</div>
-                                            </div>
-                                        </div>
-
-                                        <Button
-                                            onClick={submitAssessment}
-                                            size="lg"
-                                            disabled={processing}
-                                            className="transform bg-white px-12 py-6 text-xl font-bold text-green-600 shadow-2xl transition-all duration-300 hover:scale-105 hover:bg-gray-100"
-                                        >
-                                            {processing ? (
-                                                <>
-                                                    <div className="mr-4 h-6 w-6 animate-spin rounded-full border-b-2 border-green-600"></div>
-                                                    {t.submitting}
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <Award className="mr-3 h-6 w-6" />
-                                                    {t.submitAssessment}
-                                                </>
-                                            )}
-                                        </Button>
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* Floating Progress Indicator */}
-                        {!isComplete && (
-                            <div className="fixed right-6 bottom-6 z-50">
-                                <Card className="border-0 bg-white/95 p-4 shadow-2xl backdrop-blur-sm">
-                                    <div className="flex items-center space-x-3">
-                                        <Clock className="h-5 w-5 text-blue-600" />
-                                        <div>
-                                            <div className="text-sm font-medium text-gray-900">
-                                                {Object.keys(responses).length} / {totalCriteria}
-                                            </div>
-                                            <Progress value={completionPercentage} className="h-2 w-24" />
-                                        </div>
-                                    </div>
-                                </Card>
-                            </div>
-                        )}
-
-                        {/* Scroll to Top Button */}
                         {showScrollTop && (
-                            <Button
-                                onClick={scrollToTop}
-                                className="fixed bottom-6 left-6 z-50 h-12 w-12 rounded-full bg-blue-600 shadow-2xl hover:bg-blue-700"
-                                size="sm"
-                            >
+                            <Button onClick={scrollToTop} className="fixed bottom-6 right-6 z-50 h-12 w-12 rounded-full bg-blue-600 shadow-2xl hover:bg-blue-700 rtl:right-auto rtl:left-6" size="icon" aria-label={t.scrollToTop}>
                                 <ArrowUp className="h-5 w-5" />
                             </Button>
                         )}
                     </div>
-                </div>
+                </main>
             </div>
         </>
     );

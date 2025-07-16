@@ -361,7 +361,8 @@ class FreeAssessmentController extends Controller
                 $domainPercentage = $domainMax > 0 ? ($domainTotal / $domainMax) * 100 : 0;
 
                 $domainScores->push([
-                    'domain_name' => $domain->name_en,
+                    'domain_name_en' => $domain->name_en,
+                    'domain_name_ar' => $domain->name_ar,
                     'score' => round($domainPercentage, 1),
                     'max_score' => 100,
                     'percentage' => round($domainPercentage, 1),

@@ -272,14 +272,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return redirect()->route('tools.discover');
     });
 
-//    Route::get('/pdf', function () {
-//        // Simple usage
-//        $generator = new GartnerPDFGenerator();
-//      return  $generator->saveToPDF('my_gartner_clone.pdf');
-//
-//// Or stream directly to browser
-////        $generator->streamToBrowser();
-//    });
+
 
     // ========================================
     // SUBSCRIPTION AND UPGRADE ROUTES

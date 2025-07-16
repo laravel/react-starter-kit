@@ -1,13 +1,17 @@
 import { Post } from '@/types/post';
 
-export function PostMedia({ post }: { post: Post }) {
+interface PostMediaProps {
+    post: Post;
+}
+
+export function PostMedia({ post }: PostMediaProps) {
     return (
         <div className="space-y-4">
-            {post.thumbnail && (
+            {post.thumbnail_url && (
                 <img
                     src={post.thumbnail_url}
-                    alt={post.thumbnail_url}
-                    className="rounded-lg shadow"
+                    alt={post.title} // Use post title for better alt text
+                    className="rounded-lg shadow w-full object-cover"
                 />
             )}
             {post.image_gallery_urls && post.image_gallery_urls.length > 0 && (
@@ -16,7 +20,7 @@ export function PostMedia({ post }: { post: Post }) {
                         <img
                             key={idx}
                             src={img}
-                            alt={`image-${idx}`}
+                            alt={`Gallery image ${idx + 1}`}
                             className="rounded-lg shadow"
                         />
                     ))}
@@ -38,6 +42,7 @@ export function PostMedia({ post }: { post: Post }) {
                         src={post.youtube_url}
                         className="w-full h-full rounded-lg"
                         allowFullScreen
+                        title="YouTube video player" // Added for accessibility
                     />
                 </div>
             )}

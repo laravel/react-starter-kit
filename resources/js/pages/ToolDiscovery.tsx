@@ -1,238 +1,138 @@
-// resources/js/pages/ToolDiscovery.tsx
-// New page for free users to browse tools
-
+import { Link } from '@inertiajs/react';
 import React from 'react';
-import { Head, Link } from '@inertiajs/react';
-import AppLayout from '@/layouts/app-layout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import {
-    Clock,
-    Users,
-    Crown,
-    Lock,
-    CheckCircle,
-    Star,
-    ArrowRight,
-    Eye,
-    ShoppingCart
-} from 'lucide-react';
 
-interface Tool {
-    id: number;
-    name_en: string;
-    name_ar: string;
-    description_en: string;
-    description_ar: string;
-    image: string;
-    total_domains: number;
-    total_criteria: number;
-    estimated_time: number;
-    assessments_count: number;
-    has_access: boolean;
-    subscription_type: string;
-    pricing: {
-        free: { price: number; assessments_limit: number };
-        premium: { price: number; assessments_limit: null };
-    };
-}
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    {/* Free Assessment CTA */}
+    <Link
+        href="/free-assessment"
+        className="flex flex-col items-center justify-between bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 text-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow"
+    >
+        <div className="flex flex-col items-center text-center gap-4">
+            <div className="text-5xl">🎁</div>
+            <h3 className="text-2xl font-bold">Get Your Free Assessment</h3>
+            <p className="text-blue-100 max-w-xs">
+                Try a complimentary assessment to see how our tools can help your organisation grow.
+            </p>
+        </div>
+        <span className="mt-6 inline-block bg-white/20 text-white px-4 py-2 rounded-lg font-semibold">
+                                Start For Free
+                            </span>
+    </Link>
 
-interface User {
-    current_assessments: number;
-    is_premium: boolean;
-    is_admin: boolean;
-    subscription_status: string;
-    tool_subscriptions: Record<number, string>;
-}
-
-interface Props {
-    tools: Tool[];
-    user: User;
-    locale: string;
-}
-
-export default function ToolDiscovery({ tools, user, locale }: Props) {
-    const isRTL = locale === 'ar';
-
-    const getAccessBadge = (tool: Tool) => {
-        if (tool.has_access) {
-            return (
-                <Badge className="bg-green-100 text-green-800 border-green-200">
-                    <CheckCircle className="w-3 h-3 mr-1" />
-                    Subscribed
-                </Badge>
-            );
-        }
-        return (
-            <Badge className="bg-gray-100 text-gray-600 border-gray-200">
-                <Lock className="w-3 h-3 mr-1" />
-                Not Subscribed
-            </Badge>
-        );
-    };
-
-    const getActionButton = (tool: Tool) => {
-        if (tool.has_access) {
-            return (
-                <Link href={route('assessment.start', tool.id)}>
-                    <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700">
-                        <ArrowRight className="w-4 h-4 mr-2" />
-                        Start Assessment
-                    </Button>
-                </Link>
-            );
-        }
-
-        return (
-            <div className="space-y-2">
-                <Link href={route('tools.subscribe', tool.id)}>
-                    <Button className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
-                        <ShoppingCart className="w-4 h-4 mr-2" />
-                        Subscribe - ${tool.pricing.premium.price}
-                    </Button>
-                </Link>
-                <Link href={route('tools.show', tool.id)}>
-                    <Button variant="outline" className="w-full">
-                        <Eye className="w-4 h-4 mr-2" />
-                        View Details
-                    </Button>
-                </Link>
-            </div>
-        );
-    };
-
-    return (
-        <AppLayout>
-            <Head title="Discover Assessment Tools" />
-
-            <div className={`py-12 ${isRTL ? 'rtl' : 'ltr'}`} dir={isRTL ? 'rtl' : 'ltr'}>
-                <div className="max-w-7xl mx-auto sm:px-6 lg:px-8">
-
-                    {/* Header */}
-                    <div className="mb-8">
-                        <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                            Assessment Tools Marketplace
-                        </h1>
-                        <p className="text-xl text-gray-600 max-w-3xl">
-                            Explore our comprehensive assessment tools. Subscribe to individual tools
-                            or upgrade to premium for unlimited access to all tools.
-                        </p>
-                    </div>
-
-                    {/* User Status Card */}
-                    {!user.is_premium && (
-                        <Card className="mb-8 border-l-4 border-l-blue-500 bg-blue-50">
-                            <CardContent className="p-6">
-                                <div className="flex items-center justify-between">
-                                    <div>
-                                        <h3 className="text-lg font-semibold text-blue-900">
-                                            Get Unlimited Access
-                                        </h3>
-                                        <p className="text-blue-700">
-                                            Subscribe to individual tools for ${tools[0]?.pricing.premium.price || 49.99} each,
-                                            or upgrade to premium for unlimited access to all tools.
-                                        </p>
-                                    </div>
-                                    <Link href="/subscription">
-                                        <Button className="bg-blue-600 hover:bg-blue-700">
-                                            <Crown className="w-4 h-4 mr-2" />
-                                            Upgrade to Premium
-                                        </Button>
-                                    </Link>
-                                </div>
-                            </CardContent>
-                        </Card>
-                    )}
-
-                    {/* Tools Grid */}
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {tools.map((tool) => (
-                            <Card
-                                key={tool.id}
-                                className="border-0 shadow-lg hover:shadow-xl transition-all duration-300"
-                            >
-                                <CardHeader className="pb-3">
-                                    <div className="flex items-center justify-between mb-2">
-                                        <CardTitle className="text-xl line-clamp-2">
-                                            {isRTL ? tool.name_ar : tool.name_en}
-                                        </CardTitle>
-                                        {getAccessBadge(tool)}
-                                    </div>
-
-                                    {tool.image && (
-                                        <div className="w-full h-32 bg-gradient-to-r from-blue-100 to-purple-100 rounded-lg flex items-center justify-center">
-                                            <img
-                                                src={tool.image}
-                                                alt={isRTL ? tool.name_ar : tool.name_en}
-                                                className="w-16 h-16 object-contain"
-                                            />
-                                        </div>
-                                    )}
-                                </CardHeader>
-
-                                <CardContent>
-                                    <p className="text-gray-600 mb-4 line-clamp-3">
-                                        {isRTL ? tool.description_ar : tool.description_en}
-                                    </p>
-
-                                    {/* Tool Metrics */}
-                                    <div className="space-y-2 mb-4">
-                                        <div className="flex items-center justify-between text-sm text-gray-500">
-                                            <span className="flex items-center">
-                                                <Clock className="w-4 h-4 mr-1" />
-                                                {tool.estimated_time} min
-                                            </span>
-                                            <span className="flex items-center">
-                                                <Users className="w-4 h-4 mr-1" />
-                                                {tool.assessments_count} taken
-                                            </span>
-                                        </div>
-                                        <div className="text-sm text-gray-500">
-                                            {tool.total_domains} domains • {tool.total_criteria} criteria
-                                        </div>
-                                    </div>
-
-                                    {/* Pricing Info */}
-                                    <div className="bg-gray-50 rounded-lg p-3 mb-4">
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600">Free:</span>
-                                            <span className="font-medium">1 assessment</span>
-                                        </div>
-                                        <div className="flex items-center justify-between text-sm">
-                                            <span className="text-gray-600">Premium:</span>
-                                            <span className="font-medium text-blue-600">
-                                                ${tool.pricing.premium.price} - Unlimited
-                                            </span>
-                                        </div>
-                                    </div>
-
-                                    {/* Action Button */}
-                                    {getActionButton(tool)}
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-
-                    {/* Bottom CTA */}
-                    <Card className="mt-12 border-0 shadow-2xl bg-gradient-to-r from-purple-500 via-pink-600 to-orange-500 text-white">
-                        <CardContent className="p-8 text-center">
-                            <Crown className="w-16 h-16 mx-auto text-yellow-200 mb-4" />
-                            <h3 className="text-3xl font-bold mb-2">Ready for Full Access?</h3>
-                            <p className="text-purple-100 text-lg mb-6 max-w-2xl mx-auto">
-                                Upgrade to premium and get unlimited access to all assessment tools,
-                                advanced analytics, detailed reports, and priority support.
-                            </p>
-                            <Link href="/subscription">
-                                <Button className="bg-white text-purple-600 hover:bg-gray-100 text-lg px-8 py-3">
-                                    <Crown className="w-5 h-5 mr-2" />
-                                    Upgrade to Premium
-                                </Button>
-                            </Link>
-                        </CardContent>
-                    </Card>
+    {/* Strategic Assessment Tool (As requested) */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+        <div className="bg-gradient-to-r from-blue-500 to-blue-600 p-6">
+            <div className="text-white text-4xl mb-3">🎯</div>
+            <h3 className="text-xl font-bold text-white">Strategic Assessment</h3>
+        </div>
+        <div className="p-6">
+            <p className="text-gray-600 mb-4">
+                Comprehensive organizational evaluation covering all critical business areas
+                including leadership, operations, and performance.
+            </p>
+            <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    50+ Assessment Criteria
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Detailed PDF Report
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    30-45 minutes
                 </div>
             </div>
-        </AppLayout>
-    );
-}
+            <Link href="/free-assessment" className="block w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold text-center">
+                Start Assessment
+            </Link>
+        </div>
+    </div>
+
+    {/* Quick Assessment Tool */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow">
+        <div className="bg-gradient-to-r from-green-500 to-green-600 p-6">
+            <div className="text-white text-4xl mb-3">⚡</div>
+            <h3 className="text-xl font-bold text-white">Quick Assessment</h3>
+        </div>
+        <div className="p-6">
+            <p className="text-gray-600 mb-4">
+                Fast organizational health check focusing on key performance indicators
+                and immediate improvement opportunities.
+            </p>
+            <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    20+ Key Metrics
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    Summary Report
+                </div>
+                <div className="flex items-center text-sm text-gray-600">
+                    <svg className="w-4 h-4 mr-2 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                    10-15 minutes
+                </div>
+            </div>
+            <Link href="/free-assessment" className="block w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors font-semibold text-center">
+                Start Quick Check
+            </Link>
+        </div>
+    </div>
+
+    {/* Advanced Assessment Tool */}
+    <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200 hover:shadow-xl transition-shadow opacity-75">
+        <div className="bg-gradient-to-r from-purple-500 to-purple-600 p-6">
+            <div className="text-white text-4xl mb-3">🚀</div>
+            <h3 className="text-xl font-bold text-white">Advanced Assessment</h3>
+            <span className="inline-block bg-white/20 text-white text-xs px-2 py-1 rounded-full mt-2">
+                                    Premium Required
+                                </span>
+        </div>
+        <div className="p-6">
+            <p className="text-gray-600 mb-4">
+                In-depth analysis with advanced analytics, benchmarking,
+                and detailed improvement roadmaps.
+            </p>
+            <div className="space-y-2 mb-6">
+                <div className="flex items-center text-sm text-gray-500">
+                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    100+ Detailed Criteria
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    Premium Analytics
+                </div>
+                <div className="flex items-center text-sm text-gray-500">
+                    <svg className="w-4 h-4 mr-2 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd" />
+                    </svg>
+                    60-90 minutes
+                </div>
+            </div>
+            <Link
+                href="/subscription"
+                className="block w-full bg-purple-600 text-white py-3 px-4 rounded-lg hover:bg-purple-700 transition-colors font-semibold text-center"
+            >
+                Upgrade to Premium
+            </Link>
+        </div>
+    </div>
+</div>
