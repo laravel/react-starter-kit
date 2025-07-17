@@ -52,7 +52,7 @@ const translations = {
         freeAssessmentDesc: 'Try a complimentary assessment to see how our tools can help your organization grow.',
         freeAssessmentCTA: 'Start For Free',
         startAssessment: 'Start Assessment',
-        upgradeToPremium: 'Upgrade to Premium',
+        requestAccess: 'Request Access',
         requiresPremium: 'Premium Required',
         whyChooseTitle: 'Why Choose AFAQ?',
         feature1Title: 'Evidence-Based',
@@ -72,7 +72,7 @@ const translations = {
         freeAssessmentDesc: 'جرّب تقييمًا مجانيًا لترى كيف يمكن لأدواتنا أن تساعد مؤسستك على النمو.',
         freeAssessmentCTA: 'ابدأ مجانًا',
         startAssessment: 'ابدأ التقييم',
-        upgradeToPremium: 'الترقية إلى بريميوم',
+        requestAccess: 'طلب الوصول',
         requiresPremium: 'يتطلب بريميوم',
         whyChooseTitle: 'لماذا تختار آفاق؟',
         feature1Title: 'مبني على الأدلة',
@@ -125,11 +125,10 @@ const ToolCard = ({ tool, t, getName, getDescription }: { tool: Tool, t: any, ge
             <div className="p-6 flex flex-col flex-grow">
                 <p className="text-gray-600 mb-6 flex-grow">{getDescription(tool)}</p>
                 <Link
-                    href={tool.available ? '/assessment/' + tool.id : '/subscription'}
-                    disabled={!tool.available}
-                    className={`mt-auto block w-full py-3 px-4 rounded-lg font-semibold text-center text-white transition-all duration-300 ${!tool.available ? 'bg-gray-400 cursor-not-allowed' : `${colors.bg} ${colors.hoverBg} group-hover:shadow-lg group-hover:scale-105`}`}
+                    href={tool.available ? '/assessment/' + tool.id : `/free-assessment/request/${tool.id}`}
+                    className={`mt-auto block w-full py-3 px-4 rounded-lg font-semibold text-center text-white transition-all duration-300 ${colors.bg} ${colors.hoverBg} group-hover:shadow-lg group-hover:scale-105`}
                 >
-                    {tool.available ? t.startAssessment : t.upgradeToPremium}
+                    {tool.available ? t.startAssessment : t.requestAccess}
                 </Link>
             </div>
         </div>

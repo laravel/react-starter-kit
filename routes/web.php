@@ -150,6 +150,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Route::get('/free-assessment', [FreeAssessmentController::class, 'index'])
             ->name('free-assessment.index');
 
+        // Request access to a tool
+        Route::get('/free-assessment/request/{tool}', [FreeAssessmentController::class, 'requestForm'])
+            ->name('free-assessment.request');
+
         // 2. Start assessment - NO PARAMETERS NEEDED (uses single free tool)
         Route::post('/free-assessment/start', [FreeAssessmentController::class, 'start'])
             ->name('free-assessment.start');

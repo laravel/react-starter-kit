@@ -69,6 +69,28 @@ class FreeAssessmentController extends Controller
     }
 
     /**
+     * Show tool request form for a specific tool
+     */
+    public function requestForm(Tool $tool)
+    {
+        return Inertia::render('FreeAssessment/ToolRequest', [
+            'tool' => [
+                'id' => $tool->id,
+                'name_en' => $tool->name_en,
+                'name_ar' => $tool->name_ar,
+                'description_en' => $tool->description_en,
+                'description_ar' => $tool->description_ar,
+                'image' => $tool->image,
+            ],
+            'user' => auth()->user() ? [
+                'name' => auth()->user()->name,
+                'email' => auth()->user()->email,
+                'organization' => auth()->user()->getCompanyName(),
+            ] : null,
+        ]);
+    }
+
+    /**
      * Start or resume assessment
      */
     public function start(Request $request)
