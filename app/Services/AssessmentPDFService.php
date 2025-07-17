@@ -16,6 +16,7 @@
  *
  * Usage in Controller:
  * $service = new AssessmentPDFService('ar'); // For Arabic
+ * $service->setLogoPath(public_path('storage/logo.png')); // Set your logo path
  * $service->setAssessmentData($assessment, $results, $user);
  * return $service->generatePDF();
  */
@@ -32,8 +33,9 @@ class AssessmentPDFService
     private string $language;
     private bool $isArabic;
     private array $translations;
+    private ?string $logoPath = null;
 
-    public function __construct(string $language = 'ar')
+    public function __construct(string $language = 'en')
     {
         $this->language = $language;
         $this->isArabic = $language === 'ar';
@@ -67,6 +69,7 @@ class AssessmentPDFService
         $this->translations = [
             'en' => [
                 'assessment_results' => 'Assessment Results',
+                'confidential_report' => 'Confidential Report',
                 'completed_on' => 'Completed on',
                 'assessment_completed_by' => 'Assessment completed by',
                 'for' => 'for',
@@ -101,6 +104,7 @@ class AssessmentPDFService
             ],
             'ar' => [
                 'assessment_results' => 'نتائج التقييم',
+                'confidential_report' => 'تقرير سري',
                 'completed_on' => 'اكتمل في',
                 'assessment_completed_by' => 'تم إكمال التقييم بواسطة',
                 'for' => 'لـ',
@@ -145,13 +149,15 @@ class AssessmentPDFService
     }
 
     /**
-     * Set language and reinitialize translations
+     * Set the path to the logo file.
+     *
+     * @param string|null $path Absolute path to the logo file.
      */
-    public function setLanguage(string $language): void
+    public function setLogoPath(?string $path): void
     {
-
-        $this->language = $language;
-        $this->isArabic = $language === 'ar';
+        if ($path && file_exists($path)) {
+            $this->logoPath = $path;
+        }
     }
 
     /**
@@ -159,17 +165,12 @@ class AssessmentPDFService
      */
     public function setAssessmentData($assessment, $results, $user = null): void
     {
-        // Get certification info based on overall percentage
         $certificationInfo = $this->getCertificationInfo($results['overall_percentage'] ?? 0);
-
-        // Get tool name based on language
-        $toolName = $this->isArabic
-            ? ($assessment->tool->name_ar ?? $assessment->tool->name_en ?? 'أداة التقييم')
-            : ($assessment->tool->name_en ?? 'Assessment Tool');
+        $toolName = $this->isArabic ? ($assessment->tool->name_ar ?? 'أداة التقييم') : ($assessment->tool->name_en ?? 'Assessment Tool');
 
         $this->data = [
             'tool_name' => $toolName,
-            'company_name' => $user && $user->details ? $user->details->company_name : ($assessment->organization ?? ($this->isArabic ? 'مؤسستك' : 'Your Organization')),
+            'company_name' => $user->organization->name ?? $assessment->organization ?? ($this->isArabic ? 'مؤسستك' : 'Your Organization'),
             'assessment_name' => $assessment->name,
             'assessment_email' => $assessment->email,
             'completion_date' => $this->formatDate($assessment->completed_at ?? now()),
@@ -191,15 +192,8 @@ class AssessmentPDFService
      */
     private function formatDate($date): string
     {
-        if (!$date) {
-            $date = now();
-        }
-
-        if ($this->isArabic) {
-            return $date->locale('ar')->translatedFormat('d F Y');
-        } else {
-            return $date->format('F d, Y');
-        }
+        if (!$date) $date = now();
+        return $this->isArabic ? $date->locale('ar')->translatedFormat('d F Y') : $date->format('F d, Y');
     }
 
     /**
@@ -208,7 +202,41 @@ class AssessmentPDFService
     public function generatePDF(): Response
     {
         $html = $this->buildCompleteHTML();
+        $pdf = $this->createPdfFromHtml($html);
+        $filename = $this->generateFilename();
 
+        return response($pdf, 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => "attachment; filename=\"{$filename}\""
+        ]);
+    }
+
+    /**
+     * Save PDF to storage and return path
+     */
+    public function savePDF(string $filename = null): string
+    {
+        $filename = $filename ?? $this->generateFilename();
+        $html = $this->buildCompleteHTML();
+        $pdf = $this->createPdfFromHtml($html);
+
+        Storage::disk('public')->put("pdfs/{$filename}", $pdf);
+        return "pdfs/{$filename}";
+    }
+
+    /**
+     * Generate preview HTML for browser viewing
+     */
+    public function generatePreview(): string
+    {
+        return $this->buildCompleteHTML();
+    }
+
+    /**
+     * Centralized PDF generation logic
+     */
+    private function createPdfFromHtml(string $html): string
+    {
         try {
             $browsershot = Browsershot::html($html)
                 ->format('A4')
@@ -226,57 +254,13 @@ class AssessmentPDFService
                 $browsershot->setChromePath($chromePath);
             }
 
-            $pdf = $browsershot->pdf();
-
-            $filename = $this->generateFilename();
-
-            return response($pdf, 200, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => "attachment; filename=\"{$filename}\""
-            ]);
+            return $browsershot->pdf();
 
         } catch (\Exception $e) {
+            // It's good practice to log the error
+            // Log::error("PDF Generation Failed: " . $e->getMessage());
             throw new \Exception("Failed to generate PDF: " . $e->getMessage());
         }
-    }
-
-    /**
-     * Save PDF to storage and return path
-     */
-    public function savePDF(string $filename = null): string
-    {
-        $filename = $filename ?? $this->generateFilename();
-        $html = $this->buildCompleteHTML();
-
-        $browsershot = Browsershot::html($html)
-            ->format('A4')
-            ->margins(0, 0, 0, 0)
-            ->printBackground()
-            ->waitUntilNetworkIdle()
-            ->timeout(120)
-            ->setDelay(1000)
-            ->emulateMedia('print')
-            ->setOption('addStyleTag', json_encode(['content' => 'body { -webkit-print-color-adjust: exact; }']))
-            ->setOption('args', ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']);
-
-        $chromePath = $this->getChromePath();
-        if ($chromePath !== null) {
-            $browsershot->setChromePath($chromePath);
-        }
-
-        $pdf = $browsershot->pdf();
-
-        Storage::disk('public')->put("pdfs/{$filename}", $pdf);
-
-        return "pdfs/{$filename}";
-    }
-
-    /**
-     * Generate preview HTML for browser viewing
-     */
-    public function generatePreview(): string
-    {
-        return $this->buildCompleteHTML();
     }
 
     /**
@@ -291,21 +275,7 @@ class AssessmentPDFService
         $summaryPage = $this->generateSummaryPage();
         $domainPages = $this->generateDomainPages();
 
-        return "
-        <!DOCTYPE html>
-        <html lang=\"{$lang}\" dir=\"{$dir}\">
-        <head>
-            <meta charset=\"UTF-8\">
-            <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">
-            <title>{$this->data['tool_name']} {$this->t('assessment_results')}</title>
-            <style>{$css}</style>
-        </head>
-        <body>
-            {$coverPage}
-            {$summaryPage}
-            {$domainPages}
-        </body>
-        </html>";
+        return "<!DOCTYPE html><html lang=\"{$lang}\" dir=\"{$dir}\"><head><meta charset=\"UTF-8\"><title>{$this->data['tool_name']} {$this->t('assessment_results')}</title><style>{$css}</style></head><body>{$coverPage}{$summaryPage}{$domainPages}</body></html>";
     }
 
     /**
@@ -313,402 +283,147 @@ class AssessmentPDFService
      */
     private function getAdvancedCSS(): string
     {
-        $fontFamily = $this->isArabic
-            ? "'Amiri', 'Noto Sans Arabic', 'Tahoma', 'Arial Unicode MS', sans-serif"
-            : "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif";
-
+        $fontFamily = $this->isArabic ? "'Amiri', 'Noto Sans Arabic', sans-serif" : "'Helvetica Neue', Arial, sans-serif";
         $textAlign = $this->isArabic ? 'right' : 'left';
         $marginDirection = $this->isArabic ? 'margin-left' : 'margin-right';
 
         return "
-        /* Import Arabic fonts */
         @import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Noto+Sans+Arabic:wght@400;600;700&display=swap');
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: {$fontFamily}; font-size: 14px; line-height: 1.6; color: #333; background: white; direction: " . ($this->isArabic ? 'rtl' : 'ltr') . "; }
+        .page { width: 8.5in; min-height: 11in; margin: 0 auto; background: white; position: relative; page-break-after: always; overflow: hidden; }
+        .page:last-child { page-break-after: avoid; }
 
-        /* Reset and base styles */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: {$fontFamily};
-            font-size: " . ($this->isArabic ? '16px' : '14px') . ";
-            line-height: " . ($this->isArabic ? '1.8' : '1.5') . ";
-            color: #2c3e50;
-            background: white;
-            direction: " . ($this->isArabic ? 'rtl' : 'ltr') . ";
-        }
-
-        /* Page structure */
-        .page {
-            width: 8.5in;
-            min-height: 11in;
-            margin: 0 auto;
-            background: white;
-            position: relative;
-            page-break-after: always;
-            overflow: hidden;
-        }
-
-        .page:last-child {
-            page-break-after: avoid;
-        }
-
-        /* Cover page */
+        /* Enhanced Cover Page */
         .cover-page {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f8f9fa;
+            color: #2c3e50;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
             padding: 80px 60px;
             position: relative;
-            text-align: center;
         }
-
-        .cover-page::before {
+        .cover-page .header { text-align: " . ($this->isArabic ? 'right' : 'left') . "; }
+        .cover-page .footer { text-align: center; font-size: 12px; color: #6c757d; }
+        .cover-page .main-content { text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .cover-logo { max-width: 180px; max-height: 60px; margin-bottom: 20px; }
+        .cover-title { font-size: " . ($this->isArabic ? '44px' : '52px') . "; font-weight: 700; line-height: 1.1; margin-bottom: 16px; color: #0056b3; }
+        .cover-subtitle { font-size: " . ($this->isArabic ? '26px' : '30px') . "; font-weight: 400; color: #495057; margin-bottom: 40px; }
+        .cover-info { font-size: " . ($this->isArabic ? '18px' : '16px') . "; color: #495057; }
+        .cover-info strong { color: #0056b3; }
+        .cover-page::after {
             content: '';
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             right: 0;
-            bottom: 0;
-            background-image:
-                radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.2) 3px, transparent 3px),
-                radial-gradient(circle at 80% 35%, rgba(255, 255, 255, 0.15) 4px, transparent 4px),
-                radial-gradient(circle at 40% 70%, rgba(255, 255, 255, 0.2) 3px, transparent 3px);
-            background-size: 120px 120px, 180px 180px, 150px 150px;
-            opacity: 0.6;
-        }
-
-        .company-logo {
-            font-size: " . ($this->isArabic ? '28px' : '24px') . ";
-            font-weight: 600;
-            margin-bottom: 40px;
-            z-index: 10;
-            position: relative;
-            opacity: 0.9;
-        }
-
-        .cover-title {
-            font-size: " . ($this->isArabic ? '48px' : '56px') . ";
-            font-weight: 800;
-            line-height: 1.1;
-            margin-bottom: 24px;
-            z-index: 10;
-            position: relative;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-        }
-
-        .cover-subtitle {
-            font-size: " . ($this->isArabic ? '24px' : '28px') . ";
-            font-weight: 400;
-            opacity: 0.95;
-            z-index: 10;
-            position: relative;
-            margin-bottom: 40px;
-        }
-
-        .cover-date {
-            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
-            opacity: 0.8;
-            z-index: 10;
-            position: relative;
+            height: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
 
         /* Content pages */
-        .content-page {
-            padding: 60px;
-            text-align: {$textAlign};
-        }
-
-        .section-title {
-            font-size: " . ($this->isArabic ? '28px' : '32px') . ";
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 24px;
-            line-height: 1.3;
-        }
-
-        .section-subtitle {
-            font-size: " . ($this->isArabic ? '18px' : '16px') . ";
-            color: #546e7a;
-            margin-bottom: 32px;
-            line-height: " . ($this->isArabic ? '1.8' : '1.6') . ";
-        }
+        .content-page { padding: 60px; text-align: {$textAlign}; }
+        .section-title { font-size: " . ($this->isArabic ? '26px' : '28px') . "; font-weight: 700; color: #0056b3; margin-bottom: 24px; border-bottom: 2px solid #dee2e6; padding-bottom: 10px; }
+        .section-subtitle { font-size: 16px; color: #546e7a; margin-bottom: 32px; line-height: 1.7; }
 
         /* Overall results section */
-        .overall-results {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            border-radius: 16px;
-            padding: 40px;
-            margin: 22px 0;
-            text-align: center;
-            border: 1px solid #dee2e6;
-        }
+        .overall-results { background: #f8f9fa; border-radius: 12px; padding: 30px; margin: 20px 0; text-align: center; border: 1px solid #dee2e6; }
+        .overall-score { font-size: 60px; font-weight: 700; line-height: 1; margin-bottom: 10px; }
+        .certification-badge { display: inline-block; padding: 10px 20px; border-radius: 20px; font-size: 16px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+        .cert-excellent { background: #28a745; color: white; }
+        .cert-good { background: #007bff; color: white; }
+        .cert-satisfactory { background: #ffc107; color: #333; }
+        .cert-needs-improvement { background: #dc3545; color: white; }
 
-        .overall-score {
-            font-size: 64px;
-            font-weight: 600;
-            line-height: 1;
-            margin-bottom: 12px;
-        }
-
-        .certification-badge {
-            display: inline-block;
-            padding: 12px 24px;
-            border-radius: 25px;
-            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
-            font-weight: 700;
-            margin-bottom: 24px;
-            text-transform: " . ($this->isArabic ? 'none' : 'uppercase') . ";
-            letter-spacing: " . ($this->isArabic ? '0' : '1px') . ";
-        }
-
-        .cert-excellent { background: #4caf50; color: white; }
-        .cert-good { background: #2196f3; color: white; }
-        .cert-satisfactory { background: #ff9800; color: white; }
-        .cert-needs-improvement { background: #f44336; color: white; }
-
-        /* Statistics grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 24px;
-            margin: 32px 0;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 24px;
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #dee2e6;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .stat-number {
-            font-size: 36px;
-            font-weight: 800;
-            line-height: 1;
-            margin-bottom: 8px;
-        }
-
-        .stat-label {
-            font-size: " . ($this->isArabic ? '16px' : '14px') . ";
-            color: #6c757d;
-            font-weight: 500;
-        }
-
-        .stat-yes .stat-number { color: #28a745; }
-        .stat-no .stat-number { color: #dc3545; }
-        .stat-na .stat-number { color: #6c757d; }
-        .stat-total .stat-number { color: #007bff; }
+        /* Stats grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin: 32px 0; }
+        .stat-card { text-align: center; padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #e9ecef; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .stat-number { font-size: 32px; font-weight: 700; line-height: 1; margin-bottom: 6px; }
+        .stat-label { font-size: 13px; color: #6c757d; font-weight: 500; }
+        .stat-yes .stat-number { color: #28a745; } .stat-no .stat-number { color: #dc3545; } .stat-na .stat-number { color: #6c757d; } .stat-total .stat-number { color: #007bff; }
 
         /* Domain results */
-        .domains-overview {
-            margin: 40px 0;
-        }
-
-        .domain-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 14px;
-            padding: 24px;
-            background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
-            border-radius: 12px;
-            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #007bff;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-            " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . "
-        }
-
-        .domain-number {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 24px;
-            {$marginDirection}: 24px;
-            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.4);
-        }
-
-        .domain-content {
-            flex: 1;
-            text-align: {$textAlign};
-        }
-
-        .domain-title {
-            font-size: " . ($this->isArabic ? '22px' : '20px') . ";
-            font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 8px;
-        }
-
-        .domain-score {
-            font-size: 32px;
-            font-weight: 800;
-            margin-" . ($this->isArabic ? 'right' : 'left') . ": auto;
-            min-width: 100px;
-            text-align: " . ($this->isArabic ? 'left' : 'right') . ";
-        }
+        .domains-overview { margin: 40px 0; }
+        .domain-item { display: flex; align-items: center; margin-bottom: 12px; padding: 20px; background: #fff; border-radius: 8px; border-" . ($this->isArabic ? 'right' : 'left') . ": 5px solid; box-shadow: 0 2px 8px rgba(0,0,0,0.07); " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . " }
+        .domain-content { flex: 1; text-align: {$textAlign}; }
+        .domain-title { font-size: 18px; font-weight: 600; color: #343a40; }
+        .domain-score { font-size: 28px; font-weight: 700; margin-" . ($this->isArabic ? 'right' : 'left') . ": auto; min-width: 90px; text-align: " . ($this->isArabic ? 'left' : 'right') . "; }
 
         /* Individual domain pages */
-        .domain-page {
-            padding: 60px;
-            text-align: {$textAlign};
-        }
-
-        .domain-header {
-            display: flex;
-            align-items: center;
-            margin-bottom: 48px;
-            gap: 24px;
-            " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . "
-        }
-
-        .domain-icon {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 800;
-            font-size: 32px;
-            box-shadow: 0 8px 24px rgba(0, 123, 255, 0.4);
-        }
-
-        .domain-info {
-            flex: 1;
-        }
-
-        .domain-main-title {
-            font-size: " . ($this->isArabic ? '32px' : '36px') . ";
-            font-weight: 700;
-            color: #2c3e50;
-            line-height: 1.2;
-            margin-bottom: 8px;
-        }
-
-        .domain-percentage {
-            font-size: " . ($this->isArabic ? '26px' : '24px') . ";
-            font-weight: 600;
-            color: #6c757d;
-        }
+        .domain-page { padding: 60px; }
+        .domain-header { display: flex; align-items: center; margin-bottom: 40px; gap: 20px; " . ($this->isArabic ? 'flex-direction: row-reverse;' : '') . " }
+        .domain-icon { width: 60px; height: 60px; border-radius: 50%; background: #007bff; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 24px; }
+        .domain-info { flex: 1; }
+        .domain-main-title { font-size: " . ($this->isArabic ? '28px' : '32px') . "; font-weight: 700; color: #2c3e50; line-height: 1.2; }
 
         /* Progress bars */
-        .progress-section {
-            margin: 32px 0;
-        }
-
-        .progress-bar {
-            width: 100%;
-            height: 24px;
-            background: #e9ecef;
-            border-radius: 12px;
-            overflow: hidden;
-            margin: 16px 0;
-            direction: ltr; /* Progress bars always LTR */
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 12px;
-            position: relative;
-            transition: width 0.3s ease;
-        }
-
-        .progress-fill.excellent { background: linear-gradient(90deg, #28a745 0%, #20c997 100%); }
-        .progress-fill.good { background: linear-gradient(90deg, #007bff 0%, #6610f2 100%); }
-        .progress-fill.satisfactory { background: linear-gradient(90deg, #ffc107 0%, #fd7e14 100%); }
-        .progress-fill.needs-improvement { background: linear-gradient(90deg, #dc3545 0%, #e83e8c 100%); }
-
-        .progress-text {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-        }
+        .progress-bar { width: 100%; height: 20px; background: #e9ecef; border-radius: 10px; overflow: hidden; margin: 12px 0; direction: ltr; }
+        .progress-fill { height: 100%; border-radius: 10px; position: relative; text-align: right; }
+        .progress-fill.excellent { background: #28a745; } .progress-fill.good { background: #007bff; } .progress-fill.satisfactory { background: #ffc107; } .progress-fill.needs-improvement { background: #dc3545; }
+        .progress-text { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: white; font-weight: 600; font-size: 12px; }
 
         /* Domain details */
-        .domain-details {
+        .domain-details { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 32px; }
+        .detail-card { padding: 20px; border-radius: 8px; border: 1px solid #e9ecef; }
+        .card-title { font-size: 16px; font-weight: 700; color: #343a40; margin-bottom: 12px; }
+        .card-content { font-size: 14px; line-height: 1.7; color: #495057; }
+
+        /* UPDATED Vertical Bar Graph Styles */
+        .chart-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
-            margin: 32px 0;
+            grid-template-columns: 40px 1fr;
+            gap: 10px;
+            margin-top: 20px;
+            direction: ltr; /* Chart is always LTR */
         }
-
-        .detail-card {
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
-        }
-
-        .performance-card {
-            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #2196f3;
-        }
-
-        .breakdown-card {
-            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-            border-" . ($this->isArabic ? 'right' : 'left') . ": 6px solid #ff9800;
-        }
-
-        .card-title {
-            font-size: " . ($this->isArabic ? '20px' : '18px') . ";
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 16px;
-        }
-
-        .card-content {
-            font-size: " . ($this->isArabic ? '17px' : '15px') . ";
-            line-height: " . ($this->isArabic ? '1.8' : '1.6') . ";
-            color: #37474f;
-        }
-
-        /* Utility classes */
-        .text-center { text-align: center; }
-        .mb-2 { margin-bottom: 8px; }
-        .mb-4 { margin-bottom: 16px; }
-        .mb-6 { margin-bottom: 24px; }
-
-        /* Print optimization */
-        @media print {
-            body { margin: 0; }
-            .page { margin: 0; width: 100%; min-height: 100vh; }
-        }
-
-        /* RTL specific adjustments */
-        " . ($this->isArabic ? "
-        .domain-item {
+        .y-axis {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 160px;
             text-align: right;
+            padding-right: 5px;
+            font-size: 12px;
+            color: #6c757d;
         }
-
-        .domain-score {
-            margin-right: auto;
-            margin-left: 0;
-            text-align: left;
+        .vertical-chart-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-end;
+            height: 160px;
+            width: 100%;
+            border-left: 1px solid #dee2e6;
+            border-bottom: 1px solid #dee2e6;
+            padding: 0 10px;
         }
-
-        .progress-text {
-            right: auto;
-            left: 12px;
+        .chart-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            text-align: center;
         }
-        " : "") . "
+        .chart-bar {
+            width: 50px;
+            position: relative;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            border-radius: 4px 4px 0 0;
+        }
+        .bar-value {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+            padding-bottom: 4px;
+        }
+        .chart-label {
+            margin-top: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #495057;
+        }
         ";
     }
 
@@ -717,12 +432,26 @@ class AssessmentPDFService
      */
     private function generateCoverPage(): string
     {
+        $logoHtml = '';
+        if ($this->logoPath) {
+            $type = pathinfo($this->logoPath, PATHINFO_EXTENSION);
+            $data = file_get_contents($this->logoPath);
+            $base64 = 'data:image/' . $type . ';base64,' . base64_encode($data);
+            $logoHtml = "<img src='{$base64}' alt='Company Logo' class='cover-logo'>";
+        }
+
         return "
         <div class=\"page cover-page\">
-            <div class=\"company-logo\">{$this->data['company_name']}</div>
-            <div class=\"cover-title\">{$this->data['tool_name']}</div>
-            <div class=\"cover-subtitle\">{$this->t('assessment_results')}</div>
-            <div class=\"cover-date\">{$this->t('completed_on')} {$this->data['completion_date']}</div>
+            <div class=\"header\">{$logoHtml}</div>
+            <div class=\"main-content\">
+                <div class=\"cover-title\">{$this->data['tool_name']}</div>
+                <div class=\"cover-subtitle\">{$this->t('assessment_results')}</div>
+                <div class=\"cover-info\">
+                    <p><strong>{$this->t('for')}:</strong> {$this->data['company_name']}</p>
+                    <p><strong>{$this->t('completed_on')}:</strong> {$this->data['completion_date']}</p>
+                </div>
+            </div>
+            <div class=\"footer\">{$this->t('confidential_report')}</div>
         </div>";
     }
 
@@ -732,15 +461,15 @@ class AssessmentPDFService
     private function generateSummaryPage(): string
     {
         $domainsHTML = '';
-        foreach ($this->data['domain_results'] as $index => $domain) {
+        foreach ($this->data['domain_results'] as $domain) {
+            $scoreColor = $this->getScoreColor($domain['score_percentage']);
             $domainsHTML .= "
-                <div class=\"domain-item\">
-                    <div class=\"domain-number\">" . ($index + 1) . "</div>
+                <div class=\"domain-item\" style=\"border-color: {$scoreColor};\">
                     <div class=\"domain-content\">
                         <div class=\"domain-title\">{$domain['domain_name']}</div>
                     </div>
-                    <div class=\"domain-score\" style=\"color: {$this->getScoreColor($domain['score_percentage'])};\">
-                        " . number_format($domain['score_percentage'], 1) . "%
+                    <div class=\"domain-score\" style=\"color: {$scoreColor};\">
+                        " . round($domain['score_percentage']) . "%
                     </div>
                 </div>";
         }
@@ -749,23 +478,19 @@ class AssessmentPDFService
         <div class=\"page content-page\">
             <div class=\"section-title\">{$this->t('assessment_results')}</div>
             <div class=\"section-subtitle\">
-                {$this->t('assessment_completed_by')} {$this->data['assessment_name']} ({$this->data['assessment_email']})
-                {$this->t('for')} {$this->data['company_name']} {$this->t('using_tool')} {$this->data['tool_name']} {$this->t('assessment_tool')}.
+                {$this->t('assessment_completed_by')} <strong>{$this->data['assessment_name']}</strong> ({$this->data['assessment_email']})
+                {$this->t('for')} <strong>{$this->data['company_name']}</strong>.
             </div>
-
             <div class=\"overall-results\">
                 <div class=\"overall-score\" style=\"color: {$this->data['certification_color']};\">
-                    " . number_format($this->data['overall_percentage'], 1) . "%
+                    " . round($this->data['overall_percentage']) . "%
                 </div>
                 <div class=\"certification-badge cert-{$this->data['certification_level']}\">
                     {$this->data['certification_text']}
                 </div>
             </div>
-
             <div class=\"section-title\">{$this->t('domain_performance_overview')}</div>
-            <div class=\"domains-overview\">
-                {$domainsHTML}
-            </div>
+            <div class=\"domains-overview\">{$domainsHTML}</div>
         </div>";
     }
 
@@ -775,11 +500,9 @@ class AssessmentPDFService
     private function generateDomainPages(): string
     {
         $pagesHTML = '';
-
         foreach ($this->data['domain_results'] as $index => $domain) {
             $pagesHTML .= $this->generateDomainPage($domain, $index + 1);
         }
-
         return $pagesHTML;
     }
 
@@ -791,79 +514,85 @@ class AssessmentPDFService
         $scoreClass = $this->getScoreClass($domain['score_percentage']);
         $scoreColor = $this->getScoreColor($domain['score_percentage']);
 
+        // Calculate height percentages for the vertical bar graph.
+        $maxHeightValue = $domain['applicable_criteria'] > 0 ? $domain['applicable_criteria'] : 1;
+        $yesHeightPercent = ($domain['yes_count'] / $maxHeightValue) * 100;
+        $noHeightPercent = ($domain['no_count'] / $maxHeightValue) * 100;
+        $naHeightPercent = ($domain['na_count'] / $maxHeightValue) * 100;
+
+        // Generate Y-axis labels
+        $yAxisLabels = '';
+        for ($i = 4; $i >= 0; $i--) {
+            $value = round(($maxHeightValue / 4) * $i);
+            $yAxisLabels .= "<div>{$value}</div>";
+        }
+
+        $responseBreakdownHtml = "
+            <div class='chart-grid'>
+                <div class='y-axis'>{$yAxisLabels}</div>
+                <div class='vertical-chart-container'>
+                    <div class='chart-column'>
+                        <div class='chart-bar' style='height: {$yesHeightPercent}%; background-color: #4CAF50;'>
+                            <span class='bar-value'>{$domain['yes_count']}</span>
+                        </div>
+                        <div class='chart-label'>{$this->t('yes')}</div>
+                    </div>
+                    <div class='chart-column'>
+                        <div class='chart-bar' style='height: {$noHeightPercent}%; background-color: #F44336;'>
+                            <span class='bar-value'>{$domain['no_count']}</span>
+                        </div>
+                        <div class='chart-label'>{$this->t('no')}</div>
+                    </div>
+                    <div class='chart-column'>
+                        <div class='chart-bar' style='height: {$naHeightPercent}%; background-color: #9E9E9E;'>
+                            <span class='bar-value'>{$domain['na_count']}</span>
+                        </div>
+                        <div class='chart-label'>{$this->t('not_applicable')}</div>
+                    </div>
+                </div>
+            </div>
+        ";
+
         return "
         <div class=\"page domain-page\">
             <div class=\"domain-header\">
                 <div class=\"domain-icon\">{$domainNumber}</div>
                 <div class=\"domain-info\">
                     <div class=\"domain-main-title\">{$domain['domain_name']}</div>
-                    <div class=\"domain-percentage\">{$this->t('score')}: " . number_format($domain['score_percentage'], 1) . "%</div>
                 </div>
             </div>
-
-            <div class=\"progress-section\">
-                <div class=\"progress-bar\">
-                    <div class=\"progress-fill {$scoreClass}\" style=\"width: {$domain['score_percentage']}%;\">
-                        <div class=\"progress-text\">" . number_format($domain['score_percentage'], 1) . "%</div>
-                    </div>
+            <div class=\"progress-bar\">
+                <div class=\"progress-fill {$scoreClass}\" style=\"width: {$domain['score_percentage']}%;\">
+                    <div class=\"progress-text\">" . round($domain['score_percentage']) . "%</div>
                 </div>
             </div>
-
             <div class=\"domain-details\">
-                <div class=\"detail-card performance-card\">
+                <div class=\"detail-card\">
                     <div class=\"card-title\">{$this->t('performance_analysis')}</div>
                     <div class=\"card-content\">
-                        <p>{$this->t('this_domain_achieved')} <strong>" . number_format($domain['score_percentage'], 1) . "%</strong>،
-                        {$this->t('which_is_considered')} <strong>" . $this->getPerformanceLevel($domain['score_percentage']) . "</strong>.</p>
-
-                        <p class=\"mb-4\">{$this->t('based_on_criteria')} {$domain['applicable_criteria']} {$this->t('applicable_criteria')} {$domain['total_criteria']} {$this->t('total_criteria')}.</p>
-
-                        " . $this->getPerformanceRecommendation($domain['score_percentage']) . "
+                        <p>{$this->t('this_domain_achieved')} <strong style=\"color:{$scoreColor}\">" . round($domain['score_percentage']) . "%</strong>, {$this->t('which_is_considered')} <strong>" . $this->getPerformanceLevel($domain['score_percentage']) . "</strong>.</p>
+                        <p>{$this->getPerformanceRecommendation($domain['score_percentage'])}</p>
                     </div>
                 </div>
-
-                <div class=\"detail-card breakdown-card\">
+                <div class=\"detail-card\">
                     <div class=\"card-title\">{$this->t('response_breakdown')}</div>
                     <div class=\"card-content\">
-                        <div class=\"stats-grid\" style=\"grid-template-columns: 1fr 1fr; gap: 16px;\">
-                            <div class=\"stat-card stat-yes\">
-                                <div class=\"stat-number\">{$domain['yes_count']}</div>
-                                <div class=\"stat-label\">{$this->t('yes')}</div>
-                            </div>
-                            <div class=\"stat-card stat-no\">
-                                <div class=\"stat-number\">{$domain['no_count']}</div>
-                                <div class=\"stat-label\">{$this->t('no')}</div>
-                            </div>
-                        </div>
-
-                        <p style=\"margin-top: 16px; text-align: center; color: #6c757d;\">
-                            {$domain['na_count']} {$this->t('criteria_marked_na')}
-                        </p>
+                        {$responseBreakdownHtml}
                     </div>
                 </div>
             </div>
         </div>";
     }
 
-    /**
-     * Get certification info based on percentage
-     */
+    // --- Helper Methods ---
     private function getCertificationInfo(float $percentage): array
     {
-        if ($percentage >= 90) {
-            return ['level' => 'excellent', 'color' => '#28a745', 'text' => $this->t('excellent_performance')];
-        } elseif ($percentage >= 75) {
-            return ['level' => 'good', 'color' => '#007bff', 'text' => $this->t('good_performance')];
-        } elseif ($percentage >= 60) {
-            return ['level' => 'satisfactory', 'color' => '#ffc107', 'text' => $this->t('satisfactory_performance')];
-        } else {
-            return ['level' => 'needs-improvement', 'color' => '#dc3545', 'text' => $this->t('needs_improvement')];
-        }
+        if ($percentage >= 90) return ['level' => 'excellent', 'color' => '#28a745', 'text' => $this->t('excellent_performance')];
+        if ($percentage >= 75) return ['level' => 'good', 'color' => '#007bff', 'text' => $this->t('good_performance')];
+        if ($percentage >= 60) return ['level' => 'satisfactory', 'color' => '#ffc107', 'text' => $this->t('satisfactory_performance')];
+        return ['level' => 'needs-improvement', 'color' => '#dc3545', 'text' => $this->t('needs_improvement')];
     }
 
-    /**
-     * Get score class for styling
-     */
     private function getScoreClass(float $percentage): string
     {
         if ($percentage >= 90) return 'excellent';
@@ -872,9 +601,6 @@ class AssessmentPDFService
         return 'needs-improvement';
     }
 
-    /**
-     * Get score color
-     */
     private function getScoreColor(float $percentage): string
     {
         if ($percentage >= 90) return '#28a745';
@@ -883,9 +609,6 @@ class AssessmentPDFService
         return '#dc3545';
     }
 
-    /**
-     * Get performance level text
-     */
     private function getPerformanceLevel(float $percentage): string
     {
         if ($percentage >= 90) return $this->t('excellent');
@@ -894,70 +617,35 @@ class AssessmentPDFService
         return $this->t('needing_improvement');
     }
 
-    /**
-     * Get performance recommendation
-     */
     private function getPerformanceRecommendation(float $percentage): string
     {
-        $recommendation = '';
-        if ($percentage >= 90) {
-            $recommendation = $this->t('outstanding_recommendation');
-        } elseif ($percentage >= 75) {
-            $recommendation = $this->t('good_recommendation');
-        } elseif ($percentage >= 60) {
-            $recommendation = $this->t('satisfactory_recommendation');
-        } else {
-            $recommendation = $this->t('poor_recommendation');
-        }
-
-        return '<p><strong>' . $this->t('recommendation') . ':</strong> ' . $recommendation . '</p>';
+        if ($percentage >= 90) $rec = $this->t('outstanding_recommendation');
+        elseif ($percentage >= 75) $rec = $this->t('good_recommendation');
+        elseif ($percentage >= 60) $rec = $this->t('satisfactory_recommendation');
+        else $rec = $this->t('poor_recommendation');
+        return '<p><strong>' . $this->t('recommendation') . ':</strong> ' . $rec . '</p>';
     }
 
-    /**
-     * Generate filename based on assessment data
-     */
     private function generateFilename(): string
     {
-        $toolName = preg_replace('/[^A-Za-z0-9_\u0600-\u06FF-]/', '_', $this->data['tool_name']);
-        $companyName = preg_replace('/[^A-Za-z0-9_\u0600-\u06FF-]/', '_', $this->data['company_name']);
-        $date = now()->format('Y-m-d');
-        $lang = $this->language;
-
-        return "{$toolName}_{$companyName}_Assessment_Results_{$date}_{$lang}.pdf";
+        $toolName = preg_replace('/[^A-Za-z0-9_\x{0600}-\x{06FF}-]/u', '_', $this->data['tool_name']);
+        $companyName = preg_replace('/[^A-Za-z0-9_\x{0600}-\x{06FF}-]/u', '_', $this->data['company_name']);
+        return "{$toolName}_{$companyName}_Results_{$this->language}.pdf";
     }
 
-    /**
-     * Helper method to find Chrome path
-     */
     private function getChromePath(): ?string
     {
-        $paths = [
-            '/usr/bin/google-chrome-stable',
-            '/usr/bin/google-chrome',
-            '/usr/bin/chromium-browser',
-            '/usr/bin/chromium',
-            '/snap/bin/chromium',
-            '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome',
-            '/Applications/Chromium.app/Contents/MacOS/Chromium',
-        ];
-
+        $paths = ['/usr/bin/google-chrome-stable', '/usr/bin/google-chrome', '/usr/bin/chromium-browser', '/usr/bin/chromium', '/snap/bin/chromium', '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/Applications/Chromium.app/Contents/MacOS/Chromium'];
         if (PHP_OS_FAMILY === 'Windows') {
             $paths[] = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
             $paths[] = 'C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe';
         }
-
         foreach ($paths as $path) {
-            if (file_exists($path) && is_executable($path)) {
-                return $path;
-            }
+            if (file_exists($path) && is_executable($path)) return $path;
         }
-
         return null;
     }
 
-    /**
-     * Allow manual data override
-     */
     public function setData(array $data): void
     {
         $this->data = array_merge($this->data, $data);
