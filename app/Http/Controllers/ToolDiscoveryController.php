@@ -75,10 +75,10 @@ class ToolDiscoveryController extends Controller
             'tool_subscriptions' => [],
         ];
 
+
         return Inertia::render('ToolDiscover', [
             'tools' => $tools,
             'user' => $userInfo,
-            'message' => 'hiii',
             'locale' => app()->getLocale(),
         ]);
     }

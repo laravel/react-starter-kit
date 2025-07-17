@@ -1,12 +1,6 @@
 <?php
 
-/**
- * File Location: app/Http/Controllers/AssessmentPDFController.php
- *
- * This controller handles PDF generation for assessment results.
- * It works dynamically with any tool and generates professional PDF reports.
- * Now supports bilingual PDF generation (EN/AR).
- */
+
 
 namespace App\Http\Controllers;
 

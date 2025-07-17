@@ -137,7 +137,7 @@ const ToolCard = ({ tool, t, getName, getDescription }: { tool: Tool, t: any, ge
 
 
 // --- MAIN COMPONENT ---
-export default function ToolsDiscover({ user, tools = [], message }: ToolsDiscoverProps) {
+export default function ToolsDiscover({ user, tools = [] }: ToolsDiscoverProps) {
     const { language } = useLanguage();
     const isArabic = language === 'ar';
     const t = translations[language];
@@ -162,12 +162,7 @@ export default function ToolsDiscover({ user, tools = [], message }: ToolsDiscov
                 />
 
                 <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-24">
-                    {message && (
-                        <div className="bg-green-100 border-l-4 border-green-500 text-green-800 p-4 rounded-r-lg mb-12 rtl:border-l-0 rtl:border-r-4 rtl:rounded-r-none rtl:rounded-l-lg" role="alert">
-                            <p className="font-bold">Success</p>
-                            <p>{message}</p>
-                        </div>
-                    )}
+
 
                     <div className="text-center mb-16">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-gray-900 tracking-tighter mb-4">

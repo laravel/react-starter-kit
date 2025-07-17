@@ -369,61 +369,15 @@ class AssessmentPDFService
         .card-title { font-size: 16px; font-weight: 700; color: #343a40; margin-bottom: 12px; }
         .card-content { font-size: 14px; line-height: 1.7; color: #495057; }
 
-        /* UPDATED Vertical Bar Graph Styles */
-        .chart-grid {
-            display: grid;
-            grid-template-columns: 40px 1fr;
-            gap: 10px;
-            margin-top: 20px;
-            direction: ltr; /* Chart is always LTR */
-        }
-        .y-axis {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            height: 160px;
-            text-align: right;
-            padding-right: 5px;
-            font-size: 12px;
-            color: #6c757d;
-        }
-        .vertical-chart-container {
-            display: flex;
-            justify-content: space-around;
-            align-items: flex-end;
-            height: 160px;
-            width: 100%;
-            border-left: 1px solid #dee2e6;
-            border-bottom: 1px solid #dee2e6;
-            padding: 0 10px;
-        }
-        .chart-column {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            flex: 1;
-            text-align: center;
-        }
-        .chart-bar {
-            width: 50px;
-            position: relative;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            border-radius: 4px 4px 0 0;
-        }
-        .bar-value {
-            color: white;
-            font-size: 12px;
-            font-weight: bold;
-            padding-bottom: 4px;
-        }
-        .chart-label {
-            margin-top: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            color: #495057;
-        }
+        /* NEW Bar Graph Styles */
+        .response-bar { display: flex; width: 100%; height: 24px; border-radius: 12px; overflow: hidden; background-color: #e9ecef; margin-bottom: 12px; }
+        .bar-segment { height: 100%; float: left; }
+        .bar-segment-yes { background-color: #28a745; }
+        .bar-segment-no { background-color: #dc3545; }
+        .bar-segment-na { background-color: #6c757d; }
+        .bar-legend { display: flex; justify-content: center; gap: 20px; margin-top: 16px; font-size: 12px; }
+        .legend-item { display: flex; align-items: center; gap: 6px; }
+        .legend-color { width: 12px; height: 12px; border-radius: 3px; }
         ";
     }
 
@@ -514,42 +468,22 @@ class AssessmentPDFService
         $scoreClass = $this->getScoreClass($domain['score_percentage']);
         $scoreColor = $this->getScoreColor($domain['score_percentage']);
 
-        // Calculate height percentages for the vertical bar graph.
-        $maxHeightValue = $domain['applicable_criteria'] > 0 ? $domain['applicable_criteria'] : 1;
-        $yesHeightPercent = ($domain['yes_count'] / $maxHeightValue) * 100;
-        $noHeightPercent = ($domain['no_count'] / $maxHeightValue) * 100;
-        $naHeightPercent = ($domain['na_count'] / $maxHeightValue) * 100;
-
-        // Generate Y-axis labels
-        $yAxisLabels = '';
-        for ($i = 4; $i >= 0; $i--) {
-            $value = round(($maxHeightValue / 4) * $i);
-            $yAxisLabels .= "<div>{$value}</div>";
-        }
+        // Calculate percentages for the bar graph
+        $totalResponses = $domain['yes_count'] + $domain['no_count'] + $domain['na_count'];
+        $yesPercent = $totalResponses > 0 ? ($domain['yes_count'] / $totalResponses) * 100 : 0;
+        $noPercent = $totalResponses > 0 ? ($domain['no_count'] / $totalResponses) * 100 : 0;
+        $naPercent = $totalResponses > 0 ? ($domain['na_count'] / $totalResponses) * 100 : 0;
 
         $responseBreakdownHtml = "
-            <div class='chart-grid'>
-                <div class='y-axis'>{$yAxisLabels}</div>
-                <div class='vertical-chart-container'>
-                    <div class='chart-column'>
-                        <div class='chart-bar' style='height: {$yesHeightPercent}%; background-color: #4CAF50;'>
-                            <span class='bar-value'>{$domain['yes_count']}</span>
-                        </div>
-                        <div class='chart-label'>{$this->t('yes')}</div>
-                    </div>
-                    <div class='chart-column'>
-                        <div class='chart-bar' style='height: {$noHeightPercent}%; background-color: #F44336;'>
-                            <span class='bar-value'>{$domain['no_count']}</span>
-                        </div>
-                        <div class='chart-label'>{$this->t('no')}</div>
-                    </div>
-                    <div class='chart-column'>
-                        <div class='chart-bar' style='height: {$naHeightPercent}%; background-color: #9E9E9E;'>
-                            <span class='bar-value'>{$domain['na_count']}</span>
-                        </div>
-                        <div class='chart-label'>{$this->t('not_applicable')}</div>
-                    </div>
-                </div>
+            <div class='response-bar'>
+                <div class='bar-segment bar-segment-yes' style='width: {$yesPercent}%;'></div>
+                <div class='bar-segment bar-segment-no' style='width: {$noPercent}%;'></div>
+                <div class='bar-segment bar-segment-na' style='width: {$naPercent}%;'></div>
+            </div>
+            <div class='bar-legend'>
+                <div class='legend-item'><div class='legend-color' style='background-color: #28a745;'></div>{$this->t('yes')} ({$domain['yes_count']})</div>
+                <div class='legend-item'><div class='legend-color' style='background-color: #dc3545;'></div>{$this->t('no')} ({$domain['no_count']})</div>
+                <div class='legend-item'><div class='legend-color' style='background-color: #6c757d;'></div>{$this->t('not_applicable')} ({$domain['na_count']})</div>
             </div>
         ";
 
