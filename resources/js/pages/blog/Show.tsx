@@ -5,7 +5,14 @@ import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import { BlogComment, BlogPost } from '@/types/blog';
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, MessageSquare } from 'lucide-react';
+import {
+    ArrowLeft,
+    MessageSquare,
+    FileText,
+    FileSpreadsheet,
+    FileArchive,
+    File,
+} from 'lucide-react';
 
 interface Props {
     post: BlogPost;
@@ -60,6 +67,89 @@ export default function BlogShow({ post, comments, isLiked, canComment }: Props)
                             {post.read_time && <span className="text-sm">{post.read_time} min read</span>}
                         </div>
                     </header>
+
+                    {/* --- Media Sections --- */}
+                    <div className="space-y-10 my-8">
+                        {/* Images Section */}
+                        {(post.image_gallery_urls || post.image_gallery) &&
+                            (post.image_gallery_urls?.length || post.image_gallery?.length) && (
+                                <section>
+                                    <h2 className="mb-4 text-2xl font-bold">Images</h2>
+                                    <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-3">
+                                        {(post.image_gallery_urls || post.image_gallery)!.map((img: string, idx: number) => (
+                                            <img
+                                                key={idx}
+                                                src={img}
+                                                alt={`Image ${idx + 1}`}
+                                                className="rounded-lg object-cover w-full"
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+
+                        {/* Audio Section */}
+                        {post.audio && (
+                            <section>
+                                <h2 className="mb-4 text-2xl font-bold">Audio</h2>
+                                <audio controls className="w-full rounded">
+                                    <source src={post.audio} />
+                                </audio>
+                            </section>
+                        )}
+
+                        {/* Video Section */}
+                        {(post.video || post.youtube_url) && (
+                            <section>
+                                <h2 className="mb-4 text-2xl font-bold">Video</h2>
+                                {post.video && (
+                                    <video controls className="w-full rounded mb-4">
+                                        <source src={post.video} />
+                                    </video>
+                                )}
+                                {post.youtube_url && (
+                                    <div className="aspect-video">
+                                        <iframe
+                                            src={post.youtube_url}
+                                            className="h-full w-full rounded"
+                                            allowFullScreen
+                                            title="Video player"
+                                        />
+                                    </div>
+                                )}
+                            </section>
+                        )}
+
+                        {/* Files Section */}
+                        {post.attachments && post.attachments.length > 0 && (
+                            <section>
+                                <h2 className="mb-4 text-2xl font-bold">Files</h2>
+                                <ul className="grid gap-2">
+                                    {post.attachments.map((file, idx) => {
+                                        const ext = file.split('.').pop()?.toLowerCase();
+                                        let Icon = File;
+                                        if (ext && ['doc', 'docx'].includes(ext)) Icon = FileText;
+                                        else if (ext && ['xls', 'xlsx'].includes(ext)) Icon = FileSpreadsheet;
+                                        else if (ext && ['ppt', 'pptx'].includes(ext)) Icon = FileArchive;
+                                        else if (ext === 'pdf') Icon = FileText;
+                                        const name = file.split('/').pop();
+                                        return (
+                                            <li key={idx}>
+                                                <a
+                                                    href={file.startsWith('http') ? file : `/storage/${file}`}
+                                                    className="flex items-center gap-2 rounded hover:underline"
+                                                    download
+                                                >
+                                                    <Icon className="h-5 w-5" />
+                                                    <span>{name}</span>
+                                                </a>
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            </section>
+                        )}
+                    </div>
 
                     {/* --- Main Content (Requires @tailwindcss/typography) --- */}
                     <div

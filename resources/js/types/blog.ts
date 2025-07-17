@@ -10,6 +10,12 @@ export interface BlogPost {
     content: string;
     content_ar?: string;
     featured_image?: string;
+    thumbnail_url?: string;
+    image_gallery_urls?: string[];
+    audio?: string | null;
+    video?: string | null;
+    youtube_url?: string | null;
+    attachments?: string[];
     status: 'draft' | 'published' | 'archived';
     tags?: string[];
     meta_data?: Record<string, any>;
