@@ -91,10 +91,11 @@ Route::post('/tool-requests', [ToolRequestController::class, 'store'])->name('to
 Route::post('/guest/assessments/{assessment}/reports/generate', [AssessmentPDFController::class, 'downloadGuestReport'])
     ->middleware(['throttle:10,1']);
 
+
 // Blog posts
-Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
-Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
-Route::post('/posts/{post:slug}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
+    Route::get('/posts', [PostController::class, 'index'])->name('posts.index');
+    Route::get('/posts/{post:slug}', [PostController::class, 'show'])->name('posts.show');
+    Route::post('/posts/{post:slug}/comments', [PostController::class, 'storeComment'])->name('posts.comments.store');
 
 // Paddle webhooks (no auth middleware)
 Route::post('/paddle/webhook', [PaddleWebhookController::class, 'handleWebhook'])
