@@ -29,40 +29,40 @@ use Inertia\Inertia;
 // PUBLIC HOME ROUTE - UPDATED FOR PROPER REDIRECT LOGIC
 // ========================================
 
-Route::get('/', function () {
-    if (auth()->check()) {
-        $user = auth()->user();
-
-        // Load user relationships
-        $user->load(['subscription', 'details', 'roles']);
-
-        // Create default subscription/details if missing
-        if (!$user->subscription || !$user->details) {
-            $user->createDefaultSubscriptionAndDetails();
-            $user->refresh();
-        }
-
-        // FIXED REDIRECT LOGIC:
-        // 1. Admin users -> dashboard
-        if ($user->isAdmin()) {
-            return redirect()->route('dashboard');
-        }
-
-        // 2. Users with tool subscriptions (premium) -> dashboard
-        if ($user->hasAnyToolSubscription()) {
-            return redirect()->route('dashboard');
-        }
-
-        // 3. Free users -> tools discovery page to browse available tools
-        return redirect()->route('tools.discover');
-    }
-
-    // Guest users see welcome page
-    return app(GuestAssessmentController::class)->index2();
-})->name('home');
+//Route::get('/', function () {
+//    if (auth()->check()) {
+//        $user = auth()->user();
+//
+//        // Load user relationships
+//        $user->load(['subscription', 'details', 'roles']);
+//
+//        // Create default subscription/details if missing
+//        if (!$user->subscription || !$user->details) {
+//            $user->createDefaultSubscriptionAndDetails();
+//            $user->refresh();
+//        }
+//
+//        // FIXED REDIRECT LOGIC:
+//        // 1. Admin users -> dashboard
+//        if ($user->isAdmin()) {
+//            return redirect()->route('dashboard');
+//        }
+//
+//        // 2. Users with tool subscriptions (premium) -> dashboard
+//        if ($user->hasAnyToolSubscription()) {
+//            return redirect()->route('dashboard');
+//        }
+//
+//        // 3. Free users -> tools discovery page to browse available tools
+//        return redirect()->route('tools.discover');
+//    }
+//
+//    // Guest users see welcome page
+//    return app(GuestAssessmentController::class)->index2();
+//})->name('home');
 
 // Alternative home route for compatibility
-Route::get('/home', [GuestAssessmentController::class, 'index2'])->name('home2');
+Route::get('/', [GuestAssessmentController::class, 'index2'])->name('home');
 
 // ========================================
 // PUBLIC GUEST ROUTES
