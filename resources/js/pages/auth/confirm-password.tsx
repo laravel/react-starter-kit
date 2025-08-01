@@ -8,11 +8,26 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import MainCard from '@/components/MainCard';
+
+import Image from 'react-bootstrap/Image';
+
+import useConfig from '@/hooks/useConfig';
+import { ThemeMode } from '@/config';
+import { getResolvedTheme, setResolvedTheme } from '@/components/setResolvedTheme';
+
+import LightLogo from '@assets/images/logo-white.svg';
+import DarkLogo from '@assets/images/logo-dark.svg';
 
 export default function ConfirmPassword() {
     const { data, setData, post, processing, errors, reset } = useForm<Required<{ password: string }>>({
         password: '',
     });
+    const { mode } = useConfig();
+    const resolvedTheme = getResolvedTheme(mode);
+    setResolvedTheme(mode);
+
+    const logo = resolvedTheme === ThemeMode.DARK ? LightLogo : DarkLogo;
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
@@ -23,38 +38,57 @@ export default function ConfirmPassword() {
     };
 
     return (
-        <AuthLayout
-            title="Confirm your password"
-            description="This is a secure area of the application. Please confirm your password before continuing."
-        >
+        <AuthLayout>
             <Head title="Confirm password" />
+            <div className="auth-main">
+                <div className="auth-wrapper v1">
+                    <div className="auth-form">
+                        <div className="position-relative">
+                            <div className="auth-bg">
+                                <span className="r"></span>
+                                <span className="r s"></span>
+                                <span className="r s"></span>
+                                <span className="r"></span>
+                            </div>
+                            <MainCard className="mb-0">
+                                <div className="text-center">
+                                    <a>
+                                        <Image src={logo} alt="img" />
+                                    </a>
+                                </div>
+                                <h4 className={`text-center f-w-500 mt-4 mb-3`}>Confirm password</h4>
+                                <form onSubmit={submit}>
+                                    <div className="space-y-6">
+                                        <div className="d-flex flex-column gap-2 mb-3">
+                                            <Input
+                                                id="password"
+                                                type="password"
+                                                name="password"
+                                                placeholder="Password"
+                                                autoComplete="current-password"
+                                                value={data.password}
+                                                className='form-control'
+                                                autoFocus
+                                                onChange={(e) => setData('password', e.target.value)}
+                                            />
 
-            <form onSubmit={submit}>
-                <div className="space-y-6">
-                    <div className="grid gap-2">
-                        <Label htmlFor="password">Password</Label>
-                        <Input
-                            id="password"
-                            type="password"
-                            name="password"
-                            placeholder="Password"
-                            autoComplete="current-password"
-                            value={data.password}
-                            autoFocus
-                            onChange={(e) => setData('password', e.target.value)}
-                        />
+                                            <InputError message={errors.password} />
+                                        </div>
 
-                        <InputError message={errors.password} />
-                    </div>
+                                        <div className="text-center mt-4">
+                                            <Button className="btn btn-primary shadow px-sm-4" disabled={processing}>
+                                                {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
+                                                Confirm password
+                                            </Button>
+                                        </div>
 
-                    <div className="flex items-center">
-                        <Button className="w-full" disabled={processing}>
-                            {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
-                            Confirm password
-                        </Button>
+                                    </div>
+                                </form>
+                            </MainCard>
+                        </div>
                     </div>
                 </div>
-            </form>
+            </div>
         </AuthLayout>
     );
 }

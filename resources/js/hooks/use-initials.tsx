@@ -1,7 +1,7 @@
 import { useCallback } from 'react';
 
 export function useInitials() {
-    const getInitials = useCallback((fullName: string): string => {
+    return useCallback((fullName: string): string => {
         const names = fullName.trim().split(' ');
 
         if (names.length === 0) return '';
@@ -12,6 +12,4 @@ export function useInitials() {
 
         return `${firstInitial}${lastInitial}`.toUpperCase();
     }, []);
-
-    return getInitials;
 }

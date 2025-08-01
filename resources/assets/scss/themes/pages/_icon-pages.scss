@@ -1,0 +1,36 @@
+/**  =====================
+  23. Icon layouts css start
+==========================  **/
+
+.i-main {
+  .i-block {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 70px;
+    height: 70px;
+    margin: 5px;
+    border: 1px solid $border-color;
+    border-radius: var(--bs-border-radius);
+    position: relative;
+    cursor: pointer;
+
+    i {
+      font-size: 30px;
+    }
+
+    label {
+      margin-bottom: 0;
+      display: none;
+    }
+
+    span.ic-badge {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+    }
+  }
+}
+/**  =====================
+  23. Icon layouts css end
+==========================  **/

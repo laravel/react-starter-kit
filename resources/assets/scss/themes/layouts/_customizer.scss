@@ -1,0 +1,291 @@
+/**  =====================
+  36. Customizer css start
+==========================  **/
+// main framework
+.pct-c-btn {
+  display: block;
+  padding: 0px;
+  border: 4px solid var(--bs-primary);
+  border-right: none;
+  position: fixed;
+  overflow: hidden;
+  right: -4px;
+  top: 100px;
+  z-index: 1030;
+  transition: all 0.15s ease-in-out;
+  border-radius: 50% 0px 0px 50%;
+  box-shadow: -6px 0px 14px 1px rgba(27, 46, 94, 0.04);
+  background: var(--bs-primary);
+
+  a {
+    display: block;
+    padding: 8px 10px;
+    transition: all 0.08s cubic-bezier(0.37, 0.24, 0.53, 0.99);
+
+    i {
+      font-size: 24px;
+      display: block;
+      animation: anim-rotate 2.5s infinite linear;
+      line-height: 24px;
+      color: #fff;
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+  }
+
+  @media (max-width: 1024px) {
+    display: none;
+  }
+}
+
+@keyframes anim-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
+}
+.pct-tabs {
+  background: rgba(var(--bs-primary-rgb), 0.06);
+  border-top: 1px solid var(--bs-border-color);
+  border-bottom: 1px solid var(--bs-border-color);
+
+  .nav-link {
+    border-radius: 0px;
+    background: transparent;
+    font-size: 24px;
+    border: none;
+    color: var(--bs-body-color);
+    position: relative;
+    padding: 12px 16px;
+
+    &::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 1px;
+      height: 0;
+      background: var(--bs-primary);
+    }
+  }
+
+  .nav-link.active,
+  .nav-item.show .nav-link {
+    background: rgba(255, 255, 255, 0.5);
+    color: var(--bs-primary);
+
+    &::after {
+      height: 2px;
+    }
+  }
+}
+
+.pct-offcanvas {
+  --bs-offcanvas-width: 360px;
+  --bs-offcanvas-zindex: 1079;
+
+  transition: transform 0.45s cubic-bezier(0.37, 0.24, 0.53, 0.99);
+  box-shadow: 8px 0 14px rgba(27, 46, 94, 0.4);
+
+  ~ .offcanvas-backdrop {
+    opacity: 0.2;
+  }
+
+  .offcanvas-body {
+    padding: 25px;
+    overflow: visible;
+  }
+
+  .avatar.avatar-xs {
+    width: 36px;
+    height: 36px;
+  }
+
+  .list-group-item {
+    padding: 20px 0;
+
+    > div > .pct-content,
+    a.btn {
+      padding: var(--bs-list-group-item-padding-y) var(--bs-list-group-item-padding-x);
+    }
+  }
+}
+
+.preset-btn {
+  height: 54px;
+  width: 54px;
+  border: 2px solid var(--bs-gray-300);
+  --bs-btn-active-border-color: var(--bs-gray-300);
+
+  &:hover {
+    border-color: var(--bs-primary);
+  }
+
+  &:active,
+  &.active {
+    border-color: var(--bs-primary);
+  }
+
+  &.btn-img {
+    height: auto;
+    border-radius: var(--bs-border-radius);
+
+    img {
+      width: 100%;
+    }
+  }
+}
+
+.theme-color {
+  display: flex;
+  position: relative;
+  padding: 0;
+
+  > a {
+    position: relative;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    overflow: hidden;
+    margin-right: 4px;
+    width: 25px;
+    height: 45px;
+    flex: none;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      right: 5px;
+      bottom: 5px;
+      border-radius: 3px;
+      background: rgba(255, 255, 255, 0.3);
+      z-index: 1;
+      transform: scale(0);
+      transition: all 0.15s ease-in-out;
+    }
+
+    i {
+      font-size: 26px;
+      color: #fff;
+      transform: scale(0);
+      transition: all 0.15s ease-in-out;
+
+      &::before {
+        position: relative;
+        z-index: 5;
+      }
+    }
+
+    &:hover {
+      &::after {
+        transform: scale(1);
+      }
+    }
+
+    &.active {
+      flex: 1;
+      max-width: 50px;
+
+      &::after,
+      i {
+        transform: scale(1);
+      }
+    }
+  }
+
+  &.header-color,
+  &.navbar-color,
+  &.logo-color,
+  &.caption-color,
+  &.preset-color {
+    $i: 1;
+
+    @each $name, $value in $preset-colors {
+      > a {
+        &[data-value='preset-#{$i}'] {
+          background: map-get($value, 'primary');
+        }
+      }
+
+      $i: $i + 1;
+    }
+  }
+  &.navbar-img {
+    > a {
+      width: 45px;
+      height: 100px;
+      background-position: center;
+      background-size: cover;
+    }
+  }
+  &.drp-menu-link-icon,
+  &.drp-menu-icon {
+    > a {
+      width: 45px;
+      height: 45px;
+      border: 2px solid var(--bs-border-color);
+      i {
+        transform: scale(1);
+        color: var(--bs-body-color);
+      }
+      &.active {
+        flex: none;
+        border-color: var(--bs-primary);
+      }
+    }
+  }
+}
+
+.theme-layout {
+  .btn {
+    i {
+      font-size: 26px;
+    }
+  }
+}
+
+.customizer-body {
+  height: calc(100% - 240px);
+}
+
+.preset-btn {
+  padding: 3px;
+  line-height: 1;
+
+  &.active {
+    border-color: var(--bs-primary);
+  }
+}
+
+.pc-box-width {
+  @include media-breakpoint-down(xl) {
+    display: none;
+  }
+}
+
+// [data-pc-layout='horizontal'] {
+//   .pc-rtl {
+//     display: none;
+//   }
+// }
+
+.auth-main {
+  ~ .pct-offcanvas {
+    .pc-boxcontainer {
+      display: none;
+    }
+  }
+}
+
+/**  =====================
+  36. Customizer css end
+==========================  **/

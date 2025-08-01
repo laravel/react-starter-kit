@@ -1,0 +1,360 @@
+/**======================================================================
+=========================================================================
+Template Name: Datta able - Admin Template
+Author: Codedthemes
+Support: https://codedthemes.support-hub.io/
+File: style.css
+=========================================================================
+=================================================================================== */
+
+// main framework
+@import 'settings/color-variables';
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'settings/bootstrap-variables';
+@import 'settings/theme-variables';
+
+@import 'bootstrap/scss/mixins';
+
+$i: 1;
+@each $name, $value in $preset-colors {
+  [data-pc-preset='#{$name}'] {
+    $pc-primary: map-get($value, 'primary');
+    $color-rgb: to-rgb($pc-primary);
+    $pc-primary-light: tint-color($pc-primary, 90%);
+    --pc-sidebar-active-color: #{$pc-primary};
+    --bs-blue: #{$pc-primary};
+    --bs-primary: #{$pc-primary};
+    --bs-primary-rgb: #{$color-rgb};
+    --bs-primary-light: #{$pc-primary-light};
+    --bs-link-color: #{$pc-primary};
+    --bs-link-color-rgb: #{$color-rgb};
+    --bs-link-hover-color: #{shift-color($pc-primary, $link-shade-percentage)};
+    --bs-link-hover-color-rgb: to-rgb(shift-color($pc-primary, $link-shade-percentage));
+
+    --dt-row-selected: #{to-rgb($pc-primary)};
+
+    .bg-light-primary {
+      background: $pc-primary-light;
+      color: $pc-primary;
+    }
+
+    .link-primary {
+      $value: map-get($value, 'primary');
+      color: $value !important; // stylelint-disable-line declaration-no-important
+
+      @if $link-shade-percentage !=0 {
+        &:hover,
+        &:focus {
+          color: if(
+            color-contrast($value) ==$color-contrast-light,
+            shade-color($value, $link-shade-percentage),
+            tint-color($value, $link-shade-percentage)
+          ) !important; // stylelint-disable-line declaration-no-important
+        }
+      }
+    }
+
+    .btn-primary {
+      @include button-variant($pc-primary, $pc-primary);
+    }
+
+    .btn-link {
+      --bs-btn-color: #{$pc-primary};
+      --bs-btn-hover-color: #{shift-color($pc-primary, $link-shade-percentage)};
+      --bs-btn-active-color: #{shift-color($pc-primary, $link-shade-percentage)};
+    }
+
+    .text-bg-primary {
+      color: color-contrast($pc-primary) if($enable-important-utilities, !important, null);
+      background-color: RGBA($color-rgb, var(--#{$prefix}bg-opacity, 1)) if($enable-important-utilities, !important, null);
+    }
+
+    .accordion {
+      // scss-docs-start accordion-css-vars
+      --#{$prefix}accordion-btn-focus-border-color: #{$pc-primary};
+      --#{$prefix}accordion-btn-focus-box-shadow: 0 0 0 #{$input-btn-focus-width} #{rgba($pc-primary, $input-btn-focus-color-opacity)};
+      --#{$prefix}accordion-active-color: #{$pc-primary};
+      --#{$prefix}accordion-active-bg: #{$pc-primary-light};
+      --#{$prefix}accordion-btn-active-icon: #{escape-svg(
+          url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='#{$pc-primary}'><path fill-rule=' evenodd' d=' M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/></svg>")
+        )};
+      // scss-docs-end accordion-css-vars
+    }
+
+    .alert-primary {
+      $alert-background: shift-color($pc-primary, $alert-bg-scale);
+      $alert-border: shift-color($pc-primary, $alert-border-scale);
+      $alert-color: shift-color($pc-primary, $alert-color-scale);
+
+      --#{$prefix}alert-color: #{$alert-color};
+      --#{$prefix}alert-bg: #{$alert-background};
+      --#{$prefix}alert-border-color: #{$alert-border};
+      --#{$prefix}alert-link-color: #{shade-color($alert-color, 20%)};
+    }
+
+    .list-group {
+      --bs-list-group-active-bg: #{$pc-primary};
+      --bs-list-group-active-border-color: #{$pc-primary};
+    }
+
+    .list-group-item-primary {
+      color: shift-color($pc-primary, $alert-color-scale);
+      background-color: shift-color($pc-primary, $alert-bg-scale);
+    }
+
+    .nav {
+      --bs-nav-link-hover-color: #{shift-color($pc-primary, $link-shade-percentage)};
+    }
+
+    .nav-pills {
+      --bs-nav-pills-link-active-bg: #{$pc-primary};
+    }
+
+    .pagination {
+      --bs-pagination-hover-color: #{shift-color($pc-primary, $link-shade-percentage)};
+      --bs-pagination-focus-color: #{shift-color($pc-primary, $link-shade-percentage)};
+      --bs-pagination-focus-box-shadow: 0 0 0 #{$input-btn-focus-width} #{rgba($pc-primary, $input-btn-focus-color-opacity)};
+      --bs-pagination-active-bg: #{$pc-primary};
+      --bs-pagination-active-border-color: #{$pc-primary};
+    }
+
+    .progress {
+      --bs-progress-bar-bg: #{$pc-primary};
+    }
+
+    .form-check {
+      .form-check-input {
+        &.input-primary {
+          &:checked {
+            border-color: $pc-primary;
+            background-color: $pc-primary;
+          }
+        }
+
+        &.input-light-primary {
+          &:checked {
+            border-color: shift-color($pc-primary, $soft-bg-level);
+            background-color: shift-color($pc-primary, $soft-bg-level);
+
+            &[type='checkbox'] {
+              background-image: escape-svg(
+                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$pc-primary}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='M6 10l3 3l6-6'/></svg>")
+              );
+            }
+
+            &[type='radio'] {
+              background-image: escape-svg(
+                url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='2' fill='#{$pc-primary}'/></svg>")
+              );
+            }
+          }
+        }
+
+        &.input-primary,
+        &.input-light-primary {
+          &:focus {
+            &[type='checkbox'],
+            &[type='radio'] {
+              box-shadow: 0 0 0 0.2rem rgba($pc-primary, 0.25);
+              border-color: $pc-primary;
+            }
+          }
+        }
+      }
+
+      &.form-switch {
+        .form-check-input.input-light-primary {
+          &:checked {
+            background-image: escape-svg(
+              url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'><circle r='3' fill='#{$pc-primary}'/></svg>")
+            );
+          }
+        }
+      }
+    }
+
+    .btn-light-primary {
+      background: $pc-primary-light;
+      color: $pc-primary;
+      border-color: $pc-primary-light;
+
+      &:hover {
+        background: $pc-primary;
+        color: #fff;
+        border-color: $pc-primary;
+      }
+
+      &.focus,
+      &:focus {
+        background: $pc-primary;
+        color: #fff;
+        border-color: $pc-primary;
+      }
+
+      &:not(:disabled):not(.disabled).active,
+      &:not(:disabled):not(.disabled):active,
+      .show > &.dropdown-toggle {
+        background: $pc-primary;
+        color: #fff;
+        border-color: $pc-primary;
+      }
+    }
+
+    .btn-check:active,
+    .btn-check:checked {
+      + .btn-light-primary {
+        background: $pc-primary;
+        color: #fff;
+        border-color: $pc-primary;
+      }
+    }
+
+    .btn-link-primary {
+      background: transparent;
+      color: $pc-primary;
+      border-color: transparent;
+
+      &:hover {
+        background: $pc-primary-light;
+        color: $pc-primary;
+        border-color: $pc-primary-light;
+      }
+
+      &.focus,
+      &:focus {
+        background: $pc-primary-light;
+        color: $pc-primary;
+        border-color: $pc-primary-light;
+      }
+
+      &:not(:disabled):not(.disabled).active,
+      &:not(:disabled):not(.disabled):active,
+      .show > &.dropdown-toggle {
+        background: $pc-primary-light;
+        color: $pc-primary;
+        border-color: $pc-primary-light;
+      }
+    }
+
+    .btn-check:active,
+    .btn-check:checked {
+      + .btn-link-primary {
+        background: $pc-primary-light;
+        color: $pc-primary;
+        border-color: $pc-primary-light;
+      }
+    }
+
+    .slider-selection {
+      background-image: linear-gradient(to bottom, lighten($pc-primary, 25%) 0, lighten($pc-primary, 25%) 100%);
+
+      &.tick-slider-selection {
+        background-image: linear-gradient(to bottom, lighten($pc-primary, 20%) 0, lighten($pc-primary, 20%) 100%);
+      }
+    }
+
+    .swal-button {
+      &:not([disabled]):hover {
+        background-color: darken($pc-primary, 5%);
+      }
+
+      &:active {
+        background-color: darken($pc-primary, 5%);
+      }
+
+      &:focus {
+        box-shadow:
+          0 0 0 1px #fff,
+          0 0 0 3px transparentize($pc-primary, 0.71);
+      }
+    }
+
+    .swal-content__input:focus {
+      border-color: transparentize($pc-primary, 0.71);
+    }
+
+    .swal-content__textarea {
+      &:focus {
+        border-color: transparentize($pc-primary, 0.71);
+      }
+    }
+
+    .swal2-styled {
+      &:focus {
+        box-shadow:
+          0 0 0 1px #fff,
+          0 0 0 3px rgba($pc-primary, 0.4) !important;
+      }
+    }
+
+    .slider-tick {
+      &.in-selection {
+        background-image: linear-gradient(to bottom, lighten($pc-primary, 20%) 0, lighten($pc-primary, 20%) 100%);
+      }
+    }
+
+    @include table-variant('primary', $pc-primary);
+  }
+
+  [data-pc-header='#{$name}'] {
+    $color-rgb: to-rgb($value);
+    --pc-header-background: rgba(#{$color-rgb}, 0.85);
+    --pc-header-color: #fff;
+  }
+  [data-pc-navbar='#{$name}'] {
+    $color-rgb: to-rgb($value);
+    --pc-sidebar-background: #{$value};
+    --pc-sidebar-color: #fff;
+  }
+  [data-pc-logo='#{$name}'] {
+    --pc-logo-bg: #{$value};
+  }
+  [data-pc-caption='#{$name}'] {
+    --pc-sidebar-caption-color: #{$value};
+  }
+  [data-pc-navimg='#{$name}'] {
+    @if($i <= 6){
+      --pc-sidebar-background: url('@assets/images/layout/navbar-img-#{$i}.jpg');
+    }
+  }
+  $i: $i + 1;
+}
+
+$drp-icon: (
+  'preset-1': '\ea61',
+  'preset-2': '\ea65',
+  'preset-3': '\eb5f',
+  'preset-4': '\ea69',
+  'preset-5': '\eb0b'
+);
+@each $key, $value in $drp-icon {
+  [data-pc-drp-menu-icon='#{$key}'] {
+    --pc-sidebar-drp-menu-icon: '#{$value}';
+  }
+}
+
+$drp-link-icon: (
+  'preset-1': '',
+  'preset-2': '\ea1c',
+  'preset-3': '\ea61',
+  'preset-4': '\ea65',
+  'preset-5': '\ea7d',
+  'preset-6': '\eaf2'
+);
+@each $key, $value in $drp-link-icon {
+  [data-pc-drp-menu-link-icon='#{$key}'] {
+    --pc-sidebar-drp-menu-link-icon: '#{$value}';
+  }
+}
+
+[data-pc-direction='rtl'] {
+  direction: rtl;
+  text-align: right;
+  @import 'themes/layouts/style-rtl';
+}
+
+[data-pc-theme='dark'] {
+  @import 'themes/layouts/style-dark';
+  color-scheme: dark;
+}

@@ -1,0 +1,378 @@
+/**  =====================
+      mail css start
+==========================  **/
+
+.fc {
+  td,
+  th {
+    border: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+  }
+
+  .fc-toolbar {
+    h2 {
+      font-size: 16px;
+      line-height: 30px;
+      text-transform: uppercase;
+    }
+
+    @media (max-width: 767.98px) {
+      .fc-left,
+      .fc-right,
+      .fc-center {
+        float: none;
+        display: block;
+        text-align: center;
+        clear: both;
+        margin: 10px 0;
+      }
+
+      > * > * {
+        float: none;
+      }
+
+      .fc-today-button {
+        display: none;
+      }
+    }
+
+    .fc-button {
+      text-transform: capitalize;
+    }
+  }
+
+  .fc-daygrid-day-top {
+    flex-direction: column;
+    padding: 14px;
+  }
+
+  .fc-col-header-cell {
+    background-color: transparent;
+    border: none;
+  }
+
+  .fc-col-header-cell-cushion {
+    display: block;
+    padding: 16px 4px;
+  }
+
+  .fc-scrollgrid-section {
+    .fc-scroller-harness {
+      padding: 0;
+    }
+  }
+
+  .fc-daygrid-day-number {
+    width: 24px;
+    height: 24px;
+    border-radius: 8px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 400;
+    margin: 2px;
+
+    &:hover {
+      background-color: $secondary;
+      color: $white;
+    }
+  }
+
+  .fc-daygrid-day {
+    &.fc-day-today {
+      .fc-daygrid-day-number {
+        background-color: var(--bs-primary);
+        color: $white;
+      }
+    }
+  }
+
+  .fc-daygrid-day {
+    &.fc-day-today {
+      background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+  }
+
+  .fc-timegrid-col {
+    &.fc-day-today {
+      background-color: rgba(var(--bs-primary-rgb), 0.1);
+    }
+  }
+
+  .fc-col-header,
+  .fc-daygrid-body,
+  .fc-scrollgrid-sync-table {
+    width: 100% !important;
+  }
+
+  .fc-scrollgrid-section > * {
+    border-left: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+    border-top: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+  }
+
+  .fc-scrollgrid-section-liquid > td {
+    border-top: 0;
+  }
+
+  a[data-navlink]:hover {
+    text-decoration: none;
+  }
+}
+
+.fc-theme-bootstrap a:not([href]) {
+  color: var(--bs-body-color);
+}
+.fc-theme-standard .fc-scrollgrid {
+  border: none;
+}
+.fc-event {
+  background: shift-color($secondary, $soft-bg-level);
+  color: $secondary;
+  border-radius: var(--bs-btn-border-radius);
+  cursor: move;
+  font-size: 0.8125rem;
+  margin: 5px 7px;
+  padding: 5px;
+  text-align: center;
+  border: 1px solid;
+}
+
+.fc-h-event {
+  .fc-event-main {
+    color: $secondary;
+  }
+}
+
+.fc-event-title,
+.fc-sticky {
+  font-weight: $font-weight-semibold !important;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.fc-daygrid-event-dot {
+  border-color: $white !important;
+  display: none;
+}
+
+.fc-event-time {
+  display: none;
+}
+
+.fc-event .fc-content {
+  color: $white;
+}
+
+#external-events {
+  .external-event {
+    text-align: left;
+    padding: 8px 16px;
+    margin: 6px 0;
+  }
+}
+
+.fc-day-grid-event.fc-h-event.fc-event.fc-start.fc-end.bg-dark {
+  .fc-content {
+    color: $light;
+  }
+}
+
+.fc-prev-button,
+.fc-next-button {
+  &.fc-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 0;
+  }
+}
+
+.fc-toolbar-chunk {
+  .d-inline-flex {
+    .fc-button {
+      color: var(--bs-primary);
+      background-color: rgba(var(--bs-primary-rgb), 0.15);
+      border: none;
+      box-shadow: none;
+      border-radius: var(--bs-btn-border-radius) !important;
+
+      &:not(:first-child) {
+        margin-left: 5px;
+      }
+
+      &:focus,
+      &:hover,
+      &.active {
+        color: $white;
+        background-color: var(--bs-primary);
+      }
+    }
+  }
+
+  .fc-button-primary {
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    color: var(--bs-primary);
+    border: var(--bs-primary);
+    padding: 9px 16px;
+
+    &:focus,
+    &:hover {
+      background-color: var(--bs-primary) !important;
+      color: #fff;
+    }
+
+    &:focus {
+      box-shadow: none;
+    }
+
+    &:not(:disabled) {
+      &.fc-button-active,
+      &:active {
+        background-color: var(--bs-primary) !important;
+        color: #fff;
+        &:focus {
+          box-shadow: none;
+        }
+      }
+    }
+  }
+
+  .fc-today-button {
+    border-radius: var(--bs-btn-border-radius) !important;
+    background-color: var(--bs-primary) !important;
+    border: var(--bs-primary);
+    color: #fff;
+  }
+}
+
+.fc-toolbar {
+  @media (max-width: 575.98px) {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+.fc-daygrid-event-harness {
+  .fc-daygrid-event {
+    backdrop-filter: blur(4px);
+  }
+}
+
+.fc-timegrid-event-harness {
+  .fc-timegrid-event {
+    backdrop-filter: blur(4px);
+  }
+}
+
+.fc-timegrid-slots {
+  table {
+    tr {
+      border-color: $border-color !important;
+    }
+  }
+}
+
+.fc-list-table {
+  border-color: $border-color;
+}
+
+.fc-event {
+  @each $color, $value in $theme-colors {
+    &.event-#{$color} {
+      background: shift-color($value, $soft-bg-level) !important;
+      color: $value !important;
+
+      &.fc-h-event {
+        .fc-event-main {
+          color: $value !important;
+        }
+
+        &:focus,
+        &:hover {
+          background: $value;
+          color: #fff;
+        }
+      }
+    }
+  }
+}
+
+.fc .fc-popover {
+  box-shadow: $dropdown-box-shadow;
+  border-radius: $dropdown-border-radius;
+  border: none;
+  overflow: hidden;
+  z-index: 1040;
+
+  .fc-popover-header,
+  .fc-popover-body {
+    padding: 12px 14px;
+  }
+
+  .fc-popover-header {
+    background: transparent;
+    border-bottom: var(--bs-border-width) var(--bs-border-style) var(--bs-border-color);
+
+    .fc-popover-close {
+      color: $danger;
+
+      width: 24px;
+      height: 24px;
+      font-size: 14px;
+      border-radius: 5px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+
+      &:focus,
+      &:hover {
+        background: shift-color($danger, $soft-bg-level);
+      }
+    }
+  }
+}
+
+.fc-daygrid-event-harness .fc-daygrid-event.bg-soft-dark {
+  .fc-event-main,
+  .fc-event-title {
+    color: var(--bs-dark) !important;
+  }
+}
+
+.fc-direction-ltr .fc-daygrid-event.fc-event-start,
+.fc-direction-rtl .fc-daygrid-event.fc-event-end {
+  margin-left: 5px;
+}
+
+.fc-direction-ltr .fc-daygrid-event.fc-event-end,
+.fc-direction-rtl .fc-daygrid-event.fc-event-start {
+  margin-right: 5px;
+}
+
+.fc-v-event {
+  .fc-event-main {
+    color: inherit;
+  }
+}
+
+.avatar.pc-cal-toggle {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  position: sticky;
+  top: calc(100% - 80px);
+  left: calc(100% - 120px);
+  z-index: 1025;
+}
+
+.cal-event-offcanvas {
+  --bs-offcanvas-zindex: 1081;
+}
+
+// mail css end

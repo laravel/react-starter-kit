@@ -1,0 +1,473 @@
+/**  =====================
+    2. Custom css start
+==========================  **/
+
+* {
+  &:focus {
+    outline: none;
+  }
+}
+
+.accordion {
+  --#{$prefix}accordion-color: #{$body-color};
+}
+
+a {
+  &:hover {
+    outline: none;
+    text-decoration: none;
+  }
+
+  &:not([href]) {
+    color: inherit;
+  }
+}
+
+p {
+  font-size: 14px;
+}
+
+h6,
+.h6,
+h5,
+.h5,
+h4,
+.h4,
+h3,
+.h3,
+h2,
+.h2,
+h1,
+.h1 {
+  color: var(--pc-heading-color);
+}
+
+b,
+strong {
+  font-weight: 600;
+}
+.ti:not([class*='align-']) {
+  vertical-align: middle;
+}
+
+.breadcrumb-default-icon {
+  .breadcrumb-item + .breadcrumb-item::before {
+    position: relative;
+    top: 2px;
+  }
+}
+
+.btn-page {
+  .btn {
+    margin-right: 5px;
+    margin-bottom: 5px;
+  }
+
+  .btn-group {
+    .btn {
+      margin-right: 0;
+      margin-bottom: 0;
+
+      &:last-child {
+        border-left: none;
+      }
+    }
+
+    label {
+      &:first-of-type {
+        border-right: none;
+      }
+    }
+  }
+}
+
+.img-radius {
+  border-radius: 50%;
+}
+
+.pc-icon {
+  &:not([class*='wid-']) {
+    width: 22px;
+  }
+
+  &:not([class*='hei-']) {
+    height: 22px;
+  }
+}
+.peity-full-width .peity {
+  width: 100%;
+  height: 125px;
+}
+.apexcharts-tooltip-series-group.apexcharts-active,
+.apexcharts-tooltip-series-group:last-child {
+  padding-bottom: 0 !important;
+}
+// ==============  highlight code css start  ================
+
+.hljs {
+  display: block;
+  overflow-x: auto;
+  padding: 0.5em;
+  color: #abb2bf;
+  background: #282c34;
+}
+
+.hljs-comment,
+.hljs-quote {
+  color: #5c6370;
+  font-style: italic;
+}
+
+.hljs-doctag,
+.hljs-formula,
+.hljs-keyword {
+  color: #c678dd;
+}
+
+.hljs-deletion,
+.hljs-name,
+.hljs-section,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #e06c75;
+}
+
+.hljs-literal {
+  color: #56b6c2;
+}
+
+.hljs-addition,
+.hljs-attribute,
+.hljs-meta-string,
+.hljs-regexp,
+.hljs-string {
+  color: #98c379;
+}
+
+.hljs-built_in,
+.hljs-class .hljs-title {
+  color: #e6c07b;
+}
+
+.hljs-attr,
+.hljs-number,
+.hljs-selector-attr,
+.hljs-selector-class,
+.hljs-selector-pseudo,
+.hljs-template-variable,
+.hljs-type,
+.hljs-variable {
+  color: #d19a66;
+}
+
+.hljs-bullet,
+.hljs-link,
+.hljs-meta,
+.hljs-selector-id,
+.hljs-symbol,
+.hljs-title {
+  color: #61aeee;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: bold;
+}
+
+.hljs-link {
+  text-decoration: underline;
+}
+
+// ==============  highlight code css end  ================
+/* ========================================================
+ ===============     document      ======================
+ ========================================================
+
+ Grid examples
+*/
+.bd-example-row {
+  background: $body-bg;
+  padding: 15px;
+  margin-bottom: 15px;
+
+  .row {
+    > [class^='col-'],
+    > .col {
+      padding-top: 0.75rem;
+      padding-bottom: 0.75rem;
+      background-color: rgba(86, 61, 124, 0.15);
+      border: 1px solid rgba(86, 61, 124, 0.2);
+    }
+  }
+
+  .row + .row {
+    margin-top: 1rem;
+  }
+
+  .flex-items-bottom,
+  .flex-items-middle,
+  .flex-items-top {
+    min-height: 6rem;
+    background-color: rgba(255, 0, 0, 0.1);
+  }
+}
+
+.bd-example-row-flex-cols .row {
+  min-height: 10rem;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+/* Docs examples */
+.bd-example {
+  position: relative;
+  padding: 1rem;
+  margin: 1rem;
+  border: solid #ddd;
+  border-width: 0.2rem 0 0;
+
+  @media only screen and (max-height: 575px) {
+    padding: 1.5rem;
+    margin-right: 0;
+    margin-left: 0;
+    border-width: 0.2rem;
+  }
+}
+
+/* Example modals */
+.modal {
+  z-index: 1081;
+
+  .popover,
+  .tooltip {
+    z-index: 1073;
+  }
+}
+
+.modal-backdrop {
+  z-index: 1071;
+}
+
+.bd-example-modal {
+  background-color: var(--bs-body-bg);
+
+  .modal {
+    position: relative;
+    top: auto;
+    right: auto;
+    bottom: auto;
+    left: auto;
+    z-index: 1;
+    display: block;
+  }
+
+  .modal-dialog {
+    left: auto;
+    margin-right: auto;
+    margin-left: auto;
+    padding: 0 20px;
+  }
+
+  .offcanvas {
+    position: static;
+    display: block;
+    height: 200px;
+    visibility: visible;
+    transform: translate(0);
+  }
+}
+.modal {
+  .bd-example-row {
+    padding: 15px 25px;
+  }
+}
+/* Example tabbable tabs */
+.bd-example-tabs .nav-tabs {
+  margin-bottom: 1rem;
+}
+
+/* Code snippets */
+.highlight {
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  background-color: #f3f2fb;
+  -ms-overflow-style: -ms-autohiding-scrollbar;
+
+  @media only screen and (max-height: 575px) {
+    padding: 1.5rem;
+  }
+}
+
+.bd-content .highlight {
+  margin-right: 15px;
+  margin-left: 15px;
+
+  @media only screen and (max-height: 575px) {
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+.highlight {
+  pre {
+    padding: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    background-color: transparent;
+    border: 0;
+  }
+
+  pre code {
+    font-size: inherit;
+    color: #333;
+  }
+}
+
+:not(pre) > code[class*='language-'],
+pre[class*='language-'] {
+  background: transparent;
+}
+
+/* ================================    Blockquote Start  ===================== */
+
+@media (min-width: 1600px) {
+  .container {
+    max-width: 1540px;
+  }
+}
+
+pre[class*='language-']:before,
+pre[class*='language-']:after {
+  display: none;
+}
+
+:not(pre) > code[class*='language-'],
+pre[class*='language-'] {
+  display: flex;
+  margin: 0;
+}
+
+pre[class*='language-'] > code {
+  width: 100%;
+}
+
+.blockquote {
+  padding: 0.5rem 1rem;
+}
+
+/* ================================    Blockquote End  ===================== */
+
+.fixed-button {
+  position: fixed;
+  bottom: -50px;
+  right: 30px;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.35);
+  opacity: 0;
+  z-index: 9;
+  transition: all 0.5s ease;
+}
+
+.fixed-button.active {
+  bottom: 50px;
+  opacity: 1;
+}
+
+.color-card {
+  .card-body {
+    margin: var(--bs-card-spacer-y) var(--bs-card-spacer-x);
+    background: rgba(107, 117, 125, 0.08);
+    border-radius: $border-radius;
+  }
+}
+
+.color-block {
+  border-radius: $border-radius;
+  margin: 4px 0;
+
+  @each $name, $value in $more-colors {
+    $i: 100;
+
+    @while $i<=900 {
+      &.bg-#{$name}-#{$i} {
+        color: color-contrast(map-get($value, $i));
+      }
+
+      &.text-#{$name}-#{$i} {
+        background-color: color-contrast(map-get($value, $i));
+      }
+
+      $i: $i + 100;
+    }
+  }
+}
+
+.row {
+  > div {
+    .color-block {
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.card .toast-container {
+  position: relative;
+}
+
+.blockquote-footer {
+  margin-top: 0;
+}
+.toast-container {
+  z-index: 1022;
+}
+
+.carousel-indicators {
+  li {
+    &::marker {
+      font-size: 0;
+    }
+  }
+}
+.breadcrumb-svg {
+  .breadcrumb-item + .breadcrumb-item::before {
+    position: relative;
+    top: 2px;
+  }
+}
+.pagination {
+  .page-item {
+    .page-link {
+      border-radius: 0;
+    }
+    &:first-child {
+      .page-link {
+        border-radius: var(--bs-pagination-border-radius) 0 0 var(--bs-pagination-border-radius);
+      }
+    }
+    &:last-child {
+      .page-link {
+        border-radius: 0 var(--bs-pagination-border-radius) var(--bs-pagination-border-radius) 0;
+      }
+    }
+  }
+}
+
+// offcanvas page css
+.customer-body {
+  height: calc(100% - 60px);
+}
+.offcanvas-top,
+.offcanvas-bottom {
+  min-height: 240px;
+}
+
+/**  =====================
+    2. Custom css end
+==========================  **/

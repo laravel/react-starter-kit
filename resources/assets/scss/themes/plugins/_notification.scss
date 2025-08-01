@@ -1,0 +1,51 @@
+/**  =====================
+    28. Notification css start
+========================== **/
+.alert-dismissable .close,
+.alert-dismissible .close {
+  color: inherit;
+  text-shadow: none;
+}
+
+.notifier-container {
+  z-index: 1051;
+  font-family: $font-family-sans-serif;
+  width: 400px;
+  max-width: 98%;
+  top: 15px;
+}
+.notifier {
+  padding: calc(#{$card-spacer-y} - 5px) calc(#{$card-spacer-x} - 5px);
+  border-radius: $border-radius;
+  .notifier-title {
+    font-size: $h5-font-size;
+    font-weight: $headings-font-weight;
+    margin-bottom: 2px;
+  }
+  .notifier-body {
+    font-size: $font-size-base;
+  }
+  .notifier-img {
+    .img {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  .notifier-close {
+    &:focus,
+    &:hover {
+      color: $danger;
+      background: transparent;
+    }
+  }
+}
+.notifier {
+  @each $color, $value in $theme-colors {
+    &.#{$color} {
+      border-left-color: $value;
+    }
+  }
+}
+/**  =====================
+    28. Notification css end
+========================== **/

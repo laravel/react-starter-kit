@@ -1,0 +1,22 @@
+// ============================
+//    12. Badge css start
+// ============================
+
+.badge {
+  &.dot {
+    width: 6px;
+    height: 6px;
+    display: block;
+    padding: 0;
+  }
+  @each $color, $value in $theme-colors {
+    &.bg-light-#{$color} {
+      background: shift-color($value, $soft-bg-level);
+      color: $value;
+    }
+  }
+}
+
+// ============================
+//    12. Badge css end
+// ============================

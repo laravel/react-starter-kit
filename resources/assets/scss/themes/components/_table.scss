@@ -1,0 +1,46 @@
+// ============================
+//   17. Table css start
+// ============================
+
+.table {
+  &.table-align-center {
+    td,
+    th {
+      vertical-align: middle;
+    }
+  }
+  thead th {
+    padding: 0.9rem 0.75rem;
+  }
+  td,
+  th {
+    vertical-align: middle;
+  }
+  &.table-borderless {
+    td,
+    th {
+      border: none !important;
+    }
+  }
+}
+
+.table-hover tbody tr:hover {
+  background-color: transparentize($primary, 0.97);
+}
+
+.affiliate-table {
+  tr {
+    th,
+    td {
+      &:first-child {
+        @include media-breakpoint-down(xl) {
+          min-width: 150px;
+        }
+      }
+    }
+  }
+}
+
+// ============================
+//   17. Table css end
+// ============================

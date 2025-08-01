@@ -1,0 +1,151 @@
+/**======================================================================
+=========================================================================
+Template Name: Datta able - Admin Template
+Author: Codedthemes
+Support: https://codedthemes.support-hub.io/
+File: style.css
+
+1.  Generic-class css
+2.  Custom css
+3.  Sidebar css
+4.  header css
+5.  footer css
+6.  Common layout css
+8.  Horizontal layout css
+9.  Tab layout css
+10. Widget css 
+11. Avatar css
+12. Badge css
+13. Button css
+14. Dropdown css
+15. Card css
+16. Progress css
+17. Table css
+18. Tabs css
+19. Form css
+20. Authentication css
+21. Maintaince css
+22. Pages css
+23. Icon layouts css
+24. User card css
+25. Application css
+26. Sweetalert css
+27. Lightbox css
+28. Notification css
+29. Modal css
+30. Rangeslider css
+31. Daterange css
+32. Tagsinput css
+33. Slider css
+34. Switches css
+35. Data Tables css
+36. Customizer css
+
+=========================================================================
+=================================================================================== */
+
+// main framework
+@import 'bootstrap/scss/functions';
+@import 'bootstrap/scss/variables';
+@import 'bootstrap/scss/variables-dark';
+
+@import 'settings/color-variables';
+@import 'settings/theme-variables';
+@import 'settings/bootstrap-variables';
+
+@import 'bootstrap/scss/maps';
+@import 'bootstrap/scss/mixins';
+@import 'bootstrap/scss/root';
+@import 'bootstrap/scss/reboot';
+@import 'bootstrap/scss/type';
+@import 'bootstrap/scss/images';
+@import 'bootstrap/scss/containers';
+@import 'bootstrap/scss/grid';
+@import 'bootstrap/scss/tables';
+@import 'bootstrap/scss/forms';
+@import 'bootstrap/scss/buttons';
+@import 'bootstrap/scss/transitions';
+@import 'bootstrap/scss/dropdown';
+@import 'bootstrap/scss/button-group';
+@import 'bootstrap/scss/nav';
+@import 'bootstrap/scss/navbar';
+@import 'bootstrap/scss/card';
+@import 'bootstrap/scss/accordion';
+@import 'bootstrap/scss/breadcrumb';
+@import 'bootstrap/scss/pagination';
+@import 'bootstrap/scss/badge';
+@import 'bootstrap/scss/alert';
+@import 'bootstrap/scss/progress';
+@import 'bootstrap/scss/list-group';
+@import 'bootstrap/scss/close';
+@import 'bootstrap/scss/toasts';
+@import 'bootstrap/scss/modal';
+@import 'bootstrap/scss/tooltip';
+@import 'bootstrap/scss/popover';
+@import 'bootstrap/scss/carousel';
+@import 'bootstrap/scss/spinners';
+@import 'bootstrap/scss/offcanvas';
+@import 'bootstrap/scss/placeholders';
+@import 'bootstrap/scss/helpers';
+
+[data-pc-direction='ltr'] {
+  @import 'bootstrap/scss/utilities';
+  @import 'bootstrap/scss/utilities/api';
+}
+
+[data-pc-direction='rtl'] {
+  @import 'themes/layouts/style-rtl-utility';
+  @import 'bootstrap/scss/utilities/api';
+}
+
+@import 'global.scss';
+
+// main framework
+@import 'themes/generic';
+@import 'themes/general';
+
+// Layouts
+@import 'themes/layouts/pc-sidebar';
+@import 'themes/layouts/pc-header';
+@import 'themes/layouts/pc-footer';
+@import 'themes/layouts/pc-common';
+// @import 'themes/layouts/pc-horizontal';
+@import 'themes/layouts/pc-tab';
+
+// widget
+@import 'themes/components/widget';
+
+// Components
+@import 'themes/components/avatar';
+@import 'themes/components/badge';
+@import 'themes/components/button';
+@import 'themes/components/dropdown';
+@import 'themes/components/card';
+@import 'themes/components/progress';
+@import 'themes/components/table';
+@import 'themes/components/tabs';
+@import 'themes/components/form';
+
+// pages
+@import 'themes/pages/authentication';
+@import 'themes/pages/maintaince';
+@import 'themes/pages/pages';
+@import 'themes/pages/icon-pages';
+@import 'themes/pages/user';
+@import 'themes/pages/application';
+@import 'themes/pages/admin';
+
+// custom plugins
+@import 'themes/plugins/sweatalert';
+@import 'themes/plugins/lightbox';
+@import 'themes/plugins/notification';
+@import 'themes/plugins/modal';
+@import 'themes/plugins/rangeslider';
+@import 'themes/plugins/daterange';
+@import 'themes/plugins/tags-input';
+@import 'themes/plugins/slider';
+@import 'themes/plugins/switches';
+@import 'themes/plugins/data-tables';
+@import 'themes/plugins/treeview';
+
+@import 'themes/layouts/customizer';

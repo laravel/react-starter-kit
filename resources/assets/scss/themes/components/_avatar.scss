@@ -1,0 +1,67 @@
+// ============================
+//    11. Avatar css start
+// ============================
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  font: {
+    size: 18px;
+    weight: 600;
+  }
+  width: 48px;
+  height: 48px;
+
+  &.avatar-xxs {
+    width: 16px;
+    height: 16px;
+    font-size: 14px;
+    border-radius: 1px;
+  }
+
+  &.avatar-xs {
+    width: 32px;
+    height: 32px;
+    font-size: 12px;
+    border-radius: 2px;
+  }
+
+  &.avatar-s {
+    width: 40px;
+    height: 40px;
+    font-size: 14px;
+    border-radius: 2px;
+  }
+
+  &.avatar-l {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+    border-radius: 5px;
+  }
+
+  &.avatar-xl {
+    width: 80px;
+    height: 80px;
+    font-size: 24px;
+    border-radius: 6px;
+  }
+
+  &.avatar-square {
+    border-radius: 4px;
+    border: 2px solid;
+  }
+
+  &.avatar-icon {
+    border: 2px solid $border-color;
+
+    > img {
+      width: 60%;
+    }
+  }
+}
+// ============================
+//    11. Avatar css end
+// ============================

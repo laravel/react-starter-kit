@@ -1,0 +1,84 @@
+// ============================
+//   14. Dropdown css start
+// ============================
+
+.dropdown-toggle {
+  &.arrow-none {
+    &:after {
+      display: none;
+    }
+  }
+}
+
+.pc-header {
+  .dropdown-menu {
+    animation: 0.3s ease-in-out 0s normal forwards 0.3s fadein;
+  }
+}
+@keyframes fadein {
+  from {
+    transform: translate3d(0, 8px, 0);
+    opacity: 0;
+  }
+
+  to {
+    transform: translate3d(0, 0, 0);
+    opacity: 1;
+  }
+}
+
+.dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+
+  &.active,
+  &:active,
+  &:focus,
+  &:hover {
+    background: var(--pc-active-background);
+    color: var(--bs-dropdown-link-color);
+  }
+}
+
+.dropdown-menu {
+  box-shadow: 0 4px 24px 0 rgba(62, 57, 107, 0.18);
+  border: none;
+  padding: 8px;
+  .dropdown-item {
+    border-radius: var(--bs-border-width);
+    padding: 10px 15px;
+    i {
+      font-size: 18px;
+      margin-right: 10px;
+    }
+
+    svg {
+      width: 18px;
+      height: 18px;
+      margin-right: 10px;
+      fill: #f2f2f2;
+    }
+
+    .float-right {
+      svg {
+        width: 14px;
+        height: 14px;
+      }
+    }
+  }
+}
+
+.dropdown-menu-dark {
+  .dropdown-item {
+    &.active,
+    &:active,
+    &:focus,
+    &:hover {
+      color: var(--bs-dropdown-link-hover-color);
+      background-color: var(--bs-dropdown-link-hover-bg);
+    }
+  }
+}
+// ============================
+//   14. Dropdown css end
+// ============================

@@ -1,0 +1,411 @@
+/**  =====================
+    1. Generic-class css start
+========================== **/
+/*====== Padding , Margin css starts ======*/
+$i: 0;
+@while $i<=50 {
+  .p {
+    &-#{$i} {
+      padding: #{$i}px;
+    }
+
+    &-t-#{$i} {
+      padding-top: #{$i}px;
+    }
+
+    &-b-#{$i} {
+      padding-bottom: #{$i}px;
+    }
+
+    &-l-#{$i} {
+      padding-left: #{$i}px;
+    }
+
+    &-r-#{$i} {
+      padding-right: #{$i}px;
+    }
+  }
+
+  .m {
+    &-#{$i} {
+      margin: #{$i}px;
+    }
+
+    &-t-#{$i} {
+      margin-top: #{$i}px;
+    }
+
+    &-b-#{$i} {
+      margin-bottom: #{$i}px;
+    }
+
+    &-l-#{$i} {
+      margin-left: #{$i}px;
+    }
+
+    &-r-#{$i} {
+      margin-right: #{$i}px;
+    }
+  }
+  $i: $i + 5;
+}
+/*====== Padding , Margin css ends ======*/
+/*====== Font-size css starts ======*/
+$i: 6;
+@while $i<=80 {
+  .f-#{$i} {
+    font-size: #{$i}px;
+  }
+  $i: $i + 2;
+}
+/*====== Font-size css ends ======*/
+/*====== Font-weight css starts ======*/
+$i: 100;
+@while $i<=900 {
+  .f-w-#{$i} {
+    font-weight: #{$i};
+  }
+  $i: $i + 100;
+}
+/*====== Font-weight css ends ======*/
+/*====== width, Height css starts ======*/
+$i: 10;
+@while $i<=150 {
+  .wid-#{$i} {
+    width: #{$i}px;
+  }
+
+  .hei-#{$i} {
+    height: #{$i}px;
+  }
+  $i: $i + 5;
+}
+/*====== width, Height css ends ======*/
+/*====== border-width css starts ======*/
+$i: 1;
+@while $i<=8 {
+  .b-wid-#{$i} {
+    border-width: #{$i}px;
+  }
+  $i: $i + 1;
+}
+/*====== border-width css ends ======*/
+/*====== background starts ======*/
+
+.text-header {
+  color: var(--bs-heading-color);
+}
+.bg-body {
+  background: var(--bs-body-bg);
+}
+@each $color, $value in $theme-colors {
+  .bg-light-#{$color} {
+    background: shift-color($value, $soft-bg-level);
+    color: $value;
+  }
+
+  .icon-svg-#{$color} {
+    fill: shift-color($value, $soft-bg-level);
+    stroke: $value;
+  }
+
+  .text-hover-#{$color}:hover {
+    color: $value !important;
+  }
+}
+/*====== background ends ======*/
+/*====== border color css starts ======*/
+@each $color, $value in $theme-colors {
+  .b-#{$color} {
+    border: 1px solid $value;
+  }
+
+  .border-bottom-#{$color} td {
+    border-bottom: 1px solid $value;
+  }
+
+  .border-bottom-#{$color} th {
+    border-bottom: 1px solid $value !important;
+  }
+
+  .fill-#{$color} {
+    fill: $value;
+  }
+}
+/*====== border color css ends ======*/
+/*====== brand color css start ======*/
+@each $color, $value in $brand-colors {
+  .bg-#{$color} {
+    background: $value;
+  }
+}
+/*====== brand color css ends ======*/
+/*====== text-color, background color css starts ======*/
+$social-colors: (
+  'facebook': #4267b2,
+  'twitter': #42c0fb,
+  'dribbble': #ec4a89,
+  'pinterest': #bf2131,
+  'youtube': #e0291d,
+  'googleplus': #c73e2e,
+  'instagram': #aa7c62,
+  'viber': #7b519d,
+  'behance': #0057ff,
+  'dropbox': #3380ff,
+  'linkedin': #0077b5,
+  'amazon': #000000
+);
+@each $color, $value in $social-colors {
+  .bg-light-#{$color} {
+    background: shift-color($value, $soft-bg-level);
+    color: $value;
+  }
+  .bg-#{$color} {
+    background: $value;
+  }
+
+  .text-#{$color} {
+    color: $value;
+  }
+}
+/*====== text-color css ends ======*/
+
+.font-hairline {
+  font-weight: 100 !important;
+}
+
+.font-thin {
+  font-weight: 200 !important;
+}
+
+.font-light {
+  font-weight: 300 !important;
+}
+
+.font-normal {
+  font-weight: 400 !important;
+}
+
+.font-medium {
+  font-weight: 500 !important;
+}
+
+.font-semibold {
+  font-weight: 600 !important;
+}
+
+.font-bold {
+  font-weight: 700 !important;
+}
+
+.font-extrabold {
+  font-weight: 800 !important;
+}
+
+.font-black {
+  font-weight: 900 !important;
+}
+
+.text-xs {
+  font-size: 0.625rem !important;
+}
+
+.text-sm {
+  font-size: 0.75rem !important;
+}
+
+.text-md {
+  font-size: 0.8125rem !important;
+}
+
+.text-base {
+  font-size: 0.875rem !important;
+}
+
+.text-lg {
+  font-size: 1rem !important;
+}
+
+.text-xl {
+  font-size: 1.125rem !important;
+}
+
+.text-2xl {
+  font-size: 1.25rem !important;
+}
+
+.text-3xl {
+  font-size: 1.5rem !important;
+}
+
+.text-4xl {
+  font-size: 2rem !important;
+}
+
+.text-5xl {
+  font-size: 2.25rem !important;
+}
+
+.text-6xl {
+  font-size: 2.5rem !important;
+}
+
+.text-7xl {
+  font-size: 3rem !important;
+}
+
+.text-8xl {
+  font-size: 4rem !important;
+}
+
+.text-9xl {
+  font-size: 6rem !important;
+}
+
+.text-10xl {
+  font-size: 8rem !important;
+}
+
+.uppercase {
+  text-transform: uppercase !important;
+}
+
+.lowercase {
+  text-transform: lowercase !important;
+}
+
+.capitalize {
+  text-transform: capitalize !important;
+}
+
+.normal-case {
+  text-transform: none !important;
+}
+/*====== more bootstrap colors start ======*/
+$more-colors: (
+  'blue': (
+    100: $blue-100,
+    200: $blue-200,
+    300: $blue-300,
+    400: $blue-400,
+    500: $blue-500,
+    600: $blue-600,
+    700: $blue-700,
+    800: $blue-800,
+    900: $blue-900
+  ),
+  'purple': (
+    100: $purple-100,
+    200: $purple-200,
+    300: $purple-300,
+    400: $purple-400,
+    500: $purple-500,
+    600: $purple-600,
+    700: $purple-700,
+    800: $purple-800,
+    900: $purple-900
+  ),
+  'pink': (
+    100: $pink-100,
+    200: $pink-200,
+    300: $pink-300,
+    400: $pink-400,
+    500: $pink-500,
+    600: $pink-600,
+    700: $pink-700,
+    800: $pink-800,
+    900: $pink-900
+  ),
+  'red': (
+    100: $red-100,
+    200: $red-200,
+    300: $red-300,
+    400: $red-400,
+    500: $red-500,
+    600: $red-600,
+    700: $red-700,
+    800: $red-800,
+    900: $red-900
+  ),
+  'orange': (
+    100: $orange-100,
+    200: $orange-200,
+    300: $orange-300,
+    400: $orange-400,
+    500: $orange-500,
+    600: $orange-600,
+    700: $orange-700,
+    800: $orange-800,
+    900: $orange-900
+  ),
+  'yellow': (
+    100: $yellow-100,
+    200: $yellow-200,
+    300: $yellow-300,
+    400: $yellow-400,
+    500: $yellow-500,
+    600: $yellow-600,
+    700: $yellow-700,
+    800: $yellow-800,
+    900: $yellow-900
+  ),
+  'green': (
+    100: $green-100,
+    200: $green-200,
+    300: $green-300,
+    400: $green-400,
+    500: $green-500,
+    600: $green-600,
+    700: $green-700,
+    800: $green-800,
+    900: $green-900
+  ),
+  'cyan': (
+    100: $cyan-100,
+    200: $cyan-200,
+    300: $cyan-300,
+    400: $cyan-400,
+    500: $cyan-500,
+    600: $cyan-600,
+    700: $cyan-700,
+    800: $cyan-800,
+    900: $cyan-900
+  ),
+  'gray': (
+    100: $gray-100,
+    200: $gray-200,
+    300: $gray-300,
+    400: $gray-400,
+    500: $gray-500,
+    600: $gray-600,
+    700: $gray-700,
+    800: $gray-800,
+    900: $gray-900
+  )
+);
+@each $name, $value in $more-colors {
+  $i: 100;
+  @while $i<=900 {
+    .bg-#{$name}-#{$i} {
+      background: var(--bs-#{$name}-#{$i});
+    }
+    .text-#{$name}-#{$i} {
+      color: var(--bs-#{$name}-#{$i});
+    }
+    $i: $i + 100;
+  }
+}
+:root {
+  @each $name, $value in $more-colors {
+    $i: 100;
+    @while $i<=900 {
+      $temp: map-get($value, $i);
+      --bs-#{$name}-#{$i}: #{$temp};
+      $i: $i + 100;
+    }
+  }
+}
+/*====== more bootstrap colors end ======*/
+/**  =====================
+    1. Generic-class css end
+========================== **/

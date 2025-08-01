@@ -1,0 +1,64 @@
+// ============================
+//   18. Tabs css start
+// ============================
+
+.tabs-border {
+  &.nav-tabs {
+    .nav-item {
+      margin-bottom: 0;
+    }
+
+    .nav-link {
+      border: none;
+      background:
+        no-repeat center bottom,
+        center 100%;
+      background-size:
+        0 100%,
+        100% 100%;
+      transition: background 0.3s ease-out;
+      background-image: linear-gradient(to top, theme-color('primary') 2px, rgba(255, 255, 255, 0) 2px);
+
+      &.active {
+        background-size:
+          100% 100%,
+          100% 100%;
+      }
+    }
+  }
+}
+
+.tabs-light {
+  &.nav-pill {
+    + .tab-content {
+      border-top: 1px solid $border-color;
+    }
+
+    .nav-item {
+      margin-bottom: 0;
+
+      .nav-link {
+        color: $primary;
+        background: shift-color($primary, $soft-bg-level);
+        border-radius: 4px;
+        transition: background 0.3s ease-out;
+      }
+
+      + .nav-item {
+        margin-left: 10px;
+      }
+    }
+
+    .nav-link {
+      border: none;
+
+      &.active {
+        color: #fff;
+        background: $primary;
+      }
+    }
+  }
+}
+// ============================
+//   18. Tabs css end
+// ============================

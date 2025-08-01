@@ -1,0 +1,75 @@
+/**  =====================
+  25. Application css start
+==========================  **/
+@import 'chat';
+@import 'calendar';
+@import 'gallery';
+// Common Application css start for all apllication pages
+.invoice-tab,
+.profile-tabs {
+  border-bottom: 0;
+  .nav-item {
+    margin-bottom: -0px;
+
+    .nav-link {
+      position: relative;
+      padding: 1rem 0;
+      margin: 0 1.5rem 0 0;
+      font-weight: 500;
+      color: var(--bs-body-color);
+      display: inline-flex;
+      align-items: center;
+      @include media-breakpoint-down(sm) {
+        padding: 0.8rem 0;
+      }
+      i {
+        font-size: 18px;
+      }
+      &:after {
+        content: '';
+        background: var(--bs-primary);
+        position: absolute;
+        transition: all 0.3s ease-in-out;
+        left: 50%;
+        right: 50%;
+        bottom: -1px;
+        height: 2px;
+        border-radius: 2px 2px 0 0;
+      }
+    }
+  }
+
+  .nav-link:hover {
+    border-color: transparent;
+    background: transparent;
+    color: var(--bs-primary);
+  }
+
+  .nav-item.show .nav-link,
+  .nav-link.active {
+    border-color: transparent;
+    color: var(--bs-primary);
+    background: transparent;
+    &:after {
+      left: 0;
+      right: 0;
+    }
+  }
+}
+.table {
+  tr {
+    td {
+      .row {
+        margin-right: 50px;
+        .col {
+          display: flex;
+          flex-direction: column;
+          width: 1%;
+        }
+      }
+    }
+  }
+}
+/**  =====================
+  25. Application css end
+==========================  **/

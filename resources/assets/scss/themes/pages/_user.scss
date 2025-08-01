@@ -1,0 +1,622 @@
+/**  =====================
+  24. User card css start
+==========================  **/
+// [ user card widget ] start
+
+.user-card {
+  .dropdown-toggle {
+    cursor: pointer;
+  }
+  .cover-img-block {
+    position: relative;
+    > img {
+      width: 100%;
+    }
+    .change-cover {
+      position: absolute;
+      top: 30px;
+      left: 30px;
+      z-index: 5;
+      opacity: 0;
+      transition: all 0.3s ease-in-out;
+
+      .dropdown-toggle {
+        color: #fff;
+        background: rgba(0, 0, 0, 0.6);
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        font-size: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        &:after {
+          display: none;
+        }
+      }
+    }
+
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      z-index: 1;
+      background: rgba(0, 0, 0, 0.4);
+      transition: all 0.3s ease-in-out;
+    }
+
+    &:hover {
+      .change-cover,
+      .overlay {
+        opacity: 1;
+      }
+    }
+  }
+
+  .user-about-block {
+    margin-top: -20px;
+    z-index: 1;
+    position: relative;
+
+    img {
+      box-shadow: 0 0 0 5px var(--bs-card-bg);
+    }
+
+    .certificated-badge {
+      position: absolute;
+      bottom: -5px;
+      right: -5px;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      background: var(--bs-card-bg);
+      padding: 5px 3px;
+
+      .bg-icon {
+        font-size: 22px;
+      }
+
+      .front-icon {
+        font-size: 11px;
+        position: absolute;
+        top: 11px;
+        left: 9px;
+      }
+    }
+  }
+
+  .hover-data {
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(36, 46, 62, 0.92);
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: scale(0);
+    transition: all 0.3s ease-in-out;
+  }
+
+  &:hover {
+    .hover-data {
+      transform: scale(1);
+    }
+  }
+
+  .change-profile {
+    .dropdown-toggle::after {
+      display: none;
+    }
+
+    .profile-dp {
+      position: relative;
+      overflow: hidden;
+      padding: 5px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+
+      .overlay {
+        position: absolute;
+        top: 5px;
+        left: 5px;
+        width: calc(100% - 10px);
+        height: calc(100% - 10px);
+        border-radius: 50%;
+        opacity: 0;
+        z-index: 1;
+        overflow: hidden;
+        background: rgba(0, 0, 0, 0.4);
+        transition: all 0.3s ease-in-out;
+
+        span {
+          background: rgba(0, 0, 0, 0.5);
+          color: #fff;
+          position: absolute;
+          bottom: 0;
+          width: 100%;
+          text-align: center;
+          border-top: 1px solid rgba(255, 255, 255, 0.4);
+          padding: 0 0 5px;
+        }
+      }
+
+      &:hover {
+        .overlay {
+          opacity: 1;
+        }
+      }
+    }
+  }
+  @media only screen and (max-width: 992px) {
+    .user-about-block {
+      margin-top: -10px;
+    }
+
+    .wid-80 {
+      width: 60px;
+    }
+
+    .change-profile .profile-dp {
+      width: 90px;
+      height: 90px;
+    }
+
+    &.user-card-2.shape-right .cover-img-block {
+      clip-path: none;
+    }
+
+    .cover-img-block {
+      .change-cover {
+        .dropdown-toggle {
+          padding: 5px 7px;
+        }
+      }
+    }
+  }
+}
+.tab-content {
+  .btn.btn-sm.float-end i {
+    font-size: 14px;
+  }
+}
+.user-card-2 {
+  .cover-img-block {
+    clip-path: polygon(0 0, 100% 0%, 100% 100%, 0% 80%);
+  }
+
+  &.shape-right {
+    .cover-img-block {
+      clip-path: polygon(0 0, 100% 0%, 100% 80%, 0% 100%);
+    }
+  }
+
+  &.shape-center {
+    .cover-img-block {
+      clip-path: polygon(0 0, 100% 0%, 100% 80%, 50% 100%, 0% 80%);
+    }
+  }
+}
+
+.user-card-3 {
+  .certificated-badge {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    background: var(--bs-card-bg);
+    padding: 5px 3px;
+
+    .bg-icon {
+      font-size: 30px;
+    }
+
+    .front-icon {
+      font-size: 14px;
+      position: absolute;
+      top: 14px;
+      left: 13px;
+    }
+  }
+
+  .social-top-link {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+  }
+
+  &.social-hover {
+    .social-top-link {
+      top: 20px;
+      left: 20px;
+      overflow: hidden;
+
+      .btn,
+      li {
+        margin-left: -100px;
+        transition: all 0.2s ease-in-out;
+        $i: 1;
+        @while $i<=10 {
+          &:nth-child(#{$i}) {
+            transition-delay: $i * 0.05s;
+          }
+          $i: $i + 1;
+        }
+      }
+    }
+
+    &:hover {
+      .social-top-link {
+        .btn,
+        li {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+}
+// [ user card widget ] end
+// [ user profile page ] start
+
+.user-profile {
+  margin-top: -20px;
+  margin-left: -40px;
+  margin-right: -40px;
+
+  .card-body {
+    position: relative;
+    z-index: 1;
+    box-shadow: 0 2px 4px -2px rgba(54, 80, 138, 0.3);
+
+    .overlay {
+      > span {
+        cursor: pointer;
+      }
+    }
+  }
+
+  .cover-img-block {
+    &:hover {
+      > img {
+        filter: grayscale(1) blur(1px);
+      }
+    }
+  }
+
+  .profile-dp {
+    .overlay {
+      text-align: left;
+    }
+  }
+
+  .user-about-block .certificated-badge {
+    bottom: 8px;
+    right: 0;
+    z-index: 2;
+  }
+
+  .profile-tabs {
+    border-bottom: 0;
+    margin-top: 30px;
+
+    .nav-item {
+      margin-bottom: -0px;
+
+      .nav-link {
+        position: relative;
+        justify-content: center;
+
+        &:after {
+          content: '';
+          background: $primary;
+          position: absolute;
+          transition: all 0.3s ease-in-out;
+          left: 50%;
+          right: 50%;
+          bottom: -1px;
+          height: 2px;
+          border-radius: 2px 2px 0 0;
+        }
+      }
+    }
+
+    .nav-link:hover {
+      border-color: transparent;
+    }
+
+    .nav-item.show .nav-link,
+    .nav-link.active {
+      background: transparent;
+      border-color: transparent;
+
+      &:after {
+        left: 0;
+        right: 0;
+      }
+    }
+  }
+  @media only screen and (max-width: 575px) {
+    margin-top: -30px;
+    margin-left: -15px;
+    margin-right: -15px;
+  }
+}
+// [ user profile page ] end
+// [ user list page ] start
+
+.user-profile-list {
+  background: transparent;
+  box-shadow: none;
+
+  table {
+    border-spacing: 0 10px;
+    border-collapse: separate;
+    width: calc(100% - 10px);
+    margin: 0 5px;
+
+    tbody {
+      tr {
+        box-shadow: var(--pc-card-shadow);
+        border-radius: $border-radius;
+        position: relative;
+
+        .overlay-edit {
+          position: absolute;
+          opacity: 0;
+          top: 0;
+          right: 0;
+          padding: 0 8px;
+          background: $primary;
+          bottom: 0;
+          left: auto;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          .btn {
+            margin: 0 3px;
+            width: 35px;
+            height: 35px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+
+        &:hover {
+          box-shadow: 0 0 6px 0 $primary;
+
+          td {
+            cursor: pointer;
+            color: #fff;
+            background: $primary;
+
+            h6 {
+              color: #fff;
+            }
+
+            .overlay-edit {
+              opacity: 1;
+            }
+          }
+        }
+      }
+    }
+
+    tr {
+      td,
+      th {
+        vertical-align: middle;
+        border: none;
+      }
+
+      td {
+        background: #fff;
+        position: relative;
+
+        &:first-child {
+          border-top-left-radius: $border-radius;
+          border-bottom-left-radius: $border-radius;
+        }
+
+        &:last-child {
+          border-top-right-radius: $border-radius;
+          border-bottom-right-radius: $border-radius;
+        }
+      }
+    }
+  }
+}
+// [ user list page ] end
+.list-pills {
+  &.nav-pills {
+    .nav-link.active,
+    .show > .nav-link {
+      .h5,
+      .h6 {
+        color: $primary;
+      }
+      color: $primary;
+      border-color: $list-group-border-color;
+      background: $list-group-hover-bg;
+    }
+  }
+}
+
+.widget-profile-card-1 {
+  position: relative;
+  margin-bottom: 50px;
+
+  .middle-user {
+    position: absolute;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin: 0 auto;
+    text-align: center;
+    bottom: -60px;
+
+    img {
+      width: 115px;
+      border-radius: 50%;
+    }
+  }
+
+  ~ .card-footer [class*='col-'] {
+    border-right: 1px solid #fff;
+
+    &:last-child {
+      border: none;
+    }
+  }
+  @media (max-width: 767px) {
+    ~ .card-footer [class*='col-']:nth-child(2) {
+      border: 0;
+    }
+
+    ~ .card-footer [class*='col-']:last-child {
+      margin-top: 10px;
+    }
+  }
+}
+
+.widget-profile-card-2 {
+  img.user-img {
+    width: 115px;
+  }
+
+  a {
+    color: #fff;
+    transition: all ease-in 0.3s;
+
+    &:hover {
+      opacity: 0.7;
+    }
+  }
+}
+
+.widget-profile-card-3 {
+  background-size: cover;
+  padding: 50px 0;
+  text-align: center;
+
+  img {
+    width: 120px;
+    border-radius: 50%;
+  }
+}
+
+.social-res-card {
+  .progress {
+    height: 6px;
+  }
+}
+
+.profile-card {
+  position: relative;
+  min-height: 410px;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .card-body {
+    text-align: center;
+    color: #fff;
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    width: 100%;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.72));
+
+    h3 {
+      font-weight: 600;
+    }
+  }
+
+  ~ .card-footer {
+    [class*='col-'] {
+      padding: 10px;
+      border-right: 1px solid rgba(255, 255, 255, 0.57);
+
+      h4 {
+        font-size: 18px;
+        font-weight: 600;
+      }
+
+      &:last-child {
+        border: none;
+      }
+
+      span {
+        text-transform: uppercase;
+      }
+    }
+    @media only screen and (max-width: 767px) {
+      [class*='col-']:nth-child(2) {
+        border: none;
+      }
+    }
+  }
+}
+
+.blur-user-card {
+  color: #fff;
+  text-align: center;
+  padding-top: 45px;
+  background-size: cover;
+
+  h3 {
+    margin-top: 10px;
+    font-size: 30px;
+    font-weight: 600;
+  }
+
+  p {
+    font-size: 18px;
+    font-weight: 300;
+  }
+
+  .blur-footer {
+    [class*='col-'] {
+      padding: 1em;
+      border-right: 1px solid #fff;
+      margin-top: 30px;
+      margin-bottom: 30px;
+
+      &:last-child {
+        border-right: none;
+      }
+    }
+    @media (max-width: 767px) {
+      [class*='col-']:nth-child(2) {
+        border: 0;
+      }
+
+      [class*='col-']:last-child {
+        margin-top: 0;
+        padding-top: 0;
+      }
+    }
+  }
+}
+.skill-mlt-select + .select2-container {
+  display: block;
+}
+/**  =====================
+  24. User card css end
+==========================  **/

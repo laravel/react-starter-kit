@@ -1,0 +1,34 @@
+/**  =====================
+    27. Lightbox css start
+========================== **/
+.modal-lightbox {
+  .modal-body {
+    padding: 0;
+    img {
+      border-radius: 2px;
+    }
+  }
+  .modal-dialog {
+    @include media-breakpoint-down(sm) {
+      margin: var(--bs-modal-margin) 24px;
+    }
+  }
+  .modal-content {
+    border-radius: 2px;
+    border: none;
+  }
+  .btn-close {
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%) scale(0.8);
+    background-color: var(--bs-modal-bg);
+    padding: 8px;
+    z-index: 5;
+    opacity: 1;
+    border-radius: 50%;
+  }
+}
+/**  =====================
+    27. Lightbox css end
+========================== **/

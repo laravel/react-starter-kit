@@ -1,0 +1,352 @@
+/**  =====================
+    26. Sweetalert css start
+========================== **/
+body .swal2-container {
+  z-index: 1080 !important;
+
+  &.swal2-noanimation,
+  &.swal2-backdrop-show {
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
+}
+.swal2-container.swal2-top-end.swal2-backdrop-show {
+  width: 100% !important;
+  .swal2-popup {
+    width: 290px !important;
+  }
+}
+.swal-icon--error {
+  border-color: $danger;
+}
+
+.swal-icon--error__line {
+  background-color: $danger;
+}
+
+.swal-icon--warning {
+  border-color: $warning;
+}
+
+.swal-icon--warning__body {
+  background-color: $warning;
+}
+
+.swal2-popup {
+  background: var(--bs-body-bg) !important;
+  color: var(--bs-body-color) !important;
+
+  .swal2-footer {
+    border-top-color: var(--bs-border-color) !important;
+  }
+}
+
+.swal-icon--warning__dot {
+  background-color: $warning;
+}
+
+@-webkit-keyframes pulseWarning {
+  0% {
+    border-color: lighten($warning, 5%);
+  }
+
+  to {
+    border-color: $warning;
+  }
+}
+
+@keyframes pulseWarning {
+  0% {
+    border-color: lighten($warning, 5%);
+  }
+
+  to {
+    border-color: $warning;
+  }
+}
+
+.swal-icon--success {
+  border-color: $success;
+}
+
+.swal-icon--success__ring {
+  border: 4px solid transparentize($success, 0.8);
+}
+
+.swal-icon--success__line {
+  background-color: $success;
+}
+
+.swal-icon--info {
+  border-color: $info;
+
+  &:after,
+  &:before {
+    background-color: $info;
+  }
+}
+
+.swal-title {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.swal-text {
+  color: rgba(0, 0, 0, 0.64);
+}
+
+.swal-button {
+  background-color: var(--bs-primary);
+  margin: 0 10px;
+
+  &:not([disabled]):hover {
+    background-color: darken($primary, 5%);
+  }
+
+  &:active {
+    background-color: darken($primary, 5%);
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 1px #fff,
+      0 0 0 3px transparentize($primary, 0.71);
+  }
+}
+
+.swal-button--cancel {
+  color: #555;
+  background-color: #efefef;
+  margin: 0 10px;
+
+  &:not([disabled]):hover {
+    background-color: #e8e8e8;
+  }
+
+  &:active {
+    background-color: #d7d7d7;
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 1px #fff,
+      0 0 0 3px rgba(116, 136, 150, 0.29);
+  }
+}
+
+.swal-button--danger {
+  background-color: $danger;
+  margin: 0 10px;
+
+  &:not([disabled]):hover {
+    background-color: darken($danger, 5%);
+  }
+
+  &:active {
+    background-color: darken($danger, 5%);
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 1px #fff,
+      0 0 0 3px transparentize($danger, 0.71);
+  }
+}
+
+.swal-footer {
+  text-align: center;
+}
+
+.swal-content__input:focus {
+  border-color: transparentize($primary, 0.71);
+}
+
+.swal-content__textarea {
+  &:focus {
+    border-color: transparentize($primary, 0.71);
+  }
+}
+
+.swal2-popup.swal2-toast {
+  .swal2-styled {
+    &:focus {
+      box-shadow:
+        0 0 0 1px #fff,
+        0 0 0 3px rgba(50, 100, 150, 0.4);
+    }
+  }
+
+  .swal2-success {
+    border-color: $success !important;
+  }
+}
+
+.swal2-loader {
+  border-color: var(--bs-primary) transparent var(--bs-primary) transparent !important;
+}
+
+.swal2-styled {
+  &.swal2-confirm {
+    background-color: var(--bs-primary) !important;
+  }
+
+  &.swal2-deny {
+    background-color: $danger !important;
+  }
+
+  &:focus {
+    box-shadow:
+      0 0 0 1px #fff,
+      0 0 0 3px rgba($primary, 0.4) !important;
+  }
+}
+
+.swal2-close {
+  &:hover {
+    color: $danger !important;
+  }
+}
+
+.swal2-content {
+  color: #545454;
+}
+
+.swal2-file,
+.swal2-input,
+.swal2-textarea {
+  border: 1px solid #d9d9d9;
+}
+
+.swal2-file.swal2-inputerror,
+.swal2-input.swal2-inputerror,
+.swal2-textarea.swal2-inputerror {
+  border-color: $danger !important;
+  box-shadow: 0 0 2px $danger !important;
+}
+
+.swal2-file:focus,
+.swal2-input:focus,
+.swal2-textarea:focus {
+  border: 1px solid #b4dbed;
+  box-shadow: 0 0 3px #c4e6f5;
+}
+
+.swal2-validation-message {
+  background: #f0f0f0;
+  color: #666;
+
+  &::before {
+    background-color: $danger;
+  }
+}
+
+.swal2-icon {
+  &.swal2-error {
+    border-color: lighten($danger, 15%) !important;
+    color: $danger !important;
+
+    [class^='swal2-x-mark-line'] {
+      background-color: $danger !important;
+    }
+  }
+
+  &.swal2-warning {
+    border-color: lighten($warning, 15%) !important;
+    color: $warning !important;
+  }
+
+  &.swal2-info {
+    border-color: lighten($info, 15%) !important;
+    color: $info !important;
+  }
+
+  &.swal2-question {
+    border-color: lighten($purple, 15%) !important;
+    color: $purple !important;
+  }
+
+  &.swal2-success {
+    border-color: lighten($success, 15%) !important;
+    color: $success !important;
+
+    .swal2-success-ring {
+      border: 0.25em solid rgba($success, 0.3) !important;
+    }
+
+    [class^='swal2-success-line'] {
+      background-color: $success !important;
+    }
+  }
+}
+
+.swal2-progress-steps {
+  .swal2-progress-step {
+    background: var(--bs-primary);
+    color: #fff;
+
+    &.swal2-active-progress-step {
+      background: var(--bs-primary);
+
+      ~ {
+        .swal2-progress-step {
+          background: $info;
+          color: #fff;
+        }
+
+        .swal2-progress-step-line {
+          background: $info;
+        }
+      }
+    }
+  }
+
+  .swal2-progress-step-line {
+    background: var(--bs-primary);
+  }
+}
+
+.swal2-actions {
+  .btn {
+    margin: 0 10px;
+  }
+}
+div:where(.swal2-container) input:where(.swal2-input),
+div:where(.swal2-container) textarea:where(.swal2-textarea),
+div:where(.swal2-container) div:where(.swal2-radio),
+div:where(.swal2-container) label:where(.swal2-checkbox) {
+  margin: 0.4em 0em 0 !important;
+}
+div:where(.swal2-container) input:where(.swal2-file) {
+  margin: 1em auto 3px !important;
+}
+div:where(.swal2-container) .swal2-select {
+  background: var(--bs-body-bg) !important;
+}
+div:where(.swal2-container) select:where(.swal2-select) {
+  margin: 1em 2em 3px !important;
+}
+div:where(.swal2-container) .swal2-radio,
+div:where(.swal2-container) .swal2-checkbox,
+div:where(.swal2-container) .swal2-range {
+  background: var(--bs-body-bg) !important;
+}
+.swal2-styled.swal2-confirm {
+  i {
+    margin: 0 5px;
+  }
+}
+div:where(.swal2-container) .swal2-input,
+div:where(.swal2-container) .swal2-textarea {
+  margin: 1.7em 1.7em 0 !important;
+}
+.swal2-rtl .swal2-close {
+  margin-right: initial;
+  margin-left: 0;
+}
+div:where(.swal2-icon) {
+  margin: 1.5em auto 0.6em !important;
+}
+div:where(.swal2-container) button:where(.swal2-close):focus {
+  box-shadow: none !important;
+}
+/**  =====================
+    26. Sweetalert css end
+========================== **/

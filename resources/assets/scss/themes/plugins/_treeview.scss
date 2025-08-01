@@ -1,0 +1,25 @@
+.tree,
+.tree-node,
+.tree-node-group {
+  list-style: none;
+}
+
+.arrow--open {
+  transform: rotate(90deg);
+}
+
+.tree-node .name:hover {
+  background: #e7f4f9;
+  color: $primary;
+  outline: 1px solid #d8f0fa;
+}
+
+.tree-node__leaf {
+  padding: 0 2px;
+  outline-color: #d8f0fa;
+}
+
+.tree-node--focused .name {
+  background: #beebff;
+  outline: 1px solid #99defd;
+}

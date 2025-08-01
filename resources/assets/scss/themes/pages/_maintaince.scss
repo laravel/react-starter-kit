@@ -1,0 +1,256 @@
+/**  =====================
+      Maintaince css start
+==========================  **/
+
+.maintenance-block {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+
+  &.offline {
+    background: radial-gradient(#94acbe, #253653);
+    overflow: hidden;
+    .offline-wrapper {
+      position: relative;
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+
+      > svg {
+        width: 100%;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+
+      .boat-img {
+        animation: boatanim 12s ease-in-out infinite;
+      }
+    }
+
+    .s-img-1,
+    .s-img-2 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+    }
+
+    .s-img-1 {
+      animation: sparcle 3.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+    }
+
+    .s-img-2 {
+      animation: sparcle 3.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+      animation-delay: 1.19s;
+    }
+
+    .moon {
+      background: rgba(255, 255, 255, 0.4);
+      position: absolute;
+      top: 12%;
+      left: 40%;
+      width: 150px;
+      height: 150px;
+      border-radius: 50%;
+
+      &:after,
+      &:before {
+        content: '';
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        box-shadow: inset 0 0 20px 5px rgba(255, 255, 255, 0.4);
+      }
+
+      &:after {
+        animation: sunwawe 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+      }
+
+      &:before {
+        animation: sunwawe 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+        animation-delay: 1.15s;
+      }
+    }
+
+    .sark {
+      .img-sark {
+        width: 300px;
+        position: absolute;
+        right: -200px;
+        animation: sark 12s ease-in-out infinite;
+      }
+
+      .bubble {
+        background: rgba(255, 255, 255, 0);
+        position: absolute;
+        top: 12%;
+        left: 60%;
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        animation: bubble 12s ease-in-out infinite;
+
+        &:after,
+        &:before {
+          content: '';
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          position: absolute;
+          top: 0;
+          left: 0;
+          box-shadow: inset 0 0 20px 5px rgba(255, 255, 255, 0.4);
+        }
+
+        &:after {
+          animation: sunwawe 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite;
+        }
+
+        &:before {
+          animation: sunwawe 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) infinite;
+          animation-delay: 1.15s;
+        }
+      }
+    }
+
+    .off-main {
+      position: relative;
+      height: 100%;
+      display: flex;
+      align-items: center;
+
+      .off-content {
+        position: absolute;
+        width: 100%;
+        bottom: 5%;
+        left: 0;
+        z-index: 5;
+      }
+    }
+
+    @media only screen and (max-width: 575px) {
+      .sark {
+        display: none;
+      }
+
+      .offline-wrapper {
+        > svg {
+          height: 95%;
+        }
+      }
+
+      .off-main {
+        .off-content {
+          h1 {
+            font-size: 45px;
+          }
+
+          bottom: 0%;
+        }
+      }
+
+      .moon {
+        top: 12%;
+        width: 50px;
+        height: 50px;
+      }
+    }
+  }
+}
+
+.error-card {
+  box-shadow: none;
+  text-align: center;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+
+  .error-image-block {
+    position: relative;
+    text-align: center;
+    display: inline-flex;
+  }
+}
+
+@keyframes bubble {
+  0%,
+  30% {
+    opacity: 0;
+  }
+
+  31% {
+    opacity: 1;
+  }
+
+  59% {
+    opacity: 1;
+  }
+
+  60%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes sark {
+  0% {
+    transform: rotate(-10deg) translate(245px, 46px);
+  }
+
+  30% {
+    transform: rotate(-13deg) translate(-329px, -80px);
+  }
+
+  60% {
+    transform: rotate(-13deg) translate(-329px, -80px);
+  }
+
+  100% {
+    transform: rotate(-26deg) translate(-887px, -80px);
+  }
+}
+
+@keyframes boatanim {
+  0% {
+    transform: rotate(-10deg) translate(95px, -14px);
+  }
+
+  50% {
+    transform: rotate(5deg) translate(-65px, -14px);
+  }
+
+  100% {
+    transform: rotate(-10deg) translate(95px, -14px);
+  }
+}
+
+@keyframes sunwawe {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes sparcle {
+  0% {
+    opacity: 0.5;
+  }
+
+  50% {
+    opacity: 0;
+  }
+}
+
+/**====== Maintaince css end ======**/

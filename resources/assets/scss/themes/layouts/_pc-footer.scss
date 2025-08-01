@@ -1,0 +1,49 @@
+// ============================
+//    5. footer css start
+// ============================
+
+.pc-footer {
+  position: relative;
+  z-index: 995;
+  margin-left: $sidebar-width;
+  margin-top: $header-height;
+  padding: 15px 0;
+
+  a {
+    color: var(--bs-body-color);
+
+    &:hover {
+      color: var(--bs-primary);
+    }
+  }
+
+  .footer-wrapper {
+    padding-left: 40px;
+    padding-right: 40px;
+
+    @media (max-width: 1024px) {
+      padding-left: 30px;
+      padding-right: 30px;
+    }
+    @include media-breakpoint-down(sm) {
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+  }
+
+  .footer-link {
+    .list-inline-item:not(:last-child) {
+      margin-right: 0.9rem;
+    }
+  }
+
+  @media (max-width: 1024px) {
+    margin-left: 0;
+  }
+  @include media-breakpoint-down(sm) {
+    margin-top: 50px;
+  }
+}
+// ============================
+//    5. footer css end
+// ============================

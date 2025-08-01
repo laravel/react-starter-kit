@@ -1,0 +1,117 @@
+// ========================================
+//    9. Tab layout css start
+// ========================================
+
+[data-pc-layout='tab'] {
+  .pc-sidebar {
+    --bs-border-color: rgba(255, 255, 255, 0.2);
+
+    .tab-container {
+      display: flex;
+      align-items: flex-start;
+
+      .tab-sidemenu,
+      .tab-link {
+        height: calc(100vh - #{$header-height});
+      }
+
+      .tab-sidemenu {
+        width: $sidebar-tab-width;
+        border-right: 1px solid var(--bs-border-color);
+
+        .nav-link {
+          width: 50px;
+          height: 50px;
+          padding: 0;
+          margin: 4px auto;
+          border-radius: var(--bs-border-radius);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: var(--pc-sidebar-color);
+          cursor: pointer;
+          font-size: 18px;
+          font-weight: 600;
+
+          &:hover {
+            background: rgba(var(--pc-sidebar-color-rgb), 0.2);
+          }
+
+          &:focus,
+          &.active {
+            color: var(--bs-primary);
+            background: rgba(var(--bs-primary-rgb), 0.2);
+          }
+        }
+      }
+
+      .tab-link {
+        flex: 1 1 auto;
+        width: 1%;
+        min-width: 0;
+      }
+    }
+
+    &:not(.pc-sidebar-hide) {
+      width: $sidebar-tab-navbar-width;
+
+      .navbar-wrapper {
+        width: $sidebar-tab-navbar-width;
+      }
+    }
+
+    @media (min-width: 1025px) {
+      &:not(.pc-sidebar-hide) {
+        ~ .pc-header {
+          left: $sidebar-tab-navbar-width;
+        }
+
+        ~ .pc-container,
+        ~ .pc-footer {
+          margin-left: $sidebar-tab-navbar-width;
+        }
+      }
+    }
+
+    @media (max-width: 1024px) {
+      &:not(.mob-sidebar-active) {
+        left: -#{$sidebar-tab-navbar-width};
+      }
+    }
+  }
+
+  &[data-pc-direction='rtl'] {
+    .pc-sidebar {
+      @media (min-width: 1025px) {
+        &:not(.pc-sidebar-hide) {
+          ~ .pc-header {
+            left: 0;
+            right: $sidebar-tab-navbar-width;
+          }
+
+          ~ .pc-container,
+          ~ .pc-footer {
+            margin-left: 0;
+            margin-right: $sidebar-tab-navbar-width;
+          }
+        }
+      }
+
+      @media (max-width: 1024px) {
+        &:not(.mob-sidebar-active) {
+          left: 0;
+          right: -#{$sidebar-tab-navbar-width};
+        }
+      }
+
+      .tab-container .tab-sidemenu {
+        border-left: 1px solid var(--bs-border-color);
+        border-right: none;
+      }
+    }
+  }
+}
+
+// ========================================
+//    9. Tab layout css end
+// ========================================

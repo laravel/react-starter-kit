@@ -1,0 +1,46 @@
+/**  =====================
+  34. Switches css start
+==========================  **/
+.switch {
+  margin-bottom: 8px;
+  margin-right: 8px;
+}
+.switch-off.btn,
+.switch-on.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  i {
+    margin: 0 4px;
+    font-size: 12px;
+  }
+}
+.slow .switch-group {
+  transition: left 0.7s;
+  -webkit-transition: left 0.7s;
+}
+
+.fast .switch-group {
+  transition: left 0.1s;
+  -webkit-transition: left 0.1s;
+}
+
+.quick .switch-group {
+  transition: none;
+  -webkit-transition: none;
+}
+
+.table.switch-table {
+  th,
+  td {
+    vertical-align: middle;
+    padding: 0.45rem 0.25rem;
+
+    .btn {
+      margin-bottom: 0;
+    }
+  }
+}
+/**  =====================
+  34. Switches css end
+==========================  **/

@@ -1,0 +1,269 @@
+@import 'react-calendar/dist/Calendar.css';
+@import 'react-toastify/dist/ReactToastify.css';
+@import 'rc-slider/assets/index.css';
+@import 'simplebar-react/dist/simplebar.min.css';
+@import 'flatpickr/dist/flatpickr.css';
+@import 'flatpickr/dist/themes/material_green.css';
+@import 'intro.js/introjs.css';
+@import 'jsvectormap/dist/jsvectormap.css';
+
+
+.switch.btn {
+  &:not([class*='wid-']) {
+    width: 4rem;
+  }
+  &:not([class*='hei-']) {
+    height: 40px;
+  }
+}
+
+.landing-background-image {
+  background-image: url('@assets/images/landing/img-title-line.svg');
+}
+
+// will remove it when I change the text editor
+.document-main {
+  width: 770px !important;
+  margin: 0 auto !important;
+  background: #fff !important;
+  box-shadow: 0 0 10px #ccc !important;
+}
+
+.bg-secondary-100 {
+  background-color: #f2f2f2;
+}
+
+.star-square:hover {
+  fill: #fdd835;
+}
+
+.star-square:active {
+  fill: #fdd835;
+}
+
+.svg1:hover circle {
+  fill: #ffa98d;
+}
+.svg2:hover circle {
+  fill: #ffc385;
+}
+.svg3:hover circle {
+  fill: #ffd885;
+}
+
+.carousel-indicators [data-bs-target] {
+  border-radius: 50%;
+  width: 20px !important;
+}
+
+.bg-light[colspan] {
+  @include media-breakpoint-up(sm) {
+    padding-left: 40px;
+  }
+  @include media-breakpoint-up(md) {
+    padding-left: 48px;
+  }
+  @include media-breakpoint-up(lg) {
+    padding-left: 96px;
+  }
+}
+
+.rotate-45 {
+  transform: rotate(45deg);
+}
+
+.max-w-100 {
+  max-width: 250px;
+}
+
+.custom-padding {
+  padding-left: 0px;
+  @media (min-width: 576px) {
+    padding-left: 20px;
+  }
+
+  @media (min-width: 768px) {
+    padding-left: 40px;
+  }
+
+  @media (min-width: 992px) {
+    padding-left: 60px;
+  }
+
+  @media (min-width: 1200px) {
+    padding-left: 96px;
+  }
+}
+
+.table thead th::after {
+  position: absolute;
+  content: '';
+  background-color: rgb(240, 240, 240);
+  width: 1px;
+  height: calc(100% - 30px);
+  right: 0px;
+  top: 16px;
+  height: 0;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.custom-pagination {
+  .page-link {
+    color: $body-color;
+    border: none;
+
+    &:hover {
+      color: $body-color;
+      background-color: #d9d9d9;
+    }
+
+    &.focus {
+      box-shadow: none;
+    }
+  }
+
+  .page-item:not(:first-child) .page-link {
+    margin-left: 2px;
+  }
+
+  .page-link.active,
+  .active > .page-link {
+    background-color: #d9d9d9;
+    color: $body-color;
+  }
+}
+
+.custom-accordion-header {
+  .accordion-button:not(.collapsed) {
+    background-color: transparent;
+  }
+
+  .accordion-button {
+    padding: 0px !important;
+    box-shadow: none !important;
+  }
+}
+
+.ql-container.ql-snow {
+  height: 125px;
+}
+
+.finance-image {
+  background-image: url('../images/widget/img-card-bg.svg');
+  background-size: cover;
+}
+
+.fill-body-color {
+  fill: $body-color !important;
+}
+
+.pct-c-btn {
+  @media (max-width: 1024px) {
+    display: block;
+  }
+}
+
+.pagination {
+  @media screen and (max-width: 768px) {
+    display: flex;
+    flex-wrap: wrap;
+  }
+}
+
+.apexcharts-tooltip-text-goals-value,
+.apexcharts-tooltip-text-y-value,
+.apexcharts-tooltip-text-z-value {
+  margin-left: 0 !important;
+}
+
+.apexcharts-tooltip-series-group.apexcharts-active .apexcharts-tooltip-marker {
+  margin-bottom: 3px;
+}
+
+.apexcharts-menu-item:hover {
+  background: #eee;
+}
+
+.apexcharts-canvas .apexcharts-svg {
+  background: transparent !important;
+}
+
+[data-pc-theme='dark'] {
+  .rc-slider-rail {
+    background-color: #1a1b1d;
+  }
+
+  .apexcharts-menu-item:hover {
+    color: var(--bs-black);
+  }
+
+  .custom-pagination {
+    .page-link:hover {
+      background-color: #464646;
+    }
+    .page-link.active,
+    .active > .page-link {
+      background-color: #464646;
+    }
+  }
+  .custom-thumb {
+    box-shadow: none;
+    background: var(--bs-body-bg);
+    border: 1px solid #ffffff26;
+  }
+  .custom-track {
+    background: #0000001a;
+  }
+  .custom-slider {
+    color: var(--bs-body-color);
+    border: 1px solid #ffffff26;
+  }
+  .custom-tooltip {
+    color: var(--bs-body-color);
+    color: var(--bs-body-color);
+  }
+  .vertical-track {
+    background: var(--bs-body-bg);
+  }
+  .vertical-thumb {
+    background: var(--bs-body-bg);
+    border: 1px solid #ffffff26;
+  }
+  .editor-toolbar button {
+    color: #bfbfbf;
+  }
+
+  .language-javascript {
+    color: var(--bs-white) !important;
+  }
+
+  .react-calendar__tile:disabled {
+    background-color: #393b3f;
+  }
+  .react-calendar button:enabled:hover {
+    background-color: var(--bs-primary);
+  }
+
+  .react-calendar {
+    background-color: #{lighten($dark-layout-color, 5%)};
+  }
+
+  .tree-node--focused .name,
+  .tree-node .name:hover {
+    outline-color: #353639;
+    background: #353639;
+  }
+
+  .custom-scrollbar {
+    scrollbar-color: #919090 #383838;
+    &::-webkit-scrollbar-track {
+      background: #383838;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #919090;
+    }
+  }
+}

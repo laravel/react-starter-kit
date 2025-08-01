@@ -1,0 +1,29 @@
+{
+  "brandName": "Datta Able",
+  "title": "React Admin Dashboard Template",
+  "Docs": "https://codedthemes.gitbook.io/datta",
+  "changeLog": "https://codedthemes.gitbook.io/datta/changelog",
+  "company": {
+    "name": "CodedThemes",
+    "url": "https://codedthemes.com",
+    "support": "https://codedthemes.support-hub.io/",
+    "privacyPolicy": "https://codedthemes.com/privacy-policy/",
+    "license": "https://codedthemes.com/license/",
+    "socialLink": {
+      "linkedin": "https://www.linkedin.com/company/codedthemes/",
+      "twitter": "https://x.com/codedthemes",
+      "instagram": "https://www.instagram.com/codedthemes/",
+      "facebook": "https://www.facebook.com/codedthemes",
+      "youtube": "https://www.youtube.com/@codedthemes",
+      "github": "https://github.com/codedthemes",
+      "dribble": "https://dribbble.com/codedthemes",
+      "discord": "https://discord.com/invite/p2E2WhCb6s"
+    }
+  },
+  "logo": {
+    "main": "",
+    "logoIcon": "",
+    "logoFab": "",
+    "logoWatermark": ""
+  }
+}

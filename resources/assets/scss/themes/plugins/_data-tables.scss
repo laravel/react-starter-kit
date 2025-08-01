@@ -1,0 +1,734 @@
+/**  =====================
+  35. Data Tables css start
+==========================  **/
+.datatable-table > tbody > tr > td,
+.datatable-table > tbody > tr > th,
+.datatable-table > tfoot > tr > td,
+.datatable-table > tfoot > tr > th,
+.datatable-table > thead > tr > td,
+.datatable-table > thead > tr > th {
+  vertical-align: middle;
+  padding: 0.7rem 0.75rem;
+}
+.datatable-table,
+.table {
+  td,
+  th {
+    border-top: 1px solid $border-color;
+    border-bottom: none;
+    white-space: nowrap;
+    padding: 0.7rem 0.75rem;
+    vertical-align: middle;
+  }
+
+  thead th {
+    border-bottom: 1px solid $border-color;
+    font-size: 13px;
+    color: $headings-color;
+    background: transparentize($body-bg, 0.5);
+    text-transform: uppercase;
+  }
+
+  tbody + tbody {
+    border-top: 2px solid $border-color;
+  }
+
+  &.table-dark {
+    thead th {
+      background-color: #11171a;
+    }
+  }
+
+  &.dataTable[class*='table-'] {
+    thead th {
+      background: $body-bg;
+    }
+  }
+
+  > :not(:last-child) > :last-child > * {
+    border-bottom-color: $border-color;
+  }
+
+  > :not(:first-child) {
+    border-top: none;
+  }
+}
+.custom-select,
+.dataTable-selector,
+.dataTable-input {
+  @extend .form-control;
+}
+/* Border versions */
+.table-bordered {
+  border: 1px solid $border-color;
+
+  td,
+  th {
+    border: 1px solid $border-color;
+  }
+}
+
+/* Zebra-striping */
+.table-striped {
+  tbody tr:nth-of-type(2n + 1) {
+    background-color: transparentize($primary, 0.97);
+  }
+}
+
+/* Hover effect */
+.table-hover {
+  tbody tr {
+    &:hover {
+      background-color: transparentize($secondary, 0.97);
+    }
+  }
+}
+
+/* Table backgrounds */
+.table {
+  .thead-dark {
+    th {
+      color: #fff;
+      background-color: $dark;
+      border-color: darken($dark, 10%);
+    }
+  }
+}
+
+.table-dark {
+  color: #fff;
+  background-color: $dark;
+
+  td,
+  th,
+  thead th {
+    border-color: darken($dark, 10%);
+  }
+
+  &.table-striped {
+    tbody tr:nth-of-type(odd) {
+      background-color: darken($dark, 2%);
+    }
+  }
+
+  &.table-hover {
+    tbody tr {
+      &:hover {
+        background-color: darken($dark, 5%);
+      }
+    }
+  }
+
+  thead th {
+    color: #fff;
+  }
+}
+
+/* fixed header position */
+table.dataTable.fixedHeader-floating {
+  top: calc(#{$header-height} + 55px) !important;
+
+  @media screen and (max-width: 992px) {
+    display: none !important;
+  }
+}
+
+@media screen and (max-width: 992px) {
+  .fixedHeader-locked {
+    display: none !important;
+  }
+}
+/**======= basic table css start =======**/
+
+.table.table-xl {
+  td,
+  th {
+    padding: 1.25rem 0.8rem;
+  }
+}
+
+.table.table-lg {
+  td,
+  th {
+    padding: 0.9rem 0.8rem;
+  }
+}
+
+.table.table-de {
+  td,
+  th {
+    padding: 0.75rem 0.8rem;
+  }
+}
+
+.table.table-sm {
+  td,
+  th {
+    padding: 0.6rem 0.8rem;
+  }
+}
+
+.table.table-xs {
+  td,
+  th {
+    padding: 0.4rem 0.8rem;
+  }
+}
+
+/**======= basic table css end ======**/
+
+table.dataTable > thead .sorting:before,
+table.dataTable > thead .sorting:after,
+table.dataTable > thead .sorting_asc:before,
+table.dataTable > thead .sorting_asc:after,
+table.dataTable > thead .sorting_desc:before,
+table.dataTable > thead .sorting_desc:after,
+table.dataTable > thead .sorting_asc_disabled:before,
+table.dataTable > thead .sorting_asc_disabled:after,
+table.dataTable > thead .sorting_desc_disabled:before,
+table.dataTable > thead .sorting_desc_disabled:after {
+  top: 13px;
+}
+
+table.dataTable tbody > tr > .selected td.select-checkbox:after,
+table.dataTable tbody > tr > .selected th.select-checkbox:after,
+table.dataTable tbody > tr.selected td.select-checkbox:after,
+table.dataTable tbody > tr.selected th.select-checkbox:after {
+  margin-top: -21px;
+  margin-left: -7px;
+}
+
+// vanilla table css start
+
+.datatable-top {
+  padding: 0 4px 14px;
+  > div {
+    margin: 0 0 5px;
+  }
+}
+
+.datatable-bottom {
+  padding: 14px 4px 0;
+}
+.card.table-card {
+  .datatable-top {
+    padding-top: 0;
+  }
+  .datatable-top,
+  .datatable-bottom {
+    padding-left: var(--bs-card-spacer-x);
+    padding-right: var(--bs-card-spacer-x);
+  }
+}
+.datatable-top > {
+  nav:first-child,
+  div:first-child {
+    float: left;
+  }
+}
+
+.datatable-bottom > {
+  nav:first-child,
+  div:first-child {
+    float: left;
+  }
+}
+
+.datatable-top > {
+  nav:last-child,
+  div:last-child {
+    float: right;
+  }
+}
+.datatable-top > div:last-child {
+  @media (max-width: 574.98px) {
+    float: left;
+    width: 100%;
+  }
+}
+.datatable-bottom > {
+  nav:last-child,
+  div:last-child {
+    float: right;
+  }
+}
+.dataTable-dropdown {
+  label {
+    display: flex;
+    align-items: center;
+    width: 230px;
+    white-space: nowrap;
+    select {
+      margin-right: 8px;
+    }
+  }
+}
+.dataTable-info {
+  margin: 7px 0;
+}
+
+/* PAGER */
+.dataTable-pagination {
+  ul {
+    margin: 0;
+    padding-left: 0;
+  }
+
+  li {
+    list-style: none;
+    float: left;
+  }
+
+  a {
+    border: 1px solid transparent;
+    float: left;
+    margin-left: 2px;
+    padding: 6px 12px;
+    position: relative;
+    text-decoration: none;
+    border-radius: $border-radius;
+    color: $body-color;
+
+    &:hover {
+      background-color: var(--bs-primary-light);
+      color: var(--bs-primary);
+    }
+  }
+
+  .active a {
+    background-color: var(--bs-primary);
+    color: #fff;
+    cursor: default;
+
+    &:focus,
+    &:hover {
+      background-color: var(--bs-primary);
+      color: #fff;
+      cursor: default;
+    }
+  }
+
+  .ellipsis a {
+    cursor: not-allowed;
+  }
+
+  .disabled a {
+    cursor: not-allowed;
+
+    &:focus,
+    &:hover {
+      cursor: not-allowed;
+    }
+
+    cursor: not-allowed;
+    opacity: 0.4;
+
+    &:focus,
+    &:hover {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+  .pager a {
+    font-weight: bold;
+  }
+}
+/* TABLE */
+.dataTable-table {
+  > {
+    tbody > tr > {
+      td,
+      th {
+        vertical-align: middle;
+      }
+    }
+
+    tfoot > tr > {
+      td,
+      th {
+        vertical-align: middle;
+      }
+    }
+
+    thead > tr > {
+      td {
+        vertical-align: middle;
+      }
+
+      th {
+        vertical-align: middle;
+      }
+    }
+  }
+
+  th {
+    vertical-align: middle;
+    a {
+      text-decoration: none;
+      color: inherit;
+      padding-right: 16px;
+    }
+  }
+}
+
+.dataTable-sorter {
+  display: inline-block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+
+  &::before,
+  &::after {
+    content: '';
+    height: 0;
+    width: 0;
+    position: absolute;
+    right: 4px;
+    border-left: 4px solid transparent;
+    border-right: 4px solid transparent;
+    opacity: 0.2;
+  }
+
+  &::before {
+    border-top: 4px solid #000;
+    bottom: 0px;
+  }
+
+  &::after {
+    border-bottom: 4px solid #000;
+    border-top: 4px solid transparent;
+    top: 0px;
+  }
+}
+
+.asc .dataTable-sorter::after,
+.desc .dataTable-sorter::before {
+  opacity: 0.6;
+}
+
+.dataTables-empty {
+  text-align: center;
+}
+
+.datatable-top::after,
+.datatable-bottom::after {
+  clear: both;
+  content: ' ';
+  display: table;
+}
+// vanilla table css end
+// data table css start
+.dt-responsive {
+  .dt-row {
+    overflow: auto;
+  }
+}
+.dataTables_scrollHeadInner,
+.dataTables_scrollFootInner {
+  width: calc(100% - 6px) !important;
+}
+.dataTables_scrollBody {
+  &::-webkit-scrollbar {
+    width: 6px;
+    opacity: 0;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: darken($body-bg, 05%);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: darken($body-bg, 25%);
+  }
+}
+table.dataTable tbody th.focus,
+table.dataTable tbody td.focus {
+  outline: 2px solid var(--bs-primary);
+}
+div.dt-autofill-handle {
+  background: var(--bs-primary);
+}
+table.dataTable {
+  border-collapse: collapse !important;
+  width: 100% !important;
+  .form-control {
+    min-width: 100px;
+    padding-right: 30px;
+  }
+  > tbody {
+    > tr {
+      &.child {
+        ul.dtr-details {
+          display: block;
+        }
+      }
+    }
+  }
+}
+#basic-scroller_wrapper,
+#state-scroller_wrapper,
+#api-scroller_wrapper {
+  .dataTables_paginate {
+    padding-top: 5px;
+  }
+}
+.datatable-pagination {
+  @media (max-width: 462px) {
+    margin-top: 6px;
+  }
+}
+.datatable-bottom > nav:last-child,
+.datatable-bottom > div:last-child {
+  @media (max-width: 462px) {
+    float: left;
+  }
+}
+.table-striped > tbody > tr:nth-of-type(odd) > * {
+  --bs-table-accent-bg: transparent;
+}
+.dataTables_length {
+  select.form-select {
+    padding-right: 30px;
+  }
+}
+div.dataTables_wrapper div.dataTables_filter input {
+  @media screen and (max-width: 767px) {
+    width: 155px;
+  }
+}
+.dataTables_length,
+.dataTables_filter {
+  margin: 0 0 8px;
+}
+table.dataTable > tbody > tr,
+table.DTFC_Cloned tr {
+  background-color: var(--bs-card-bg);
+}
+.DTFC_LeftBodyWrapper,
+.DTFC_RightBodyLiner {
+  .table.dataTable.DTFC_Cloned {
+    thead .sorting {
+      &:after,
+      &:before {
+        display: none;
+      }
+    }
+  }
+}
+
+// data table css end
+.fixed-header-table {
+  overflow-x: hidden;
+}
+div.dt-button-info {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  margin-top: -100px;
+  margin-left: -200px;
+  background-color: lighten($primary, 30%);
+  color: $primary;
+  border: 2px solid $primary;
+  box-shadow: 3px 3px 8px rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  text-align: center;
+  z-index: 21;
+
+  h2 {
+    padding: 0.5em;
+    margin: 0;
+    font-weight: normal;
+    color: #fff;
+    border-bottom: 1px solid $primary;
+    background-color: $primary;
+  }
+
+  > div {
+    padding: 1em;
+  }
+}
+
+.dtfh-floatingparenthead {
+  top: 70px !important;
+}
+
+.dt-buttons {
+  margin-bottom: 5px;
+}
+
+table.dataTable tbody {
+  td.focus,
+  th.focus {
+    box-shadow: inset 0 0 1px 2px $primary;
+  }
+}
+
+div.dtk-focus-alt table.dataTable tbody {
+  td.focus,
+  th.focus {
+    box-shadow: inset 0 0 1px 2px $warning;
+    background: transparentize($warning, 0.85);
+    color: $warning;
+  }
+}
+
+table.dataTable > thead .sorting:before,
+table.dataTable > thead .sorting:after,
+table.dataTable > thead .sorting_asc:before,
+table.dataTable > thead .sorting_asc:after,
+table.dataTable > thead .sorting_desc:before,
+table.dataTable > thead .sorting_desc:after,
+table.dataTable > thead .sorting_asc_disabled:before,
+table.dataTable > thead .sorting_asc_disabled:after,
+table.dataTable > thead .sorting_desc_disabled:before,
+table.dataTable > thead .sorting_desc_disabled:after {
+  top: 13px;
+}
+
+table.dataTable tbody > tr > .selected td.select-checkbox:after,
+table.dataTable tbody > tr > .selected th.select-checkbox:after,
+table.dataTable tbody > tr.selected td.select-checkbox:after,
+table.dataTable tbody > tr.selected th.select-checkbox:after {
+  margin-top: -21px;
+  margin-left: -7px;
+}
+.datatable-selector {
+  @extend .form-select;
+}
+.datatable-input {
+  @extend .form-control;
+}
+.datatable-wrapper.no-footer .datatable-container {
+  border-bottom: none;
+}
+.datatable-wrapper {
+  .datatable-container {
+    overflow-x: auto;
+  }
+}
+.datatable-top {
+  > div {
+    margin: 5px 0;
+    @media (max-width: 574.98px) {
+      &:last-child {
+        float: left;
+      }
+    }
+  }
+}
+
+.datatable-dropdown,
+.dataTable-dropdown {
+  label {
+    display: flex;
+    align-items: center;
+    width: 230px;
+    white-space: nowrap;
+    select {
+      margin-right: 8px;
+      margin-left: 0px;
+    }
+  }
+}
+.datatable-sorter {
+  padding-right: 18px;
+  &:after {
+    border-top: 0px;
+    top: 4px;
+  }
+  &::before {
+    border-bottom: 0px;
+    bottom: 4px;
+  }
+}
+.datatable-pagination {
+  ul {
+    margin: 0;
+    padding-left: 0;
+  }
+
+  li {
+    list-style: none;
+    float: left;
+  }
+
+  a {
+    border: 1px solid transparent;
+    float: left;
+    margin-left: 2px;
+    padding: 6px 12px;
+    position: relative;
+    text-decoration: none;
+    border-radius: var(--bs-border-radius);
+    color: var(--bs-card-color);
+
+    &:hover {
+      background-color: var(--bs-primary-light);
+      color: var(--bs-primary);
+    }
+  }
+  .datatable-active a,
+  .active a {
+    background-color: var(--bs-primary);
+    color: #fff;
+    cursor: default;
+
+    &:focus,
+    &:hover {
+      background-color: var(--bs-primary);
+      color: #fff;
+      cursor: default;
+    }
+  }
+
+  .ellipsis a {
+    cursor: not-allowed;
+  }
+
+  .disabled a {
+    cursor: not-allowed;
+
+    &:focus,
+    &:hover {
+      cursor: not-allowed;
+    }
+
+    cursor: not-allowed;
+    opacity: 0.4;
+
+    &:focus,
+    &:hover {
+      cursor: not-allowed;
+      opacity: 0.4;
+    }
+  }
+  .pager a {
+    font-weight: bold;
+  }
+}
+.dt-buttons.btn-group.flex-wrap {
+  .btn {
+    margin-bottom: 5px;
+  }
+}
+.dataTable[aria-describedby='no-style_info'] {
+  th {
+    padding: 14px 0;
+  }
+}
+div.dataTables_wrapper div.dt-row {
+  margin-top: 8px !important;
+  margin-bottom: 8px !important;
+}
+/**  =====================
+  35. Data Tables css end
+==========================  **/

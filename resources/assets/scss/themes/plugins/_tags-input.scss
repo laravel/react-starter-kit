@@ -1,0 +1,21 @@
+/**  =====================
+    32. Tagsinput css start
+========================== **/
+.bootstrap-tagsinput {
+  padding: 5px 10px;
+  line-height: 28px;
+  background: $body-bg;
+  border: 1px solid $border-color;
+  border-radius: $card-border-radius;
+  width: 100%;
+
+  .tag {
+    background: $primary;
+    padding: 5px 12px;
+    color: #fff;
+    border-radius: $card-border-radius;
+  }
+}
+/**  =====================
+    32. Tagsinput css end
+========================== **/
