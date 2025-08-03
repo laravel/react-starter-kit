@@ -12,12 +12,15 @@ const ProfileWizard = ({ onComplete }: ProfileWizardProps) => {
   const [step, setStep] = useState(1);
   const { data, setData, post, processing, errors } = useForm({
     phone: '',
+  const [profileData, setProfileData] = useState({
+    phoneNumber: '',
     address: '',
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setData(name as 'phone' | 'address', value);
+    setProfileData((prev) => ({ ...prev, [name]: value }));
   };
 
   const nextStep = () => setStep((prev) => prev + 1);
@@ -29,6 +32,8 @@ const ProfileWizard = ({ onComplete }: ProfileWizardProps) => {
         if (onComplete) onComplete();
       },
     });
+    console.log(profileData);
+    if (onComplete) onComplete();
   };
 
   return (
@@ -46,6 +51,15 @@ const ProfileWizard = ({ onComplete }: ProfileWizardProps) => {
           />
           {errors.phone && <div className="text-red-500 text-sm mt-1">{errors.phone}</div>}
           <Button onClick={nextStep} className="mt-4" disabled={processing}>
+          <Label htmlFor="phoneNumber" className="mb-2 block">Phone Number</Label>
+          <Input
+            id="phoneNumber"
+            name="phoneNumber"
+            placeholder="Phone Number"
+            value={profileData.phoneNumber}
+            onChange={handleChange}
+          />
+          <Button onClick={nextStep} className="mt-4">
             Next
           </Button>
         </div>
@@ -67,6 +81,14 @@ const ProfileWizard = ({ onComplete }: ProfileWizardProps) => {
               Back
             </Button>
             <Button onClick={handleSubmit} disabled={processing}>Finish</Button>
+            value={profileData.address}
+            onChange={handleChange}
+          />
+          <div className="flex gap-2 mt-4">
+            <Button variant="secondary" onClick={prevStep}>
+              Back
+            </Button>
+            <Button onClick={handleSubmit}>Finish</Button>
           </div>
         </div>
       )}
