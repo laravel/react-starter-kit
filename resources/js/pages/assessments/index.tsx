@@ -1,16 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import {
     Search,
-    Play,
     Award,
     Calendar,
     Building,
     BarChart3,
     ChevronRight,
-    FolderKanban
+    FolderKanban,
+    ListFilter,
 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,6 +18,13 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { useLanguage } from '@/hooks/use-language';
 import { Progress } from '@/components/ui/progress';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
 
 // --- TYPE DEFINITIONS ---
 interface Assessment {
@@ -62,12 +69,15 @@ const translations = {
         continueAssessment: 'Continue Assessment',
         viewResults: 'View Results',
         noAssessments: 'No assessments found.',
-        noResultsFound: 'No assessments match your search.',
+        noResultsFound: 'No assessments match your filters.',
         completed: 'Completed',
         inProgress: 'In Progress',
         createdAt: 'Created on',
         organization: 'Organization',
         progress: 'Progress',
+        all: 'All',
+        filterByTool: 'Filter by tool',
+        showingAssessments: 'assessments',
     },
     ar: {
         title: 'تقييماتي',
@@ -81,21 +91,26 @@ const translations = {
         createdAt: 'تاريخ الإنشاء',
         organization: 'المؤسسة',
         progress: 'التقدم',
-    }
+        all: 'الكل',
+        filterByTool: 'فرز حسب الأداة',
+        showingAssessments: 'تقييمات',
+    },
 };
 
-// --- SUB-COMPONENTS for a cleaner UI ---
+// --- SUB-COMPONENTS ---
 
-const PageHeader = ({ t, total, searchTerm, onSearchChange }: any) => (
-    <Card className="mb-8 border-0 shadow-sm bg-white">
-        <CardContent className="p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+const PageHeader = ({ t, count, searchTerm, onSearchChange }: any) => (
+    <div className="mb-6">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
                 <div className="bg-blue-100 p-3 rounded-lg">
                     <Award className="w-8 h-8 text-blue-600" />
                 </div>
                 <div>
                     <h1 className="text-2xl font-bold text-gray-800">{t.title}</h1>
-                    <p className="text-gray-500">{total} {total === 1 ? 'assessment' : 'assessments'}</p>
+                    <p className="text-gray-500">
+                        {count} {t.showingAssessments}
+                    </p>
                 </div>
             </div>
             <div className="relative w-full md:w-auto md:min-w-[300px]">
@@ -104,25 +119,57 @@ const PageHeader = ({ t, total, searchTerm, onSearchChange }: any) => (
                     placeholder={t.searchPlaceholder}
                     value={searchTerm}
                     onChange={(e) => onSearchChange(e.target.value)}
-                    className="ps-10 h-10 rounded-lg"
+                    className="ps-10 h-10 rounded-lg bg-white"
                 />
+            </div>
+        </div>
+    </div>
+);
+
+const FilterControls = ({ t, statusFilter, onStatusChange, toolFilter, onToolChange, tools }: any) => (
+    <Card className="mb-8 border-0 shadow-sm bg-white">
+        <CardContent className="p-4 flex flex-col md:flex-row items-center gap-4">
+            <div className="flex items-center gap-2">
+                <ListFilter className="w-5 h-5 text-gray-500" />
+                <span className="font-semibold text-gray-700">{t.filterBy}:</span>
+            </div>
+            <div className="flex items-center gap-2 border-s border-gray-200 ps-4">
+                {(['all', 'completed', 'inProgress'] as const).map((status) => (
+                    <Button
+                        key={status}
+                        variant={statusFilter === status ? 'default' : 'ghost'}
+                        size="sm"
+                        onClick={() => onStatusChange(status)}
+                    >
+                        {t[status] || status.charAt(0).toUpperCase() + status.slice(1)}
+                    </Button>
+                ))}
+            </div>
+            <div className="w-full md:w-auto md:min-w-[250px]">
+                <Select value={toolFilter} onValueChange={onToolChange}>
+                    <SelectTrigger className="w-full">
+                        <SelectValue placeholder={t.filterByTool} />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">{t.all} {t.tools}</SelectItem>
+                        {tools.map((tool: any) => (
+                            <SelectItem key={tool.id} value={String(tool.id)}>
+                                {tool.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
             </div>
         </CardContent>
     </Card>
 );
 
-const AssessmentCard = ({ assessment, auth, t, getText, language }: any) => { // THE FIX, Part 1: Added `language` to props
+const AssessmentCard = ({ assessment, t, getText, language }: any) => {
     const isComplete = assessment.status === 'completed';
-    const isUserAssessment = assessment.user_id === auth.user.id;
-
-    // Determine the correct URL based on completion status and ownership
     const url = isComplete
         ? route('assessment.results', assessment.id)
-        : isUserAssessment
-            ? route('assessment.start', assessment.tool.id)
-            : route('assessment.take', assessment.id);
+        : route('assessment.take', assessment.id);
 
-    console.log(assessment);
     return (
         <Card className="flex flex-col overflow-hidden rounded-xl shadow-md border border-gray-200 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
             <div className="relative h-40 bg-gray-200">
@@ -145,7 +192,6 @@ const AssessmentCard = ({ assessment, auth, t, getText, language }: any) => { //
 
             <div className="p-5 flex flex-col flex-grow bg-white">
                 <h3 className="text-lg font-bold text-gray-900 mb-2">{getText(assessment.tool, 'name')}</h3>
-
                 <div className="text-xs text-gray-500 space-y-1 mb-4">
                     {assessment.organization && (
                         <div className="flex items-center gap-2">
@@ -158,7 +204,6 @@ const AssessmentCard = ({ assessment, auth, t, getText, language }: any) => { //
                         <span>{t.createdAt}: {new Date(assessment.created_at).toLocaleDateString(language === 'ar' ? 'ar-SA' : 'en-US')}</span>
                     </div>
                 </div>
-
                 {!isComplete && assessment.completion_percentage !== undefined && (
                     <div className="my-2">
                         <div className="flex justify-between text-xs text-gray-600 mb-1">
@@ -168,7 +213,6 @@ const AssessmentCard = ({ assessment, auth, t, getText, language }: any) => { //
                         <Progress value={assessment.completion_percentage} className="h-1.5" />
                     </div>
                 )}
-
                 <div className="mt-auto pt-4">
                     <Button asChild className="w-full">
                         <Link href={url}>
@@ -194,7 +238,11 @@ const NoAssessmentsFound = ({ t, isSearch }: { t: any, isSearch: boolean }) => (
 
 // --- MAIN COMPONENT ---
 export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndexProps) {
+    // --- STATE MANAGEMENT ---
     const [searchTerm, setSearchTerm] = useState('');
+    const [statusFilter, setStatusFilter] = useState<'all' | 'completed' | 'inProgress'>('all');
+    const [toolFilter, setToolFilter] = useState('all');
+
     const { language } = useLanguage();
     const t = translations[language];
     const isArabic = language === 'ar';
@@ -206,11 +254,26 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
     const getText = (item: any, field: string): string =>
         language === 'ar' ? item[`${field}_ar`] : item[`${field}_en`];
 
-    const filteredAssessments = assessments.filter(
-        (a) =>
-            getText(a.tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (a.organization && a.organization.toLowerCase().includes(searchTerm.toLowerCase()))
-    );
+    // --- DERIVED STATE & FILTERING LOGIC ---
+    const uniqueTools = useMemo(() => {
+        const tools = new Map();
+        assessments.forEach(a => {
+            if (!tools.has(a.tool.id)) {
+                tools.set(a.tool.id, { id: a.tool.id, name: getText(a.tool, 'name') });
+            }
+        });
+        return Array.from(tools.values());
+    }, [assessments, language]);
+
+    const filteredAssessments = useMemo(() => {
+        return assessments
+            .filter(a => statusFilter === 'all' || a.status === statusFilter)
+            .filter(a => toolFilter === 'all' || String(a.tool.id) === toolFilter)
+            .filter(a =>
+                getText(a.tool, 'name').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                (a.organization && a.organization.toLowerCase().includes(searchTerm.toLowerCase()))
+            );
+    }, [assessments, searchTerm, statusFilter, toolFilter, language]);
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
@@ -218,7 +281,18 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
 
             <div className="min-h-screen bg-slate-50 p-4 sm:p-6" dir={isArabic ? 'rtl' : 'ltr'}>
                 <div className="max-w-7xl mx-auto">
-                    <PageHeader t={t} total={assessments.length} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+                    <PageHeader t={t} count={filteredAssessments.length} searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+
+                    {assessments.length > 0 && (
+                        <FilterControls
+                            t={t}
+                            statusFilter={statusFilter}
+                            onStatusChange={setStatusFilter}
+                            toolFilter={toolFilter}
+                            onToolChange={setToolFilter}
+                            tools={uniqueTools}
+                        />
+                    )}
 
                     {assessments.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -227,10 +301,9 @@ export default function AssessmentsIndex({ assessments, auth }: AssessmentsIndex
                                     <AssessmentCard
                                         key={assessment.id}
                                         assessment={assessment}
-                                        auth={auth}
                                         t={t}
                                         getText={getText}
-                                        language={language} // THE FIX, Part 2: Pass `language` down as a prop
+                                        language={language}
                                     />
                                 ))
                             ) : (
