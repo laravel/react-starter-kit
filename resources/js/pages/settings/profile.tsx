@@ -49,7 +49,7 @@ const translations = {
 type ProfileForm = {
     name: string;
     email: string;
-}
+};
 
 export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: boolean; status?: string }) {
     const { language } = useLanguage();
@@ -119,6 +119,8 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                             <div>
                                 <p className="text-muted-foreground -mt-4 text-sm">
                                     {t.unverified}{' '}
+                                <p className="-mt-4 text-sm text-muted-foreground">
+                                    Your email address is unverified.{' '}
                                     <Link
                                         href={route('verification.send')}
                                         method="post"

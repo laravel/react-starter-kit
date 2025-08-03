@@ -82,6 +82,7 @@ export default function Password() {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={t.pageTitle} />
+            <Head title="Password settings" />
 
             <SettingsLayout>
                 <div className="space-y-6">
