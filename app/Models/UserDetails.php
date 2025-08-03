@@ -35,6 +35,7 @@ class UserDetails extends Model
         'how_did_you_hear',
         'marketing_emails',
         'newsletter_subscription',
+        'profile_completed',
     ];
 
     protected $casts = [
@@ -45,6 +46,7 @@ class UserDetails extends Model
         'annual_revenue' => 'decimal:2',
         'established_year' => 'integer',
         'company_size' => 'integer',
+        'profile_completed' => 'boolean',
     ];
 
     /**
