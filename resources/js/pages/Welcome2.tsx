@@ -3,19 +3,16 @@ import { Head, useForm, Link } from '@inertiajs/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import ProfileWizard from '@/components/ProfileWizard';
 import {
-    Target,
     UserPlus,
     User,
     Eye,
     EyeOff,
     Loader2,
     ArrowLeft,
-    CheckCircle,
-    AlertCircle,
     Globe,
     Sparkles
 } from 'lucide-react';
@@ -113,31 +110,20 @@ const translations = {
 };
 
 export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
-    const [currentView, setCurrentView] = useState<'home' | 'options' | 'register' | 'signin'>('home');
+    const [currentView, setCurrentView] = useState<'home' | 'options' | 'register' | 'signin' | 'profile'>('home');
+    const [isProfileComplete, setIsProfileComplete] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [currentLang, setCurrentLang] = useState<'en' | 'ar'>(locale as 'en' | 'ar');
 
     const t = translations[currentLang];
     const isRTL = currentLang === 'ar';
 
-    // Registration form - FIXED: Added all fields backend expects
     const { data: newUserData, setData: setNewUserData, post: postNewUser, processing: processingNewUser, errors: newUserErrors } = useForm({
         name: '',
         email: '',
         password: '',
         password_confirmation: '',
         company_name: '',
-        position: '',
-        phone: '',
-        city: '',
-        industry: '',
-        company_size: '',
-        website: '', // Added missing field
-        how_did_you_hear: '', // Added missing field
-        marketing_emails: true, // Added missing field
-        newsletter_subscription: false, // Added missing field
-        agree_terms: false,
     });
 
     // Login form
@@ -155,7 +141,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         console.log('Form data:', newUserData);
         console.log('Available routes:', window.route);
 
-        // Enhanced client-side validation
+        setNewUserData('password_confirmation', newUserData.password);
+
         if (!newUserData.name.trim()) {
             alert('Please enter your full name');
             return;
@@ -176,13 +163,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
             return;
         }
 
-        if (newUserData.password !== newUserData.password_confirmation) {
-            alert('Passwords do not match');
-            return;
-        }
-
-        if (!newUserData.agree_terms) {
-            alert('Please agree to terms and conditions');
+        if (!newUserData.company_name.trim()) {
+            alert('Please enter your company name');
             return;
         }
 
@@ -197,7 +179,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
             try {
                 routeUrl = route(routeName);
                 console.log('Using route:', routeName, 'URL:', routeUrl);
-            } catch (e) {
+            } catch {
                 console.log('Route user.register-free not found, trying alternatives...');
 
                 // Try alternative routes
@@ -209,7 +191,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                         routeName = altRoute;
                         console.log('Using alternative route:', routeName, 'URL:', routeUrl);
                         break;
-                    } catch (e2) {
+                    } catch {
                         console.log('Route', altRoute, 'not found');
                     }
                 }
@@ -224,6 +206,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
             postNewUser(routeUrl, {
                 onSuccess: (response) => {
                     console.log('Registration successful:', response);
+                    setCurrentView('profile');
                 },
                 onError: (errors) => {
                     console.error('Registration errors:', errors);
@@ -286,7 +269,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
             try {
                 routeUrl = route(routeName);
                 console.log('Using login route:', routeName, 'URL:', routeUrl);
-            } catch (e) {
+            } catch {
                 console.log('Route login not found, trying alternatives...');
 
                 // Try alternative routes
@@ -298,7 +281,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                         routeName = altRoute;
                         console.log('Using alternative login route:', routeName, 'URL:', routeUrl);
                         break;
-                    } catch (e2) {
+                    } catch {
                         console.log('Login route', altRoute, 'not found');
                     }
                 }
@@ -595,35 +578,6 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                             )}
                                         </div>
 
-                                        {/* Confirm Password */}
-                                        <div>
-                                            <Label htmlFor="password_confirmation" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.confirmPassword} <span className="text-red-500">*</span>
-                                            </Label>
-                                            <div className="relative">
-                                                <Input
-                                                    id="password_confirmation"
-                                                    type={showConfirmPassword ? "text" : "password"}
-                                                    value={newUserData.password_confirmation}
-                                                    onChange={(e) => setNewUserData('password_confirmation', e.target.value)}
-                                                    className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl pr-12"
-                                                    placeholder={t.confirmPassword}
-                                                    required
-                                                    minLength={8}
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-blue-500"
-                                                >
-                                                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                                                </button>
-                                            </div>
-                                            {newUserErrors.password_confirmation && (
-                                                <p className="text-red-500 text-xs mt-1">{newUserErrors.password_confirmation}</p>
-                                            )}
-                                        </div>
-
                                         {/* Company Name */}
                                         <div>
                                             <Label htmlFor="company_name" className="text-blue-900 text-sm font-semibold mb-2 block">
@@ -638,109 +592,14 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                 placeholder={t.companyName}
                                             />
                                         </div>
-
-                                        {/* Position */}
-                                        <div>
-                                            <Label htmlFor="position" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.position}
-                                            </Label>
-                                            <Input
-                                                id="position"
-                                                type="text"
-                                                value={newUserData.position}
-                                                onChange={(e) => setNewUserData('position', e.target.value)}
-                                                className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl"
-                                                placeholder={t.position}
-                                            />
-                                        </div>
-
-                                        {/* Phone */}
-                                        <div>
-                                            <Label htmlFor="phone" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.phone}
-                                            </Label>
-                                            <Input
-                                                id="phone"
-                                                type="tel"
-                                                value={newUserData.phone}
-                                                onChange={(e) => setNewUserData('phone', e.target.value)}
-                                                className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl"
-                                                placeholder="+96600000000"
-                                            />
-                                        </div>
-
-                                        {/* City */}
-                                        <div>
-                                            <Label htmlFor="city" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.city}
-                                            </Label>
-                                            <Input
-                                                id="city"
-                                                type="text"
-                                                value={newUserData.city}
-                                                onChange={(e) => setNewUserData('city', e.target.value)}
-                                                className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl"
-                                                placeholder={t.city}
-                                            />
-                                        </div>
-
-                                        {/* Industry */}
-                                        <div>
-                                            <Label htmlFor="industry" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.industry}
-                                            </Label>
-                                            <Select onValueChange={(value) => setNewUserData('industry', value)}>
-                                                <SelectTrigger className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl">
-                                                    <SelectValue placeholder={t.industry} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="service">{t.service}</SelectItem>
-                                                    <SelectItem value="manufacturing">{t.manufacturing}</SelectItem>
-                                                    <SelectItem value="commercial">{t.commercial}</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-
-                                        {/* Company Size */}
-                                        <div>
-                                            <Label htmlFor="company_size" className="text-blue-900 text-sm font-semibold mb-2 block">
-                                                {t.companySize}
-                                            </Label>
-                                            <Select onValueChange={(value) => setNewUserData('company_size', value)}>
-                                                <SelectTrigger className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl">
-                                                    <SelectValue placeholder={t.companySize} />
-                                                </SelectTrigger>
-                                                <SelectContent>
-                                                    <SelectItem value="1-10">1-10 {t.employees}</SelectItem>
-                                                    <SelectItem value="11-50">11-50 {t.employees}</SelectItem>
-                                                    <SelectItem value="51-200">51-200 {t.employees}</SelectItem>
-                                                    <SelectItem value="201-500">201-500 {t.employees}</SelectItem>
-                                                    <SelectItem value="501-1000">501-1000 {t.employees}</SelectItem>
-                                                    <SelectItem value="1000+">1000+ {t.employees}</SelectItem>
-                                                </SelectContent>
-                                            </Select>
-                                        </div>
-                                    </div>
-
-                                    {/* Terms Agreement */}
-                                    <div className="mt-6 flex items-center space-x-3">
-                                        <Checkbox
-                                            id="agree_terms"
-                                            checked={newUserData.agree_terms}
-                                            onCheckedChange={(checked) => setNewUserData('agree_terms', !!checked)}
-                                            className="border-blue-300 data-[state=checked]:bg-blue-600"
-                                        />
-                                        <label htmlFor="agree_terms" className="text-blue-900 text-sm cursor-pointer">
-                                            {t.agreeTerms}
-                                        </label>
                                     </div>
 
                                     {/* Submit Button */}
                                     <div className="mt-6 text-center">
                                         <Button
                                             type="submit"
-                                            disabled={processingNewUser || !newUserData.agree_terms}
-                                            className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-12 py-3 rounded-xl font-semibold"
+                                            disabled={processingNewUser}
+                        className="bg-gradient-to-r from-blue-600 to-blue-800 hover:from-blue-700 hover:to-blue-900 text-white px-12 py-3 rounded-xl font-semibold"
                                         >
                                             {processingNewUser ? (
                                                 <>
@@ -760,6 +619,19 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Profile Wizard */}
+                    {currentView === 'profile' && (
+                        <div className="w-full max-w-md mx-auto">
+                            {!isProfileComplete ? (
+                                <ProfileWizard onComplete={() => setIsProfileComplete(true)} />
+                            ) : (
+                                <h1 className="text-2xl font-bold text-center text-blue-900 mt-8">
+                                    Welcome to the app!
+                                </h1>
+                            )}
                         </div>
                     )}
 
