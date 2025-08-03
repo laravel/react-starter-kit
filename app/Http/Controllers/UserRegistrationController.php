@@ -76,6 +76,7 @@ class UserRegistrationController extends Controller
                         'preferred_language' => app()->getLocale(),
                         'marketing_emails' => true,
                         'newsletter_subscription' => false,
+                        'profile_completed' => false,
                     ]);
                     Log::info('User details created', ['user_id' => $user->id]);
                 }
@@ -171,6 +172,29 @@ class UserRegistrationController extends Controller
                 'email' => 'Registration failed due to a system error. Please try again in a few moments.'
             ]);
         }
+    }
+
+    /**
+     * Complete user profile after initial registration
+     */
+    public function completeProfile(Request $request)
+    {
+        $data = $request->validate([
+            'phone' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user && $user->details) {
+            $user->details->update([
+                'phone' => $data['phone'],
+                'address' => $data['address'],
+                'profile_completed' => true,
+            ]);
+        }
+
+        return redirect()->route('dashboard');
     }
 
     /**

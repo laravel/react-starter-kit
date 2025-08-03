@@ -206,6 +206,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
             postNewUser(routeUrl, {
                 onSuccess: (response) => {
                     console.log('Registration successful:', response);
+                    setCurrentView('options');
                     setCurrentView('profile');
                 },
                 onError: (errors) => {
