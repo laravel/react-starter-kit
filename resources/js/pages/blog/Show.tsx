@@ -234,7 +234,7 @@ export default function BlogShow({ post, comments, isLiked, canComment }: Props)
                                         comments.map((comment) => (
                                             <div key={comment.id} className="flex items-start gap-4">
                                                 <Avatar>
-                                                    <AvatarImage src={comment.author.avatar_url} />
+                                                    <AvatarImage src={comment.avatar_url} />
                                                     <AvatarFallback>{comment.author.name.slice(0, 2)}</AvatarFallback>
                                                 </Avatar>
                                                 <div className="flex-1">
