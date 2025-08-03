@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Checkbox } from '@/components/ui/checkbox';
+import ProfileWizard from '@/components/ProfileWizard';
 import {
     UserPlus,
     User,
@@ -113,7 +114,8 @@ const translations = {
 };
 
 export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
-    const [currentView, setCurrentView] = useState<'home' | 'options' | 'register' | 'signin'>('home');
+    const [currentView, setCurrentView] = useState<'home' | 'options' | 'register' | 'signin' | 'profile'>('home');
+    const [isProfileComplete, setIsProfileComplete] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [currentLang, setCurrentLang] = useState<'en' | 'ar'>(locale as 'en' | 'ar');
 
@@ -211,6 +213,7 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                 onSuccess: (response) => {
                     console.log('Registration successful:', response);
                     setCurrentView('options');
+                    setCurrentView('profile');
                 },
                 onError: (errors) => {
                     console.error('Registration errors:', errors);
@@ -649,6 +652,19 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                     </div>
                                 </form>
                             </div>
+                        </div>
+                    )}
+
+                    {/* Profile Wizard */}
+                    {currentView === 'profile' && (
+                        <div className="w-full max-w-md mx-auto">
+                            {!isProfileComplete ? (
+                                <ProfileWizard onComplete={() => setIsProfileComplete(true)} />
+                            ) : (
+                                <h1 className="text-2xl font-bold text-center text-blue-900 mt-8">
+                                    Welcome to the app!
+                                </h1>
+                            )}
                         </div>
                     )}
 
