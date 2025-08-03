@@ -32,17 +32,7 @@ class UserRegistrationController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:8|confirmed',
-                'phone' => 'nullable|string|max:20',
-                'company_name' => 'nullable|string|max:255',
-                'position' => 'nullable|string|max:255',
-                'city' => 'nullable|string|max:255',
-                'website' => 'nullable|url|max:255',
-                'industry' => 'nullable|string|max:100',
-                'company_size' => 'nullable|string|max:100',
-                'how_did_you_hear' => 'nullable|string|max:255',
-                'marketing_emails' => 'boolean',
-                'newsletter_subscription' => 'boolean',
-                'agree_terms' => 'required|accepted',
+                'company_name' => 'required|string|max:255',
             ], [
                 'name.required' => 'Full name is required.',
                 'email.required' => 'Email address is required.',
@@ -51,9 +41,7 @@ class UserRegistrationController extends Controller
                 'password.required' => 'Password is required.',
                 'password.min' => 'Password must be at least 8 characters long.',
                 'password.confirmed' => 'Password confirmation does not match.',
-                'agree_terms.required' => 'You must agree to the terms and conditions.',
-                'agree_terms.accepted' => 'You must agree to the terms and conditions.',
-                'website.url' => 'Please enter a valid website URL.',
+                'company_name.required' => 'Company name is required.',
             ]);
 
             Log::info('Validation passed for user registration', ['email' => $validated['email']]);
@@ -83,18 +71,11 @@ class UserRegistrationController extends Controller
             try {
                 if (method_exists($user, 'details')) {
                     $user->details()->create([
-                        'organization' => $validated['company_name'] ?? 'Not specified',
-                        'phone' => $validated['phone'] ?? null,
-                        'company_name' => $validated['company_name'] ?? null,
-                        'position' => $validated['position'] ?? null,
-                        'city' => $validated['city'] ?? null,
-                        'website' => $validated['website'] ?? null,
-                        'industry' => $validated['industry'] ?? null,
-                        'company_size' => $validated['company_size'] ?? null,
-                        'how_did_you_hear' => $validated['how_did_you_hear'] ?? null,
-                        'marketing_emails' => $validated['marketing_emails'] ?? true,
-                        'newsletter_subscription' => $validated['newsletter_subscription'] ?? false,
+                        'company' => $validated['company_name'],
+                        'company_name' => $validated['company_name'],
                         'preferred_language' => app()->getLocale(),
+                        'marketing_emails' => true,
+                        'newsletter_subscription' => false,
                     ]);
                     Log::info('User details created', ['user_id' => $user->id]);
                 }
