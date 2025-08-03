@@ -1,19 +1,18 @@
-import React, { useState } from 'react'; // THE FIX: Added useState to the import
-import { Head, Link } from '@inertiajs/react';
+
+import React, { useState } from 'react';
+import { Head } from '@inertiajs/react';
 import AppLayout from '@/layouts/app-layout';
 import { type BreadcrumbItem } from '@/types';
 import {
     CheckCircle,
     Download,
-    Share2,
-    TrendingUp,
     Award,
     BarChart3,
     Target,
     ChevronDown,
     Lightbulb,
     AlertCircle,
-    FileText
+    TrendingUp // FIX: Added the missing icon
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -66,7 +65,6 @@ interface AssessmentResultsData {
 interface AssessmentResultsProps {
     assessment: AssessmentResult;
     results: AssessmentResultsData;
-    locale?: string;
     isGuest?: boolean;
 }
 
@@ -96,7 +94,8 @@ const translations = {
         nextSteps: 'Recommended Next Steps',
         highPerformingDomains: 'High-Performing Domains',
         improvementAreas: 'Areas for Improvement',
-        applicableCriteria: 'Applicable Criteria'
+        applicableCriteria: 'Applicable Criteria',
+        allDomainsPerforming: 'All domains are performing excellently. Keep up the great work!',
     },
     ar: {
         assessmentResults: 'نتائج التقييم',
@@ -122,11 +121,31 @@ const translations = {
         nextSteps: 'الخطوات التالية الموصى بها',
         highPerformingDomains: 'المجالات عالية الأداء',
         improvementAreas: 'مجالات التحسين',
-        applicableCriteria: 'المعايير القابلة للتطبيق'
+        applicableCriteria: 'المعايير القابلة للتطبيق',
+        allDomainsPerforming: 'جميع المجالات تحقق أداءً ممتازًا. استمروا في العمل الرائع!',
     }
 };
 
-// --- HELPER FUNCTIONS & COMPONENTS ---
+// --- HELPER COMPONENTS ---
+
+const PageHeader = ({ t, assessment, results, language, isGuest, getName }: any) => (
+    <Card className="mb-8 border-0 shadow-sm bg-white">
+        <CardContent className="p-6 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                    <Award className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                    <h1 className="text-xl md:text-2xl font-bold text-gray-900">{t.assessmentResults}</h1>
+                    <p className="text-sm text-gray-600">{getName(assessment.tool)}</p>
+                </div>
+            </div>
+            <PDFGeneratorComponent assessment={assessment} results={results} locale={language} isGuest={isGuest}>
+                <Button><Download className="h-4 w-4 me-2" />{t.downloadPDF}</Button>
+            </PDFGeneratorComponent>
+        </CardContent>
+    </Card>
+);
 
 const CircularProgress = ({ value, size = 120, strokeWidth = 10 }: { value: number, size?: number, strokeWidth?: number }) => {
     const radius = (size - strokeWidth) / 2;
@@ -164,6 +183,7 @@ const DomainAccordion = ({ domain, categories, t, language }: any) => {
     const scoreBadgeColor = getScoreBadgeColor(domain.score_percentage);
 
     return (
+
         <Card className="border-gray-200 shadow-sm">
             <CardHeader className="p-4 cursor-pointer flex items-center justify-between" onClick={() => setIsOpen(!isOpen)}>
                 <div className="flex items-center gap-4">
@@ -184,7 +204,7 @@ const DomainAccordion = ({ domain, categories, t, language }: any) => {
                 <CardContent className="p-4 border-t border-gray-100">
                     <h4 className="font-semibold mb-3">{t.categoryBreakdown}</h4>
                     <div className="space-y-4">
-                        {categories.map((cat: any) => (
+                        {categories.map((cat: CategoryResult) => (
                             <div key={cat.category_id}>
                                 <div className="flex justify-between items-center mb-1 text-sm">
                                     <span className="font-medium text-gray-700">{language === 'ar' ? cat.category_name_ar : cat.category_name_en}</span>
@@ -215,7 +235,7 @@ const getScoreBadgeColor = (score: number) => {
 };
 
 // --- MAIN COMPONENT ---
-export default function AssessmentResults({ assessment, results, locale = 'en', isGuest = false }: AssessmentResultsProps) {
+export default function AssessmentResults({ assessment, results, isGuest = false }: AssessmentResultsProps) {
     const { language } = useLanguage();
     const isArabic = language === 'ar';
     const t = translations[language];
@@ -229,121 +249,104 @@ export default function AssessmentResults({ assessment, results, locale = 'en', 
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title={`${t.assessmentResults} - ${getName(assessment.tool)}`} />
 
-            <div className="min-h-screen bg-slate-50" dir={isArabic ? 'rtl' : 'ltr'}>
-                {/* Header */}
-                <div className="bg-white/80 backdrop-blur-md shadow-sm border-b border-gray-200 sticky top-0 z-40">
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                        <div className="flex items-center justify-between h-20">
-                            <div className="flex items-center gap-3">
-                                <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <Award className="w-7 h-7 text-white" />
+            <div className="min-h-screen bg-slate-50 p-4 sm:p-6" dir={isArabic ? 'rtl' : 'ltr'}>
+                <div className="max-w-7xl mx-auto">
+
+                    {/* FIX: Page Header is now inside the main layout */}
+                    <PageHeader t={t} assessment={assessment} results={results} language={language} isGuest={isGuest} getName={getName} />
+
+                    <main className="space-y-8">
+                        {/* Top Section: Score and Insights */}
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <Card className="lg:col-span-1 border-0 shadow-lg bg-white p-6 flex flex-col items-center justify-center text-center">
+                                <h3 className="text-lg font-semibold text-gray-700 mb-4">{t.overallScore}</h3>
+                                <CircularProgress value={results.overall_percentage} />
+                                <Badge className={`mt-4 px-4 py-1 text-base ${getScoreBadgeColor(results.overall_percentage)}`}>
+                                    {getScoreLevel(results.overall_percentage, t)}
+                                </Badge>
+                            </Card>
+                            <Card className="lg:col-span-2 border-0 shadow-lg bg-white p-6">
+                                <CardTitle className="flex items-center gap-3 mb-4">
+                                    <Lightbulb className="w-6 h-6 text-blue-600" />
+                                    {t.insights}
+                                </CardTitle>
+                                <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
+                                    <InsightCard icon={<CheckCircle className="h-5 w-5 text-white" />} title={t.successRate} value={`${successRate}%`} description={`${results.yes_count} / ${results.applicable_criteria}`} color="bg-emerald-500" />
+                                    <InsightCard icon={<BarChart3 className="h-5 w-5 text-white" />} title={t.overallScore} value={`${Math.round(results.overall_percentage)}%`} description={getScoreLevel(results.overall_percentage, t)} color="bg-blue-500" />
+                                    <InsightCard icon={<Target className="h-5 w-5 text-white" />} title={t.highPerformingDomains} value={results.domain_results.filter(d => d.score_percentage >= 80).length} description={`out of ${results.domain_results.length} domains`} color="bg-purple-500" />
+                                    <InsightCard icon={<AlertCircle className="h-5 w-5 text-white" />} title={t.improvementAreas} value={results.domain_results.filter(d => d.score_percentage < 60).length} description="need attention" color="bg-amber-500" />
                                 </div>
-                                <div>
-                                    <h1 className="text-xl font-bold text-gray-900">{t.assessmentResults}</h1>
-                                    <p className="text-sm text-gray-600">{getName(assessment.tool)}</p>
-                                </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                {/*<Button variant="outline"><Share2 className="h-4 w-4 mr-2" />{t.share}</Button>*/}
-                                <PDFGeneratorComponent assessment={assessment} results={results} locale={language} isGuest={isGuest}>
-                                    <Button><Download className="h-4 w-4 mr-2" />{t.downloadPDF}</Button>
-                                </PDFGeneratorComponent>
-                            </div>
+                            </Card>
                         </div>
-                    </div>
-                </div>
 
-                {/* Main Content */}
-                <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-                    {/* Top Section: Score and Insights */}
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <Card className="lg:col-span-1 border-0 shadow-lg bg-white p-6 flex flex-col items-center justify-center text-center">
-                            <h3 className="text-lg font-semibold text-gray-700 mb-4">{t.overallScore}</h3>
-                            <CircularProgress value={results.overall_percentage} />
-                            <Badge className={`mt-4 px-4 py-1 text-base ${getScoreBadgeColor(results.overall_percentage)}`}>
-                                {getScoreLevel(results.overall_percentage, t)}
-                            </Badge>
-                        </Card>
-                        <Card className="lg:col-span-2 border-0 shadow-lg bg-white p-6">
-                            <CardTitle className="flex items-center gap-3 mb-4">
-                                <Lightbulb className="w-6 h-6 text-blue-600" />
-                                {t.insights}
-                            </CardTitle>
-                            <div className="grid grid-cols-2 md:grid-cols-2 gap-4">
-                                <InsightCard icon={<CheckCircle className="h-5 w-5 text-white" />} title={t.successRate} value={`${successRate}%`} description={`${results.yes_count} / ${results.applicable_criteria}`} color="bg-emerald-500" />
-                                <InsightCard icon={<BarChart3 className="h-5 w-5 text-white" />} title={t.overallScore} value={`${Math.round(results.overall_percentage)}%`} description={getScoreLevel(results.overall_percentage, t)} color="bg-blue-500" />
-                                <InsightCard icon={<Target className="h-5 w-5 text-white" />} title={t.highPerformingDomains} value={results.domain_results.filter(d => d.score_percentage >= 80).length} description={`out of ${results.domain_results.length} domains`} color="bg-purple-500" />
-                                <InsightCard icon={<AlertCircle className="h-5 w-5 text-white" />} title={t.improvementAreas} value={results.domain_results.filter(d => d.score_percentage < 60).length} description="need attention" color="bg-amber-500" />
-                            </div>
-                        </Card>
-                    </div>
-
-                    {/* Domain Performance Section */}
-                    <Card className="border-0 shadow-lg bg-white">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <BarChart3 className="w-6 h-6 text-blue-600" />
-                                {t.domainPerformance}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 p-6">
-                            {results.domain_results.map((domain) => (
-                                <div key={domain.domain_id}>
-                                    <div className="flex justify-between items-center mb-1 text-sm">
-                                        <span className="font-semibold text-gray-800">{language === 'ar' ? domain.domain_name_ar : domain.domain_name_en}</span>
-                                        <span className={`font-bold ${getScoreBadgeColor(domain.score_percentage).replace('bg-', 'text-').replace('100', '800')}`}>{Math.round(domain.score_percentage)}%</span>
-                                    </div>
-                                    <Progress value={domain.score_percentage} className="h-2" />
-                                </div>
-                            ))}
-                        </CardContent>
-                    </Card>
-
-                    {/* Detailed Breakdown Section */}
-                    <div>
-                        <h2 className="text-2xl font-bold text-gray-900 mb-4">{t.detailedResults}</h2>
-                        <div className="space-y-4">
-                            {results.domain_results.map((domain) => (
-                                <DomainAccordion
-                                    key={domain.domain_id}
-                                    domain={domain}
-                                    categories={results.category_results[domain.domain_id] || []}
-                                    t={t}
-                                    language={language}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Recommendations Section */}
-                    <Card className="border-0 shadow-lg bg-white">
-                        <CardHeader>
-                            <CardTitle className="flex items-center gap-3">
-                                <TrendingUp className="w-6 h-6 text-amber-600" />
-                                {t.nextSteps}
-                            </CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4 p-6">
-                            {results.domain_results.every(d => d.score_percentage >= 80) ? (
-                                <div className="border-l-4 border-emerald-500 pl-4 py-2 bg-emerald-50/50">
-                                    <h4 className="font-bold text-emerald-900">{t.excellentPerformance}</h4>
-                                    <p className="text-emerald-800">{t.allDomainsPerforming}</p>
-                                </div>
-                            ) : (
-                                results.domain_results
-                                    .filter(domain => domain.score_percentage < 80)
-                                    .sort((a, b) => a.score_percentage - b.score_percentage)
-                                    .map(domain => (
-                                        <div key={domain.domain_id} className="border-l-4 border-amber-500 pl-4 py-2 bg-amber-50/50">
-                                            <h4 className="font-bold text-amber-900">{language === 'ar' ? domain.domain_name_ar : domain.domain_name_en}</h4>
-                                            <p className="text-amber-800">{t.focusOnImprovement}</p>
+                        {/* Domain Performance Section */}
+                        <Card className="border-0 shadow-lg bg-white">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3">
+                                    <BarChart3 className="w-6 h-6 text-blue-600" />
+                                    {t.domainPerformance}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4 p-6">
+                                {results.domain_results.map((domain) => (
+                                    <div key={domain.domain_id}>
+                                        <div className="flex justify-between items-center mb-1 text-sm">
+                                            <span className="font-semibold text-gray-800">{language === 'ar' ? domain.domain_name_ar : domain.domain_name_en}</span>
+                                            <span className={`font-bold ${getScoreBadgeColor(domain.score_percentage).replace('bg-', 'text-').replace('100', '800')}`}>{Math.round(domain.score_percentage)}%</span>
                                         </div>
-                                    ))
-                            )}
-                        </CardContent>
-                    </Card>
-                </main>
+                                        <Progress value={domain.score_percentage} className="h-2" />
+                                    </div>
+                                ))}
+                            </CardContent>
+                        </Card>
+
+                        {/* Detailed Breakdown Section */}
+                        <div>
+                            <h2 className="text-2xl font-bold text-gray-900 mb-4">{t.detailedResults}</h2>
+                            <div className="space-y-4">
+                                {results.domain_results.map((domain) => (
+                                    <DomainAccordion
+                                        key={domain.domain_id}
+                                        domain={domain}
+                                        categories={results.category_results[domain.domain_id] || []}
+                                        t={t}
+                                        language={language}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Recommendations Section */}
+                        <Card className="border-0 shadow-lg bg-white">
+                            <CardHeader>
+                                <CardTitle className="flex items-center gap-3">
+                                    <TrendingUp className="w-6 h-6 text-amber-600" />
+                                    {t.nextSteps}
+                                </CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4 p-6">
+                                {results.domain_results.every(d => d.score_percentage >= 80) ? (
+                                    <div className="border-l-4 border-emerald-500 pl-4 py-2 bg-emerald-50/50">
+                                        <h4 className="font-bold text-emerald-900">{t.excellentPerformance}</h4>
+                                        <p className="text-emerald-800">{t.allDomainsPerforming}</p>
+                                    </div>
+                                ) : (
+                                    results.domain_results
+                                        .filter(domain => domain.score_percentage < 80)
+                                        .sort((a, b) => a.score_percentage - b.score_percentage)
+                                        .map(domain => (
+                                            <div key={domain.domain_id} className="border-l-4 border-amber-500 pl-4 py-2 bg-amber-50/50">
+                                                <h4 className="font-bold text-amber-900">{language === 'ar' ? domain.domain_name_ar : domain.domain_name_en}</h4>
+                                                <p className="text-amber-800">{t.focusOnImprovement}</p>
+                                            </div>
+                                        ))
+                                )}
+                            </CardContent>
+                        </Card>
+                    </main>
+                </div>
             </div>
         </AppLayout>
     );
 }
+

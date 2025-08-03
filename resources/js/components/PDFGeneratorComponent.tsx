@@ -6,7 +6,6 @@ import {
     Save,
     Share2,
     CheckCircle,
-    AlertCircle,
     Loader2,
     Copy
 } from 'lucide-react';
@@ -42,19 +41,17 @@ interface PDFGeneratorComponentProps {
     results: AssessmentResults;
     locale?: string;
     isGuest?: boolean;
+    children: React.ReactNode; // Added to wrap the trigger button
 }
 
 // --- TRANSLATIONS ---
 const translations = {
     en: {
-        downloadPDF: 'Download PDF',
         menuTitle: 'Assessment Summary',
         score: 'Score',
         yes: 'Yes',
         no: 'No',
-        na: 'N/A',
         applicableCriteria: 'Applicable Criteria',
-        totalCriteria: 'Total Criteria',
         download: 'Download',
         preview: 'Preview',
         save: 'Save',
@@ -73,14 +70,11 @@ const translations = {
         copyError: 'Failed to copy link.',
     },
     ar: {
-        downloadPDF: 'تحميل التقرير',
         menuTitle: 'ملخص التقييم',
         score: 'النتيجة',
         yes: 'نعم',
         no: 'لا',
-        na: 'غير مطبق',
         applicableCriteria: 'المعايير المطبقة',
-        totalCriteria: 'إجمالي المعايير',
         download: 'تنزيل',
         preview: 'معاينة',
         save: 'حفظ',
@@ -105,7 +99,8 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorComponentProps> = ({
                                                                          assessment,
                                                                          results,
                                                                          locale = 'en',
-                                                                         isGuest = false
+                                                                         isGuest = false,
+                                                                         children
                                                                      }) => {
     const { toast } = useToast();
     const { language } = useLanguage();
@@ -148,11 +143,14 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorComponentProps> = ({
 
         setLoading(action, true);
         try {
-            const url = `/assessment/${assessment.id}/pdf/${action}`;
+            // THE FIX: Append the current language as a query parameter to the URL.
+            const url = `/assessment/${assessment.id}/pdf/${action}?lang=${language}`;
+
             if (action === 'save') {
                 const response = await fetch(url, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': getCSRFToken(), 'Accept': 'application/json' },
+                    body: JSON.stringify({ lang: language }) // Also send lang in body for POST
                 });
                 const data = await response.json();
                 if (!response.ok) throw new Error(data.message || 'Server error');
@@ -177,19 +175,18 @@ const PDFGeneratorComponent: React.FC<PDFGeneratorComponentProps> = ({
     };
 
     const toolName = isArabic ? assessment.tool.name_ar : assessment.tool.name_en;
-    const summaryText = `${toolName} - ${t.score}: ${Math.round(results.overall_percentage)}% (${results.yes_count} ${t.yes}, ${results.no_count} ${t.no}) - ${t.applicableCriteria}: ${results.applicable_criteria}`;
+    const summaryText = `${toolName} - ${t.score}: ${Math.round(results.overall_percentage)}% (${results.yes_count} ${t.yes}, ${results.no_count} ${t.no})`;
 
     return (
         <div className="relative inline-block text-left">
-            <Button onClick={() => setIsMenuOpen(!isMenuOpen)}>
-                <Download className="h-4 w-4 me-2" />
-                {t.downloadPDF}
-            </Button>
+            <div onClick={() => setIsMenuOpen(!isMenuOpen)}>
+                {children}
+            </div>
 
             {isMenuOpen && (
                 <div
                     ref={menuRef}
-                    className="origin-top-right rtl:origin-top-left absolute right-0 rtl:left-0 rtl:right-auto mt-2 w-80 rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+                    className="origin-top-right rtl:origin-top-left absolute right-0 rtl:left-0 rtl:right-auto mt-2 w-80 rounded-xl shadow-2xl bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50 animate-fade-in-up"
                 >
                     <div className="py-1">
                         <div className="px-4 py-3 border-b border-gray-200">
@@ -216,7 +213,7 @@ const ActionButton = ({ icon, label, onClick, loading, disabled = false }: any) 
     <button
         onClick={onClick}
         disabled={loading || disabled}
-        className="flex items-center w-full px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed"
+        className="flex items-center w-full px-3 py-2 text-sm text-gray-700 rounded-lg hover:bg-gray-100 hover:text-gray-900 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
     >
         {loading ? <Loader2 className="h-4 w-4 me-2 animate-spin" /> : React.cloneElement(icon, { className: "h-4 w-4 me-2" })}
         {label}

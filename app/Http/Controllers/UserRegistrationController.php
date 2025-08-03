@@ -44,6 +44,8 @@ class UserRegistrationController extends Controller
                 'password.min' => 'Password must be at least 8 characters long.',
                   'password.confirmed' => 'Password confirmation does not match.',
                   'company_name.required' => 'Company name is required.',
+                'password.confirmed' => 'Password confirmation does not match.',
+                'company_name.required' => 'Company name is required.',
             ]);
 
             Log::info('Validation passed for user registration', ['email' => $validated['email']]);
@@ -78,6 +80,8 @@ class UserRegistrationController extends Controller
                         'preferred_language' => app()->getLocale(),
                         'marketing_emails' => (bool) ($validated['marketing_emails'] ?? false),
                         'newsletter_subscription' => (bool) ($validated['newsletter_subscription'] ?? false),
+                        'marketing_emails' => true,
+                        'newsletter_subscription' => false,
                         'profile_completed' => false,
                     ]);
                     Log::info('User details created', ['user_id' => $user->id]);
@@ -194,6 +198,8 @@ class UserRegistrationController extends Controller
             'website' => ['nullable', 'url', 'max:255'],
             'notes' => ['nullable', 'string'],
             'how_did_you_hear' => ['nullable', 'string', 'max:255'],
+            'phone' => ['required', 'string', 'max:255'],
+            'address' => ['required', 'string'],
         ]);
 
         $user = $request->user();
@@ -212,6 +218,8 @@ class UserRegistrationController extends Controller
                 'website' => $data['website'] ?? null,
                 'notes' => $data['notes'] ?? null,
                 'how_did_you_hear' => $data['how_did_you_hear'] ?? null,
+                'phone' => $data['phone'],
+                'address' => $data['address'],
                 'profile_completed' => true,
             ]);
         }

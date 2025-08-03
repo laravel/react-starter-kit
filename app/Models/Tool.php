@@ -160,4 +160,29 @@ class Tool extends Model
         // or define premium tools by their IDs
         return $this->premium_only ?? false;
     }
+
+
+    /**
+     * Performance level thresholds associated with this tool.
+     */
+    public function performanceLevels()
+    {
+        return $this->hasMany(ToolPerformanceLevel::class)->orderBy('min_percentage');
+    }
+
+    public function getPerformanceByScore(float $percentage): ?ToolPerformanceLevel
+    {
+        $percentage = floatval($percentage); // ensure number
+
+        return $this->performanceLevels()
+            ->where('min_percentage', '<=', $percentage)
+            ->orderBy('min_percentage', 'asc') // ← ascending
+            ->get()
+            ->last(); // ← get highest within qualifying
+    }
+
+
+
+
+
 }
