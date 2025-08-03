@@ -16,12 +16,19 @@ class UserDetails extends Model
         'company',
         'company_type',
         'company_name',
+        'company_name_ar',
+        'company_name_en',
+        'region',
         'city',
+        'employee_name_ar',
+        'employee_name_en',
+        'employee_type',
         'position',
         'website',
         'address',
         'country',
         'industry',
+        'notes',
         'company_size',
         'established_year',
         'annual_revenue',
@@ -35,16 +42,20 @@ class UserDetails extends Model
         'how_did_you_hear',
         'marketing_emails',
         'newsletter_subscription',
+        'profile_completed',
     ];
 
     protected $casts = [
         'communication_preferences' => 'array',
         'interests' => 'array',
+        'company_type' => 'integer',
+        'employee_type' => 'integer',
         'marketing_emails' => 'boolean',
         'newsletter_subscription' => 'boolean',
         'annual_revenue' => 'decimal:2',
         'established_year' => 'integer',
         'company_size' => 'integer',
+        'profile_completed' => 'boolean',
     ];
 
     /**
