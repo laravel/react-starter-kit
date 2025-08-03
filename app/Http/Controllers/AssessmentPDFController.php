@@ -1,6 +1,12 @@
 <?php
 
-
+/**
+ * File Location: app/Http/Controllers/AssessmentPDFController.php
+ *
+ * This controller handles PDF generation for assessment results.
+ * It works dynamically with any tool and generates professional PDF reports.
+ * Now supports bilingual PDF generation (EN/AR).
+ */
 
 namespace App\Http\Controllers;
 
@@ -154,7 +160,6 @@ class AssessmentPDFController extends Controller
 
             // Get language from request
             $language = $request->get('lang', 'en');
-
             if (!in_array($language, ['en', 'ar'])) {
                 $language = 'en';
             }
