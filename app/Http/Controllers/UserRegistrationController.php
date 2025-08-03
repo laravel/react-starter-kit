@@ -32,17 +32,9 @@ class UserRegistrationController extends Controller
                 'name' => 'required|string|max:255',
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:8|confirmed',
-                'phone' => 'nullable|string|max:20',
-                'company_name' => 'nullable|string|max:255',
-                'position' => 'nullable|string|max:255',
-                'city' => 'nullable|string|max:255',
-                'website' => 'nullable|url|max:255',
-                'industry' => 'nullable|string|max:100',
-                'company_size' => 'nullable|string|max:100',
-                'how_did_you_hear' => 'nullable|string|max:255',
-                'marketing_emails' => 'boolean',
-                'newsletter_subscription' => 'boolean',
-                'agree_terms' => 'required|accepted',
+                'company_name' => 'required|string|max:255',
+                'marketing_emails' => 'nullable|boolean',
+                'newsletter_subscription' => 'nullable|boolean',
             ], [
                 'name.required' => 'Full name is required.',
                 'email.required' => 'Email address is required.',
@@ -50,10 +42,8 @@ class UserRegistrationController extends Controller
                 'email.unique' => 'This email address is already registered. Please use a different email or try signing in.',
                 'password.required' => 'Password is required.',
                 'password.min' => 'Password must be at least 8 characters long.',
-                'password.confirmed' => 'Password confirmation does not match.',
-                'agree_terms.required' => 'You must agree to the terms and conditions.',
-                'agree_terms.accepted' => 'You must agree to the terms and conditions.',
-                'website.url' => 'Please enter a valid website URL.',
+                  'password.confirmed' => 'Password confirmation does not match.',
+                  'company_name.required' => 'Company name is required.',
             ]);
 
             Log::info('Validation passed for user registration', ['email' => $validated['email']]);
@@ -83,18 +73,12 @@ class UserRegistrationController extends Controller
             try {
                 if (method_exists($user, 'details')) {
                     $user->details()->create([
-                        'organization' => $validated['company_name'] ?? 'Not specified',
-                        'phone' => $validated['phone'] ?? null,
-                        'company_name' => $validated['company_name'] ?? null,
-                        'position' => $validated['position'] ?? null,
-                        'city' => $validated['city'] ?? null,
-                        'website' => $validated['website'] ?? null,
-                        'industry' => $validated['industry'] ?? null,
-                        'company_size' => $validated['company_size'] ?? null,
-                        'how_did_you_hear' => $validated['how_did_you_hear'] ?? null,
-                        'marketing_emails' => $validated['marketing_emails'] ?? true,
-                        'newsletter_subscription' => $validated['newsletter_subscription'] ?? false,
+                        'company' => $validated['company_name'],
+                        'company_name' => $validated['company_name'],
                         'preferred_language' => app()->getLocale(),
+                        'marketing_emails' => (bool) ($validated['marketing_emails'] ?? false),
+                        'newsletter_subscription' => (bool) ($validated['newsletter_subscription'] ?? false),
+                        'profile_completed' => false,
                     ]);
                     Log::info('User details created', ['user_id' => $user->id]);
                 }
@@ -190,6 +174,49 @@ class UserRegistrationController extends Controller
                 'email' => 'Registration failed due to a system error. Please try again in a few moments.'
             ]);
         }
+    }
+
+    /**
+     * Complete user profile after initial registration
+     */
+    public function completeProfile(Request $request)
+    {
+        $data = $request->validate([
+            'company_name_ar' => ['required', 'string', 'max:255'],
+            'company_name_en' => ['required', 'string', 'max:255'],
+            'company_type' => ['required', 'integer', 'in:1,2,3'],
+            'region' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'employee_name_ar' => ['required', 'string', 'max:255'],
+            'employee_name_en' => ['required', 'string', 'max:255'],
+            'employee_type' => ['required', 'integer', 'in:1,2,3,4,5,6,7'],
+            'phone' => ['required', 'string', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'how_did_you_hear' => ['nullable', 'string', 'max:255'],
+        ]);
+
+        $user = $request->user();
+
+        if ($user && $user->details) {
+            $user->details->update([
+                'company_name_ar' => $data['company_name_ar'],
+                'company_name_en' => $data['company_name_en'],
+                'company_type' => $data['company_type'],
+                'region' => $data['region'],
+                'city' => $data['city'],
+                'employee_name_ar' => $data['employee_name_ar'],
+                'employee_name_en' => $data['employee_name_en'],
+                'employee_type' => $data['employee_type'],
+                'phone' => $data['phone'],
+                'website' => $data['website'] ?? null,
+                'notes' => $data['notes'] ?? null,
+                'how_did_you_hear' => $data['how_did_you_hear'] ?? null,
+                'profile_completed' => true,
+            ]);
+        }
+
+        return redirect()->route('dashboard');
     }
 
     /**

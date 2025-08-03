@@ -435,6 +435,7 @@ class User extends Authenticatable implements FilamentUser
                 'preferred_language' => 'en',
                 'marketing_emails' => true,
                 'newsletter_subscription' => false,
+                'profile_completed' => false,
             ]);
         }
     }
@@ -454,6 +455,11 @@ class User extends Authenticatable implements FilamentUser
     {
         // Only if they have bought at least one tool or are admin
         return $this->hasAnyToolSubscription() || $this->isAdmin();
+    }
+
+    public function hasCompletedProfile(): bool
+    {
+        return (bool) ($this->details?->profile_completed);
     }
     public function hasAccessToTool(int $toolId): bool
     {
