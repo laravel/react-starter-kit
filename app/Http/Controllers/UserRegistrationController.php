@@ -33,6 +33,8 @@ class UserRegistrationController extends Controller
                 'email' => 'required|string|email|max:255|unique:users,email',
                 'password' => 'required|string|min:8|confirmed',
                 'company_name' => 'required|string|max:255',
+                'marketing_emails' => 'nullable|boolean',
+                'newsletter_subscription' => 'nullable|boolean',
             ], [
                 'name.required' => 'Full name is required.',
                 'email.required' => 'Email address is required.',
@@ -40,6 +42,8 @@ class UserRegistrationController extends Controller
                 'email.unique' => 'This email address is already registered. Please use a different email or try signing in.',
                 'password.required' => 'Password is required.',
                 'password.min' => 'Password must be at least 8 characters long.',
+                  'password.confirmed' => 'Password confirmation does not match.',
+                  'company_name.required' => 'Company name is required.',
                 'password.confirmed' => 'Password confirmation does not match.',
                 'company_name.required' => 'Company name is required.',
             ]);
@@ -74,6 +78,8 @@ class UserRegistrationController extends Controller
                         'company' => $validated['company_name'],
                         'company_name' => $validated['company_name'],
                         'preferred_language' => app()->getLocale(),
+                        'marketing_emails' => (bool) ($validated['marketing_emails'] ?? false),
+                        'newsletter_subscription' => (bool) ($validated['newsletter_subscription'] ?? false),
                         'marketing_emails' => true,
                         'newsletter_subscription' => false,
                         'profile_completed' => false,
@@ -180,6 +186,18 @@ class UserRegistrationController extends Controller
     public function completeProfile(Request $request)
     {
         $data = $request->validate([
+            'company_name_ar' => ['required', 'string', 'max:255'],
+            'company_name_en' => ['required', 'string', 'max:255'],
+            'company_type' => ['required', 'integer', 'in:1,2,3'],
+            'region' => ['required', 'string', 'max:255'],
+            'city' => ['required', 'string', 'max:255'],
+            'employee_name_ar' => ['required', 'string', 'max:255'],
+            'employee_name_en' => ['required', 'string', 'max:255'],
+            'employee_type' => ['required', 'integer', 'in:1,2,3,4,5,6,7'],
+            'phone' => ['required', 'string', 'max:255'],
+            'website' => ['nullable', 'url', 'max:255'],
+            'notes' => ['nullable', 'string'],
+            'how_did_you_hear' => ['nullable', 'string', 'max:255'],
             'phone' => ['required', 'string', 'max:255'],
             'address' => ['required', 'string'],
         ]);
@@ -188,6 +206,18 @@ class UserRegistrationController extends Controller
 
         if ($user && $user->details) {
             $user->details->update([
+                'company_name_ar' => $data['company_name_ar'],
+                'company_name_en' => $data['company_name_en'],
+                'company_type' => $data['company_type'],
+                'region' => $data['region'],
+                'city' => $data['city'],
+                'employee_name_ar' => $data['employee_name_ar'],
+                'employee_name_en' => $data['employee_name_en'],
+                'employee_type' => $data['employee_type'],
+                'phone' => $data['phone'],
+                'website' => $data['website'] ?? null,
+                'notes' => $data['notes'] ?? null,
+                'how_did_you_hear' => $data['how_did_you_hear'] ?? null,
                 'phone' => $data['phone'],
                 'address' => $data['address'],
                 'profile_completed' => true,

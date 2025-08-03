@@ -63,6 +63,8 @@ const translations = {
         industry: "Type",
         companySize: "Company Size",
         agreeTerms: "I agree to Terms & Privacy Policy",
+        newsletterOptIn: "Subscribe to newsletter",
+        marketingOptIn: "Receive marketing emails",
         rememberMe: "Remember me",
         forgotPassword: "Forgot password?",
         processing: "Processing...",
@@ -99,6 +101,8 @@ const translations = {
         industry: "الفئة",
         companySize: "حجم الشركة",
         agreeTerms: "أوافق على الشروط وسياسة الخصوصية",
+        newsletterOptIn: "الاشتراك في النشرة البريدية",
+        marketingOptIn: "استقبال رسائل تسويقية",
         rememberMe: "تذكرني",
         forgotPassword: "نسيت كلمة المرور؟",
         processing: "جاري المعالجة...",
@@ -124,6 +128,8 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
         password: '',
         password_confirmation: '',
         company_name: '',
+        marketing_emails: false,
+        newsletter_subscription: false,
     });
 
     // Login form
@@ -592,6 +598,32 @@ export default function Welcome2({ auth, locale = 'en' }: Welcome2Props) {
                                                 className="border-blue-200 focus:border-blue-500 focus:ring-blue-500 h-12 rounded-xl"
                                                 placeholder={t.companyName}
                                             />
+                                        </div>
+
+                                        {/* Marketing Emails */}
+                                        <div className="flex items-center space-x-2 mt-4">
+                                            <Checkbox
+                                                id="marketing_emails"
+                                                checked={newUserData.marketing_emails}
+                                                onCheckedChange={(checked) => setNewUserData('marketing_emails', !!checked)}
+                                                className="border-blue-300 data-[state=checked]:bg-blue-600"
+                                            />
+                                            <label htmlFor="marketing_emails" className="text-blue-900 text-sm cursor-pointer">
+                                                {t.marketingOptIn}
+                                            </label>
+                                        </div>
+
+                                        {/* Newsletter Subscription */}
+                                        <div className="flex items-center space-x-2 mt-2">
+                                            <Checkbox
+                                                id="newsletter_subscription"
+                                                checked={newUserData.newsletter_subscription}
+                                                onCheckedChange={(checked) => setNewUserData('newsletter_subscription', !!checked)}
+                                                className="border-blue-300 data-[state=checked]:bg-blue-600"
+                                            />
+                                            <label htmlFor="newsletter_subscription" className="text-blue-900 text-sm cursor-pointer">
+                                                {t.newsletterOptIn}
+                                            </label>
                                         </div>
                                     </div>
 
