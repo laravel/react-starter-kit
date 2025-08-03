@@ -317,7 +317,6 @@ const ProfileWizard = ({ onComplete }: ProfileWizardProps) => {
       )}
     </div>
   );
-=======
 
 interface ProfileWizardProps {
     onComplete?: () => void;
