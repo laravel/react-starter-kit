@@ -194,10 +194,21 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::middleware(['checkAccess:premium'])->group(function () {
 
+        Route::get('/profile/setup', function () {
+            return Inertia::render('ProfileWizard');
+        })->name('profile.setup');
+
+        Route::post('/profile/setup', [UserRegistrationController::class, 'completeProfile'])
+            ->name('profile.complete');
+
         // Dashboard access
-                 Route::get('dashboard', function () {
-                return Inertia::render('dashboard');
-            })->name('dashboard');
+        Route::get('dashboard', function () {
+            $user = auth()->user();
+            if (!$user->hasCompletedProfile()) {
+                return redirect()->route('profile.setup');
+            }
+            return Inertia::render('dashboard');
+        })->name('dashboard');
 
         // Assessment tools access
         Route::get('/assessment-tools', [AssessmentToolsController::class, 'index'])
