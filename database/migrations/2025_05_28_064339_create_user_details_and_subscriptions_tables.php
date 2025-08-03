@@ -17,14 +17,23 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('phone')->nullable();
             $table->string('company')->nullable();
-            $table->enum('company_type', ['commercial', 'government', 'service'])->nullable();
+            // 1: Service, 2: Industrial, 3: Commercial
+            $table->unsignedTinyInteger('company_type')->nullable();
             $table->string('company_name')->nullable();
+            $table->string('company_name_ar')->nullable();
+            $table->string('company_name_en')->nullable();
+            $table->string('region')->nullable();
             $table->string('city')->nullable();
+            $table->string('employee_name_ar')->nullable();
+            $table->string('employee_name_en')->nullable();
+            // 1: Owner, 2: Board Chair, 3: General Manager, 4: CEO, 5: Department Manager, 6: Head of Section, 7: Authorized Employee
+            $table->unsignedTinyInteger('employee_type')->nullable();
             $table->string('position')->nullable();
             $table->string('website')->nullable();
             $table->text('address')->nullable();
             $table->string('country')->nullable();
             $table->string('industry')->nullable();
+            $table->text('notes')->nullable();
             $table->integer('company_size')->nullable(); // Number of employees
             $table->year('established_year')->nullable();
             $table->decimal('annual_revenue', 15, 2)->nullable();
