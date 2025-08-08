@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
+import { store as newPasswordControllerStore } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
 
 interface ResetPasswordProps {
     token: string;
@@ -30,7 +31,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
 
     const submit: FormEventHandler = (e) => {
         e.preventDefault();
-        post(route('password.store'), {
+        post(newPasswordControllerStore.url(), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
