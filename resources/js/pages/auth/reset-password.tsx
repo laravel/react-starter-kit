@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { store as newPasswordControllerStore } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
+import { store } from '@/actions/App/Http/Controllers/Auth/NewPasswordController';
 
 interface ResetPasswordProps {
     token: string;
@@ -22,16 +22,16 @@ type ResetPasswordForm = {
 };
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
+    const { data, setData, submit, processing, errors, reset } = useForm<Required<ResetPasswordForm>>({
         token: token,
         email: email,
         password: '',
         password_confirmation: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submitForm: FormEventHandler = (e) => {
         e.preventDefault();
-        post(newPasswordControllerStore.url(), {
+        submit(store(), {
             onFinish: () => reset('password', 'password_confirmation'),
         });
     };
@@ -40,7 +40,7 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
         <AuthLayout title="Reset password" description="Please enter your new password below">
             <Head title="Reset password" />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submitForm}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email</Label>

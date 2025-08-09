@@ -10,7 +10,7 @@ import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { update as passwordControllerUpdate } from '@/actions/App/Http/Controllers/Settings/PasswordController';
+import { update } from '@/actions/App/Http/Controllers/Settings/PasswordController';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,7 +23,7 @@ export default function Password() {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
 
-    const { data, setData, errors, put, reset, processing, recentlySuccessful } = useForm({
+    const { data, setData, errors, submit, reset, processing, recentlySuccessful } = useForm({
         current_password: '',
         password: '',
         password_confirmation: '',
@@ -32,7 +32,7 @@ export default function Password() {
     const updatePassword: FormEventHandler = (e) => {
         e.preventDefault();
 
-        put(passwordControllerUpdate.url(), {
+        submit(update(), {
             preserveScroll: true,
             onSuccess: () => reset(),
             onError: (errors) => {

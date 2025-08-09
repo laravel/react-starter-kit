@@ -8,17 +8,17 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { store as confirmablePasswordControllerStore } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
+import { store } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
 
 export default function ConfirmPassword() {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<{ password: string }>>({
+    const { data, setData, submit, processing, errors, reset } = useForm<Required<{ password: string }>>({
         password: '',
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submitForm: FormEventHandler = (e) => {
         e.preventDefault();
 
-        post(confirmablePasswordControllerStore.url(), {
+        submit(store(), {
             onFinish: () => reset('password'),
         });
     };
@@ -30,7 +30,7 @@ export default function ConfirmPassword() {
         >
             <Head title="Confirm password" />
 
-            <form onSubmit={submit}>
+            <form onSubmit={submitForm}>
                 <div className="space-y-6">
                     <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>

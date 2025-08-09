@@ -9,9 +9,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { store as authenticatedSessionControllerStore } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
-import { register as registerRoute } from '@/routes';
-import { request as passwordRequestRoute } from '@/routes/password';
+import { store } from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
+import { register } from '@/routes';
+import { request } from '@/routes/password';
 
 type LoginForm = {
     email: string;
@@ -25,15 +25,15 @@ interface LoginProps {
 }
 
 export default function Login({ status, canResetPassword }: LoginProps) {
-    const { data, setData, post, processing, errors, reset } = useForm<Required<LoginForm>>({
+    const { data, setData, submit, processing, errors, reset } = useForm<Required<LoginForm>>({
         email: '',
         password: '',
         remember: false,
     });
 
-    const submit: FormEventHandler = (e) => {
+    const submitForm: FormEventHandler = (e) => {
         e.preventDefault();
-        post(authenticatedSessionControllerStore.url(), {
+        submit(store(), {
             onFinish: () => reset('password'),
         });
     };
@@ -42,7 +42,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
         <AuthLayout title="Log in to your account" description="Enter your email and password below to log in">
             <Head title="Log in" />
 
-            <form className="flex flex-col gap-6" onSubmit={submit}>
+            <form className="flex flex-col gap-6" onSubmit={submitForm}>
                 <div className="grid gap-6">
                     <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
@@ -64,7 +64,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                         <div className="flex items-center">
                             <Label htmlFor="password">Password</Label>
                             {canResetPassword && (
-                                <TextLink href={passwordRequestRoute.url()} className="ml-auto text-sm" tabIndex={5}>
+                                <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
                                     Forgot password?
                                 </TextLink>
                             )}
@@ -101,7 +101,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
 
                 <div className="text-center text-sm text-muted-foreground">
                     Don't have an account?{' '}
-                    <TextLink href={registerRoute.url()} tabIndex={5}>
+                    <TextLink href={register()} tabIndex={5}>
                         Sign up
                     </TextLink>
                 </div>
