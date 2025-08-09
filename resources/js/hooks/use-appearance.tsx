@@ -65,7 +65,7 @@ export function useAppearance() {
         setCookie('appearance', mode);
 
         applyTheme(mode);
-    }, []);
+    }, [setColorScheme]);
 
     useEffect(() => {
         const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
