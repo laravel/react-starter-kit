@@ -1,30 +1,9 @@
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
-
-import { Button } from '@/components/ui/button';
-
 import HeadingSmall from '@/components/heading-small';
-
+import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Form } from '@inertiajs/react';
 
 export default function DeleteUser() {
-    const { delete: destroy, processing, reset, clearErrors } = useForm();
-
-    const deleteUser: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        destroy(route('profile.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onFinish: () => reset(),
-        });
-    };
-
-    const closeModal = () => {
-        clearErrors();
-        reset();
-    };
-
     return (
         <div className="space-y-6">
             <HeadingSmall title="Delete account" description="Delete your account and all of its resources" />
@@ -41,22 +20,34 @@ export default function DeleteUser() {
                     <DialogContent>
                         <DialogTitle>Are you sure you want to delete your account?</DialogTitle>
                         <DialogDescription>
-                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please confirm
-                            you would like to permanently delete your account.
+                            Once your account is deleted, all of its resources and data will also be permanently deleted. Please confirm you would
+                            like to permanently delete your account.
                         </DialogDescription>
-                        <form method="POST" className="space-y-6" onSubmit={deleteUser}>
-                            <DialogFooter className="gap-2">
-                                <DialogClose asChild>
-                                    <Button variant="secondary" onClick={closeModal}>
-                                        Cancel
-                                    </Button>
-                                </DialogClose>
+                        <Form
+                            method="delete"
+                            action={route('profile.destroy')}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                            resetOnSuccess
+                            className="space-y-6"
+                        >
+                            {({ resetAndClearErrors, processing, errors }) => (
+                                <>
+                                    <DialogFooter className="gap-2">
+                                        <DialogClose asChild>
+                                            <Button variant="secondary" onClick={() => resetAndClearErrors()}>
+                                                Cancel
+                                            </Button>
+                                        </DialogClose>
 
-                                <Button variant="destructive" disabled={processing} asChild>
-                                    <button type="submit">Delete account</button>
-                                </Button>
-                            </DialogFooter>
-                        </form>
+                                        <Button variant="destructive" disabled={processing} asChild>
+                                            <button type="submit">Delete account</button>
+                                        </Button>
+                                    </DialogFooter>
+                                </>
+                            )}
+                        </Form>
                     </DialogContent>
                 </Dialog>
             </div>
