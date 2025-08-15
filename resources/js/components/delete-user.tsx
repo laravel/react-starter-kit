@@ -1,33 +1,15 @@
-import { useForm } from '@inertiajs/react';
-import { FormEventHandler, useRef } from 'react';
+import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 
+import { Form } from '@inertiajs/react';
 import { Button, Modal, PasswordInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
-    const { data, setData, delete: destroy, processing, reset, errors, clearErrors } = useForm<Required<{ password: string }>>({ password: '' });
 
     const [opened, { toggle, close }] = useDisclosure(false);
-
-    const deleteUser: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        destroy(route('profile.destroy'), {
-            preserveScroll: true,
-            onSuccess: () => closeModal(),
-            onError: () => passwordInput.current?.focus(),
-            onFinish: () => reset(),
-        });
-    };
-
-    const closeModal = () => {
-        clearErrors();
-        reset();
-        close();
-    };
 
     return (
         <div className="space-y-6">
@@ -54,31 +36,51 @@ export default function DeleteUser() {
                         Once your account is deleted, all of its resources and data will also be permanently deleted. Please enter your password to
                         confirm you would like to permanently delete your account.
                     </div>
-                    <form className="space-y-6" onSubmit={deleteUser}>
-                        <div className="mt-4">
-                            <PasswordInput
-                                id="password"
-                                type="password"
-                                name="password"
-                                error={errors.password}
-                                ref={passwordInput}
-                                value={data.password}
-                                onChange={(e) => setData('password', e.target.value)}
-                                placeholder="Password"
-                                autoComplete="current-password"
-                            />
-                        </div>
+                    <Form
+                        method="delete"
+                        action={route('profile.destroy')}
+                        options={{
+                            preserveScroll: true,
+                        }}
+                        onError={() => passwordInput.current?.focus()}
+                        onSubmitComplete={(form) => {
+                            form.reset();
+                            close();
+                        }}
+                        className="space-y-6"
+                    >
+                        {({ resetAndClearErrors, processing, errors }) => (
+                            <>
+                                <div className="mt-4">
+                                    <PasswordInput
+                                        id="password"
+                                        type="password"
+                                        name="password"
+                                        error={errors.password}
+                                        ref={passwordInput}
+                                        placeholder="Password"
+                                        autoComplete="current-password"
+                                    />
+                                </div>
 
-                        <div className="flex justify-end gap-2">
-                            <Button variant="outline" onClick={closeModal}>
-                                Cancel
-                            </Button>
+                                <div className="flex justify-end gap-2">
+                                    <Button
+                                        variant="outline"
+                                        onClick={() => {
+                                            resetAndClearErrors();
+                                            close();
+                                        }}
+                                    >
+                                        Cancel
+                                    </Button>
 
-                            <Button color="red" type="submit" disabled={processing}>
-                                Delete account
-                            </Button>
-                        </div>
-                    </form>
+                                    <Button color="red" type="submit" disabled={processing}>
+                                        Delete account
+                                    </Button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
                 </Modal>
             </div>
         </div>

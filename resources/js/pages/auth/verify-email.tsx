@@ -1,21 +1,12 @@
 // Components
-import { Head, router, useForm } from '@inertiajs/react';
-import { FormEventHandler } from 'react';
+import { Form, Head, router } from '@inertiajs/react';
 
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import AuthLayout from '@/layouts/auth-layout';
 import { Button } from '@mantine/core';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 
 export default function VerifyEmail({ status }: { status?: string }) {
-    const { post, processing } = useForm({});
-
     const cleanup = useMobileNavigation();
-
-    const submit: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        post(route('verification.send'));
-    };
 
     const handleLogout = () => {
         cleanup();
@@ -33,15 +24,19 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <form onSubmit={submit} className="space-y-6 text-center flex flex-col items-center">
-                <Button type='submit' disabled={processing} variant="outline" loading={processing}>
-                    Resend verification email
-                </Button>
+            <Form method="post" action={route('verification.send')} className="flex flex-col items-center space-y-6 text-center">
+                {({ processing }) => (
+                    <>
+                        <Button type="submit" disabled={processing} variant="outline" loading={processing}>
+                            Resend verification email
+                        </Button>
 
-                <Button type='button' onClick={handleLogout} variant='subtle' className="cursor-pointer mx-auto block text-sm">
-                    Log out
-                </Button>
-            </form>
+                        <Button type="button" onClick={handleLogout} variant="subtle" className="mx-auto block cursor-pointer text-sm">
+                            Log out
+                        </Button>
+                    </>
+                )}
+            </Form>
         </AuthLayout>
     );
 }
