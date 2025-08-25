@@ -1,3 +1,4 @@
+import { destroy } from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -24,8 +25,7 @@ export default function DeleteUser() {
                             like to permanently delete your account.
                         </DialogDescription>
                         <Form
-                            method="delete"
-                            action={route('profile.destroy')}
+                            {...destroy.form()}
                             options={{
                                 preserveScroll: true,
                             }}
