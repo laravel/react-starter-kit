@@ -1,4 +1,4 @@
-import { store } from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
+import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
 import { login } from '@/routes';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -14,7 +14,12 @@ export default function Register() {
     return (
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
-            <Form {...store.form()} resetOnSuccess={['password', 'password_confirmation']} disableWhileProcessing className="flex flex-col gap-6">
+            <Form
+                {...RegisteredUserController.store.form()}
+                resetOnSuccess={['password', 'password_confirmation']}
+                disableWhileProcessing
+                className="flex flex-col gap-6"
+            >
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">

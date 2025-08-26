@@ -51,4 +51,29 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
         $response->assertRedirect('/');
     }
+
+    public function test_users_are_rate_limited()
+    {
+        $user = User::factory()->create();
+
+        for ($i = 0; $i < 5; $i++) {
+            $this->post('/login', [
+                'email' => $user->email,
+                'password' => 'wrong-password',
+            ])->assertStatus(302)->assertSessionHasErrors([
+                'email' => 'These credentials do not match our records.',
+            ]);
+        }
+
+        $response = $this->post('/login', [
+            'email' => $user->email,
+            'password' => 'wrong-password',
+        ]);
+
+        $response->assertSessionHasErrors('email');
+
+        $errors = session('errors');
+
+        $this->assertStringContainsString('Too many login attempts', $errors->first('email'));
+    }
 }
