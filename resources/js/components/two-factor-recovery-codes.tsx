@@ -1,7 +1,7 @@
-import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
+import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -50,11 +50,7 @@ export default function TwoFactorRecoveryCodes() {
                     </Button>
 
                     {isRecoveryCodesVisible && (
-                        <Form
-                            {...regenerateRecoveryCodes.form()}
-                            options={{ preserveScroll: true }}
-                            onSuccess={fetchRecoveryCodes}
-                        >
+                        <Form {...regenerateRecoveryCodes.form()} options={{ preserveScroll: true }} onSuccess={fetchRecoveryCodes}>
                             {({ processing }) => (
                                 <Button variant="secondary" type="submit" disabled={processing}>
                                     <RefreshCw className={`mr-2 size-4 ${processing ? 'animate-spin' : ''}`} />
@@ -78,11 +74,7 @@ export default function TwoFactorRecoveryCodes() {
                                     ))}
                                 </div>
                             ) : (
-                                recoveryCodesList.map((code, index) => (
-                                    <div key={index}>
-                                        {code}
-                                    </div>
-                                ))
+                                recoveryCodesList.map((code, index) => <div key={index}>{code}</div>)
                             )}
                         </div>
                         <p className="text-xs text-muted-foreground select-none">

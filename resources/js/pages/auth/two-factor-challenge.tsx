@@ -1,12 +1,12 @@
-import { store } from '@/routes/two-factor/login';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
 import AuthLayout from '@/layouts/auth-layout';
+import { store } from '@/routes/two-factor/login';
 import { Form, Head } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { computed, ref, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 
 interface AuthConfigContent {
     title: string;
@@ -17,7 +17,7 @@ interface AuthConfigContent {
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<number[]>([]);
-    
+
     const codeValue = useMemo<string>(() => code.join(''), [code]);
 
     const authConfigContent = useMemo<AuthConfigContent>(() => {
@@ -48,12 +48,7 @@ export default function TwoFactorChallenge() {
 
             <div className="space-y-6">
                 {!showRecoveryInput ? (
-                    <Form
-                        {...store.form()}
-                        className="space-y-4"
-                        resetOnError
-                        onError={() => setCode([])}
-                    >
+                    <Form {...store.form()} className="space-y-4" resetOnError onError={() => setCode([])}>
                         {({ errors, processing, clearErrors }) => (
                             <>
                                 <input type="hidden" name="code" value={codeValue} />
@@ -92,20 +87,10 @@ export default function TwoFactorChallenge() {
                         )}
                     </Form>
                 ) : (
-                    <Form
-                        {...store.form()}
-                        className="space-y-4"
-                        resetOnError
-                    >
+                    <Form {...store.form()} className="space-y-4" resetOnError>
                         {({ errors, processing, clearErrors }) => (
                             <>
-                                <Input
-                                    name="recovery_code"
-                                    type="text"
-                                    placeholder="Enter recovery code"
-                                    autoFocus={showRecoveryInput}
-                                    required
-                                />
+                                <Input name="recovery_code" type="text" placeholder="Enter recovery code" autoFocus={showRecoveryInput} required />
                                 <InputError message={errors.recovery_code} />
                                 <Button type="submit" className="w-full" disabled={processing}>
                                     Continue

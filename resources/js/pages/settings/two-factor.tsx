@@ -46,13 +46,15 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                             <div>
                                 {hasSetupData ? (
                                     <Button onClick={() => setShowSetupModal(true)}>
-                                        <ShieldCheck />Continue Setup
+                                        <ShieldCheck />
+                                        Continue Setup
                                     </Button>
                                 ) : (
                                     <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
                                         {({ processing }) => (
                                             <Button type="submit" disabled={processing}>
-                                                <ShieldCheck />{processing ? 'Enabling...' : 'Enable 2FA'}
+                                                <ShieldCheck />
+                                                {processing ? 'Enabling...' : 'Enable 2FA'}
                                             </Button>
                                         )}
                                     </Form>
@@ -63,8 +65,8 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                         <div className="flex flex-col items-start justify-start space-y-4">
                             <Badge variant="default">Enabled</Badge>
                             <p className="text-muted-foreground">
-                                With two factor authentication enabled, you'll be prompted for a secure, random token during login, which you can retrieve
-                                from your TOTP Authenticator app.
+                                With two factor authentication enabled, you'll be prompted for a secure, random token during login, which you can
+                                retrieve from your TOTP Authenticator app.
                             </p>
 
                             <TwoFactorRecoveryCodes />
@@ -73,7 +75,8 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                                 <Form {...disable.form()}>
                                     {({ processing }) => (
                                         <Button variant="destructive" type="submit" disabled={processing}>
-                                            <ShieldBan />{processing ? 'Disabling...' : 'Disable 2FA'}
+                                            <ShieldBan />
+                                            {processing ? 'Disabling...' : 'Disable 2FA'}
                                         </Button>
                                     )}
                                 </Form>
