@@ -1,4 +1,4 @@
-import { store } from '@/actions/App/Http/Controllers/Auth/ConfirmablePasswordController';
+import { store } from '@/routes/password/confirm'
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
