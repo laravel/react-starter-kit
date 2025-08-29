@@ -15,7 +15,7 @@ class TwoFactorChallengeTest extends TestCase
     public function test_two_factor_challenge_redirects_when_not_authenticated(): void
     {
         if (! Features::canManageTwoFactorAuthentication()) {
-            $this->markTestSkipped('Two factor authentication is not enabled.');
+            $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
         $response = $this->get(route('two-factor.login'));
@@ -26,7 +26,7 @@ class TwoFactorChallengeTest extends TestCase
     public function test_two_factor_challenge_renders_correct_inertia_component(): void
     {
         if (! Features::canManageTwoFactorAuthentication()) {
-            $this->markTestSkipped('Two factor authentication is not enabled.');
+            $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
         Features::twoFactorAuthentication([
@@ -57,7 +57,7 @@ class TwoFactorChallengeTest extends TestCase
     public function test_two_factor_authentication_is_rate_limited(): void
     {
         if (! Features::enabled(Features::twoFactorAuthentication())) {
-            $this->markTestSkipped('Two factor authentication is not enabled.');
+            $this->markTestSkipped('Two-factor authentication is not enabled.');
         }
 
         Features::twoFactorAuthentication([

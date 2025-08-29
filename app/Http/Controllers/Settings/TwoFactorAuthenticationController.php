@@ -34,14 +34,14 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
         abort_if(
             ! Features::enabled(Features::twoFactorAuthentication()),
             HttpResponse::HTTP_FORBIDDEN,
-            'Two factor authentication is disabled.'
+            'Two-factor authentication is disabled.'
         );
 
         $this->validateTwoFactorAuthenticationState($request);
 
         return Inertia::render('settings/two-factor', [
-            'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),
+            'requiresConfirmation' => Features::optionEnabled(Features::twoFactorAuthentication(), 'confirm'),
         ]);
     }
 }

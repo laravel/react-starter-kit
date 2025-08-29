@@ -1,13 +1,13 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
+import { useTwoFactorAuthContext } from '@/hooks/use-two-factor-auth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
 export default function TwoFactorRecoveryCodes() {
-    const { recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
+    const { recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuthContext();
     const [isRecoveryCodesVisible, setIsRecoveryCodesVisible] = useState<boolean>(false);
     const recoveryCodeSectionRef = useRef<HTMLDivElement | null>(null);
 

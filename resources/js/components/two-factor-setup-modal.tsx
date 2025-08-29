@@ -2,7 +2,7 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
+import { useTwoFactorAuthContext } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { useClipboard } from '@reactuses/core';
@@ -18,7 +18,7 @@ interface TwoFactorSetupModalProps {
 }
 
 export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConfirmation, twoFactorEnabled }: TwoFactorSetupModalProps) {
-    const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData } = useTwoFactorAuth();
+    const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData } = useTwoFactorAuthContext();
     const [copiedText, copy] = useClipboard();
 
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
@@ -30,8 +30,8 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
     const modalConfig = useMemo<{ title: string; description: string; buttonText: string }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'You have enabled two factor authentication.',
-                description: 'Two factor authentication is now enabled, scan the QR code or enter the setup key in authenticator app.',
+                title: 'Two-Factor Authentication Enabled',
+                description: 'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
                 buttonText: 'Close',
             };
         }
@@ -45,8 +45,8 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
         }
 
         return {
-            title: 'Turn on 2-step Verification',
-            description: 'To finish enabling two factor authentication, scan the QR code or enter the setup key in authenticator app',
+            title: 'Enable Two-Factor Authentication',
+            description: 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
             buttonText: 'Continue',
         };
     }, [twoFactorEnabled, showVerificationStep]);

@@ -38,7 +38,7 @@ class AuthenticatedSessionController extends Controller
                 'login.remember' => $request->boolean('remember'),
             ]);
 
-            return redirect()->route('two-factor.login');
+            return to_route('two-factor.login');
         }
 
         Auth::login($user, $request->boolean('remember'));
