@@ -45,14 +45,21 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                                     name="password"
                                     required
                                     withAsterisk={false}
-                                    label="Password"
-                                    description={
-                                        canResetPassword && (
-                                            <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
-                                                Forgot password?
-                                            </TextLink>
-                                        )
+                                    label={
+                                        <>
+                                            <span>Password</span>
+                                            <span>
+                                                {canResetPassword && (
+                                                    <TextLink href={request()} className="ml-auto text-sm" tabIndex={5}>
+                                                        Forgot password?
+                                                    </TextLink>
+                                                )}
+                                            </span>
+                                        </>
                                     }
+                                    classNames={{
+                                        label: 'flex! flex-1 items-center justify-between mb-1!',
+                                    }}
                                     inputWrapperOrder={['label', 'input', 'description', 'error']}
                                     tabIndex={2}
                                     autoComplete="current-password"
