@@ -1,6 +1,6 @@
-import { IconBook, IconFolder, IconGridDots, IconX } from '@tabler/icons-react';
-
+import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
+import { IconBook, IconFolder, IconLayoutGrid, IconX } from '@tabler/icons-react';
 
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
@@ -13,8 +13,8 @@ import SidebarMenuButton from './sidebar-menu-button';
 const mainNavItems: NavItem[] = [
     {
         title: 'Dashboard',
-        href: '/dashboard',
-        icon: IconGridDots,
+        href: dashboard(),
+        icon: IconLayoutGrid,
     },
 ];
 
@@ -34,7 +34,7 @@ const footerNavItems: NavItem[] = [
 const SidebarGroupLabel = ({ children }: { children: React.ReactNode }) => (
     <div
         className={cn(
-            'text-sidebar-foreground/70 ring-sidebar-ring flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
+            'flex h-8 shrink-0 items-center rounded-md px-2 text-xs font-medium text-sidebar-foreground/70 ring-sidebar-ring outline-hidden transition-[margin,opacity] duration-200 ease-linear focus-visible:ring-2 [&>svg]:size-4 [&>svg]:shrink-0',
         )}
     >
         {children}
@@ -47,19 +47,19 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
     return (
         <div
             data-collapsible={collapsed ? 'icon' : ''}
-            className={cn('bg-sidebar text-sidebar-foreground flex h-full flex-col', collapsed && 'items-center', className)}
+            className={cn('flex h-full flex-col bg-sidebar text-sidebar-foreground', collapsed && 'items-center', className)}
         >
             <div className={cn('flex items-center justify-center px-4 pt-4', collapsed ? 'mb-2 px-1.5' : 'pb-4')}>
                 <SidebarMenuButton
                     component={Link}
-                    href={route('dashboard')}
+                    href={dashboard()}
                     prefetch
                     icon={<AppLogo showName={!collapsed} />}
                     iconOnly={collapsed}
                     className="h-12! flex-1"
                 />
                 {isMobile && (
-                    <Button onClick={toggleMobile} variant="icon" className="hover:bg-muted! bg-transparent! p-0! px-2!" aria-label="Close sidebar">
+                    <Button onClick={toggleMobile} variant="icon" className="bg-transparent! p-0! px-2! hover:bg-muted!" aria-label="Close sidebar">
                         <IconX size={24} color="var(--sidebar-foreground)" />
                     </Button>
                 )}
@@ -86,8 +86,8 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                     {footerNavItems.map((item) => (
                         <SidebarMenuButton
                             key={item.title}
+                            href={typeof item.href === 'string' ? item.href : item.href.url}
                             component="a"
-                            href={item.href}
                             className={cn('font-light!')}
                             tooltip={item.title}
                             icon={item.icon && <item.icon size={20} />}

@@ -1,6 +1,6 @@
-import { useRef } from 'react';
-
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import HeadingSmall from '@/components/heading-small';
+import { useRef } from 'react';
 
 import { Form } from '@inertiajs/react';
 import { Button, Modal, PasswordInput } from '@mantine/core';
@@ -37,12 +37,12 @@ export default function DeleteUser() {
                         confirm you would like to permanently delete your account.
                     </div>
                     <Form
-                        method="delete"
-                        action={route('profile.destroy')}
+                        {...ProfileController.destroy.form()}
                         options={{
                             preserveScroll: true,
                         }}
                         onError={() => passwordInput.current?.focus()}
+                        resetOnSuccess
                         onSubmitComplete={(form) => {
                             form.reset();
                             close();

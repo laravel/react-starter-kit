@@ -1,8 +1,7 @@
+import { Breadcrumbs } from '@/components/breadcrumbs';
+import { type BreadcrumbItem } from '@/types';
 import { Button } from '@mantine/core';
-
-import { BreadcrumbItem } from '@/types';
 import { IconLayoutSidebar } from '@tabler/icons-react';
-import { Breadcrumbs } from './breadcrumbs';
 
 interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
@@ -12,7 +11,7 @@ interface AppHeaderProps {
 
 export function AppHeader({ breadcrumbs, toggleDesktop, toggleMobile }: AppHeaderProps) {
     return (
-        <div className="bg-background border-b border-sidebar-border/80 flex h-full w-full flex-1 items-center justify-start gap-x-4 px-2">
+        <div className="flex h-full w-full flex-1 items-center justify-start gap-x-4 border-b border-sidebar-border/80 bg-background px-2">
             <Button
                 variant="subtle"
                 className="p-0"

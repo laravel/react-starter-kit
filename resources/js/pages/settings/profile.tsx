@@ -1,3 +1,5 @@
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import { send } from '@/routes/verification';
 import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
@@ -7,12 +9,13 @@ import HeadingSmall from '@/components/heading-small';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { edit } from '@/routes/profile';
 import { Button, TextInput } from '@mantine/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
         title: 'Profile settings',
-        href: '/settings/profile',
+        href: edit().url,
     },
 ];
 
@@ -28,8 +31,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                     <HeadingSmall title="Profile information" description="Update your name and email address" />
 
                     <Form
-                        method="patch"
-                        action={route('profile.update')}
+                        {...ProfileController.update.form()}
                         options={{
                             preserveScroll: true,
                         }}
@@ -71,8 +73,7 @@ export default function Profile({ mustVerifyEmail, status }: { mustVerifyEmail: 
                                         <p className="-mt-4 text-sm text-muted-foreground">
                                             Your email address is unverified.{' '}
                                             <Link
-                                                href={route('verification.send')}
-                                                method="post"
+                                                href={send()}
                                                 as="button"
                                                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                             >

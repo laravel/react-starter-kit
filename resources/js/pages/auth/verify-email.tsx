@@ -1,4 +1,5 @@
 // Components
+import EmailVerificationNotificationController from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
 import { Form, Head, router } from '@inertiajs/react';
 
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
@@ -11,7 +12,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
     const handleLogout = () => {
         cleanup();
         router.flushAll();
-        router.post(route('logout'));
+        router.post(logout());
     };
 
     return (
@@ -24,7 +25,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
                 </div>
             )}
 
-            <Form method="post" action={route('verification.send')} className="flex flex-col items-center space-y-6 text-center">
+            <Form {...EmailVerificationNotificationController.store.form()} className="flex flex-col items-center space-y-6 text-center">
                 {({ processing }) => (
                     <>
                         <Button type="submit" disabled={processing} variant="outline" loading={processing}>

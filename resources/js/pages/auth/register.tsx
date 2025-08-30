@@ -1,3 +1,5 @@
+import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
+import { login } from '@/routes';
 import { Form, Head } from '@inertiajs/react';
 
 import TextLink from '@/components/text-link';
@@ -10,9 +12,8 @@ export default function Register() {
         <AuthLayout title="Create an account" description="Enter your details below to create your account">
             <Head title="Register" />
             <Form
-                method="post"
-                action={route('register')}
-                onSubmitComplete={(form) => form.reset('password', 'password_confirmation')}
+                {...RegisteredUserController.store.form()}
+                resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
             >
@@ -91,7 +92,7 @@ export default function Register() {
 
                         <div className="text-center text-sm text-muted-foreground">
                             Already have an account?{' '}
-                            <TextLink href={route('login')} tabIndex={6}>
+                            <TextLink href={login()} tabIndex={6}>
                                 Log in
                             </TextLink>
                         </div>

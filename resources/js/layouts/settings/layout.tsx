@@ -1,4 +1,7 @@
 import Heading from '@/components/heading';
+import { appearance } from '@/routes';
+import { edit as editPassword } from '@/routes/password';
+import { edit } from '@/routes/profile';
 
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
@@ -8,17 +11,17 @@ import { type PropsWithChildren } from 'react';
 const sidebarNavItems: NavItem[] = [
     {
         title: 'Profile',
-        href: '/settings/profile',
+        href: edit(),
         icon: null,
     },
     {
         title: 'Password',
-        href: '/settings/password',
+        href: editPassword(),
         icon: null,
     },
     {
         title: 'Appearance',
-        href: '/settings/appearance',
+        href: appearance(),
         icon: null,
     },
 ];
@@ -40,14 +43,15 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${item.href}-${index}`}
-                                href={item.href}
+                                key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
+                                href={typeof item.href === 'string' ? item.href : item.href.url}
                                 component={Link}
                                 prefetch
                                 size="sm"
                                 justify="start"
                                 color="gray"
                                 variant="subtle"
+                                leftSection={item.icon && <item.icon className="h-4 w-4" />}
                                 styles={{
                                     root: {
                                         ...(currentPath === item.href && {

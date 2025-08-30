@@ -3,11 +3,13 @@ import { Menu } from '@mantine/core';
 import { IconLogout, IconSelector, IconSettings } from '@tabler/icons-react';
 
 import { UserInfo } from '@/components/user-info';
+import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import { cn } from '@/lib/utils';
+import { logout } from '@/routes';
+import { edit } from '@/routes/profile';
 import { type SharedData } from '@/types';
 import { usePage } from '@inertiajs/react';
 import SidebarMenuButton from './sidebar-menu-button';
-import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 
 export function NavUser({ variant, collapsed = false }: { variant: 'header' | 'sidebar'; collapsed?: boolean }) {
     const { auth } = usePage<SharedData>().props;
@@ -17,7 +19,7 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
     const handleLogout = () => {
         cleanup();
         router.flushAll();
-        router.post(route('logout'));
+        router.post(logout());
     };
 
     return (
@@ -36,14 +38,14 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                     </SidebarMenuButton>
                 </Menu.Target>
 
-                <Menu.Dropdown className="border-border border-2">
+                <Menu.Dropdown className="border-2 border-border">
                     <Menu.Label>
                         <UserInfo user={auth.user} showEmail={true} />
                     </Menu.Label>
 
                     <Menu.Divider />
 
-                    <Menu.Item component={Link} href={route('profile.edit')} leftSection={<IconSettings color="gray" size={20} />}>
+                    <Menu.Item component={Link} href={edit()} leftSection={<IconSettings color="gray" size={20} />}>
                         Settings
                     </Menu.Item>
                     <Menu.Divider />
