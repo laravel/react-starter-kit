@@ -41,7 +41,7 @@ const SidebarGroupLabel = ({ children }: { children: React.ReactNode }) => (
     </div>
 );
 
-export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: boolean; className?: string; toggleMobile: () => void }) {
+export function AppSidebar({ collapsed, className, toggle }: { collapsed: boolean; className?: string; toggle: () => void }) {
     const pathname = window.location.pathname;
     const isMobile = useIsMobile();
     return (
@@ -59,7 +59,7 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                     className="h-12! flex-1"
                 />
                 {isMobile && (
-                    <Button onClick={toggleMobile} variant="icon" className="bg-transparent! p-0! px-2! hover:bg-muted!" aria-label="Close sidebar">
+                    <Button onClick={toggle} variant="icon" className="bg-transparent! p-0! px-2! hover:bg-muted!" aria-label="Close sidebar">
                         <IconX size={24} color="var(--sidebar-foreground)" />
                     </Button>
                 )}
@@ -103,7 +103,7 @@ export function AppSidebar({ collapsed, className, toggleMobile }: { collapsed: 
                     ))}
                 </div>
                 <div className="flex flex-1 flex-col items-stretch justify-start p-4">
-                    <NavUser variant="sidebar" collapsed={collapsed} />
+                    <NavUser />
                 </div>
             </div>
         </div>
