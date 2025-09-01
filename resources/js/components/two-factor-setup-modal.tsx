@@ -6,8 +6,10 @@ import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { useClipboard } from '@reactuses/core';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
+import { Check, Copy, Loader2, LucideIcon, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+const OTP_MAX_LENGTH = 6;
 
 interface TwoFactorSetupModalProps {
     isOpen: boolean;
@@ -31,7 +33,6 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
 }: TwoFactorSetupModalProps) {
     const [copiedText, copy] = useClipboard();
-    const OTP_MAX_LENGTH = 6;
 
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
@@ -62,39 +63,37 @@ export default function TwoFactorSetupModal({
         };
     }, [twoFactorEnabled, showVerificationStep]);
 
-    const handleModalNextStep = () => {
+    const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {
             setShowVerificationStep(true);
             setTimeout(() => {
                 pinInputContainerRef.current?.querySelector('input')?.focus();
             }, 0);
-
             return;
         }
         clearSetupData();
         onClose();
-    };
+    }, [requiresConfirmation, clearSetupData, onClose]);
 
     const resetModalState = useCallback(() => {
+        setShowVerificationStep(false);
+        setCode('');
         if (twoFactorEnabled) {
             clearSetupData();
         }
-        setShowVerificationStep(false);
-        setCode('');
     }, [twoFactorEnabled, clearSetupData]);
 
     useEffect(() => {
         if (!isOpen) {
             resetModalState();
-
             return;
         }
-
         if (!qrCodeSvg) {
-            fetchSetupData().then();
+            fetchSetupData();
         }
     }, [isOpen, qrCodeSvg, fetchSetupData, resetModalState]);
 
+    const CopyIcon: LucideIcon = copiedText === manualSetupKey ? Check : Copy;
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
@@ -167,7 +166,7 @@ export default function TwoFactorSetupModal({
                                                 onClick={() => copy(manualSetupKey)}
                                                 className="relative block h-auto border-l border-border px-3 hover:bg-muted"
                                             >
-                                                {copiedText === manualSetupKey ? <Check className="w-4 text-green-500" /> : <Copy className="w-4" />}
+                                                <CopyIcon className="w-4" />
                                             </button>
                                         </>
                                     )}
@@ -206,7 +205,7 @@ export default function TwoFactorSetupModal({
                                             >
                                                 Back
                                             </Button>
-                                            <Button type="submit" className="w-auto flex-1" disabled={processing || code.length < 6}>
+                                            <Button type="submit" className="w-auto flex-1" disabled={processing || code.length < OTP_MAX_LENGTH}>
                                                 {processing ? 'Confirming...' : 'Confirm'}
                                             </Button>
                                         </div>
