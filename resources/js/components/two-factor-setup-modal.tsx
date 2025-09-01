@@ -2,7 +2,6 @@ import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
-import { useTwoFactorAuthContext } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { useClipboard } from '@reactuses/core';
@@ -12,13 +11,25 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 interface TwoFactorSetupModalProps {
     isOpen: boolean;
-    onOpenChange: (open: boolean) => void;
+    onClose: () => void;
     requiresConfirmation: boolean;
     twoFactorEnabled: boolean;
+    qrCodeSvg: string | null;
+    manualSetupKey: string | null;
+    clearSetupData: () => void;
+    fetchSetupData: () => Promise<void>;
 }
 
-export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConfirmation, twoFactorEnabled }: TwoFactorSetupModalProps) {
-    const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData } = useTwoFactorAuthContext();
+export default function TwoFactorSetupModal({
+    isOpen,
+    onClose,
+    requiresConfirmation,
+    twoFactorEnabled,
+    qrCodeSvg,
+    manualSetupKey,
+    clearSetupData,
+    fetchSetupData,
+}: TwoFactorSetupModalProps) {
     const [copiedText, copy] = useClipboard();
 
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
@@ -57,10 +68,11 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
             setTimeout(() => {
                 pinInputContainerRef.current?.querySelector('input')?.focus();
             }, 0);
+
             return;
         }
         clearSetupData();
-        onOpenChange(false);
+        onClose();
     };
 
     const resetModalState = useCallback(() => {
@@ -74,6 +86,7 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
     useEffect(() => {
         if (!isOpen) {
             resetModalState();
+
             return;
         }
 
@@ -83,7 +96,7 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
     }, [isOpen, qrCodeSvg, fetchSetupData, resetModalState]);
 
     return (
-        <Dialog open={isOpen} onOpenChange={onOpenChange}>
+        <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader className="flex items-center justify-center">
                     <div className="mb-3 w-auto rounded-full border border-border bg-card p-0.5 shadow-sm">
@@ -162,7 +175,7 @@ export default function TwoFactorSetupModal({ isOpen, onOpenChange, requiresConf
                             </div>
                         </>
                     ) : (
-                        <Form {...confirm.form()} onFinish={() => setCode('')} onSuccess={() => onOpenChange(false)} resetOnError>
+                        <Form {...confirm.form()} onFinish={() => setCode('')} onSuccess={() => onClose()} resetOnError>
                             {({ processing, errors }: { processing: boolean; errors?: { confirmTwoFactorAuthentication?: { code?: string } } }) => (
                                 <>
                                     <input type="hidden" name="code" value={codeValue} />

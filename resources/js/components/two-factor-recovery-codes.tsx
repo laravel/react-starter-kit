@@ -1,13 +1,16 @@
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { useTwoFactorAuthContext } from '@/hooks/use-two-factor-auth';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-export default function TwoFactorRecoveryCodes() {
-    const { recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuthContext();
+interface TwoFactorRecoveryCodesProps {
+    recoveryCodesList: string[];
+    fetchRecoveryCodes: () => Promise<void>;
+}
+
+export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes }: TwoFactorRecoveryCodesProps) {
     const [isRecoveryCodesVisible, setIsRecoveryCodesVisible] = useState<boolean>(false);
     const recoveryCodeSectionRef = useRef<HTMLDivElement | null>(null);
 
@@ -21,7 +24,7 @@ export default function TwoFactorRecoveryCodes() {
         if (!isRecoveryCodesVisible) {
             setTimeout(() => {
                 recoveryCodeSectionRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }, 0);
+            });
         }
     };
 

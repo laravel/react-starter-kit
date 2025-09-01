@@ -2,10 +2,8 @@
 
 namespace App\Http\Controllers\Settings;
 
-use App\Http\Controllers\Concerns\ConfirmsTwoFactorAuthentication;
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response as HttpResponse;
+use App\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use Illuminate\Routing\Controllers\HasMiddleware;
 use Illuminate\Routing\Controllers\Middleware;
 use Inertia\Inertia;
@@ -14,8 +12,6 @@ use Laravel\Fortify\Features;
 
 class TwoFactorAuthenticationController extends Controller implements HasMiddleware
 {
-    use ConfirmsTwoFactorAuthentication;
-
     /**
      * Get the middleware that should be assigned to the controller.
      */
@@ -29,15 +25,9 @@ class TwoFactorAuthenticationController extends Controller implements HasMiddlew
     /**
      * Show the user's two-factor authentication settings page.
      */
-    public function show(Request $request): Response
+    public function show(TwoFactorAuthenticationRequest $request): Response
     {
-        abort_if(
-            ! Features::enabled(Features::twoFactorAuthentication()),
-            HttpResponse::HTTP_FORBIDDEN,
-            'Two-factor authentication is disabled.'
-        );
-
-        $this->validateTwoFactorAuthenticationState($request);
+        $request->ensureStateIsValid();
 
         return Inertia::render('settings/two-factor', [
             'twoFactorEnabled' => $request->user()->hasEnabledTwoFactorAuthentication(),

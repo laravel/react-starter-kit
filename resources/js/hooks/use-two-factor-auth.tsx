@@ -1,6 +1,6 @@
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 import { type TwoFactorSecretKey, type TwoFactorSetupData } from '@/types';
-import { createContext, useCallback, useContext, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 const fetchJson = async <T,>(url: string): Promise<T> => {
     const response = await fetch(url, {
@@ -90,25 +90,4 @@ export const useTwoFactorAuth = () => {
         fetchSetupData,
         fetchRecoveryCodes,
     ]);
-};
-
-type TwoFactorAuthContextType = ReturnType<typeof useTwoFactorAuth>;
-
-const TwoFactorAuthContext = createContext<TwoFactorAuthContextType | null>(null);
-
-export const TwoFactorAuthProvider = ({ children }: { children: React.ReactNode }) => {
-    const twoFactorAuth = useTwoFactorAuth();
-    return (
-        <TwoFactorAuthContext.Provider value={twoFactorAuth}>
-            {children}
-        </TwoFactorAuthContext.Provider>
-    );
-};
-
-export const useTwoFactorAuthContext = () => {
-    const context = useContext(TwoFactorAuthContext);
-    if (!context) {
-        throw new Error('useTwoFactorAuthContext must be used within TwoFactorAuthProvider');
-    }
-    return context;
 };
