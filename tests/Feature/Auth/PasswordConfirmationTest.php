@@ -19,13 +19,14 @@ class PasswordConfirmationTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertInertia(fn (Assert $page) => $page
-            ->component('auth/confirm-password')
+            ->component('auth/ConfirmPassword')
         );
     }
 
     public function test_password_confirmation_requires_authentication()
     {
         $response = $this->get(route('password.confirm'));
+
         $response->assertRedirect(route('login'));
     }
 }

@@ -166,6 +166,7 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
 
         $user = User::factory()->create();
+
         $user->forceFill([
             'two_factor_secret' => encrypt('test-secret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['code1', 'code2'])),
@@ -190,6 +191,7 @@ class TwoFactorAuthenticationTest extends TestCase
         ]);
 
         $user = User::factory()->create();
+
         $user->forceFill([
             'two_factor_secret' => encrypt('test-secret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['code1', 'code2'])),

@@ -8,18 +8,13 @@ import { Form, Head } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { useMemo, useState } from 'react';
 
-interface AuthConfigContent {
-    title: string;
-    description: string;
-    toggleText: string;
-}
+const OTP_MAX_LENGTH = 6;
 
 export default function TwoFactorChallenge() {
-    const OTP_MAX_LENGTH = 6;
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
 
-    const authConfigContent = useMemo<AuthConfigContent>(() => {
+    const authConfigContent = useMemo<{ title: string; description: string; toggleText: string }>(() => {
         if (showRecoveryInput) {
             return {
                 title: 'Recovery Code',
