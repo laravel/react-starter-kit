@@ -19,10 +19,7 @@ export const useTwoFactorAuth = () => {
     const [manualSetupKey, setManualSetupKey] = useState<string | null>(null);
     const [recoveryCodesList, setRecoveryCodesList] = useState<string[]>([]);
 
-    const hasSetupData = useMemo<boolean>(
-        () => qrCodeSvg !== null && manualSetupKey !== null,
-        [qrCodeSvg, manualSetupKey]
-    );
+    const hasSetupData = useMemo<boolean>(() => qrCodeSvg !== null && manualSetupKey !== null, [qrCodeSvg, manualSetupKey]);
 
     const fetchQrCode = useCallback(async (): Promise<void> => {
         try {
@@ -69,25 +66,18 @@ export const useTwoFactorAuth = () => {
         }
     }, [fetchQrCode, fetchSetupKey]);
 
-    return useMemo(() => ({
-        qrCodeSvg,
-        manualSetupKey,
-        recoveryCodesList,
-        hasSetupData,
-        clearSetupData,
-        fetchQrCode,
-        fetchSetupKey,
-        fetchSetupData,
-        fetchRecoveryCodes,
-    }), [
-        qrCodeSvg,
-        manualSetupKey,
-        recoveryCodesList,
-        hasSetupData,
-        clearSetupData,
-        fetchQrCode,
-        fetchSetupKey,
-        fetchSetupData,
-        fetchRecoveryCodes,
-    ]);
+    return useMemo(
+        () => ({
+            qrCodeSvg,
+            manualSetupKey,
+            recoveryCodesList,
+            hasSetupData,
+            clearSetupData,
+            fetchQrCode,
+            fetchSetupKey,
+            fetchSetupData,
+            fetchRecoveryCodes,
+        }),
+        [qrCodeSvg, manualSetupKey, recoveryCodesList, hasSetupData, clearSetupData, fetchQrCode, fetchSetupKey, fetchSetupData, fetchRecoveryCodes],
+    );
 };

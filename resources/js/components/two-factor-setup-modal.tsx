@@ -31,10 +31,10 @@ export default function TwoFactorSetupModal({
     fetchSetupData,
 }: TwoFactorSetupModalProps) {
     const [copiedText, copy] = useClipboard();
+    const OTP_MAX_LENGTH = 6;
 
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
     const [code, setCode] = useState<string>('');
-    const codeValue = useMemo(() => code, [code]);
 
     const pinInputContainerRef = useRef<HTMLDivElement>(null);
 
@@ -175,21 +175,20 @@ export default function TwoFactorSetupModal({
                             </div>
                         </>
                     ) : (
-                        <Form {...confirm.form()} onFinish={() => setCode('')} onSuccess={() => onClose()} resetOnError>
+                        <Form {...confirm.form()} onSuccess={() => onClose()} resetOnError transform={(data) => ({ ...data, code })}>
                             {({ processing, errors }: { processing: boolean; errors?: { confirmTwoFactorAuthentication?: { code?: string } } }) => (
                                 <>
-                                    <input type="hidden" name="code" value={codeValue} />
                                     <div ref={pinInputContainerRef} className="relative w-full space-y-3">
                                         <div className="flex w-full flex-col items-center justify-center space-y-3 py-2">
                                             <InputOTP
-                                                maxLength={6}
-                                                value={codeValue}
-                                                onChange={setCode}
+                                                id="otp"
+                                                maxLength={OTP_MAX_LENGTH}
+                                                onChange={(value) => setCode(value)}
                                                 disabled={processing}
                                                 pattern={REGEXP_ONLY_DIGITS}
                                             >
                                                 <InputOTPGroup>
-                                                    {Array.from({ length: 6 }, (_, index) => (
+                                                    {Array.from({ length: OTP_MAX_LENGTH }, (_, index) => (
                                                         <InputOTPSlot key={index} index={index} />
                                                     ))}
                                                 </InputOTPGroup>
@@ -207,7 +206,7 @@ export default function TwoFactorSetupModal({
                                             >
                                                 Back
                                             </Button>
-                                            <Button type="submit" className="w-auto flex-1" disabled={processing || codeValue.length < 6}>
+                                            <Button type="submit" className="w-auto flex-1" disabled={processing || code.length < 6}>
                                                 {processing ? 'Confirming...' : 'Confirm'}
                                             </Button>
                                         </div>

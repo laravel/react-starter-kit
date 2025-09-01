@@ -15,10 +15,9 @@ interface AuthConfigContent {
 }
 
 export default function TwoFactorChallenge() {
+    const OTP_MAX_LENGTH = 6;
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);
-    const [code, setCode] = useState<number[]>([]);
-
-    const codeValue = useMemo<string>(() => code.join(''), [code]);
+    const [code, setCode] = useState<string>('');
 
     const authConfigContent = useMemo<AuthConfigContent>(() => {
         if (showRecoveryInput) {
@@ -39,7 +38,7 @@ export default function TwoFactorChallenge() {
     const toggleRecoveryMode = (clearErrors: () => void): void => {
         setShowRecoveryInput(!showRecoveryInput);
         clearErrors();
-        setCode([]);
+        setCode('');
     };
 
     return (
@@ -48,21 +47,20 @@ export default function TwoFactorChallenge() {
 
             <div className="space-y-6">
                 {!showRecoveryInput ? (
-                    <Form {...store.form()} className="space-y-4" resetOnError onError={() => setCode([])}>
+                    <Form {...store.form()} className="space-y-4" resetOnError transform={(data) => ({ ...data, code })}>
                         {({ errors, processing, clearErrors }) => (
                             <>
-                                <input type="hidden" name="code" value={codeValue} />
                                 <div className="flex flex-col items-center justify-center space-y-3 text-center">
                                     <div className="flex w-full items-center justify-center">
                                         <InputOTP
-                                            maxLength={6}
-                                            value={codeValue}
-                                            onChange={(value) => setCode(value.split('').map(Number))}
+                                            maxLength={OTP_MAX_LENGTH}
+                                            value={code}
+                                            onChange={(value) => setCode(value)}
                                             disabled={processing}
                                             pattern={REGEXP_ONLY_DIGITS}
                                         >
                                             <InputOTPGroup>
-                                                {Array.from({ length: 6 }, (_, index) => (
+                                                {Array.from({ length: OTP_MAX_LENGTH }, (_, index) => (
                                                     <InputOTPSlot key={index} index={index} />
                                                 ))}
                                             </InputOTPGroup>
@@ -70,7 +68,7 @@ export default function TwoFactorChallenge() {
                                     </div>
                                     <InputError message={errors.code} />
                                 </div>
-                                <Button type="submit" className="w-full" disabled={processing}>
+                                <Button type="submit" className="w-full" disabled={processing || code.length < OTP_MAX_LENGTH}>
                                     Continue
                                 </Button>
                                 <div className="text-center text-sm text-muted-foreground">

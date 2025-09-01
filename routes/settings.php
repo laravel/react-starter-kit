@@ -23,6 +23,6 @@ Route::middleware('auth')->group(function () {
         return Inertia::render('settings/appearance');
     })->name('appearance');
 
-     Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
+    Route::get('settings/two-factor', [TwoFactorAuthenticationController::class, 'show'])
         ->name('two-factor.show');
 });
