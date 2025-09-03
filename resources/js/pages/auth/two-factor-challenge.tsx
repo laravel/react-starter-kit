@@ -42,12 +42,13 @@ export default function TwoFactorChallenge() {
 
             <div className="space-y-6">
                 {!showRecoveryInput ? (
-                    <Form {...store.form()} className="space-y-4" resetOnError transform={(data) => ({ ...data, code })}>
+                    <Form {...store.form()} className="space-y-4" resetOnError resetOnSuccess>
                         {({ errors, processing, clearErrors }) => (
                             <>
                                 <div className="flex flex-col items-center justify-center space-y-3 text-center">
                                     <div className="flex w-full items-center justify-center">
                                         <InputOTP
+                                            name="code"
                                             maxLength={OTP_MAX_LENGTH}
                                             value={code}
                                             onChange={(value) => setCode(value)}

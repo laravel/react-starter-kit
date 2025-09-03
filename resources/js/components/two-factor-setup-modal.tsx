@@ -174,13 +174,14 @@ export default function TwoFactorSetupModal({
                             </div>
                         </>
                     ) : (
-                        <Form {...confirm.form()} onSuccess={() => onClose()} resetOnError transform={(data) => ({ ...data, code })}>
+                        <Form {...confirm.form()} onSuccess={() => onClose()} resetOnError resetOnSuccess>
                             {({ processing, errors }: { processing: boolean; errors?: { confirmTwoFactorAuthentication?: { code?: string } } }) => (
                                 <>
                                     <div ref={pinInputContainerRef} className="relative w-full space-y-3">
                                         <div className="flex w-full flex-col items-center justify-center space-y-3 py-2">
                                             <InputOTP
                                                 id="otp"
+                                                name="code"
                                                 maxLength={OTP_MAX_LENGTH}
                                                 onChange={(value) => setCode(value)}
                                                 disabled={processing}
