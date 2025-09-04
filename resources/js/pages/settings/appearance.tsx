@@ -6,7 +6,7 @@ import { type BreadcrumbItem } from '@/types';
 
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { appearance } from '@/routes';
+import { appearance } from '@/routes/settings';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
