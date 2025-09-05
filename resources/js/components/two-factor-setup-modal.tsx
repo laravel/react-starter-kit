@@ -7,7 +7,7 @@ import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { useClipboard } from '@reactuses/core';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { Check, Copy, Loader2, LucideIcon, ScanLine } from 'lucide-react';
+import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 function GridScanIcon() {
@@ -42,7 +42,7 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
 }) {
     const [copiedText, copy] = useClipboard();
-    const CopyIcon: LucideIcon = copiedText === manualSetupKey ? Check : Copy;
+    const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
     return (
         <>
@@ -86,7 +86,7 @@ function TwoFactorSetupStep({
                                 className="h-full w-full bg-background p-3 text-foreground outline-none"
                             />
                             <button onClick={() => copy(manualSetupKey)} className="border-l border-border px-3 hover:bg-muted">
-                                <CopyIcon className="w-4" />
+                                <IconComponent className="w-4" />
                             </button>
                         </>
                     )}
