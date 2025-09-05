@@ -2,7 +2,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, LucideIcon, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface TwoFactorRecoveryCodesProps {
@@ -11,17 +11,17 @@ interface TwoFactorRecoveryCodesProps {
 }
 
 export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes }: TwoFactorRecoveryCodesProps) {
-    const [isCodesVisible, setIsCodesVisible] = useState<boolean>(false);
+    const [codesAeVisible, setCodesAeVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
 
     const toggleCodesVisibility = useCallback(async () => {
-        if (!isCodesVisible && !recoveryCodesList.length) {
+        if (!codesAeVisible && !recoveryCodesList.length) {
             await fetchRecoveryCodes();
         }
 
-        setIsCodesVisible(!isCodesVisible);
+        setCodesAeVisible(!codesAeVisible);
 
-        if (!isCodesVisible) {
+        if (!codesAeVisible) {
             setTimeout(() => {
                 codesSectionRef.current?.scrollIntoView({
                     behavior: 'smooth',
@@ -29,7 +29,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                 });
             });
         }
-    }, [isCodesVisible, recoveryCodesList.length, fetchRecoveryCodes]);
+    }, [codesAeVisible, recoveryCodesList.length, fetchRecoveryCodes]);
 
     useEffect(() => {
         if (!recoveryCodesList.length) {
@@ -37,7 +37,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
         }
     }, [recoveryCodesList.length, fetchRecoveryCodes]);
 
-    const IconComponent: LucideIcon = isCodesVisible ? EyeOff : Eye;
+    const RecoveryCodeIconComponent = codesAeVisible ? EyeOff : Eye;
 
     return (
         <Card>
@@ -52,12 +52,12 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
             </CardHeader>
             <CardContent>
                 <div className="flex flex-col gap-3 select-none sm:flex-row sm:items-center sm:justify-between">
-                    <Button onClick={toggleCodesVisibility} className="w-fit" aria-expanded={isCodesVisible} aria-controls="recovery-codes-section">
-                        <IconComponent className="size-4" aria-hidden="true" />
-                        {isCodesVisible ? 'Hide' : 'View'} Recovery Codes
+                    <Button onClick={toggleCodesVisibility} className="w-fit" aria-expanded={codesAeVisible} aria-controls="recovery-codes-section">
+                        <RecoveryCodeIconComponent className="size-4" aria-hidden="true" />
+                        {codesAeVisible ? 'Hide' : 'View'} Recovery Codes
                     </Button>
 
-                    {isCodesVisible && (
+                    {codesAeVisible && (
                         <Form {...regenerateRecoveryCodes.form()} options={{ preserveScroll: true }} onSuccess={fetchRecoveryCodes}>
                             {({ processing }) => (
                                 <Button variant="secondary" type="submit" disabled={processing} aria-describedby="regenerate-warning">
@@ -70,8 +70,8 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                 </div>
                 <div
                     id="recovery-codes-section"
-                    className={`relative overflow-hidden transition-all duration-300 ${isCodesVisible ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}
-                    aria-hidden={!isCodesVisible}
+                    className={`relative overflow-hidden transition-all duration-300 ${codesAeVisible ? 'h-auto opacity-100' : 'h-0 opacity-0'}`}
+                    aria-hidden={!codesAeVisible}
                 >
                     <div className="mt-3 space-y-3">
                         <div

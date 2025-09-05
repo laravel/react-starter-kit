@@ -2,7 +2,9 @@ import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 import { type TwoFactorSecretKey, type TwoFactorSetupData } from '@/types';
 import { useCallback, useMemo, useState } from 'react';
 
-const fetchJson = async <T,>(url: string): Promise<T> => {
+export const OTP_MAX_LENGTH = 6;
+
+const fetchJson = async <T>(url: string): Promise<T> => {
     const response = await fetch(url, {
         headers: { Accept: 'application/json' },
     });
@@ -66,18 +68,15 @@ export const useTwoFactorAuth = () => {
         }
     }, [fetchQrCode, fetchSetupKey]);
 
-    return useMemo(
-        () => ({
-            qrCodeSvg,
-            manualSetupKey,
-            recoveryCodesList,
-            hasSetupData,
-            clearSetupData,
-            fetchQrCode,
-            fetchSetupKey,
-            fetchSetupData,
-            fetchRecoveryCodes,
-        }),
-        [qrCodeSvg, manualSetupKey, recoveryCodesList, hasSetupData, clearSetupData, fetchQrCode, fetchSetupKey, fetchSetupData, fetchRecoveryCodes],
-    );
+    return {
+        qrCodeSvg,
+        manualSetupKey,
+        recoveryCodesList,
+        hasSetupData,
+        clearSetupData,
+        fetchQrCode,
+        fetchSetupKey,
+        fetchSetupData,
+        fetchRecoveryCodes,
+    };
 };
