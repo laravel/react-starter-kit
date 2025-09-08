@@ -25,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabled = false }: TwoFactorProps) {
-    const { hasSetupData, qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
+    const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
@@ -44,21 +44,13 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                             </p>
 
                             <div>
-                                {hasSetupData ? (
-                                    <Button onClick={() => setShowSetupModal(true)}>
-                                        <ShieldCheck />
-                                        Continue Setup
-                                    </Button>
-                                ) : (
-                                    <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
-                                        {({ processing }) => (
-                                            <Button type="submit" disabled={processing}>
-                                                <ShieldCheck />
-                                                {processing ? 'Enabling...' : 'Enable 2FA'}
-                                            </Button>
-                                        )}
-                                    </Form>
-                                )}
+                                <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
+                                    {({ processing }) => (
+                                        <Button type="submit" disabled={processing}>
+                                            <ShieldCheck /> Enable 2FA
+                                        </Button>
+                                    )}
+                                </Form>
                             </div>
                         </div>
                     ) : (
@@ -75,8 +67,7 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                                 <Form {...disable.form()}>
                                     {({ processing }) => (
                                         <Button variant="destructive" type="submit" disabled={processing}>
-                                            <ShieldBan />
-                                            {processing ? 'Disabling...' : 'Disable 2FA'}
+                                            <ShieldBan /> Disable 2FA
                                         </Button>
                                     )}
                                 </Form>

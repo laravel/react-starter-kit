@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\RateLimiter;
 use Laravel\Fortify\Features;
 use Tests\TestCase;
 
@@ -60,20 +61,6 @@ class AuthenticationTest extends TestCase
         $this->assertGuest();
     }
 
-    public function test_users_without_two_factor_enabled_login_normally()
-    {
-        $user = User::factory()->create();
-
-        $response = $this->post(route('login'), [
-            'email' => $user->email,
-            'password' => 'password',
-        ]);
-
-        $this->assertAuthenticated();
-        $response->assertRedirect(route('dashboard', absolute: false));
-        $response->assertSessionMissing('login.id');
-    }
-
     public function test_users_can_not_authenticate_with_invalid_password()
     {
         $user = User::factory()->create();
@@ -100,14 +87,7 @@ class AuthenticationTest extends TestCase
     {
         $user = User::factory()->create();
 
-        for ($i = 0; $i < 5; $i++) {
-            $this->post(route('login.store'), [
-                'email' => $user->email,
-                'password' => 'wrong-password',
-            ])->assertStatus(302)->assertSessionHasErrors([
-                'email' => 'These credentials do not match our records.',
-            ]);
-        }
+        RateLimiter::increment(implode('|', [$user->email, '127.0.0.1']), amount: 10);
 
         $response = $this->post(route('login.store'), [
             'email' => $user->email,

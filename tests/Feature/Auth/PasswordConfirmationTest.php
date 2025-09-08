@@ -18,6 +18,7 @@ class PasswordConfirmationTest extends TestCase
         $response = $this->actingAs($user)->get(route('password.confirm'));
 
         $response->assertStatus(200);
+
         $response->assertInertia(fn (Assert $page) => $page
             ->component('auth/confirm-password')
         );

@@ -134,7 +134,7 @@ function TwoFactorVerificationStep({ onClose, onBack }: { onClose: () => void; o
                                 Back
                             </Button>
                             <Button type="submit" className="flex-1" disabled={processing || code.length < OTP_MAX_LENGTH}>
-                                {processing ? 'Confirming...' : 'Confirm'}
+                                Confirm
                             </Button>
                         </div>
                     </div>

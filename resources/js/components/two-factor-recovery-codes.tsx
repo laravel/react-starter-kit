@@ -61,8 +61,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                         <Form {...regenerateRecoveryCodes.form()} options={{ preserveScroll: true }} onSuccess={fetchRecoveryCodes}>
                             {({ processing }) => (
                                 <Button variant="secondary" type="submit" disabled={processing} aria-describedby="regenerate-warning">
-                                    <RefreshCw className={`mr-2 size-4 ${processing ? 'animate-spin' : ''}`} aria-hidden="true" />
-                                    {processing ? 'Regenerating...' : 'Regenerate Codes'}
+                                    <RefreshCw /> Regenerate Codes
                                 </Button>
                             )}
                         </Form>
