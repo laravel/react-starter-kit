@@ -212,6 +212,7 @@ export default function TwoFactorSetupModal({
     useEffect(() => {
         if (!isOpen) {
             resetModalState();
+
             return;
         }
 
