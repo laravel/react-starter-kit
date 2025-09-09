@@ -25,7 +25,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabled = false }: TwoFactorProps) {
-    const { qrCodeSvg, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
+    const { qrCodeSvg, hasSetupData, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
@@ -63,13 +63,21 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                             </p>
 
                             <div>
-                                <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
-                                    {({ processing }) => (
-                                        <Button type="submit" disabled={processing}>
-                                            <ShieldCheck /> Enable 2FA
-                                        </Button>
-                                    )}
-                                </Form>
+                                {hasSetupData ? (
+                                    <Button onClick={() => setShowSetupModal(true)}>
+                                        <ShieldCheck />
+                                        Continue Setup
+                                    </Button>
+                                ) : (
+                                    <Form {...enable.form()} onSuccess={() => setShowSetupModal(true)}>
+                                        {({ processing }) => (
+                                            <Button type="submit" disabled={processing}>
+                                                <ShieldCheck />
+                                                Enable 2FA
+                                            </Button>
+                                        )}
+                                    </Form>
+                                )}
                             </div>
                         </div>
                     )}
