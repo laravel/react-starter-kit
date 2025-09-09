@@ -79,18 +79,18 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                             role="list"
                             aria-label="Recovery codes"
                         >
-                            {!recoveryCodesList.length ? (
-                                <div className="space-y-2" aria-label="Loading recovery codes">
-                                    {Array.from({ length: 8 }, (_, index) => (
-                                        <div key={index} className="h-4 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
-                                    ))}
-                                </div>
-                            ) : (
+                            {recoveryCodesList.length ? (
                                 recoveryCodesList.map((code, index) => (
                                     <div key={index} role="listitem" className="select-text">
                                         {code}
                                     </div>
                                 ))
+                            ) : (
+                                <div className="space-y-2" aria-label="Loading recovery codes">
+                                    {Array.from({ length: 8 }, (_, index) => (
+                                        <div key={index} className="h-4 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
+                                    ))}
+                                </div>
                             )}
                         </div>
                         <div className="text-xs text-muted-foreground select-none">

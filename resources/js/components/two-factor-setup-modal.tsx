@@ -48,13 +48,13 @@ function TwoFactorSetupStep({
         <>
             <div className="mx-auto flex max-w-md overflow-hidden">
                 <div className="mx-auto aspect-square w-64 rounded-lg border border-border">
-                    {!qrCodeSvg ? (
-                        <div className="absolute inset-0 z-10 flex animate-pulse items-center justify-center bg-background">
-                            <Loader2 className="size-6 animate-spin" />
-                        </div>
-                    ) : (
+                    {qrCodeSvg ? (
                         <div className="z-10 p-5">
                             <div className="flex size-full items-center justify-center" dangerouslySetInnerHTML={{ __html: qrCodeSvg }} />
+                        </div>
+                    ) : (
+                        <div className="absolute inset-0 z-10 flex animate-pulse items-center justify-center bg-background">
+                            <Loader2 className="size-6 animate-spin" />
                         </div>
                     )}
                 </div>
@@ -194,8 +194,10 @@ export default function TwoFactorSetupModal({
     const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {
             setShowVerificationStep(true);
+
             return;
         }
+
         clearSetupData();
         onClose();
     }, [requiresConfirmation, clearSetupData, onClose]);
@@ -212,6 +214,7 @@ export default function TwoFactorSetupModal({
             resetModalState();
             return;
         }
+
         if (!qrCodeSvg) {
             fetchSetupData();
         }
@@ -227,15 +230,15 @@ export default function TwoFactorSetupModal({
                 </DialogHeader>
 
                 <div className="flex flex-col items-center space-y-5">
-                    {!showVerificationStep ? (
+                    {showVerificationStep ? (
+                        <TwoFactorVerificationStep onClose={onClose} onBack={() => setShowVerificationStep(false)} />
+                    ) : (
                         <TwoFactorSetupStep
                             qrCodeSvg={qrCodeSvg}
                             manualSetupKey={manualSetupKey}
                             buttonText={modalConfig.buttonText}
                             onNextStep={handleModalNextStep}
                         />
-                    ) : (
-                        <TwoFactorVerificationStep onClose={onClose} onBack={() => setShowVerificationStep(false)} />
                     )}
                 </div>
             </DialogContent>

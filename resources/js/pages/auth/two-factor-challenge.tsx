@@ -40,7 +40,30 @@ export default function TwoFactorChallenge() {
             <Head title="Two-Factor Authentication" />
 
             <div className="space-y-6">
-                {!showRecoveryInput ? (
+                {showRecoveryInput ? (
+                    <Form {...store.form()} className="space-y-4" resetOnError>
+                        {({ errors, processing, clearErrors }) => (
+                            <>
+                                <Input name="recovery_code" type="text" placeholder="Enter recovery code" autoFocus={showRecoveryInput} required />
+                                <InputError message={errors.recovery_code} />
+                                <Button type="submit" className="w-full" disabled={processing}>
+                                    Continue
+                                </Button>
+
+                                <div className="text-center text-sm text-muted-foreground">
+                                    <span>or you can </span>
+                                    <button
+                                        type="button"
+                                        className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                        onClick={() => toggleRecoveryMode(clearErrors)}
+                                    >
+                                        {authConfigContent.toggleText}
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </Form>
+                ) : (
                     <Form {...store.form()} className="space-y-4" resetOnError resetOnSuccess>
                         {({ errors, processing, clearErrors }) => (
                             <>
@@ -66,29 +89,6 @@ export default function TwoFactorChallenge() {
                                 <Button type="submit" className="w-full" disabled={processing || code.length < OTP_MAX_LENGTH}>
                                     Continue
                                 </Button>
-                                <div className="text-center text-sm text-muted-foreground">
-                                    <span>or you can </span>
-                                    <button
-                                        type="button"
-                                        className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                        onClick={() => toggleRecoveryMode(clearErrors)}
-                                    >
-                                        {authConfigContent.toggleText}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                ) : (
-                    <Form {...store.form()} className="space-y-4" resetOnError>
-                        {({ errors, processing, clearErrors }) => (
-                            <>
-                                <Input name="recovery_code" type="text" placeholder="Enter recovery code" autoFocus={showRecoveryInput} required />
-                                <InputError message={errors.recovery_code} />
-                                <Button type="submit" className="w-full" disabled={processing}>
-                                    Continue
-                                </Button>
-
                                 <div className="text-center text-sm text-muted-foreground">
                                     <span>or you can </span>
                                     <button
