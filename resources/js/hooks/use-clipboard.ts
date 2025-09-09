@@ -1,5 +1,4 @@
-/** Credits to https://github.com/juliencrn/usehooks-ts */
-
+// Credit: https://usehooks-ts.com/
 import { useCallback, useState } from 'react';
 
 type CopiedValue = string | null;
