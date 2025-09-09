@@ -1,6 +1,14 @@
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
-import { type TwoFactorSecretKey, type TwoFactorSetupData } from '@/types';
 import { useCallback, useMemo, useState } from 'react';
+
+interface TwoFactorSetupData {
+    svg: string;
+    url: string;
+}
+
+interface TwoFactorSecretKey {
+    secretKey: string;
+}
 
 export const OTP_MAX_LENGTH = 6;
 
