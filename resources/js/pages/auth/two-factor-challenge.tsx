@@ -40,33 +40,21 @@ export default function TwoFactorChallenge() {
             <Head title="Two-Factor Authentication" />
 
             <div className="space-y-6">
-                {showRecoveryInput ? (
-                    <Form {...store.form()} className="space-y-4" resetOnError>
-                        {({ errors, processing, clearErrors }) => (
-                            <>
-                                <Input name="recovery_code" type="text" placeholder="Enter recovery code" autoFocus={showRecoveryInput} required />
-                                <InputError message={errors.recovery_code} />
-                                <Button type="submit" className="w-full" disabled={processing}>
-                                    Continue
-                                </Button>
-
-                                <div className="text-center text-sm text-muted-foreground">
-                                    <span>or you can </span>
-                                    <button
-                                        type="button"
-                                        className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                        onClick={() => toggleRecoveryMode(clearErrors)}
-                                    >
-                                        {authConfigContent.toggleText}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                ) : (
-                    <Form {...store.form()} className="space-y-4" resetOnError resetOnSuccess>
-                        {({ errors, processing, clearErrors }) => (
-                            <>
+                <Form {...store.form()} className="space-y-4" resetOnError resetOnSuccess={!showRecoveryInput}>
+                    {({ errors, processing, clearErrors }) => (
+                        <>
+                            {showRecoveryInput ? (
+                                <>
+                                    <Input
+                                        name="recovery_code"
+                                        type="text"
+                                        placeholder="Enter recovery code"
+                                        autoFocus={showRecoveryInput}
+                                        required
+                                    />
+                                    <InputError message={errors.recovery_code} />
+                                </>
+                            ) : (
                                 <div className="flex flex-col items-center justify-center space-y-3 text-center">
                                     <div className="flex w-full items-center justify-center">
                                         <InputOTP
@@ -86,23 +74,25 @@ export default function TwoFactorChallenge() {
                                     </div>
                                     <InputError message={errors.code} />
                                 </div>
-                                <Button type="submit" className="w-full" disabled={processing || code.length < OTP_MAX_LENGTH}>
-                                    Continue
-                                </Button>
-                                <div className="text-center text-sm text-muted-foreground">
-                                    <span>or you can </span>
-                                    <button
-                                        type="button"
-                                        className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
-                                        onClick={() => toggleRecoveryMode(clearErrors)}
-                                    >
-                                        {authConfigContent.toggleText}
-                                    </button>
-                                </div>
-                            </>
-                        )}
-                    </Form>
-                )}
+                            )}
+
+                            <Button type="submit" className="w-full" disabled={processing}>
+                                Continue
+                            </Button>
+
+                            <div className="text-center text-sm text-muted-foreground">
+                                <span>or you can </span>
+                                <button
+                                    type="button"
+                                    className="cursor-pointer text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
+                                    onClick={() => toggleRecoveryMode(clearErrors)}
+                                >
+                                    {authConfigContent.toggleText}
+                                </button>
+                            </div>
+                        </>
+                    )}
+                </Form>
             </div>
         </AuthLayout>
     );
