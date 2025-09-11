@@ -28,11 +28,7 @@ export const useTwoFactorAuth = () => {
     const [qrCodeSvg, setQrCodeSvg] = useState<string | null>(null);
     const [manualSetupKey, setManualSetupKey] = useState<string | null>(null);
     const [recoveryCodesList, setRecoveryCodesList] = useState<string[]>([]);
-    const [errors, setErrors] = useState<{
-        qrCode?: string;
-        setupKey?: string;
-        recoveryCodes?: string;
-    }>({});
+    const [errors, setErrors] = useState<string[]>([]);
 
     const hasSetupData = useMemo<boolean>(() => qrCodeSvg !== null && manualSetupKey !== null, [qrCodeSvg, manualSetupKey]);
 
@@ -42,7 +38,7 @@ export const useTwoFactorAuth = () => {
 
             setQrCodeSvg(svg);
         } catch {
-            setErrors((prev) => ({ ...prev, qrCode: 'Failed to fetch QR code' }));
+            setErrors((prev) => [...prev, 'Failed to fetch QR code']);
             setQrCodeSvg(null);
         }
     }, []);
@@ -53,13 +49,13 @@ export const useTwoFactorAuth = () => {
 
             setManualSetupKey(key);
         } catch {
-            setErrors((prev) => ({ ...prev, setupKey: 'Failed to fetch a setup key' }));
+            setErrors((prev) => [...prev, 'Failed to fetch setup key']);
             setManualSetupKey(null);
         }
     }, []);
 
     const clearErrors = useCallback((): void => {
-        setErrors({});
+        setErrors([]);
     }, []);
 
     const clearSetupData = useCallback((): void => {
@@ -74,7 +70,7 @@ export const useTwoFactorAuth = () => {
 
             setRecoveryCodesList(codes);
         } catch {
-            setErrors((prev) => ({ ...prev, recoveryCodes: 'Failed to fetch recovery codes' }));
+            setErrors((prev) => [...prev, 'Failed to fetch recovery codes']);
             setRecoveryCodesList([]);
         }
     }, []);
