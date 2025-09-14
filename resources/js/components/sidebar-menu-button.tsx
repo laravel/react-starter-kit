@@ -58,7 +58,7 @@ export default function SidebarMenuButton<T extends React.ElementType>({
                     variant="subtle"
                     leftSection={icon}
                     justify={iconOnly ? 'center' : 'start'}
-                    className={cn('text-foreground h-8! w-full flex-1 transition-none', className, iconOnly && 'p-2!')}
+                    className={cn('h-8! w-full flex-1 text-foreground transition-none', className, iconOnly && 'p-2!')}
                     styles={{
                         ...(styles || {}),
                         root: {
@@ -66,8 +66,10 @@ export default function SidebarMenuButton<T extends React.ElementType>({
                             ...(isActive && { backgroundColor: 'var(--muted)' }),
                             ...(props.styles?.root || {}),
                         },
-                        // @ts-expect-error - types are incorrect
-                        ...(iconOnly && { section: { marginRight: 0, ...(styles?.section || {}) } }),
+                        ...(iconOnly && {
+                            // @ts-expect-error - types are incorrect
+                            section: { marginRight: 0, ...(styles?.section || {}) },
+                        }),
                     }}
                     {...props}
                 >
