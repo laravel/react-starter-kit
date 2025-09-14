@@ -22,7 +22,7 @@ export interface NavItem {
     isActive?: boolean;
 }
 
-export interface SharedData {
+export interface SharedData<T extends Record<string, unknown> = Record<string, unknown>> {
     name: string;
     quote: { message: string; author: string };
     auth: Auth;
