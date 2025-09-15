@@ -51,6 +51,14 @@ function useSidebar() {
   return context
 }
 
+function getCookieValue(name: string): string | null {
+    if (typeof document === 'undefined') return null
+    const value = `; ${document.cookie}`
+    const parts = value.split(`; ${name}=`)
+    if (parts.length === 2) return parts.pop()?.split(';').shift() || null
+    return null
+}
+
 function SidebarProvider({
   defaultOpen = true,
   open: openProp,
@@ -67,9 +75,21 @@ function SidebarProvider({
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
 
+  const [_open, _setOpen] = React.useState(() => {
+    if (defaultOpen !== undefined) return defaultOpen
+
+    // Check cookie value on client-side initialization
+    const cookieValue = getCookieValue(SIDEBAR_COOKIE_NAME)
+    if (cookieValue !== null) {
+      return cookieValue === 'true'
+    }
+
+    // Default to true if no cookie is found
+    return true
+  })
+
   // This is the internal state of the sidebar.
   // We use openProp and setOpenProp for control from outside the component.
-  const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
@@ -85,6 +105,17 @@ function SidebarProvider({
     },
     [setOpenProp, open]
   )
+
+  // Sync with cookie changes (in case of external updates)
+  React.useEffect(() => {
+    const cookieValue = getCookieValue(SIDEBAR_COOKIE_NAME)
+    if (cookieValue !== null && openProp === undefined) {
+      const cookieOpen = cookieValue === 'true'
+      if (cookieOpen !== _open) {
+        _setOpen(cookieOpen)
+      }
+    }
+  }, [_open, openProp])
 
   // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
