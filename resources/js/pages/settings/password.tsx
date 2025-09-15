@@ -100,7 +100,7 @@ export default function Password() {
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing}>Save password</Button>
+                                    <Button disabled={processing} data-test="update-password-button">Save password</Button>
 
                                     <Transition
                                         show={recentlySuccessful}

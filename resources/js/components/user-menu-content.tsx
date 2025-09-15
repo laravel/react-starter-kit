@@ -37,7 +37,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-                <Link className="block w-full" href={logout()} as="button" onClick={handleLogout}>
+                <Link className="block w-full" href={logout()} as="button" onClick={handleLogout} data-test="logout-button">
                     <LogOut className="mr-2" />
                     Log out
                 </Link>

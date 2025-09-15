@@ -80,7 +80,7 @@ export default function Register() {
                                 <InputError message={errors.password_confirmation} />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={5}>
+                            <Button type="submit" className="mt-2 w-full" tabIndex={5} data-test="register-user-button">
                                 {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
                                 Create account
                             </Button>
