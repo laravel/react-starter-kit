@@ -49,7 +49,7 @@ export const useTwoFactorAuth = () => {
 
             setManualSetupKey(key);
         } catch {
-            setErrors((prev) => [...prev, 'Failed to fetch setup key']);
+            setErrors((prev) => [...prev, 'Failed to fetch a setup key']);
             setManualSetupKey(null);
         }
     }, []);
@@ -66,6 +66,7 @@ export const useTwoFactorAuth = () => {
 
     const fetchRecoveryCodes = useCallback(async (): Promise<void> => {
         try {
+            clearErrors();
             const codes = await fetchJson<string[]>(recoveryCodes.url());
 
             setRecoveryCodesList(codes);
@@ -73,16 +74,17 @@ export const useTwoFactorAuth = () => {
             setErrors((prev) => [...prev, 'Failed to fetch recovery codes']);
             setRecoveryCodesList([]);
         }
-    }, []);
+    }, [clearErrors]);
 
     const fetchSetupData = useCallback(async (): Promise<void> => {
         try {
+            clearErrors();
             await Promise.all([fetchQrCode(), fetchSetupKey()]);
         } catch {
             setQrCodeSvg(null);
             setManualSetupKey(null);
         }
-    }, [fetchQrCode, fetchSetupKey]);
+    }, [clearErrors, fetchQrCode, fetchSetupKey]);
 
     return {
         qrCodeSvg,

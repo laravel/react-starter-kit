@@ -1,18 +1,21 @@
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { AlertCircleIcon, Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];
     fetchRecoveryCodes: () => Promise<void>;
+    errors: string[];
 }
 
-export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes }: TwoFactorRecoveryCodesProps) {
+export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecoveryCodes, errors }: TwoFactorRecoveryCodesProps) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
+    const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;
 
     const toggleCodesVisibility = useCallback(async () => {
         if (!codesAreVisible && !recoveryCodesList.length) {
@@ -57,7 +60,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                         {codesAreVisible ? 'Hide' : 'View'} Recovery Codes
                     </Button>
 
-                    {codesAreVisible && (
+                    {canRegenerateCodes && (
                         <Form {...regenerateRecoveryCodes.form()} options={{ preserveScroll: true }} onSuccess={fetchRecoveryCodes}>
                             {({ processing }) => (
                                 <Button variant="secondary" type="submit" disabled={processing} aria-describedby="regenerate-warning">
@@ -73,32 +76,49 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                     aria-hidden={!codesAreVisible}
                 >
                     <div className="mt-3 space-y-3">
-                        <div
-                            ref={codesSectionRef}
-                            className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
-                            role="list"
-                            aria-label="Recovery codes"
-                        >
-                            {recoveryCodesList.length ? (
-                                recoveryCodesList.map((code, index) => (
-                                    <div key={index} role="listitem" className="select-text">
-                                        {code}
-                                    </div>
-                                ))
-                            ) : (
-                                <div className="space-y-2" aria-label="Loading recovery codes">
-                                    {Array.from({ length: 8 }, (_, index) => (
-                                        <div key={index} className="h-4 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
-                                    ))}
+                        {errors?.length ? (
+                            <Alert variant="destructive">
+                                <AlertCircleIcon />
+                                <AlertTitle>Something went wrong.</AlertTitle>
+                                <AlertDescription>
+                                    <ul className="list-disc text-sm">
+                                        {errors.map((error, index) => (
+                                            <li key={index}>{error}</li>
+                                        ))}
+                                    </ul>
+                                </AlertDescription>
+                            </Alert>
+                        ) : (
+                            <>
+                                <div
+                                    ref={codesSectionRef}
+                                    className="grid gap-1 rounded-lg bg-muted p-4 font-mono text-sm"
+                                    role="list"
+                                    aria-label="Recovery codes"
+                                >
+                                    {recoveryCodesList.length ? (
+                                        recoveryCodesList.map((code, index) => (
+                                            <div key={index} role="listitem" className="select-text">
+                                                {code}
+                                            </div>
+                                        ))
+                                    ) : (
+                                        <div className="space-y-2" aria-label="Loading recovery codes">
+                                            {Array.from({ length: 8 }, (_, index) => (
+                                                <div key={index} className="h-4 animate-pulse rounded bg-muted-foreground/20" aria-hidden="true" />
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
-                            )}
-                        </div>
-                        <div className="text-xs text-muted-foreground select-none">
-                            <p id="regenerate-warning">
-                                Each recovery code can be used once to access your account and will be removed after use. If you need more, click{' '}
-                                <span className="font-bold">Regenerate Codes</span> above.
-                            </p>
-                        </div>
+
+                                <div className="text-xs text-muted-foreground select-none">
+                                    <p id="regenerate-warning">
+                                        Each recovery code can be used once to access your account and will be removed after use. If you need more,
+                                        click <span className="font-bold">Regenerate Codes</span> above.
+                                    </p>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             </CardContent>

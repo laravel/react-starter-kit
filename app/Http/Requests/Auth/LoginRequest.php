@@ -41,7 +41,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        /** @var User $user */
+        /** @var User|null $user */
         $user = Auth::getProvider()->retrieveByCredentials($this->only('email', 'password'));
 
         if (! $user || ! Auth::getProvider()->validateCredentials($user, $this->only('password'))) {

@@ -1,4 +1,5 @@
 import InputError from '@/components/input-error';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -7,7 +8,7 @@ import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
+import { AlertCircleIcon, Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 function GridScanIcon() {
@@ -35,63 +36,79 @@ function TwoFactorSetupStep({
     manualSetupKey,
     buttonText,
     onNextStep,
+    errors,
 }: {
     qrCodeSvg: string | null;
     manualSetupKey: string | null;
     buttonText: string;
     onNextStep: () => void;
+    errors: string[];
 }) {
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
     return (
         <>
-            <div className="mx-auto flex max-w-md overflow-hidden">
-                <div className="mx-auto aspect-square w-64 rounded-lg border border-border">
-                    {qrCodeSvg ? (
-                        <div className="z-10 p-5">
-                            <div className="flex size-full items-center justify-center" dangerouslySetInnerHTML={{ __html: qrCodeSvg }} />
+            {errors?.length ? (
+                <Alert variant="destructive">
+                    <AlertCircleIcon />
+                    <AlertTitle>Something went wrong.</AlertTitle>
+                    <AlertDescription>
+                        <ul className="list-inside list-disc text-sm">
+                            {Array.from(new Set(errors)).map((error, index) => (
+                                <li key={index}>{error}</li>
+                            ))}
+                        </ul>
+                    </AlertDescription>
+                </Alert>
+            ) : (
+                <>
+                    <div className="mx-auto flex max-w-md overflow-hidden">
+                        <div className="mx-auto aspect-square w-64 rounded-lg border border-border">
+                            <div className="z-10 flex h-full w-full items-center justify-center p-5">
+                                {qrCodeSvg ? (
+                                    <div dangerouslySetInnerHTML={{ __html: qrCodeSvg }} />
+                                ) : (
+                                    <Loader2 className="flex size-4 animate-spin" />
+                                )}
+                            </div>
                         </div>
-                    ) : (
-                        <div className="absolute inset-0 z-10 flex animate-pulse items-center justify-center bg-background">
-                            <Loader2 className="size-6 animate-spin" />
+                    </div>
+
+                    <div className="flex w-full space-x-5">
+                        <Button className="w-full" onClick={onNextStep}>
+                            {buttonText}
+                        </Button>
+                    </div>
+
+                    <div className="relative flex w-full items-center justify-center">
+                        <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
+                        <span className="relative bg-card px-2 py-1">or, enter the code manually</span>
+                    </div>
+
+                    <div className="flex w-full space-x-2">
+                        <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
+                            {!manualSetupKey ? (
+                                <div className="flex h-full w-full items-center justify-center bg-muted p-3">
+                                    <Loader2 className="size-4 animate-spin" />
+                                </div>
+                            ) : (
+                                <>
+                                    <input
+                                        type="text"
+                                        readOnly
+                                        value={manualSetupKey}
+                                        className="h-full w-full bg-background p-3 text-foreground outline-none"
+                                    />
+                                    <button onClick={() => copy(manualSetupKey)} className="border-l border-border px-3 hover:bg-muted">
+                                        <IconComponent className="w-4" />
+                                    </button>
+                                </>
+                            )}
                         </div>
-                    )}
-                </div>
-            </div>
-
-            <div className="flex w-full space-x-5">
-                <Button className="w-full" onClick={onNextStep}>
-                    {buttonText}
-                </Button>
-            </div>
-
-            <div className="relative flex w-full items-center justify-center">
-                <div className="absolute inset-0 top-1/2 h-px w-full bg-border" />
-                <span className="relative bg-card px-2 py-1">or, enter the code manually</span>
-            </div>
-
-            <div className="flex w-full space-x-2">
-                <div className="flex w-full items-stretch overflow-hidden rounded-xl border border-border">
-                    {!manualSetupKey ? (
-                        <div className="flex h-full w-full items-center justify-center bg-muted p-3">
-                            <Loader2 className="size-4 animate-spin" />
-                        </div>
-                    ) : (
-                        <>
-                            <input
-                                type="text"
-                                readOnly
-                                value={manualSetupKey}
-                                className="h-full w-full bg-background p-3 text-foreground outline-none"
-                            />
-                            <button onClick={() => copy(manualSetupKey)} className="border-l border-border px-3 hover:bg-muted">
-                                <IconComponent className="w-4" />
-                            </button>
-                        </>
-                    )}
-                </div>
-            </div>
+                    </div>
+                </>
+            )}
         </>
     );
 }
@@ -153,6 +170,7 @@ interface TwoFactorSetupModalProps {
     manualSetupKey: string | null;
     clearSetupData: () => void;
     fetchSetupData: () => Promise<void>;
+    errors: string[];
 }
 
 export default function TwoFactorSetupModal({
@@ -164,6 +182,7 @@ export default function TwoFactorSetupModal({
     manualSetupKey,
     clearSetupData,
     fetchSetupData,
+    errors,
 }: TwoFactorSetupModalProps) {
     const [showVerificationStep, setShowVerificationStep] = useState<boolean>(false);
 
@@ -239,6 +258,7 @@ export default function TwoFactorSetupModal({
                             manualSetupKey={manualSetupKey}
                             buttonText={modalConfig.buttonText}
                             onNextStep={handleModalNextStep}
+                            errors={errors}
                         />
                     )}
                 </div>

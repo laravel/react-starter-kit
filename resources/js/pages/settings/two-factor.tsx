@@ -25,7 +25,8 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabled = false }: TwoFactorProps) {
-    const { qrCodeSvg, hasSetupData, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes } = useTwoFactorAuth();
+    const { qrCodeSvg, hasSetupData, manualSetupKey, clearSetupData, fetchSetupData, recoveryCodesList, fetchRecoveryCodes, errors } =
+        useTwoFactorAuth();
     const [showSetupModal, setShowSetupModal] = useState<boolean>(false);
 
     return (
@@ -42,7 +43,7 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                                 retrieve from the TOTP-supported application on your phone.
                             </p>
 
-                            <TwoFactorRecoveryCodes recoveryCodesList={recoveryCodesList} fetchRecoveryCodes={fetchRecoveryCodes} />
+                            <TwoFactorRecoveryCodes recoveryCodesList={recoveryCodesList} fetchRecoveryCodes={fetchRecoveryCodes} errors={errors} />
 
                             <div className="relative inline">
                                 <Form {...disable.form()}>
@@ -91,6 +92,7 @@ export default function TwoFactor({ requiresConfirmation = false, twoFactorEnabl
                         manualSetupKey={manualSetupKey}
                         clearSetupData={clearSetupData}
                         fetchSetupData={fetchSetupData}
+                        errors={errors}
                     />
                 </div>
             </SettingsLayout>
