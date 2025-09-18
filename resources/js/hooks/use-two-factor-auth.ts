@@ -35,7 +35,6 @@ export const useTwoFactorAuth = () => {
     const fetchQrCode = useCallback(async (): Promise<void> => {
         try {
             const { svg } = await fetchJson<TwoFactorSetupData>(qrCode.url());
-
             setQrCodeSvg(svg);
         } catch {
             setErrors((prev) => [...prev, 'Failed to fetch QR code']);
@@ -46,7 +45,6 @@ export const useTwoFactorAuth = () => {
     const fetchSetupKey = useCallback(async (): Promise<void> => {
         try {
             const { secretKey: key } = await fetchJson<TwoFactorSecretKey>(secretKey.url());
-
             setManualSetupKey(key);
         } catch {
             setErrors((prev) => [...prev, 'Failed to fetch a setup key']);
@@ -68,7 +66,6 @@ export const useTwoFactorAuth = () => {
         try {
             clearErrors();
             const codes = await fetchJson<string[]>(recoveryCodes.url());
-
             setRecoveryCodesList(codes);
         } catch {
             setErrors((prev) => [...prev, 'Failed to fetch recovery codes']);
