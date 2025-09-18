@@ -1,10 +1,10 @@
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
-import { AlertCircleIcon, Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import AlertError from './alert-error';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];
@@ -77,17 +77,7 @@ export default function TwoFactorRecoveryCodes({ recoveryCodesList, fetchRecover
                 >
                     <div className="mt-3 space-y-3">
                         {errors?.length ? (
-                            <Alert variant="destructive">
-                                <AlertCircleIcon />
-                                <AlertTitle>Something went wrong.</AlertTitle>
-                                <AlertDescription>
-                                    <ul className="list-disc text-sm">
-                                        {errors.map((error, index) => (
-                                            <li key={index}>{error}</li>
-                                        ))}
-                                    </ul>
-                                </AlertDescription>
-                            </Alert>
+                            <AlertError errors={errors} />
                         ) : (
                             <>
                                 <div

@@ -1,5 +1,4 @@
 import InputError from '@/components/input-error';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@/components/ui/input-otp';
@@ -8,8 +7,9 @@ import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
-import { AlertCircleIcon, Check, Copy, Loader2, ScanLine } from 'lucide-react';
+import { Check, Copy, Loader2, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import AlertError from './alert-error';
 
 function GridScanIcon() {
     return (
@@ -50,17 +50,7 @@ function TwoFactorSetupStep({
     return (
         <>
             {errors?.length ? (
-                <Alert variant="destructive">
-                    <AlertCircleIcon />
-                    <AlertTitle>Something went wrong.</AlertTitle>
-                    <AlertDescription>
-                        <ul className="list-inside list-disc text-sm">
-                            {Array.from(new Set(errors)).map((error, index) => (
-                                <li key={index}>{error}</li>
-                            ))}
-                        </ul>
-                    </AlertDescription>
-                </Alert>
+                <AlertError errors={errors} />
             ) : (
                 <>
                     <div className="mx-auto flex max-w-md overflow-hidden">
