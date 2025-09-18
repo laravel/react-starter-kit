@@ -30,7 +30,10 @@ export const useTwoFactorAuth = () => {
     const [recoveryCodesList, setRecoveryCodesList] = useState<string[]>([]);
     const [errors, setErrors] = useState<string[]>([]);
 
-    const hasSetupData = useMemo<boolean>(() => qrCodeSvg !== null && manualSetupKey !== null, [qrCodeSvg, manualSetupKey]);
+    const hasSetupData = useMemo<boolean>(
+        () => qrCodeSvg !== null && manualSetupKey !== null,
+        [qrCodeSvg, manualSetupKey],
+    );
 
     const fetchQrCode = useCallback(async (): Promise<void> => {
         try {
@@ -44,7 +47,9 @@ export const useTwoFactorAuth = () => {
 
     const fetchSetupKey = useCallback(async (): Promise<void> => {
         try {
-            const { secretKey: key } = await fetchJson<TwoFactorSecretKey>(secretKey.url());
+            const { secretKey: key } = await fetchJson<TwoFactorSecretKey>(
+                secretKey.url(),
+            );
             setManualSetupKey(key);
         } catch {
             setErrors((prev) => [...prev, 'Failed to fetch a setup key']);

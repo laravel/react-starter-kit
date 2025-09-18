@@ -30,14 +30,21 @@ export default function Password() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall
+                        title="Update password"
+                        description="Ensure your account is using a long, random password to stay secure"
+                    />
 
                     <Form
                         {...PasswordController.update.form()}
                         options={{
                             preserveScroll: true,
                         }}
-                        resetOnError={['password', 'password_confirmation', 'current_password']}
+                        resetOnError={[
+                            'password',
+                            'password_confirmation',
+                            'current_password',
+                        ]}
                         resetOnSuccess
                         onError={(errors) => {
                             if (errors.password) {
@@ -53,7 +60,9 @@ export default function Password() {
                         {({ errors, processing, recentlySuccessful }) => (
                             <>
                                 <div className="grid gap-2">
-                                    <Label htmlFor="current_password">Current password</Label>
+                                    <Label htmlFor="current_password">
+                                        Current password
+                                    </Label>
 
                                     <Input
                                         id="current_password"
@@ -65,11 +74,15 @@ export default function Password() {
                                         placeholder="Current password"
                                     />
 
-                                    <InputError message={errors.current_password} />
+                                    <InputError
+                                        message={errors.current_password}
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password">New password</Label>
+                                    <Label htmlFor="password">
+                                        New password
+                                    </Label>
 
                                     <Input
                                         id="password"
@@ -85,7 +98,9 @@ export default function Password() {
                                 </div>
 
                                 <div className="grid gap-2">
-                                    <Label htmlFor="password_confirmation">Confirm password</Label>
+                                    <Label htmlFor="password_confirmation">
+                                        Confirm password
+                                    </Label>
 
                                     <Input
                                         id="password_confirmation"
@@ -96,11 +111,16 @@ export default function Password() {
                                         placeholder="Confirm password"
                                     />
 
-                                    <InputError message={errors.password_confirmation} />
+                                    <InputError
+                                        message={errors.password_confirmation}
+                                    />
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <Button disabled={processing} data-test="update-password-button">
+                                    <Button
+                                        disabled={processing}
+                                        data-test="update-password-button"
+                                    >
                                         Save password
                                     </Button>
 
@@ -111,7 +131,9 @@ export default function Password() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-neutral-600">Saved</p>
+                                        <p className="text-sm text-neutral-600">
+                                            Saved
+                                        </p>
                                     </Transition>
                                 </div>
                             </>
