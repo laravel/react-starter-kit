@@ -162,7 +162,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                         className="relative flex h-full items-center"
                                     >
                                         <div className={
-                                            page.url === item.href.url && ("h-full flex items-center border-b border-black dark:border-white")
+                                            page.url === item.href.url ? ("h-full flex items-center border-b border-black dark:border-white") : null
                                         }
                                         >
                                             <Link
