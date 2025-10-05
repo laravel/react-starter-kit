@@ -18,7 +18,11 @@ export function NavUser() {
     const getInitials = useInitials();
 
     return (
-        <Menu shadow="md" width={230} position={collapsed ? 'right-end' : 'top-start'}>
+        <Menu
+            shadow="md"
+            width={230}
+            position={collapsed ? 'right-end' : 'top-start'}
+        >
             <Menu.Target>
                 <SidebarMenuButton
                     component="button"
@@ -26,14 +30,22 @@ export function NavUser() {
                     classNames={{
                         inner: 'items-stretch! justify-between!',
                     }}
-                    rightSection={!collapsed && <IconSelector color="var(--foreground)" size={20} />}
+                    rightSection={
+                        !collapsed && (
+                            <IconSelector color="var(--foreground)" size={20} />
+                        )
+                    }
+                    data-test="sidebar-menu-button"
                 >
                     <Avatar
                         src={auth.user.avatar}
                         name={getInitials(auth.user.name)}
                         size="md"
                         radius="xl"
-                        imageProps={{ src: auth.user.avatar, alt: auth.user.name }}
+                        imageProps={{
+                            src: auth.user.avatar,
+                            alt: auth.user.name,
+                        }}
                     />
 
                     <div className="px-2 text-sm font-medium text-foreground">

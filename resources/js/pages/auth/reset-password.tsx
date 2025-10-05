@@ -11,7 +11,10 @@ interface ResetPasswordProps {
 
 export default function ResetPassword({ token, email }: ResetPasswordProps) {
     return (
-        <AuthLayout title="Reset password" description="Please enter your new password below">
+        <AuthLayout
+            title="Reset password"
+            description="Please enter your new password below"
+        >
             <Head title="Reset password" />
 
             <Form
@@ -64,7 +67,13 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                             />
                         </div>
 
-                        <Button type="submit" className="mt-4 w-full" disabled={processing} loading={processing}>
+                        <Button
+                            type="submit"
+                            className="mt-4 w-full"
+                            disabled={processing}
+                            loading={processing}
+                            data-test="reset-password-button"
+                        >
                             Reset password
                         </Button>
                     </div>

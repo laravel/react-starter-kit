@@ -28,14 +28,21 @@ export default function Password() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Update password" description="Ensure your account is using a long, random password to stay secure" />
+                    <HeadingSmall
+                        title="Update password"
+                        description="Ensure your account is using a long, random password to stay secure"
+                    />
 
                     <Form
                         {...PasswordController.update.form()}
                         options={{
                             preserveScroll: true,
                         }}
-                        resetOnError={['password', 'password_confirmation', 'current_password']}
+                        resetOnError={[
+                            'password',
+                            'password_confirmation',
+                            'current_password',
+                        ]}
                         resetOnSuccess
                         onError={(errors) => {
                             if (errors.password) {
@@ -92,7 +99,11 @@ export default function Password() {
                                 </div>
 
                                 <div className="flex items-center gap-4">
-                                    <Button type="submit" disabled={processing}>
+                                    <Button
+                                        type="submit"
+                                        disabled={processing}
+                                        data-test="update-password-button"
+                                    >
                                         Save password
                                     </Button>
 
@@ -103,7 +114,9 @@ export default function Password() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-neutral-600">Saved</p>
+                                        <p className="text-sm text-neutral-600">
+                                            Saved
+                                        </p>
                                     </Transition>
                                 </div>
                             </>

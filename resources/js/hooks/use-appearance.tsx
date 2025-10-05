@@ -21,7 +21,8 @@ const setCookie = (name: string, value: string, days = 365) => {
 };
 
 const applyTheme = (appearance: Appearance) => {
-    const isDark = appearance === 'dark' || (appearance === 'system' && prefersDark());
+    const isDark =
+        appearance === 'dark' || (appearance === 'system' && prefersDark());
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
@@ -41,7 +42,8 @@ const handleSystemThemeChange = () => {
 };
 
 export function initializeTheme() {
-    const savedAppearance = (localStorage.getItem('appearance') as Appearance) || 'system';
+    const savedAppearance =
+        (localStorage.getItem('appearance') as Appearance) || 'system';
 
     applyTheme(savedAppearance);
 
@@ -54,25 +56,34 @@ export function useAppearance() {
 
     const { setColorScheme } = useMantineColorScheme();
 
-    const updateAppearance = useCallback((mode: Appearance) => {
-        setAppearance(mode);
+    const updateAppearance = useCallback(
+        (mode: Appearance) => {
+            setAppearance(mode);
 
-        setColorScheme(mode === 'system' ? 'auto' : mode);
+            setColorScheme(mode === 'system' ? 'auto' : mode);
 
-        // Store in localStorage for client-side persistence...
-        localStorage.setItem('appearance', mode);
+            // Store in localStorage for client-side persistence...
+            localStorage.setItem('appearance', mode);
 
-        // Store in cookie for SSR...
-        setCookie('appearance', mode);
+            // Store in cookie for SSR...
+            setCookie('appearance', mode);
 
-        applyTheme(mode);
-    }, [setColorScheme]);
+            applyTheme(mode);
+        },
+        [setColorScheme],
+    );
 
     useEffect(() => {
-        const savedAppearance = localStorage.getItem('appearance') as Appearance | null;
+        const savedAppearance = localStorage.getItem(
+            'appearance',
+        ) as Appearance | null;
         updateAppearance(savedAppearance || 'system');
 
-        return () => mediaQuery()?.removeEventListener('change', handleSystemThemeChange);
+        return () =>
+            mediaQuery()?.removeEventListener(
+                'change',
+                handleSystemThemeChange,
+            );
     }, [updateAppearance]);
 
     return { appearance, updateAppearance } as const;

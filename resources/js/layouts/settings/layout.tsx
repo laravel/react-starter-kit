@@ -1,8 +1,8 @@
 import Heading from '@/components/heading';
-import { appearance } from '@/routes';
+import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
-
+import { show } from '@/routes/two-factor';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Button } from '@mantine/core';
@@ -20,8 +20,13 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Two-Factor Auth',
+        href: show(),
+        icon: null,
+    },
+    {
         title: 'Appearance',
-        href: appearance(),
+        href: editAppearance(),
         icon: null,
     },
 ];
@@ -36,7 +41,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
     return (
         <div className="px-4 py-6">
-            <Heading title="Settings" description="Manage your profile and account settings" />
+            <Heading
+                title="Settings"
+                description="Manage your profile and account settings"
+            />
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
@@ -44,18 +52,30 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                         {sidebarNavItems.map((item, index) => (
                             <Button
                                 key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
-                                href={typeof item.href === 'string' ? item.href : item.href.url}
+                                href={
+                                    typeof item.href === 'string'
+                                        ? item.href
+                                        : item.href.url
+                                }
                                 component={Link}
                                 prefetch
                                 size="sm"
                                 justify="start"
                                 color="gray"
                                 variant="subtle"
-                                leftSection={item.icon && <item.icon className="h-4 w-4" />}
+                                leftSection={
+                                    item.icon && (
+                                        <item.icon className="h-4 w-4" />
+                                    )
+                                }
                                 styles={{
                                     root: {
-                                        ...(currentPath === item.href && {
-                                            backgroundColor: 'var(--color-muted)',
+                                        ...(currentPath ===
+                                            (typeof item.href === 'string'
+                                                ? item.href
+                                                : item.href.url) && {
+                                            backgroundColor:
+                                                'var(--color-muted)',
                                         }),
                                     },
                                 }}
@@ -69,7 +89,9 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                 <div className="my-6 border-2 bg-border lg:hidden" />
 
                 <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-12">{children}</section>
+                    <section className="max-w-xl space-y-12">
+                        {children}
+                    </section>
                 </div>
             </div>
         </div>

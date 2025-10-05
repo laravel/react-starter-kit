@@ -5,13 +5,27 @@ import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import type { PropsWithChildren } from 'react';
 
-export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
+export default function AppHeaderLayout({
+    children,
+    breadcrumbs,
+}: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const [opened, { toggle }] = useDisclosure();
 
     return (
-        <AppShell header={{ height: 60 }} navbar={{ width: 300, breakpoint: 'sm', collapsed: { desktop: true, mobile: !opened } }}>
+        <AppShell
+            header={{ height: 60 }}
+            navbar={{
+                width: 300,
+                breakpoint: 'sm',
+                collapsed: { desktop: true, mobile: !opened },
+            }}
+        >
             <AppShell.Header className="bg-background!">
-                <AppHeader breadcrumbs={breadcrumbs} opened={opened} toggle={toggle} />
+                <AppHeader
+                    breadcrumbs={breadcrumbs}
+                    opened={opened}
+                    toggle={toggle}
+                />
             </AppShell.Header>
 
             <AppShell.Navbar py="md" px={4}>

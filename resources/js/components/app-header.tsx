@@ -5,7 +5,13 @@ import { dashboard } from '@/routes';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
 import { Avatar, Burger, Button, Group, Menu } from '@mantine/core';
-import { Icon, IconBook, IconFolder, IconLayoutGrid, IconSearch } from '@tabler/icons-react';
+import {
+    Icon,
+    IconBook,
+    IconFolder,
+    IconLayoutGrid,
+    IconSearch,
+} from '@tabler/icons-react';
 import AppLogo from './app-logo';
 import HeaderMenuButton from './header-menu-button';
 import SidebarMenuButton from './sidebar-menu-button';
@@ -37,7 +43,11 @@ const rightNavItems: (NavItem & { icon: Icon })[] = [
     },
 ];
 
-export function AppHeader({ breadcrumbs = [], opened, toggle }: AppHeaderProps) {
+export function AppHeader({
+    breadcrumbs = [],
+    opened,
+    toggle,
+}: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
@@ -46,19 +56,43 @@ export function AppHeader({ breadcrumbs = [], opened, toggle }: AppHeaderProps) 
         <>
             <div className="flex h-full items-center justify-between px-6 md:mx-auto md:max-w-7xl md:px-4">
                 <Group h="100%">
-                    <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+                    <Burger
+                        opened={opened}
+                        onClick={toggle}
+                        hiddenFrom="sm"
+                        size="sm"
+                    />
                     <Group h="100%" justify="space-between" style={{ flex: 1 }}>
-                        <HeaderMenuButton component={Link} prefetch href={dashboard()} className="bg-transparent! px-2!">
+                        <HeaderMenuButton
+                            component={Link}
+                            prefetch
+                            href={dashboard()}
+                            className="bg-transparent! px-2!"
+                        >
                             <AppLogo />
                         </HeaderMenuButton>
                         <Group h="100%" ml="xl" gap={0} visibleFrom="sm">
                             {mainNavItems.map((item) => (
                                 <HeaderMenuButton
-                                    key={typeof item.href === 'string' ? item.href : item.href.url}
+                                    key={
+                                        typeof item.href === 'string'
+                                            ? item.href
+                                            : item.href.url
+                                    }
                                     component={Link}
-                                    href={typeof item.href === 'string' ? item.href : item.href.url}
-                                    isActive={currentPath.startsWith(typeof item.href === 'string' ? item.href : item.href.url)}
-                                    leftSection={item.icon && <item.icon size={20} />}
+                                    href={
+                                        typeof item.href === 'string'
+                                            ? item.href
+                                            : item.href.url
+                                    }
+                                    isActive={currentPath.startsWith(
+                                        typeof item.href === 'string'
+                                            ? item.href
+                                            : item.href.url,
+                                    )}
+                                    leftSection={
+                                        item.icon && <item.icon size={20} />
+                                    }
                                 >
                                     {item.title}
                                 </HeaderMenuButton>
@@ -73,13 +107,26 @@ export function AppHeader({ breadcrumbs = [], opened, toggle }: AppHeaderProps) 
                             root: 'bg-transparent! hover:bg-muted! px-2!',
                         }}
                     >
-                        <IconSearch color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
+                        <IconSearch
+                            color="var(--foreground)"
+                            className="!size-5 opacity-80 group-hover:opacity-100"
+                        />
                     </HeaderMenuButton>
                     {rightNavItems.map((item) => (
                         <HeaderMenuButton
-                            key={typeof item.href === 'string' ? item.href : item.href.url}
-                            component={typeof item.href === 'string' ? 'a' : Link}
-                            href={typeof item.href === 'string' ? item.href : item.href.url}
+                            key={
+                                typeof item.href === 'string'
+                                    ? item.href
+                                    : item.href.url
+                            }
+                            component={
+                                typeof item.href === 'string' ? 'a' : Link
+                            }
+                            href={
+                                typeof item.href === 'string'
+                                    ? item.href
+                                    : item.href.url
+                            }
                             tooltip={item.title}
                             classNames={{
                                 root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',
@@ -89,7 +136,12 @@ export function AppHeader({ breadcrumbs = [], opened, toggle }: AppHeaderProps) 
                         </HeaderMenuButton>
                     ))}
 
-                    <Menu shadow="md" width={230} position={'bottom-end'} classNames={{ dropdown: 'border-1! -mt-2' }}>
+                    <Menu
+                        shadow="md"
+                        width={230}
+                        position={'bottom-end'}
+                        classNames={{ dropdown: 'border-1! -mt-2' }}
+                    >
                         <Menu.Target>
                             <SidebarMenuButton
                                 component="button"
@@ -103,7 +155,10 @@ export function AppHeader({ breadcrumbs = [], opened, toggle }: AppHeaderProps) 
                                     name={getInitials(auth.user.name)}
                                     size="md"
                                     radius="xl"
-                                    imageProps={{ src: auth.user.avatar, alt: auth.user.name }}
+                                    imageProps={{
+                                        src: auth.user.avatar,
+                                        alt: auth.user.name,
+                                    }}
                                 />
                             </SidebarMenuButton>
                         </Menu.Target>
@@ -128,7 +183,11 @@ export function AppHeaderNavBar() {
             <div className="flex flex-col gap-y-2">
                 {mainNavItems.map((item) => (
                     <Button
-                        key={typeof item.href === 'string' ? item.href : item.href.url}
+                        key={
+                            typeof item.href === 'string'
+                                ? item.href
+                                : item.href.url
+                        }
                         component={Link}
                         href={item.href}
                         justify="start"
@@ -145,7 +204,11 @@ export function AppHeaderNavBar() {
             <div className="flex flex-col gap-y-2">
                 {rightNavItems.map((item) => (
                     <Button
-                        key={typeof item.href === 'string' ? item.href : item.href.url}
+                        key={
+                            typeof item.href === 'string'
+                                ? item.href
+                                : item.href.url
+                        }
                         component={Link}
                         href={item.href}
                         justify="start"

@@ -23,9 +23,19 @@ export default function HeaderMenuButton<T extends React.ElementType>({
 }: Props<T>) {
     const Wrapper = ({ children }: React.PropsWithChildren) => (
         <>
-            <div className={cn('flex h-full flex-col items-center justify-center', isActive && 'border-b border-b-foreground')}>
+            <div
+                className={cn(
+                    'flex h-full flex-col items-center justify-center',
+                    isActive && 'border-b border-b-foreground',
+                )}
+            >
                 {tooltip ? (
-                    <Tooltip withArrow arrowSize={6} offset={10} label={<span className="text-xs">{tooltip}</span>}>
+                    <Tooltip
+                        withArrow
+                        arrowSize={6}
+                        offset={10}
+                        label={<span className="text-xs">{tooltip}</span>}
+                    >
                         {children}
                     </Tooltip>
                 ) : (
@@ -44,7 +54,11 @@ export default function HeaderMenuButton<T extends React.ElementType>({
                 variant="subtle"
                 leftSection={icon}
                 justify={iconOnly ? 'center' : 'start'}
-                className={cn('w-full text-foreground transition-none', className, iconOnly && 'p-2!')}
+                className={cn(
+                    'w-full text-foreground transition-none',
+                    className,
+                    iconOnly && 'p-2!',
+                )}
                 styles={{
                     ...(styles || {}),
                     root: {

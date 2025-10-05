@@ -9,7 +9,10 @@ import { Button, PasswordInput, TextInput } from '@mantine/core';
 
 export default function Register() {
     return (
-        <AuthLayout title="Create an account" description="Enter your details below to create your account">
+        <AuthLayout
+            title="Create an account"
+            description="Enter your details below to create your account"
+        >
             <Head title="Register" />
             <Form
                 {...RegisteredUserController.store.form()}
@@ -85,7 +88,14 @@ export default function Register() {
                                 />
                             </div>
 
-                            <Button type="submit" className="mt-2 w-full" tabIndex={5} loading={processing} disabled={processing}>
+                            <Button
+                                type="submit"
+                                className="mt-2 w-full"
+                                tabIndex={5}
+                                loading={processing}
+                                disabled={processing}
+                                data-test="register-user-button"
+                            >
                                 Create account
                             </Button>
                         </div>

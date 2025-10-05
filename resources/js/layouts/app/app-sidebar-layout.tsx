@@ -8,7 +8,10 @@ import { AppShell } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { type PropsWithChildren } from 'react';
 
-export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
+export default function AppSidebarLayout({
+    children,
+    breadcrumbs = [],
+}: PropsWithChildren<{ breadcrumbs?: BreadcrumbItem[] }>) {
     const { state: desktopOpened, toggle: toggleDesktop } = useSideBar();
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
 
@@ -39,11 +42,19 @@ export default function AppSidebarLayout({ children, breadcrumbs = [] }: PropsWi
             <AppShell.Header>
                 <AppSidebarHeader breadcrumbs={breadcrumbs} toggle={toggle} />
             </AppShell.Header>
-            <AppShell.Navbar style={{ ...(!isMobile && { transition: 'width 0.2s ease' }) }}>
-                <AppSidebar toggle={toggle} className="group peer" collapsed={collapsed} />
+            <AppShell.Navbar
+                style={{ ...(!isMobile && { transition: 'width 0.2s ease' }) }}
+            >
+                <AppSidebar
+                    toggle={toggle}
+                    className="group peer"
+                    collapsed={collapsed}
+                />
             </AppShell.Navbar>
             <AppShell.Main className="flex h-full w-full flex-col">
-                <AppContent className="overflow-x-hidden">{children}</AppContent>
+                <AppContent className="overflow-x-hidden">
+                    {children}
+                </AppContent>
             </AppShell.Main>
         </AppShell>
     );

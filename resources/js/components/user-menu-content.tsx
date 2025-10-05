@@ -30,7 +30,11 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
 
                 <Menu.Divider />
 
-                <Menu.Item component={Link} href={edit()} leftSection={<IconSettings color="gray" size={20} />}>
+                <Menu.Item
+                    component={Link}
+                    href={edit()}
+                    leftSection={<IconSettings color="gray" size={20} />}
+                >
                     Settings
                 </Menu.Item>
                 <Menu.Divider />
@@ -40,7 +44,11 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                         handleLogout();
                     }}
                 >
-                    <Menu.Item leftSection={<IconLogout color="gray" />} type="submit">
+                    <Menu.Item
+                        leftSection={<IconLogout color="gray" />}
+                        type="submit"
+                        data-test="logout-button"
+                    >
                         Log Out
                     </Menu.Item>
                 </form>

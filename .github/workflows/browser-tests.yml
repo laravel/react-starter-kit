@@ -1,0 +1,71 @@
+name: browser-tests
+
+on:
+  push:
+    branches:
+      - pest-ci
+      - develop
+      - main
+  pull_request:
+    branches:
+      - pest-ci
+      - develop
+      - main
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+          coverage: xdebug
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Install Playwright Dependencies
+        run: npm install playwright@latest
+
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Add `laravel-labs/starter-kit-browser-tests` Repository
+        run: |
+          composer config repositories.browser-tests '{"type": "vcs", "url": "https://github.com/laravel-labs/starter-kit-browser-tests"}' --file composer.json
+          composer remove "phpunit/phpunit" --dev --no-update
+          composer require "laravel-labs/starter-kit-browser-tests:dev-main@dev" --dev --no-update
+
+      - name: Install Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Copy Environment File
+        run: cp .env.example .env
+
+      - name: Generate Application Key
+        run: php artisan key:generate
+
+      - name: Setup Test Environment
+        run: |
+           cp vendor/laravel-labs/starter-kit-browser-tests/phpunit.xml.dist .
+           rm phpunit.xml
+           rm -Rf tests/
+           cp -rf vendor/laravel-labs/starter-kit-browser-tests/tests/ tests/
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Tests
+        run: php vendor/bin/pest

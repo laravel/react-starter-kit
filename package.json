@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@headlessui/react": "^2.2.0",
-        "@inertiajs/react": "^2.1.0",
+        "@inertiajs/react": "^2.1.4",
         "@mantine/core": "^8.2.4",
         "@mantine/dates": "^8.2.4",
         "@mantine/hooks": "^8.2.4",

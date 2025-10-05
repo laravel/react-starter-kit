@@ -8,7 +8,13 @@ interface AppContentProps {
 
 export function AppContent({ children, className, ...props }: AppContentProps) {
     return (
-        <div className={cn('mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4', className)} {...props}>
+        <div
+            className={cn(
+                'mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4',
+                className,
+            )}
+            {...props}
+        >
             {children}
         </div>
     );
