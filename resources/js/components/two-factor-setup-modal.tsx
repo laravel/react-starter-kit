@@ -1,8 +1,8 @@
-import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/routes/two-factor';
+import { confirm } from '@/wayfinder/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Button, InputError, Loader, Modal, PinInput } from '@mantine/core';
+import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconClipboard, IconScan } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import AlertError from './alert-error';
@@ -20,9 +20,8 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
-    const [copiedText, copy] = useClipboard();
-    const IconComponent =
-        copiedText === manualSetupKey ? IconCheck : IconClipboard;
+    const clipboard = useClipboard({ timeout: 500 });
+    const IconComponent = clipboard.copied ? IconCheck : IconClipboard;
 
     return (
         <>
@@ -74,7 +73,9 @@ function TwoFactorSetupStep({
                                         className="h-full w-full bg-background p-3 text-foreground outline-none"
                                     />
                                     <button
-                                        onClick={() => copy(manualSetupKey)}
+                                        onClick={() =>
+                                            clipboard.copy(manualSetupKey)
+                                        }
                                         className="border-l border-border px-3 hover:bg-muted"
                                     >
                                         <IconComponent className="w-4" />
