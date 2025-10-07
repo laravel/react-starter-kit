@@ -12,6 +12,7 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
@@ -60,6 +61,7 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
+    const { resolvedAppearance } = useAppearance();
     const [copiedText, copy] = useClipboard();
     const IconComponent = copiedText === manualSetupKey ? Check : Copy;
 
@@ -76,6 +78,12 @@ function TwoFactorSetupStep({
                                     <div
                                         dangerouslySetInnerHTML={{
                                             __html: qrCodeSvg,
+                                        }}
+                                        style={{
+                                            filter:
+                                                resolvedAppearance === 'dark'
+                                                    ? 'invert(1) brightness(1.5)'
+                                                    : undefined,
                                         }}
                                     />
                                 ) : (
