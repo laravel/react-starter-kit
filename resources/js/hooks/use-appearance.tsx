@@ -1,6 +1,29 @@
 import { useCallback, useEffect, useState } from 'react';
+import { Sun, Moon, Monitor } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 
-export type Appearance = 'light' | 'dark' | 'system';
+// --- Changed type from string union to enum ---
+export enum Appearance {
+    LIGHT = 'light',
+    DARK = 'dark',
+    SYSTEM = 'system',
+}
+
+// --- Centralized labels ---
+export const AppearanceLabels: Record<Appearance, string> = {
+    [Appearance.LIGHT]: 'Light',
+    [Appearance.DARK]: 'Dark',
+    [Appearance.SYSTEM]: 'System',
+};
+
+// --- Centralized icons ---
+export const AppearanceIcons: Record<Appearance, LucideIcon> = {
+    [Appearance.LIGHT]: Sun,
+    [Appearance.DARK]: Moon,
+    [Appearance.SYSTEM]: Monitor,
+};
+
+const APPEARANCE_KEY = 'appearance';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
@@ -21,7 +44,7 @@ const setCookie = (name: string, value: string, days = 365) => {
 
 const applyTheme = (appearance: Appearance) => {
     const isDark =
-        appearance === 'dark' || (appearance === 'system' && prefersDark());
+        appearance === Appearance.DARK || (appearance === Appearance.SYSTEM && prefersDark());
 
     document.documentElement.classList.toggle('dark', isDark);
     document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
@@ -37,12 +60,12 @@ const mediaQuery = () => {
 
 const handleSystemThemeChange = () => {
     const currentAppearance = localStorage.getItem('appearance') as Appearance;
-    applyTheme(currentAppearance || 'system');
+    applyTheme(currentAppearance || Appearance.SYSTEM);
 };
 
 export function initializeTheme() {
     const savedAppearance =
-        (localStorage.getItem('appearance') as Appearance) || 'system';
+        (localStorage.getItem('appearance') as Appearance) || Appearance.SYSTEM;
 
     applyTheme(savedAppearance);
 
@@ -51,7 +74,7 @@ export function initializeTheme() {
 }
 
 export function useAppearance() {
-    const [appearance, setAppearance] = useState<Appearance>('system');
+    const [appearance, setAppearance] = useState<Appearance>(Appearance.SYSTEM);
 
     const updateAppearance = useCallback((mode: Appearance) => {
         setAppearance(mode);
@@ -71,7 +94,7 @@ export function useAppearance() {
         ) as Appearance | null;
 
         // eslint-disable-next-line react-hooks/set-state-in-effect
-        updateAppearance(savedAppearance || 'system');
+        updateAppearance(savedAppearance || Appearance.SYSTEM);
 
         return () =>
             mediaQuery()?.removeEventListener(
