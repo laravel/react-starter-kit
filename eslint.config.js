@@ -8,6 +8,7 @@ import typescript from 'typescript-eslint';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     js.configs.recommended,
+    reactHooks.configs.flat.recommended,
     ...typescript.configs.recommended,
     {
         ...react.configs.flat.recommended,
@@ -29,16 +30,13 @@ export default [
         },
     },
     {
-        plugins: {
-            'react-hooks': reactHooks,
-        },
-        rules: {
-            'react-hooks/rules-of-hooks': 'error',
-            'react-hooks/exhaustive-deps': 'warn',
-        },
-    },
-    {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr'],
+        ignores: [
+            'vendor',
+            'node_modules',
+            'public',
+            'bootstrap/ssr',
+            'tailwind.config.js',
+        ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

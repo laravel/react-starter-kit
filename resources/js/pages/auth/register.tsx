@@ -1,13 +1,13 @@
-import RegisteredUserController from '@/actions/App/Http/Controllers/Auth/RegisteredUserController';
 import { login } from '@/routes';
+import { store } from '@/routes/register';
 import { Form, Head } from '@inertiajs/react';
-import { LoaderCircle } from 'lucide-react';
 
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function Register() {
@@ -18,7 +18,7 @@ export default function Register() {
         >
             <Head title="Register" />
             <Form
-                {...RegisteredUserController.store.form()}
+                {...store.form()}
                 resetOnSuccess={['password', 'password_confirmation']}
                 disableWhileProcessing
                 className="flex flex-col gap-6"
@@ -96,9 +96,7 @@ export default function Register() {
                                 tabIndex={5}
                                 data-test="register-user-button"
                             >
-                                {processing && (
-                                    <LoaderCircle className="h-4 w-4 animate-spin" />
-                                )}
+                                {processing && <Spinner />}
                                 Create account
                             </Button>
                         </div>
