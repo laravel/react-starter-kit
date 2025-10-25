@@ -15,14 +15,16 @@ function mediaQueryListener(callback: (event: MediaQueryListEvent) => void) {
     };
 }
 
-function isSmallerThanBreakpoint() {
+function isSmallerThanBreakpoint(): boolean {
     return mql()?.matches || false;
 }
+
+const getServerSnapshot = (): boolean => false;
 
 export function useIsMobile() {
     return useSyncExternalStore(
         mediaQueryListener,
         isSmallerThanBreakpoint,
-        () => false,
+        getServerSnapshot,
     );
 }
