@@ -8,9 +8,11 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable, show } from '@/routes/two-factor';
 import { type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
+
+import { Form } from '@wandry/inertia-form';
 
 interface TwoFactorProps {
     requiresConfirmation?: boolean;
@@ -67,15 +69,9 @@ export default function TwoFactor({
 
                             <div className="relative inline">
                                 <Form {...disable.form()}>
-                                    {({ processing }) => (
-                                        <Button
-                                            variant="destructive"
-                                            type="submit"
-                                            disabled={processing}
-                                        >
-                                            <ShieldBan /> Disable 2FA
-                                        </Button>
-                                    )}
+                                    <Button variant="destructive" type="submit">
+                                        <ShieldBan /> Disable 2FA
+                                    </Button>
                                 </Form>
                             </div>
                         </div>
@@ -100,19 +96,15 @@ export default function TwoFactor({
                                 ) : (
                                     <Form
                                         {...enable.form()}
-                                        onSuccess={() =>
-                                            setShowSetupModal(true)
-                                        }
+                                        options={{
+                                            onSuccess: () =>
+                                                setShowSetupModal(true),
+                                        }}
                                     >
-                                        {({ processing }) => (
-                                            <Button
-                                                type="submit"
-                                                disabled={processing}
-                                            >
-                                                <ShieldCheck />
-                                                Enable 2FA
-                                            </Button>
-                                        )}
+                                        <Button type="submit">
+                                            <ShieldCheck />
+                                            Enable 2FA
+                                        </Button>
                                     </Form>
                                 )}
                             </div>

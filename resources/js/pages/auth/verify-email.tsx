@@ -1,11 +1,11 @@
 // Components
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+import { Form } from '@wandry/inertia-form';
 
 export default function VerifyEmail({ status }: { status?: string }) {
     return (
@@ -23,21 +23,15 @@ export default function VerifyEmail({ status }: { status?: string }) {
             )}
 
             <Form {...send.form()} className="space-y-6 text-center">
-                {({ processing }) => (
-                    <>
-                        <Button disabled={processing} variant="secondary">
-                            {processing && <Spinner />}
-                            Resend verification email
-                        </Button>
+                <>
+                    <Button variant="secondary">
+                        Resend verification email
+                    </Button>
 
-                        <TextLink
-                            href={logout()}
-                            className="mx-auto block text-sm"
-                        >
-                            Log out
-                        </TextLink>
-                    </>
-                )}
+                    <TextLink href={logout()} className="mx-auto block text-sm">
+                        Log out
+                    </TextLink>
+                </>
             </Form>
         </AuthLayout>
     );

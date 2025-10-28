@@ -1,15 +1,15 @@
-import InputError from '@/components/input-error';
+import CheckboxField from '@/components/checkbox-field';
+import PasswordField from '@/components/password-field';
+import TextField from '@/components/text-field';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
-import { Form, Head } from '@inertiajs/react';
+import { Head } from '@inertiajs/react';
+
+import { Form } from '@wandry/inertia-form';
 
 interface LoginProps {
     status?: string;
@@ -34,80 +34,50 @@ export default function Login({
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
-                {({ processing, errors }) => (
-                    <>
-                        <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
-                                <Input
-                                    id="email"
-                                    type="email"
-                                    name="email"
-                                    required
-                                    autoFocus
-                                    tabIndex={1}
-                                    autoComplete="email"
-                                    placeholder="email@example.com"
-                                />
-                                <InputError message={errors.email} />
-                            </div>
+                <>
+                    <div className="grid gap-6">
+                        <TextField
+                            name="email"
+                            label="Email address"
+                            type="email"
+                            autoFocus
+                            autoComplete="email"
+                            placeholder="email@example.com"
+                        />
+                        <PasswordField
+                            name="password"
+                            label="Password"
+                            labelRight={
+                                canResetPassword ? (
+                                    <TextLink href={request()} tabIndex={4}>
+                                        Forgot your password?
+                                    </TextLink>
+                                ) : undefined
+                            }
+                            autoFocus
+                            autoComplete="current-password"
+                            placeholder="Password"
+                        />
+                        <CheckboxField name="remember" label="Remember me" />
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
-                                    {canResetPassword && (
-                                        <TextLink
-                                            href={request()}
-                                            className="ml-auto text-sm"
-                                            tabIndex={5}
-                                        >
-                                            Forgot password?
-                                        </TextLink>
-                                    )}
-                                </div>
-                                <Input
-                                    id="password"
-                                    type="password"
-                                    name="password"
-                                    required
-                                    tabIndex={2}
-                                    autoComplete="current-password"
-                                    placeholder="Password"
-                                />
-                                <InputError message={errors.password} />
-                            </div>
+                        <Button
+                            type="submit"
+                            className="mt-4 w-full"
+                            data-test="login-button"
+                        >
+                            Log in
+                        </Button>
+                    </div>
 
-                            <div className="flex items-center space-x-3">
-                                <Checkbox
-                                    id="remember"
-                                    name="remember"
-                                    tabIndex={3}
-                                />
-                                <Label htmlFor="remember">Remember me</Label>
-                            </div>
-
-                            <Button
-                                type="submit"
-                                className="mt-4 w-full"
-                                tabIndex={4}
-                                disabled={processing}
-                                data-test="login-button"
-                            >
-                                {processing && <Spinner />}
-                                Log in
-                            </Button>
+                    {canRegister && (
+                        <div className="text-center text-sm text-muted-foreground">
+                            Don't have an account?{' '}
+                            <TextLink href={register()} tabIndex={5}>
+                                Sign up
+                            </TextLink>
                         </div>
-
-                        {canRegister && (
-                            <div className="text-center text-sm text-muted-foreground">
-                                Don't have an account?{' '}
-                                <TextLink href={register()} tabIndex={5}>
-                                    Sign up
-                                </TextLink>
-                            </div>
-                        )}
-                    </>
-                )}
+                    )}
+                </>
             </Form>
 
             {status && (

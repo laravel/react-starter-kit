@@ -7,7 +7,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
-import { Form } from '@inertiajs/react';
+import { Form } from '@wandry/inertia-form';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from './alert-error';
@@ -82,19 +82,18 @@ export default function TwoFactorRecoveryCodes({
                     {canRegenerateCodes && (
                         <Form
                             {...regenerateRecoveryCodes.form()}
-                            options={{ preserveScroll: true }}
-                            onSuccess={fetchRecoveryCodes}
+                            options={{
+                                preserveScroll: true,
+                                onSuccess: fetchRecoveryCodes,
+                            }}
                         >
-                            {({ processing }) => (
-                                <Button
-                                    variant="secondary"
-                                    type="submit"
-                                    disabled={processing}
-                                    aria-describedby="regenerate-warning"
-                                >
-                                    <RefreshCw /> Regenerate Codes
-                                </Button>
-                            )}
+                            <Button
+                                variant="secondary"
+                                type="submit"
+                                aria-describedby="regenerate-warning"
+                            >
+                                <RefreshCw /> Regenerate Codes
+                            </Button>
                         </Form>
                     )}
                 </div>
