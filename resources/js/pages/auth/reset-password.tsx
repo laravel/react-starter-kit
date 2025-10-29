@@ -4,8 +4,8 @@ import { Head } from '@inertiajs/react';
 import { Form } from '@wandry/inertia-form';
 
 import PasswordField from '@/components/password-field';
+import SubmitButton from '@/components/submit-button';
 import TextField from '@/components/text-field';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 interface ResetPasswordProps {
@@ -48,13 +48,12 @@ export default function ResetPassword({ token, email }: ResetPasswordProps) {
                         placeholder="Confirm password"
                     />
 
-                    <Button
-                        type="submit"
+                    <SubmitButton
                         className="mt-4 w-full"
                         data-test="reset-password-button"
                     >
                         Reset password
-                    </Button>
+                    </SubmitButton>
                 </div>
             </Form>
         </AuthLayout>

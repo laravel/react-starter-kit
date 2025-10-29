@@ -8,7 +8,7 @@ import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 import PasswordField from '@/components/password-field';
-import { Button } from '@/components/ui/button';
+import SubmitButton from '@/components/submit-button';
 import { edit } from '@/routes/user-password';
 
 const breadcrumbs: BreadcrumbItem[] = [
@@ -80,9 +80,9 @@ export default function Password() {
                             />
 
                             <div className="flex items-center gap-4">
-                                <Button data-test="update-password-button">
+                                <SubmitButton data-test="update-password-button">
                                     Save password
-                                </Button>
+                                </SubmitButton>
 
                                 {/* <Transition
                                     show={recentlySuccessful}

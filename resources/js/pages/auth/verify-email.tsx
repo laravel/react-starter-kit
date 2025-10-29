@@ -1,6 +1,6 @@
 // Components
+import SubmitButton from '@/components/submit-button';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
@@ -24,9 +24,9 @@ export default function VerifyEmail({ status }: { status?: string }) {
 
             <Form {...send.form()} className="space-y-6 text-center">
                 <>
-                    <Button variant="secondary">
+                    <SubmitButton variant="secondary">
                         Resend verification email
-                    </Button>
+                    </SubmitButton>
 
                     <TextLink href={logout()} className="mx-auto block text-sm">
                         Log out

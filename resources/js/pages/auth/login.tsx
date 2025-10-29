@@ -1,8 +1,8 @@
 import CheckboxField from '@/components/checkbox-field';
 import PasswordField from '@/components/password-field';
+import SubmitButton from '@/components/submit-button';
 import TextField from '@/components/text-field';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
@@ -60,13 +60,12 @@ export default function Login({
                         />
                         <CheckboxField name="remember" label="Remember me" />
 
-                        <Button
-                            type="submit"
+                        <SubmitButton
                             className="mt-4 w-full"
                             data-test="login-button"
                         >
                             Log in
-                        </Button>
+                        </SubmitButton>
                     </div>
 
                     {canRegister && (

@@ -14,6 +14,7 @@ import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import AlertError from './alert-error';
 import InputOtpField from './input-otp-field';
+import SubmitButton from './submit-button';
 import { Spinner } from './ui/spinner';
 
 function GridScanIcon() {
@@ -145,9 +146,7 @@ function TwoFactorVerificationStep({
                         >
                             Back
                         </Button>
-                        <Button type="submit" className="flex-1">
-                            Confirm
-                        </Button>
+                        <SubmitButton className="flex-1">Confirm</SubmitButton>
                     </div>
                 </div>
             </>

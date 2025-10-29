@@ -13,6 +13,7 @@ import {
 import { Form } from '@wandry/inertia-form';
 import { useRef } from 'react';
 import PasswordField from './password-field';
+import SubmitButton from './submit-button';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -75,14 +76,9 @@ export default function DeleteUser() {
                                         </Button>
                                     </DialogClose>
 
-                                    <Button variant="destructive" asChild>
-                                        <button
-                                            type="submit"
-                                            data-test="confirm-delete-user-button"
-                                        >
-                                            Delete account
-                                        </button>
-                                    </Button>
+                                    <SubmitButton variant="destructive" asChild>
+                                        Delete account
+                                    </SubmitButton>
                                 </DialogFooter>
                             </>
                         </Form>

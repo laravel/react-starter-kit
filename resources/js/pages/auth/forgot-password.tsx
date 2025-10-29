@@ -5,9 +5,9 @@ import { Head } from '@inertiajs/react';
 
 import { Form } from '@wandry/inertia-form';
 
+import SubmitButton from '@/components/submit-button';
 import TextField from '@/components/text-field';
 import TextLink from '@/components/text-link';
-import { Button } from '@/components/ui/button';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function ForgotPassword({ status }: { status?: string }) {
@@ -37,12 +37,12 @@ export default function ForgotPassword({ status }: { status?: string }) {
                         />
 
                         <div className="my-6 flex items-center justify-start">
-                            <Button
+                            <SubmitButton
                                 className="w-full"
                                 data-test="email-password-reset-link-button"
                             >
                                 Email password reset link
-                            </Button>
+                            </SubmitButton>
                         </div>
                     </>
                 </Form>

@@ -1,6 +1,6 @@
 import InputOtpField from '@/components/input-otp-field';
+import SubmitButton from '@/components/submit-button';
 import TextField from '@/components/text-field';
-import { Button } from '@/components/ui/button';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/two-factor/login';
@@ -68,9 +68,7 @@ export default function TwoFactorChallenge() {
                             </div>
                         )}
 
-                        <Button type="submit" className="w-full">
-                            Continue
-                        </Button>
+                        <SubmitButton className="w-full">Continue</SubmitButton>
 
                         <div className="text-center text-sm text-muted-foreground">
                             <span>or you can </span>

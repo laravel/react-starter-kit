@@ -1,5 +1,5 @@
 import PasswordField from '@/components/password-field';
-import { Button } from '@/components/ui/button';
+import SubmitButton from '@/components/submit-button';
 import AuthLayout from '@/layouts/auth-layout';
 import { store } from '@/routes/password/confirm';
 import { Head } from '@inertiajs/react';
@@ -25,12 +25,12 @@ export default function ConfirmPassword() {
                     />
 
                     <div className="flex items-center">
-                        <Button
+                        <SubmitButton
                             className="w-full"
                             data-test="confirm-password-button"
                         >
                             Confirm password
-                        </Button>
+                        </SubmitButton>
                     </div>
                 </div>
             </Form>

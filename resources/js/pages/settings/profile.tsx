@@ -6,8 +6,8 @@ import { Form } from '@wandry/inertia-form';
 
 import DeleteUser from '@/components/delete-user';
 import HeadingSmall from '@/components/heading-small';
+import SubmitButton from '@/components/submit-button';
 import TextField from '@/components/text-field';
-import { Button } from '@/components/ui/button';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
@@ -89,9 +89,9 @@ export default function Profile({
                                 )}
 
                             <div className="flex items-center gap-4">
-                                <Button data-test="update-profile-button">
+                                <SubmitButton data-test="update-profile-button">
                                     Save
-                                </Button>
+                                </SubmitButton>
 
                                 {/* <Transition
                                     show={recentlySuccessful}

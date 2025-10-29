@@ -12,6 +12,7 @@ import { Head } from '@inertiajs/react';
 import { ShieldBan, ShieldCheck } from 'lucide-react';
 import { useState } from 'react';
 
+import SubmitButton from '@/components/submit-button';
 import { Form } from '@wandry/inertia-form';
 
 interface TwoFactorProps {
@@ -69,9 +70,9 @@ export default function TwoFactor({
 
                             <div className="relative inline">
                                 <Form {...disable.form()}>
-                                    <Button variant="destructive" type="submit">
+                                    <SubmitButton variant="destructive">
                                         <ShieldBan /> Disable 2FA
-                                    </Button>
+                                    </SubmitButton>
                                 </Form>
                             </div>
                         </div>
@@ -101,10 +102,10 @@ export default function TwoFactor({
                                                 setShowSetupModal(true),
                                         }}
                                     >
-                                        <Button type="submit">
+                                        <SubmitButton>
                                             <ShieldCheck />
                                             Enable 2FA
-                                        </Button>
+                                        </SubmitButton>
                                     </Form>
                                 )}
                             </div>

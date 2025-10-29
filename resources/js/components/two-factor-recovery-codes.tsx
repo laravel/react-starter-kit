@@ -11,6 +11,7 @@ import { Form } from '@wandry/inertia-form';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from './alert-error';
+import SubmitButton from './submit-button';
 
 interface TwoFactorRecoveryCodesProps {
     recoveryCodesList: string[];
@@ -87,13 +88,12 @@ export default function TwoFactorRecoveryCodes({
                                 onSuccess: fetchRecoveryCodes,
                             }}
                         >
-                            <Button
+                            <SubmitButton
                                 variant="secondary"
-                                type="submit"
                                 aria-describedby="regenerate-warning"
                             >
                                 <RefreshCw /> Regenerate Codes
-                            </Button>
+                            </SubmitButton>
                         </Form>
                     )}
                 </div>

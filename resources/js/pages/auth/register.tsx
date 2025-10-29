@@ -9,7 +9,7 @@ import TextField from '@/components/text-field';
 import TextLink from '@/components/text-link';
 import AuthLayout from '@/layouts/auth-layout';
 
-import { Button } from '@/components/ui/button';
+import SubmitButton from '@/components/submit-button';
 
 export default function Register() {
     return (
@@ -53,14 +53,12 @@ export default function Register() {
                             placeholder="Confirm password"
                         />
 
-                        <Button
-                            type="submit"
+                        <SubmitButton
                             className="mt-2 w-full"
-                            tabIndex={5}
                             data-test="register-user-button"
                         >
                             Create account
-                        </Button>
+                        </SubmitButton>
                     </div>
 
                     <div className="text-center text-sm text-muted-foreground">
