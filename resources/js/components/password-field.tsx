@@ -30,7 +30,6 @@ const PasswordField: React.FC<PasswordFieldProps> = ({
     name,
     label,
     description,
-    placeholder,
     labelRight,
     ...inputProps
 }) => {
