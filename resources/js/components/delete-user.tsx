@@ -32,7 +32,7 @@ export default function DeleteUser() {
                             resetOnSuccess
                             className="space-y-6"
                         >
-                            {({ resetAndClearErrors, processing, errors }) => (
+                            {({ resetAndClearErrors, processing }) => (
                                 <>
                                     <DialogFooter className="gap-2">
                                         <DialogClose asChild>
