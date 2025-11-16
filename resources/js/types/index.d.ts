@@ -1,6 +1,13 @@
 import { InertiaLinkProps } from '@inertiajs/react';
 import { LucideIcon } from 'lucide-react';
 
+
+export interface FlashMessages {
+    success?: string | null;
+    error?: string | null;
+    info?: string | null;
+    warning?: string | null;
+}
 export interface Auth {
     user: User;
 }
@@ -28,6 +35,8 @@ export interface SharedData {
     auth: Auth;
     sidebarOpen: boolean;
     [key: string]: unknown;
+    flash?: FlashMessages;
+    response_uuid: string
 }
 
 export interface User {
