@@ -2,7 +2,11 @@ import { dashboard, login, register } from '@/routes';
 import { type SharedData } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 
-export default function Welcome() {
+export default function Welcome({
+    canRegister = true,
+}: {
+    canRegister?: boolean;
+}) {
     const { auth } = usePage<SharedData>().props;
 
     return (
@@ -32,12 +36,14 @@ export default function Welcome() {
                                 >
                                     Log in
                                 </Link>
-                                <Link
-                                    href={register()}
-                                    className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
-                                >
-                                    Register
-                                </Link>
+                                {canRegister && (
+                                    <Link
+                                        href={register()}
+                                        className="inline-block rounded-sm border border-[#19140035] px-5 py-1.5 text-sm leading-normal text-[#1b1b18] hover:border-[#1915014a] dark:border-[#3E3E3A] dark:text-[#EDEDEC] dark:hover:border-[#62605b]"
+                                    >
+                                        Register
+                                    </Link>
+                                )}
                             </>
                         )}
                     </nav>
@@ -232,11 +238,7 @@ export default function Welcome() {
                                         strokeWidth={1}
                                     />
                                 </g>
-                                <g
-                                    /** @ts-expect-error 'plus-darker' doesn't seem to be defined in the 'csstype' module */
-                                    style={{ mixBlendMode: 'plus-darker' }}
-                                    className="translate-y-0 opacity-100 transition-all delay-300 duration-750 starting:translate-y-4 starting:opacity-0"
-                                >
+                                <g className="translate-y-0 opacity-100 mix-blend-plus-darker transition-all delay-300 duration-750 starting:translate-y-4 starting:opacity-0">
                                     <path
                                         d="M230.951 281.792L231.282 281.793C238.128 274.907 248.453 265.823 262.256 254.539C275.617 243.256 285.666 234.267 292.402 227.573C299.027 220.688 303.554 213.421 305.983 205.771C308.412 198.12 307.253 190.183 302.504 181.959C297.203 172.778 289.749 165.415 280.142 159.868C270.645 154.13 260.596 151.26 249.995 151.26C239.615 151.26 232.823 154.033 229.621 159.579C226.309 164.934 227.413 172.393 232.935 181.956L168.335 181.954C159.058 165.888 155.082 151.543 156.407 138.92C157.953 126.298 164.247 116.544 175.289 109.659C186.442 102.583 201.294 99.045 219.846 99.0457C239.281 99.0464 258.551 102.585 277.655 109.663C296.649 116.549 313.986 126.303 329.667 138.927C345.349 151.551 357.827 165.895 367.104 181.961C375.718 196.88 379.528 209.981 378.535 221.265C377.762 232.549 374.063 242.399 367.438 250.814C361.033 259.229 351.095 269.557 337.624 281.796L419.782 281.8L448.605 331.719L259.774 331.712L230.951 281.792Z"
                                         fill="#F3BEC7"

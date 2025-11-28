@@ -17,5 +17,5 @@ indent_size = 4
 [*.{yml,yaml}]
 indent_size = 2
 
-[docker-compose.yml]
+[compose.yaml]
 indent_size = 4

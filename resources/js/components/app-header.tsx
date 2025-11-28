@@ -1,6 +1,6 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useInitials } from '@/hooks/use-initials';
-import { cn } from '@/lib/utils';
+import { cn, resolveUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -74,21 +74,11 @@ export function AppHeader({
                         <Group h="100%" ml="xl" gap={0} visibleFrom="sm">
                             {mainNavItems.map((item) => (
                                 <HeaderMenuButton
-                                    key={
-                                        typeof item.href === 'string'
-                                            ? item.href
-                                            : item.href.url
-                                    }
+                                    key={resolveUrl(item.href)}
                                     component={Link}
-                                    href={
-                                        typeof item.href === 'string'
-                                            ? item.href
-                                            : item.href.url
-                                    }
+                                    href={resolveUrl(item.href)}
                                     isActive={currentPath.startsWith(
-                                        typeof item.href === 'string'
-                                            ? item.href
-                                            : item.href.url,
+                                        resolveUrl(item.href),
                                     )}
                                     leftSection={
                                         item.icon && <item.icon size={20} />
@@ -114,19 +104,9 @@ export function AppHeader({
                     </HeaderMenuButton>
                     {rightNavItems.map((item) => (
                         <HeaderMenuButton
-                            key={
-                                typeof item.href === 'string'
-                                    ? item.href
-                                    : item.href.url
-                            }
-                            component={
-                                typeof item.href === 'string' ? 'a' : Link
-                            }
-                            href={
-                                typeof item.href === 'string'
-                                    ? item.href
-                                    : item.href.url
-                            }
+                            key={resolveUrl(item.href)}
+                            component={Link}
+                            href={resolveUrl(item.href)}
                             tooltip={item.title}
                             classNames={{
                                 root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',

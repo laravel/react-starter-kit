@@ -6,6 +6,7 @@ import { MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
+import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { initializeTheme } from './hooks/use-appearance';
 
@@ -22,12 +23,14 @@ createInertiaApp({
         const root = createRoot(el);
 
         root.render(
-            <MantineProvider theme={theme}>
-                <ModalsProvider>
-                    <Notifications />
-                    <App {...props} />
-                </ModalsProvider>
-            </MantineProvider>,
+            <StrictMode>
+                <MantineProvider theme={theme}>
+                    <ModalsProvider>
+                        <Notifications />
+                        <App {...props} />
+                    </ModalsProvider>
+                </MantineProvider>
+            </StrictMode>,
         );
     },
     progress: {

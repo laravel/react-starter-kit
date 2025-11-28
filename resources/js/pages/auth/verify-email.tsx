@@ -1,9 +1,10 @@
 // Components
-import EmailVerificationNotificationController from '@/actions/App/Http/Controllers/Auth/EmailVerificationNotificationController';
 import { Form, Head, router } from '@inertiajs/react';
 
 import { useMobileNavigation } from '@/hooks/use-mobile-navigation';
 import AuthLayout from '@/layouts/auth-layout';
+import { logout } from '@/routes';
+import login from '@/routes/login';
 import { Button } from '@mantine/core';
 
 export default function VerifyEmail({ status }: { status?: string }) {
@@ -30,7 +31,7 @@ export default function VerifyEmail({ status }: { status?: string }) {
             )}
 
             <Form
-                {...EmailVerificationNotificationController.store.form()}
+                {...login.store.form()}
                 className="flex flex-col items-center space-y-6 text-center"
             >
                 {({ processing }) => (

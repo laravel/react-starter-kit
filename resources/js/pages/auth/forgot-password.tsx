@@ -1,6 +1,6 @@
 // Components
-import PasswordResetLinkController from '@/actions/App/Http/Controllers/Auth/PasswordResetLinkController';
 import { login } from '@/routes';
+import { email } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 
 import TextLink from '@/components/text-link';
@@ -22,7 +22,7 @@ export default function ForgotPassword({ status }: { status?: string }) {
             )}
 
             <div className="space-y-6">
-                <Form {...PasswordResetLinkController.store.form()}>
+                <Form {...email.form()}>
                     {({ processing, errors }) => (
                         <>
                             <div className="grid gap-2">

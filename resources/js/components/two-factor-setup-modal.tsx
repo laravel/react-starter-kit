@@ -1,5 +1,5 @@
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/wayfinder/routes/two-factor';
+import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Button, InputError, Loader, Modal, PinInput } from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
@@ -231,7 +231,6 @@ export default function TwoFactorSetupModal({
     const handleModalNextStep = useCallback(() => {
         if (requiresConfirmation) {
             setShowVerificationStep(true);
-
             return;
         }
 
@@ -241,27 +240,27 @@ export default function TwoFactorSetupModal({
 
     const resetModalState = useCallback(() => {
         setShowVerificationStep(false);
+
         if (twoFactorEnabled) {
             clearSetupData();
         }
     }, [twoFactorEnabled, clearSetupData]);
 
     useEffect(() => {
-        if (!isOpen) {
-            resetModalState();
-
-            return;
-        }
-
-        if (!qrCodeSvg) {
+        if (isOpen && !qrCodeSvg) {
             fetchSetupData();
         }
-    }, [isOpen, qrCodeSvg, fetchSetupData, resetModalState]);
+    }, [isOpen, qrCodeSvg, fetchSetupData]);
+
+    const handleClose = useCallback(() => {
+        resetModalState();
+        onClose();
+    }, [onClose, resetModalState]);
 
     return (
         <Modal
             opened={isOpen}
-            onClose={onClose}
+            onClose={handleClose}
             centered
             classNames={{
                 body: 'bg-background!',
@@ -289,7 +288,7 @@ export default function TwoFactorSetupModal({
                 <div className="mt-4 flex flex-col items-center space-y-5">
                     {showVerificationStep ? (
                         <TwoFactorVerificationStep
-                            onClose={onClose}
+                            onClose={handleClose}
                             onBack={() => setShowVerificationStep(false)}
                         />
                     ) : (

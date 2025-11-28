@@ -1,8 +1,9 @@
 import Heading from '@/components/heading';
+import { isSameUrl, resolveUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editPassword } from '@/routes/password';
 import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
+import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { Button } from '@mantine/core';
@@ -51,12 +52,8 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${typeof item.href === 'string' ? item.href : item.href.url}-${index}`}
-                                href={
-                                    typeof item.href === 'string'
-                                        ? item.href
-                                        : item.href.url
-                                }
+                                key={`${resolveUrl(item.href)}-${index}`}
+                                href={resolveUrl(item.href)}
                                 component={Link}
                                 prefetch
                                 size="sm"
@@ -70,10 +67,10 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 }
                                 styles={{
                                     root: {
-                                        ...(currentPath ===
-                                            (typeof item.href === 'string'
-                                                ? item.href
-                                                : item.href.url) && {
+                                        ...(isSameUrl(
+                                            item.href,
+                                            currentPath,
+                                        ) && {
                                             backgroundColor:
                                                 'var(--color-muted)',
                                         }),

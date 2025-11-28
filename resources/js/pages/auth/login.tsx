@@ -1,9 +1,9 @@
-import AuthenticatedSessionController from '@/actions/App/Http/Controllers/Auth/AuthenticatedSessionController';
 import { Form, Head } from '@inertiajs/react';
 
 import TextLink from '@/components/text-link';
 import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
+import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
 import { Button, Checkbox, PasswordInput, TextInput } from '@mantine/core';
@@ -11,9 +11,14 @@ import { Button, Checkbox, PasswordInput, TextInput } from '@mantine/core';
 interface LoginProps {
     status?: string;
     canResetPassword: boolean;
+    canRegister: boolean;
 }
 
-export default function Login({ status, canResetPassword }: LoginProps) {
+export default function Login({
+    status,
+    canResetPassword,
+    canRegister,
+}: LoginProps) {
     return (
         <AuthLayout
             title="Log in to your account"
@@ -22,7 +27,7 @@ export default function Login({ status, canResetPassword }: LoginProps) {
             <Head title="Log in" />
 
             <Form
-                {...AuthenticatedSessionController.store.form()}
+                {...store.form()}
                 resetOnSuccess={['password']}
                 className="flex flex-col gap-6"
             >
@@ -104,12 +109,14 @@ export default function Login({ status, canResetPassword }: LoginProps) {
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
-                            </TextLink>
-                        </div>
+                        {canRegister && (
+                            <div className="text-muted-foreground text-center text-sm">
+                                Don't have an account?{' '}
+                                <TextLink href={register()} tabIndex={5}>
+                                    Sign up
+                                </TextLink>
+                            </div>
+                        )}
                     </>
                 )}
             </Form>

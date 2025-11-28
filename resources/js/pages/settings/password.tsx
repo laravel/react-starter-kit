@@ -8,7 +8,7 @@ import { useRef } from 'react';
 
 import HeadingSmall from '@/components/heading-small';
 
-import { edit } from '@/routes/password';
+import { edit } from '@/routes/user-password';
 import { Button, PasswordInput } from '@mantine/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
