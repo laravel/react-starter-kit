@@ -20,7 +20,7 @@ export function NavMain({ lable = "Platform", items = [], openSubmenu, setOpenSu
 }) {
     const page = usePage();
 
-    const id = useRef<string>(useId());
+    const id = useId();
 
     const { isMobile, state, openMobile } = useSidebar();
 
@@ -56,7 +56,7 @@ export function NavMain({ lable = "Platform", items = [], openSubmenu, setOpenSu
     }, [openSubmenu]);
 
     const activeGroup = (navItem: NavItem) => {
-        let foundItem =  items.find((item) => {
+        const foundItem =  items.find((item) => {
             if (navItem.href && page.url.startsWith(resolveUrl(navItem.href))) {
                 return item;
             }
@@ -77,25 +77,25 @@ export function NavMain({ lable = "Platform", items = [], openSubmenu, setOpenSu
                                 isActive={activeGroup(item)}
                                 className="cursor-pointer"
                                 tooltip={{ children: item.title }}
-                                onClick={() => handleSubmenuToggle(index, id.current)}
+                                onClick={() => handleSubmenuToggle(index, id)}
                             >
                                 {item.icon && <item.icon />}
                                 <span>{item.title}</span>
                                 <ChevronDownIcon 
-                                    className={`ms-auto h-4 w-4 shrink-0 opacity-50 transition-all duration-300 ${openSubmenu?.id === id.current && openSubmenu?.index === index ? "rotate-180" : ""}`}
+                                    className={`ms-auto h-4 w-4 shrink-0 opacity-50 transition-all duration-300 ${openSubmenu?.id === id && openSubmenu?.index === index ? "rotate-180" : ""}`}
                                 />
                             </SidebarMenuButton>
 
                             {(state === "expanded" || (isMobile && openMobile)) && (
                                 <div
                                     ref={(el) => {
-                                        subMenuRefs.current[`${id.current}-${index}`] = el;
+                                        subMenuRefs.current[`${id}-${index}`] = el;
                                     }}
                                     className="overflow-hidden transition-all duration-300"
                                     style={{
                                         height:
-                                            openSubmenu?.id === id.current && openSubmenu?.index === index
-                                            ? `${subMenuHeight[`${id.current}-${index}`]}px`
+                                            openSubmenu?.id === id && openSubmenu?.index === index
+                                            ? `${subMenuHeight[`${id}-${index}`]}px`
                                             : "0px",
                                     }}
                                 >
