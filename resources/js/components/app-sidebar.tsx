@@ -15,6 +15,7 @@ import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
 import AppLogo from './app-logo';
+import { useState } from 'react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -38,6 +39,13 @@ const footerNavItems: NavItem[] = [
 ];
 
 export function AppSidebar() {
+
+    const [openSubmenu, setOpenSubmenu] = useState<{
+        id: string;
+        index: number;
+    } | null>(null);
+
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -53,7 +61,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={mainNavItems} openSubmenu={openSubmenu} setOpenSubmenu={setOpenSubmenu}/>
             </SidebarContent>
 
             <SidebarFooter>
