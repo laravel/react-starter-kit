@@ -21,6 +21,7 @@ const mainNavItems: NavItem[] = [
         title: 'Dashboard',
         href: dashboard(),
         icon: LayoutGrid,
+        items:[] // optional nested menus
     },
 ];
 
