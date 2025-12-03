@@ -58,7 +58,7 @@ export default function Login({
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="ms-auto text-sm"
                                             tabIndex={5}
                                         >
                                             Forgot password?

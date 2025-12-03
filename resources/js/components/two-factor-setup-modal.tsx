@@ -30,7 +30,7 @@ function GridScanIcon() {
                     {Array.from({ length: 5 }, (_, i) => (
                         <div
                             key={`col-${i + 1}`}
-                            className="border-r border-border last:border-r-0"
+                            className="border-r border-border last:border-e-0"
                         />
                     ))}
                 </div>
