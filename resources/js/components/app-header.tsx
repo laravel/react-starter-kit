@@ -189,7 +189,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                             <Button
                                 variant="ghost"
                                 size="icon"
-                                className="group h-9 w-9 cursor-pointer"
+                                className="group h-9 w-9"
                             >
                                 <Search className="!size-5 opacity-80 group-hover:opacity-100" />
                             </Button>
