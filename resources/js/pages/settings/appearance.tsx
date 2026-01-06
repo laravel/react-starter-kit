@@ -20,6 +20,8 @@ export default function Appearance() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Appearance settings" />
 
+            <h1 className="sr-only">Appearance Settings</h1>
+
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall title="Appearance settings" description="Update your account's appearance settings" />
