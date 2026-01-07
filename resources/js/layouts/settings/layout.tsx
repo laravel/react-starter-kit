@@ -1,7 +1,8 @@
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { cn, isSameUrl, resolveUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
+import { useActiveUrl } from '@/hooks/use-active-url';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
@@ -39,7 +40,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
         return null;
     }
 
-    const currentPath = window.location.pathname;
+    const { urlIsActive } = useActiveUrl();
 
     return (
         <div className="px-4 py-6">
@@ -53,15 +54,12 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                     <nav className="flex flex-col space-y-1 space-x-0" aria-label="Settings">
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${resolveUrl(item.href)}-${index}`}
+                                key={`${toUrl(item.href)}-${index}`}
                                 size="sm"
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': isSameUrl(
-                                        currentPath,
-                                        item.href,
-                                    ),
+                                    'bg-muted': urlIsActive(item.href),
                                 })}
                             >
                                 <Link href={item.href}>
