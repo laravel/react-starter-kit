@@ -35,12 +35,12 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { urlIsActive } = useActiveUrl();
+
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
     }
-
-    const { urlIsActive } = useActiveUrl();
 
     return (
         <div className="px-4 py-6">
