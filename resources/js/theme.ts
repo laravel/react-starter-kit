@@ -19,6 +19,7 @@ import { Link } from '@inertiajs/react';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';
+import { colors } from './colors';
 
 const InputStyles = {
     label: {
@@ -31,6 +32,8 @@ const InputStyles = {
 };
 
 const theme = createTheme({
+    colors,
+
     primaryColor: 'dark',
 
     defaultRadius: 'md',

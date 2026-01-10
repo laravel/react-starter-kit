@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-@import "tw-animate-css";
+@import 'tw-animate-css';
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
@@ -59,6 +59,18 @@
     --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
     --color-sidebar-border: var(--sidebar-border);
     --color-sidebar-ring: var(--sidebar-ring);
+
+    /* Mantine dark mode surface palette */
+    --color-dark-50: var(--dark-50);
+    --color-dark-100: var(--dark-100);
+    --color-dark-200: var(--dark-200);
+    --color-dark-300: var(--dark-300);
+    --color-dark-400: var(--dark-400);
+    --color-dark-500: var(--dark-500);
+    --color-dark-600: var(--dark-600);
+    --color-dark-700: var(--dark-700);
+    --color-dark-800: var(--dark-800);
+    --color-dark-900: var(--dark-900);
 }
 
 :root {
@@ -95,6 +107,18 @@
     --sidebar-accent-foreground: oklch(0.205 0 0);
     --sidebar-border: oklch(0.922 0 0);
     --sidebar-ring: oklch(0.87 0 0);
+
+    /* Mantine dark mode surface palette */
+    --dark-50: #c9c9c9;
+    --dark-100: #b8b8b8;
+    --dark-200: #828282;
+    --dark-300: #696969;
+    --dark-400: #424242;
+    --dark-500: #3b3b3b;
+    --dark-600: #2e2e2d;
+    --dark-700: #242424;
+    --dark-800: #1f1f1f;
+    --dark-900: #141414;
 }
 
 .dark {
