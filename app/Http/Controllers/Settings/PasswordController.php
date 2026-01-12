@@ -23,10 +23,8 @@ class PasswordController extends Controller
      */
     public function update(PasswordUpdateRequest $request): RedirectResponse
     {
-        $validated = $request->validated();
-
         $request->user()->update([
-            'password' => $validated['password'],
+            'password' => $request->password,
         ]);
 
         return back();
