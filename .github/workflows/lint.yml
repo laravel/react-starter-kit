@@ -30,7 +30,7 @@ jobs:
           npm install
 
       - name: Run Pint
-        run: vendor/bin/pint
+        run: composer lint
 
       - name: Format Frontend
         run: npm run format
