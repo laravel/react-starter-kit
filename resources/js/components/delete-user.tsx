@@ -1,8 +1,9 @@
+import { Form } from '@inertiajs/react';
+
 import { destroy } from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import HeadingSmall from '@/components/heading-small';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Form } from '@inertiajs/react';
 
 export default function DeleteUser() {
     return (
