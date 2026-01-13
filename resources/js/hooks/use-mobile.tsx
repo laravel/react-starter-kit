@@ -31,6 +31,6 @@ export function useIsMobile(): boolean {
     return useSyncExternalStore(
         mediaQueryListener,
         isSmallerThanBreakpoint,
-        getServerSnapshot
+        getServerSnapshot,
     );
 }

@@ -1,3 +1,7 @@
+import { Form, Head } from '@inertiajs/react';
+import { ShieldBan, ShieldCheck } from 'lucide-react';
+import { useState } from 'react';
+
 import HeadingSmall from '@/components/heading-small';
 import TwoFactorRecoveryCodes from '@/components/two-factor-recovery-codes';
 import TwoFactorSetupModal from '@/components/two-factor-setup-modal';
@@ -8,9 +12,6 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable, show } from '@/routes/two-factor';
 import { type BreadcrumbItem } from '@/types';
-import { Form, Head } from '@inertiajs/react';
-import { ShieldBan, ShieldCheck } from 'lucide-react';
-import { useState } from 'react';
 
 interface TwoFactorProps {
     requiresConfirmation?: boolean;

@@ -1,6 +1,7 @@
-import { toUrl } from '@/lib/utils';
 import type { InertiaLinkProps } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
+
+import { toUrl } from '@/lib/utils';
 
 export function useActiveUrl() {
     const page = usePage();
