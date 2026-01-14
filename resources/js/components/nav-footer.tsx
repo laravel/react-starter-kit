@@ -1,6 +1,5 @@
 import { type ComponentPropsWithoutRef } from 'react';
 
-import { Icon } from '@/components/icon';
 import {
     SidebarGroup,
     SidebarGroupContent,
@@ -37,10 +36,7 @@ export function NavFooter({
                                     rel="noopener noreferrer"
                                 >
                                     {item.icon && (
-                                        <Icon
-                                            iconNode={item.icon}
-                                            className="h-5 w-5"
-                                        />
+                                        <item.icon className="h-5 w-5" />
                                     )}
                                     <span>{item.title}</span>
                                 </a>
