@@ -2,7 +2,6 @@ import { Link, usePage } from '@inertiajs/react';
 import { BookOpen, Folder, LayoutGrid, Menu, Search } from 'lucide-react';
 
 import { Breadcrumbs } from '@/components/breadcrumbs';
-import { Icon } from '@/components/icon';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -108,10 +107,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
                                                     {item.icon && (
-                                                        <Icon
-                                                            iconNode={item.icon}
-                                                            className="h-5 w-5"
-                                                        />
+                                                        <item.icon className="h-5 w-5" />
                                                     )}
                                                     <span>{item.title}</span>
                                                 </Link>
@@ -128,10 +124,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                     className="flex items-center space-x-2 font-medium"
                                                 >
                                                     {item.icon && (
-                                                        <Icon
-                                                            iconNode={item.icon}
-                                                            className="h-5 w-5"
-                                                        />
+                                                        <item.icon className="h-5 w-5" />
                                                     )}
                                                     <span>{item.title}</span>
                                                 </a>
@@ -170,10 +163,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             )}
                                         >
                                             {item.icon && (
-                                                <Icon
-                                                    iconNode={item.icon}
-                                                    className="mr-2 h-4 w-4"
-                                                />
+                                                <item.icon className="mr-2 h-4 w-4" />
                                             )}
                                             {item.title}
                                         </Link>
@@ -213,10 +203,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                                         {item.title}
                                                     </span>
                                                     {item.icon && (
-                                                        <Icon
-                                                            iconNode={item.icon}
-                                                            className="size-5 opacity-80 group-hover:opacity-100"
-                                                        />
+                                                        <item.icon className="size-5 opacity-80 group-hover:opacity-100" />
                                                     )}
                                                 </a>
                                             </TooltipTrigger>
