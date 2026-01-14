@@ -4,7 +4,7 @@ import { type PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import { useActiveUrl } from '@/hooks/use-active-url';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { cn, toUrl } from '@/lib/utils';
 import { appearance } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -24,7 +24,7 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { urlIsActive } = useActiveUrl();
+    const { isCurrentUrl } = useCurrentUrl();
 
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -45,7 +45,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': urlIsActive(item.href),
+                                    'bg-muted': isCurrentUrl(item.href),
                                 })}
                             >
                                 <Link href={item.href} prefetch>
