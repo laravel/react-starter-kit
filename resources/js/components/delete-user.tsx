@@ -2,7 +2,7 @@ import { Form } from '@inertiajs/react';
 import { useRef } from 'react';
 
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import HeadingSmall from '@/components/heading-small';
+import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,8 @@ export default function DeleteUser() {
 
     return (
         <div className="space-y-6">
-            <HeadingSmall
+            <Heading
+                variant="small"
                 title="Delete account"
                 description="Delete your account and all of its resources"
             />

@@ -3,7 +3,7 @@ import { Form, Head } from '@inertiajs/react';
 import { useRef } from 'react';
 
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
-import HeadingSmall from '@/components/heading-small';
+import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -32,7 +32,8 @@ export default function Password() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall
+                    <Heading
+                        variant="small"
                         title="Update password"
                         description="Ensure your account is using a long, random password to stay secure"
                     />
