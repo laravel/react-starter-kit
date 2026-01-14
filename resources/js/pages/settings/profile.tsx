@@ -3,7 +3,7 @@ import { Form, Head, usePage } from '@inertiajs/react';
 
 import { update } from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
-import HeadingSmall from '@/components/heading-small';
+import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -31,7 +31,7 @@ export default function Profile() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall title="Profile information" description="Update your name and email address" />
+                    <Heading variant="small" title="Profile information" description="Update your name and email address" />
 
                     <Form
                         {...update.form()}
