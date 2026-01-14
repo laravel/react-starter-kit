@@ -3,20 +3,31 @@ import { usePage } from '@inertiajs/react';
 
 import { toUrl } from '@/lib/utils';
 
-export function useActiveUrl() {
+export function useCurrentUrl() {
     const page = usePage();
     const currentUrlPath = new URL(page.url, window?.location.origin).pathname;
 
-    function urlIsActive(
+    function isCurrentUrl(
         urlToCheck: NonNullable<InertiaLinkProps['href']>,
         currentUrl?: string,
     ) {
         const urlToCompare = currentUrl ?? currentUrlPath;
-        return toUrl(urlToCheck) === urlToCompare;
+        const urlString = toUrl(urlToCheck);
+
+        if (!urlString.startsWith('http')) {
+            return urlString === urlToCompare;
+        }
+
+        try {
+            const absoluteUrl = new URL(urlString);
+            return absoluteUrl.pathname === urlToCompare;
+        } catch {
+            return false;
+        }
     }
 
     return {
         currentUrl: currentUrlPath,
-        urlIsActive,
+        isCurrentUrl,
     };
 }
