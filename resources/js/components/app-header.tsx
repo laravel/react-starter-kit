@@ -29,7 +29,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { UserMenuContent } from '@/components/user-menu-content';
-import { useActiveUrl } from '@/hooks/use-active-url';
+import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
@@ -70,7 +70,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
-    const { urlIsActive } = useActiveUrl();
+    const { isCurrentUrl } = useCurrentUrl();
     return (
         <>
             <div className="border-b border-sidebar-border/80">
@@ -157,7 +157,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             href={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                urlIsActive(item.href) &&
+                                                isCurrentUrl(item.href) &&
                                                     activeItemStyles,
                                                 'h-9 cursor-pointer px-3',
                                             )}
@@ -167,7 +167,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             )}
                                             {item.title}
                                         </Link>
-                                        {urlIsActive(item.href) && (
+                                        {isCurrentUrl(item.href) && (
                                             <div className="absolute bottom-0 left-0 h-0.5 w-full translate-y-px bg-black dark:bg-white"></div>
                                         )}
                                     </NavigationMenuItem>
