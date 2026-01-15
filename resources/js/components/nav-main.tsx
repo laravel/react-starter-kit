@@ -2,7 +2,7 @@ import { Link } from '@inertiajs/react';
 
 import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { useActiveUrl } from '@/hooks/use-active-url';
-import { type NavItem } from '@/types';
+import type { NavItem } from '@/types';
 
 export function NavMain({ items = [] }: { items: NavItem[] }) {
     const { urlIsActive } = useActiveUrl();
