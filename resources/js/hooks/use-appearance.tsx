@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
-export type ResolvedAppearance = 'light' | 'dark';
-export type Appearance = ResolvedAppearance | 'system';
+import type {
+    Appearance,
+    ResolvedAppearance,
+    UseAppearanceReturn,
+} from '@/types';
 
 const listeners = new Set<() => void>();
 let currentAppearance: Appearance = 'system';
@@ -71,7 +74,7 @@ export function initializeTheme(): void {
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
-export function useAppearance() {
+export function useAppearance(): UseAppearanceReturn {
     const appearance: Appearance = useSyncExternalStore(
         subscribe,
         () => currentAppearance,
