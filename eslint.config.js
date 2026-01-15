@@ -63,9 +63,18 @@ export default [
     {
         ...importPlugin.flatConfigs.typescript,
         files: ['**/*.{ts,tsx}'],
+        rules: {
+            '@typescript-eslint/consistent-type-imports': [
+                'error',
+                {
+                    prefer: 'type-imports',
+                    fixStyle: 'separate-type-imports',
+                },
+            ],
+        },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js'],
+        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.ts'],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];

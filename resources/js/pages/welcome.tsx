@@ -1,7 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 
 import { dashboard, login } from '@/routes';
-import { type SharedData } from '@/types';
+import type { SharedData } from '@/types';
 
 export default function Welcome() {
     const { auth } = usePage<SharedData>().props;
@@ -214,7 +214,6 @@ export default function Welcome() {
                                     />
                                 </g>
                                 <g
-                                    /** @ts-expect-error 'plus-darker' doesn't seem to be defined in the 'csstype' module */
                                     style={{ mixBlendMode: 'plus-darker' }}
                                     className="translate-y-0 opacity-100 transition-all delay-300 duration-750 starting:translate-y-4 starting:opacity-0"
                                 >

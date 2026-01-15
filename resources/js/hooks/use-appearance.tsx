@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 
-export type Appearance = 'light' | 'dark' | 'system';
+import type { Appearance, UseAppearanceReturn } from '@/types';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
@@ -48,7 +48,7 @@ export function initializeTheme() {
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
-export function useAppearance() {
+export function useAppearance(): UseAppearanceReturn {
     const [appearance, setAppearance] = useState<Appearance>('system');
 
     const updateAppearance = useCallback((mode: Appearance) => {
