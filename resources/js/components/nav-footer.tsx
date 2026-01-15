@@ -1,4 +1,4 @@
-import { type ComponentPropsWithoutRef } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 
 import { Icon } from '@/components/icon';
 import {
@@ -9,7 +9,7 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { toUrl } from '@/lib/utils';
-import { type NavItem } from '@/types';
+import type { NavItem } from '@/types';
 
 export function NavFooter({
     items,

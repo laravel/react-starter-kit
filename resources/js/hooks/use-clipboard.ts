@@ -1,11 +1,9 @@
 // Credit: https://usehooks-ts.com/
 import { useCallback, useState } from 'react';
 
-type CopiedValue = string | null;
+import type { CopiedValue, CopyFn, UseClipboardReturn } from '@/types';
 
-type CopyFn = (text: string) => Promise<boolean>;
-
-export function useClipboard(): [CopiedValue, CopyFn] {
+export function useClipboard(): UseClipboardReturn {
     const [copiedText, setCopiedText] = useState<CopiedValue>(null);
 
     const copy: CopyFn = useCallback(async (text) => {

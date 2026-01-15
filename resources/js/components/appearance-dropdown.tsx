@@ -1,5 +1,5 @@
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { HTMLAttributes } from 'react';
+import type { HTMLAttributes } from 'react';
 
 import { Button } from '@/components/ui/button';
 import {
