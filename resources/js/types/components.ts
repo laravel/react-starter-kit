@@ -13,10 +13,6 @@ export interface AppHeaderProps {
     breadcrumbs?: BreadcrumbItem[];
 }
 
-export interface IconProps extends Omit<LucideProps, 'ref'> {
-    iconNode: ComponentType<LucideProps>;
-}
-
 export interface UserMenuContentProps {
     user: User;
 }
