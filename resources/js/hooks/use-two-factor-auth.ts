@@ -1,10 +1,20 @@
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
-import type {
-    TwoFactorSecretKey,
-    TwoFactorSetupData,
-    UseTwoFactorAuthReturn,
-} from '@/types';
+import type { TwoFactorSecretKey, TwoFactorSetupData } from '@/types';
 import { useCallback, useMemo, useState } from 'react';
+
+export type UseTwoFactorAuthReturn = {
+    qrCodeSvg: string | null;
+    manualSetupKey: string | null;
+    recoveryCodesList: string[];
+    hasSetupData: boolean;
+    errors: string[];
+    clearErrors: () => void;
+    clearSetupData: () => void;
+    fetchQrCode: () => Promise<void>;
+    fetchSetupKey: () => Promise<void>;
+    fetchSetupData: () => Promise<void>;
+    fetchRecoveryCodes: () => Promise<void>;
+};
 
 export const OTP_MAX_LENGTH = 6;
 
