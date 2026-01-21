@@ -14,11 +14,11 @@ import { regenerateRecoveryCodes } from '@/routes/two-factor';
 
 import AlertError from './alert-error';
 
-interface Props {
+type Props = {
     recoveryCodesList: string[];
     fetchRecoveryCodes: () => Promise<void>;
     errors: string[];
-}
+};
 
 export default function TwoFactorRecoveryCodes({
     recoveryCodesList,

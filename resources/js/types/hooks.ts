@@ -30,15 +30,22 @@ export type UseAppearanceReturn = {
     readonly updateAppearance: (mode: Appearance) => void;
 };
 
-// useActiveUrl
-export type UrlIsActiveFn = (
+// useCurrentUrl
+export type IsCurrentUrlFn = (
     urlToCheck: NonNullable<InertiaLinkProps['href']>,
     currentUrl?: string,
 ) => boolean;
 
-export type UseActiveUrlReturn = {
+export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
+    urlToCheck: NonNullable<InertiaLinkProps['href']>,
+    ifTrue: TIfTrue,
+    ifFalse?: TIfFalse,
+) => TIfTrue | TIfFalse;
+
+export type UseCurrentUrlReturn = {
     currentUrl: string;
-    urlIsActive: UrlIsActiveFn;
+    isCurrentUrl: IsCurrentUrlFn;
+    whenCurrentUrl: WhenCurrentUrlFn;
 };
 
 // useInitials

@@ -13,10 +13,10 @@ import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable, show } from '@/routes/two-factor';
 import type { BreadcrumbItem } from '@/types';
 
-interface Props {
+type Props = {
     requiresConfirmation?: boolean;
     twoFactorEnabled?: boolean;
-}
+};
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

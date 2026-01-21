@@ -12,11 +12,11 @@ import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
 
-interface Props {
+type Props = {
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
-}
+};
 
 export default function Login({
     status,

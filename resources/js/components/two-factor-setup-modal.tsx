@@ -230,7 +230,7 @@ function TwoFactorVerificationStep({
     );
 }
 
-interface Props {
+type Props = {
     isOpen: boolean;
     onClose: () => void;
     requiresConfirmation: boolean;
@@ -240,7 +240,7 @@ interface Props {
     clearSetupData: () => void;
     fetchSetupData: () => Promise<void>;
     errors: string[];
-}
+};
 
 export default function TwoFactorSetupModal({
     isOpen,

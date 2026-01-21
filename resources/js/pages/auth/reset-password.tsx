@@ -8,10 +8,10 @@ import { Spinner } from '@/components/ui/spinner';
 import AuthLayout from '@/layouts/auth-layout';
 import { update } from '@/routes/password';
 
-interface Props {
+type Props = {
     token: string;
     email: string;
-}
+};
 
 export default function ResetPassword({ token, email }: Props) {
     return (
