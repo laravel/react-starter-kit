@@ -1,7 +1,3 @@
-import { Form } from '@inertiajs/react';
-import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -11,20 +7,22 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
-
+import { Form } from '@inertiajs/react';
+import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import AlertError from './alert-error';
 
-interface TwoFactorRecoveryCodesProps {
+type Props = {
     recoveryCodesList: string[];
     fetchRecoveryCodes: () => Promise<void>;
     errors: string[];
-}
+};
 
 export default function TwoFactorRecoveryCodes({
     recoveryCodesList,
     fetchRecoveryCodes,
     errors,
-}: TwoFactorRecoveryCodesProps) {
+}: Props) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;

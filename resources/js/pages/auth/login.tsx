@@ -1,5 +1,3 @@
-import { Form, Head } from '@inertiajs/react';
-
 import InputError from '@/components/input-error';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
@@ -11,18 +9,19 @@ import AuthLayout from '@/layouts/auth-layout';
 import { register } from '@/routes';
 import { store } from '@/routes/login';
 import { request } from '@/routes/password';
+import { Form, Head } from '@inertiajs/react';
 
-interface LoginProps {
+type Props = {
     status?: string;
     canResetPassword: boolean;
     canRegister: boolean;
-}
+};
 
 export default function Login({
     status,
     canResetPassword,
     canRegister,
-}: LoginProps) {
+}: Props) {
     return (
         <AuthLayout
             title="Log in to your account"
