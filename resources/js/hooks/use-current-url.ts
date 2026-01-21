@@ -2,12 +2,20 @@ import type { InertiaLinkProps } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
 
 import { toUrl } from '@/lib/utils';
+import type {
+    IsCurrentUrlFn,
+    UseCurrentUrlReturn,
+    WhenCurrentUrlFn,
+} from '@/types';
 
-export function useCurrentUrl() {
+export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();
     const currentUrlPath = new URL(page.url, window?.location.origin).pathname;
 
-    function isCurrentUrl(urlToCheck: NonNullable<InertiaLinkProps['href']>, currentUrl?: string) {
+    const isCurrentUrl: IsCurrentUrlFn = (
+        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        currentUrl?: string,
+    ) => {
         const urlToCompare = currentUrl ?? currentUrlPath;
         const urlString = toUrl(urlToCheck);
 
@@ -21,11 +29,15 @@ export function useCurrentUrl() {
         } catch {
             return false;
         }
-    }
+    };
 
-    function whenCurrentUrl(urlToCheck: NonNullable<InertiaLinkProps['href']>, ifTrue, ifFalse = null) {
+    const whenCurrentUrl: WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
+        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        ifTrue: TIfTrue,
+        ifFalse: TIfFalse = null as TIfFalse,
+    ): TIfTrue | TIfFalse => {
         return isCurrentUrl(urlToCheck) ? ifTrue : ifFalse;
-    }
+    };
 
     return {
         currentUrl: currentUrlPath,

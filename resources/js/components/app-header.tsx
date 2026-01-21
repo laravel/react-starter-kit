@@ -18,9 +18,9 @@ import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
 
-interface Props {
+type Props = {
     breadcrumbs?: BreadcrumbItem[];
-}
+};
 
 const mainNavItems: NavItem[] = [
     {

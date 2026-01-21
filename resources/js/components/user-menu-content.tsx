@@ -8,9 +8,9 @@ import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
 import type { User } from '@/types';
 
-interface Props {
+type Props = {
     user: User;
-}
+};
 
 export function UserMenuContent({ user }: Props) {
     const cleanup = useMobileNavigation();
