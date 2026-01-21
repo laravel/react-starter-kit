@@ -9,10 +9,7 @@ export type UseAppearanceReturn = {
 };
 
 // useCurrentUrl
-export type IsCurrentUrlFn = (
-    urlToCheck: NonNullable<InertiaLinkProps['href']>,
-    currentUrl?: string,
-) => boolean;
+export type IsCurrentUrlFn = (urlToCheck: NonNullable<InertiaLinkProps['href']>, currentUrl?: string) => boolean;
 
 export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
     urlToCheck: NonNullable<InertiaLinkProps['href']>,

@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useState } from 'react';
-
 import type { Appearance, UseAppearanceReturn } from '@/types';
+import { useCallback, useEffect, useState } from 'react';
 
 const prefersDark = () => {
     if (typeof window === 'undefined') {
