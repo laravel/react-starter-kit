@@ -1,12 +1,11 @@
-import type { InertiaLinkProps } from '@inertiajs/react';
-import { usePage } from '@inertiajs/react';
-
 import { toUrl } from '@/lib/utils';
 import type {
     IsCurrentUrlFn,
     UseCurrentUrlReturn,
     WhenCurrentUrlFn,
 } from '@/types';
+import type { InertiaLinkProps } from '@inertiajs/react';
+import { usePage } from '@inertiajs/react';
 
 export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();

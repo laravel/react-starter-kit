@@ -1,6 +1,5 @@
-import * as React from 'react';
-
 import { SidebarInset } from '@/components/ui/sidebar';
+import * as React from 'react';
 
 type Props = React.ComponentProps<'main'> & {
     variant?: 'header' | 'sidebar';

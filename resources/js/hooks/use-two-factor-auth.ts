@@ -1,11 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
-
 import { qrCode, recoveryCodes, secretKey } from '@/routes/two-factor';
 import type {
     TwoFactorSecretKey,
     TwoFactorSetupData,
     UseTwoFactorAuthReturn,
 } from '@/types';
+import { useCallback, useMemo, useState } from 'react';
 
 export const OTP_MAX_LENGTH = 6;
 

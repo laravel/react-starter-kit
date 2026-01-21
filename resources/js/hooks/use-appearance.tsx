@@ -1,10 +1,9 @@
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
-
 import type {
     Appearance,
     ResolvedAppearance,
     UseAppearanceReturn,
 } from '@/types';
+import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
 const listeners = new Set<() => void>();
 let currentAppearance: Appearance = 'system';

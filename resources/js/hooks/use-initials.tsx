@@ -1,6 +1,5 @@
-import { useCallback } from 'react';
-
 import type { GetInitialsFn } from '@/types';
+import { useCallback } from 'react';
 
 export function useInitials(): GetInitialsFn {
     return useCallback((fullName: string): string => {
