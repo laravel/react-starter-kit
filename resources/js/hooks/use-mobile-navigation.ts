@@ -1,5 +1,6 @@
-import type { CleanupFn } from '@/types';
 import { useCallback } from 'react';
+
+export type CleanupFn = () => void;
 
 export function useMobileNavigation(): CleanupFn {
     return useCallback(() => {

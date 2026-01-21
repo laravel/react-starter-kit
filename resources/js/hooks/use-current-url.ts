@@ -1,7 +1,20 @@
 import { toUrl } from '@/lib/utils';
-import type { IsCurrentUrlFn, UseCurrentUrlReturn, WhenCurrentUrlFn } from '@/types';
 import type { InertiaLinkProps } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
+
+export type IsCurrentUrlFn = (urlToCheck: NonNullable<InertiaLinkProps['href']>, currentUrl?: string) => boolean;
+
+export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
+    urlToCheck: NonNullable<InertiaLinkProps['href']>,
+    ifTrue: TIfTrue,
+    ifFalse?: TIfFalse,
+) => TIfTrue | TIfFalse;
+
+export type UseCurrentUrlReturn = {
+    currentUrl: string;
+    isCurrentUrl: IsCurrentUrlFn;
+    whenCurrentUrl: WhenCurrentUrlFn;
+};
 
 export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();
