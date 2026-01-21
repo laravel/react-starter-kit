@@ -230,7 +230,7 @@ function TwoFactorVerificationStep({
     );
 }
 
-interface TwoFactorSetupModalProps {
+interface Props {
     isOpen: boolean;
     onClose: () => void;
     requiresConfirmation: boolean;
@@ -252,7 +252,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: TwoFactorSetupModalProps) {
+}: Props) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 

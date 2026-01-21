@@ -11,7 +11,12 @@ import { useTwoFactorAuth } from '@/hooks/use-two-factor-auth';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { disable, enable, show } from '@/routes/two-factor';
-import type { BreadcrumbItem, TwoFactorPageProps } from '@/types';
+import type { BreadcrumbItem } from '@/types';
+
+interface Props {
+    requiresConfirmation?: boolean;
+    twoFactorEnabled?: boolean;
+}
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -23,7 +28,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 export default function TwoFactor({
     requiresConfirmation = false,
     twoFactorEnabled = false,
-}: TwoFactorPageProps) {
+}: Props) {
     const {
         qrCodeSvg,
         hasSetupData,

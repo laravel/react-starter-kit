@@ -10,15 +10,15 @@ export interface User {
     [key: string]: unknown;
 }
 
-export interface Auth {
+export type Auth = {
     user: User;
-}
+};
 
-export interface TwoFactorSetupData {
+export type TwoFactorSetupData = {
     svg: string;
     url: string;
-}
+};
 
-export interface TwoFactorSecretKey {
+export type TwoFactorSecretKey = {
     secretKey: string;
-}
+};

@@ -6,7 +6,7 @@ export type CopyFn = (text: string) => Promise<boolean>;
 export type UseClipboardReturn = [CopiedValue, CopyFn];
 
 // useTwoFactorAuth
-export interface UseTwoFactorAuthReturn {
+export type UseTwoFactorAuthReturn = {
     qrCodeSvg: string | null;
     manualSetupKey: string | null;
     recoveryCodesList: string[];
@@ -18,17 +18,17 @@ export interface UseTwoFactorAuthReturn {
     fetchSetupKey: () => Promise<void>;
     fetchSetupData: () => Promise<void>;
     fetchRecoveryCodes: () => Promise<void>;
-}
+};
 
 // useAppearance
 export type ResolvedAppearance = 'light' | 'dark';
 export type Appearance = ResolvedAppearance | 'system';
 
-export interface UseAppearanceReturn {
+export type UseAppearanceReturn = {
     readonly appearance: Appearance;
     readonly resolvedAppearance: ResolvedAppearance;
     readonly updateAppearance: (mode: Appearance) => void;
-}
+};
 
 // useActiveUrl
 export type UrlIsActiveFn = (
@@ -36,10 +36,10 @@ export type UrlIsActiveFn = (
     currentUrl?: string,
 ) => boolean;
 
-export interface UseActiveUrlReturn {
+export type UseActiveUrlReturn = {
     currentUrl: string;
     urlIsActive: UrlIsActiveFn;
-}
+};
 
 // useInitials
 export type GetInitialsFn = (fullName: string) => string;
