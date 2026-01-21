@@ -2,6 +2,11 @@ import { useCallback, useEffect, useState } from 'react';
 
 export type Appearance = 'light' | 'dark' | 'system';
 
+export type UseAppearanceReturn = {
+    readonly appearance: Appearance;
+    readonly updateAppearance: (mode: Appearance) => void;
+};
+
 const prefersDark = () => {
     if (typeof window === 'undefined') {
         return false;
@@ -48,7 +53,7 @@ export function initializeTheme() {
     mediaQuery()?.addEventListener('change', handleSystemThemeChange);
 }
 
-export function useAppearance() {
+export function useAppearance(): UseAppearanceReturn {
     const [appearance, setAppearance] = useState<Appearance>('system');
 
     const updateAppearance = useCallback((mode: Appearance) => {
