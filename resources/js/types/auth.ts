@@ -1,4 +1,4 @@
-export interface User {
+export type User = {
     id: number;
     name: string;
     email: string;
@@ -7,8 +7,8 @@ export interface User {
     created_at: string;
     updated_at: string;
     [key: string]: unknown;
-}
+};
 
-export interface Auth {
+export type Auth = {
     user: User;
-}
+};

@@ -3,9 +3,9 @@ import type { ComponentProps } from 'react';
 
 import { cn } from '@/lib/utils';
 
-type LinkProps = ComponentProps<typeof Link>;
+type Props = ComponentProps<typeof Link>;
 
-export default function TextLink({ className = '', children, ...props }: LinkProps) {
+export default function TextLink({ className = '', children, ...props }: Props) {
     return (
         <Link
             className={cn(

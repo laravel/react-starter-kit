@@ -13,10 +13,14 @@ import { useCurrentUrl } from '@/hooks/use-current-url';
 import { useInitials } from '@/hooks/use-initials';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import type { AppHeaderProps, NavItem, SharedData } from '@/types';
+import type { BreadcrumbItem, NavItem, SharedData } from '@/types';
 
 import AppLogo from './app-logo';
 import AppLogoIcon from './app-logo-icon';
+
+interface Props {
+    breadcrumbs?: BreadcrumbItem[];
+}
 
 const mainNavItems: NavItem[] = [
     {
@@ -41,7 +45,7 @@ const rightNavItems: NavItem[] = [
 
 const activeItemStyles = 'text-neutral-900 dark:bg-neutral-800 dark:text-neutral-100';
 
-export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
+export function AppHeader({ breadcrumbs = [] }: Props) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();

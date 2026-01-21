@@ -3,18 +3,18 @@ import type { InertiaLinkProps } from '@inertiajs/react';
 // useAppearance
 export type Appearance = 'light' | 'dark' | 'system';
 
-export interface UseAppearanceReturn {
+export type UseAppearanceReturn = {
     readonly appearance: Appearance;
     readonly updateAppearance: (mode: Appearance) => void;
-}
+};
 
 // useActiveUrl
 export type UrlIsActiveFn = (urlToCheck: NonNullable<InertiaLinkProps['href']>, currentUrl?: string) => boolean;
 
-export interface UseActiveUrlReturn {
+export type UseActiveUrlReturn = {
     currentUrl: string;
     urlIsActive: UrlIsActiveFn;
-}
+};
 
 // useInitials
 export type GetInitialsFn = (fullName: string) => string;
