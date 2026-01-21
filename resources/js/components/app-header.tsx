@@ -70,7 +70,7 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
-    const { isCurrentUrl } = useCurrentUrl();
+    const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
     return (
         <>
             <div className="border-b border-sidebar-border/80">
@@ -157,8 +157,10 @@ export function AppHeader({ breadcrumbs = [] }: AppHeaderProps) {
                                             href={item.href}
                                             className={cn(
                                                 navigationMenuTriggerStyle(),
-                                                isCurrentUrl(item.href) &&
+                                                whenCurrentUrl(
+                                                    item.href,
                                                     activeItemStyles,
+                                                ),
                                                 'h-9 cursor-pointer px-3',
                                             )}
                                         >

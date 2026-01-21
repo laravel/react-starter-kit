@@ -26,8 +26,17 @@ export function useCurrentUrl() {
         }
     }
 
+    function whenCurrentUrl(
+        urlToCheck: NonNullable<InertiaLinkProps['href']>,
+        ifTrue,
+        ifFalse = null,
+    ) {
+        return isCurrentUrl(urlToCheck) ? ifTrue : ifFalse;
+    }
+
     return {
         currentUrl: currentUrlPath,
         isCurrentUrl,
+        whenCurrentUrl,
     };
 }
