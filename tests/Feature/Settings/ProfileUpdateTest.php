@@ -16,7 +16,7 @@ class ProfileUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get('/settings/profile');
+            ->get(route('profile.edit'));
 
         $response->assertOk();
     }
@@ -33,7 +33,7 @@ class ProfileUpdateTest extends TestCase
 
         $response
             ->assertSessionHasNoErrors()
-            ->assertRedirect('/settings/profile');
+            ->assertRedirect(route('profile.edit'));
 
         $user->refresh();
 
@@ -46,7 +46,7 @@ class ProfileUpdateTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->delete('/settings/profile', [
+            ->delete(route('profile.destroy'), [
                 'password' => 'password',
             ]);
 

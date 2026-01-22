@@ -4,12 +4,13 @@
 /public/build
 /public/hot
 /public/storage
+/storage/*.key
+/storage/pail
 /resources/js/actions
 /resources/js/routes
 /resources/js/wayfinder
-/storage/*.key
-/storage/pail
 /vendor
+.DS_Store
 .env
 .env.backup
 .env.production
