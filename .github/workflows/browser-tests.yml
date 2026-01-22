@@ -3,22 +3,22 @@ name: browser-tests
 on:
   push:
     branches:
-      - pest-ci
       - develop
       - main
+      - master
   pull_request:
     branches:
-      - pest-ci
       - develop
       - main
+      - master
 
 jobs:
   ci:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
