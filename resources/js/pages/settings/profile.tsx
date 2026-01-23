@@ -1,3 +1,5 @@
+import { Transition } from '@headlessui/react';
+import { Form, Head, usePage } from '@inertiajs/react';
 import { update } from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
@@ -9,8 +11,6 @@ import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
 import type { BreadcrumbItem, SharedData } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Form, Head, usePage } from '@inertiajs/react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,7 +30,11 @@ export default function Profile() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <Heading variant="small" title="Profile information" description="Update your name and email address" />
+                    <Heading
+                        variant="small"
+                        title="Profile information"
+                        description="Update your name and email address"
+                    />
 
                     <Form
                         {...update.form()}
@@ -54,7 +58,10 @@ export default function Profile() {
                                         placeholder="Full name"
                                     />
 
-                                    <InputError className="mt-2" message={errors.name} />
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.name}
+                                    />
                                 </div>
 
                                 <div className="grid gap-2">
@@ -71,7 +78,10 @@ export default function Profile() {
                                         disabled
                                     />
 
-                                    <InputError className="mt-2" message={errors.email} />
+                                    <InputError
+                                        className="mt-2"
+                                        message={errors.email}
+                                    />
                                 </div>
 
                                 <div className="flex items-center gap-4">
@@ -84,7 +94,9 @@ export default function Profile() {
                                         leave="transition ease-in-out"
                                         leaveTo="opacity-0"
                                     >
-                                        <p className="text-sm text-neutral-600">Saved</p>
+                                        <p className="text-sm text-neutral-600">
+                                            Saved
+                                        </p>
                                     </Transition>
                                 </div>
                             </>

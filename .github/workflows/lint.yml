@@ -5,11 +5,13 @@ on:
     branches:
       - develop
       - main
+      - master
       - workos
   pull_request:
     branches:
       - develop
       - main
+      - master
       - workos
 
 permissions:
@@ -19,7 +21,7 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -41,7 +43,7 @@ jobs:
         run: npm run lint
 
       # - name: Commit Changes
-      #   uses: stefanzweifel/git-auto-commit-action@v5
+      #   uses: stefanzweifel/git-auto-commit-action@v7
       #   with:
       #     commit_message: fix code style
       #     commit_options: '--no-verify'
