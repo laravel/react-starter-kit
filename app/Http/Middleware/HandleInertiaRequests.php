@@ -43,7 +43,7 @@ class HandleInertiaRequests extends Middleware
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'toast' => [
-                'sucess' => session('success'),
+                'success' => session('success'),
                 'error' => session('error'),
                 'info' => session('info'),
                 'warning' => session('warning'),
