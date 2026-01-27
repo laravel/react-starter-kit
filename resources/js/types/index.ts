@@ -10,5 +10,5 @@ export type SharedData = {
     auth: Auth;
     sidebarOpen: boolean;
     [key: string]: unknown;
-    toast: Toast;
+    toast?: Toast;
 };

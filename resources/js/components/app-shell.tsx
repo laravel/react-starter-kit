@@ -2,8 +2,8 @@ import { usePage } from '@inertiajs/react';
 import type { ReactNode } from 'react';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import type { SharedData } from '@/types';
-import { Toaster } from 'sonner';
 import useToast from '@/hooks/use-toast';
+import { Toaster } from './ui/sonner';
 
 type Props = {
     children: ReactNode;
