@@ -32,6 +32,7 @@ export default function Login({
             <Form
                 {...store.form()}
                 resetOnSuccess={['password']}
+                options={{ replace: true }}
                 className="flex flex-col gap-6"
             >
                 {({ processing, errors }) => (
