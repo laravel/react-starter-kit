@@ -1,12 +1,12 @@
+import { AppShell } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import { type PropsWithChildren } from 'react';
 import { AppContent } from '@/components/app-content';
 import { AppSidebar } from '@/components/app-sidebar';
 import { AppSidebarHeader } from '@/components/app-sidebar-header';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useSideBar } from '@/hooks/use-sidebar';
 import { type BreadcrumbItem } from '@/types';
-import { AppShell } from '@mantine/core';
-import { useDisclosure } from '@mantine/hooks';
-import { type PropsWithChildren } from 'react';
 
 export default function AppSidebarLayout({
     children,

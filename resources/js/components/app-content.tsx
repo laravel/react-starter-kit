@@ -1,12 +1,11 @@
-import { cn } from '@/lib/utils';
 import * as React from 'react';
+import { cn } from '@/lib/utils';
 
-interface AppContentProps {
-    children: React.ReactNode;
-    className?: string;
-}
+type Props = React.ComponentProps<'div'> & {
+    variant?: 'header' | 'sidebar';
+};
 
-export function AppContent({ children, className, ...props }: AppContentProps) {
+export function AppContent({ children, className, ...props }: Props) {
     return (
         <div
             className={cn(

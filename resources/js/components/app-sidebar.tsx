@@ -1,16 +1,16 @@
-import { dashboard } from '@/routes';
-import { type NavItem } from '@/types';
+import { Link } from '@inertiajs/react';
+import { Button } from '@mantine/core';
 import {
     IconBook,
     IconFolder,
     IconLayoutGrid,
     IconX,
 } from '@tabler/icons-react';
-
 import { useIsMobile } from '@/hooks/use-mobile';
 import { cn } from '@/lib/utils';
-import { Link } from '@inertiajs/react';
-import { Button } from '@mantine/core';
+import { dashboard } from '@/routes';
+import { type NavItem } from '@/types';
+
 import AppLogo from './app-logo';
 import { NavUser } from './nav-user';
 import SidebarMenuButton from './sidebar-menu-button';

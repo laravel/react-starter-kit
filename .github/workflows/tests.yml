@@ -5,23 +5,30 @@ on:
     branches:
       - develop
       - main
+      - master
+      - workos
   pull_request:
     branches:
       - develop
       - main
+      - master
+      - workos
 
 jobs:
   ci:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php-version: ['8.4', '8.5']
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: 8.4
+          php-version: ${{ matrix.php-version }}
           tools: composer:v2
           coverage: xdebug
 
@@ -29,22 +36,21 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: 'npm'
 
       - name: Install Node Dependencies
-        run: npm ci
+        run: npm i
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Build Assets
-        run: npm run build
 
       - name: Copy Environment File
         run: cp .env.example .env
 
       - name: Generate Application Key
         run: php artisan key:generate
+
+      - name: Build Assets
+        run: npm run build
 
       - name: Tests
         run: ./vendor/bin/phpunit

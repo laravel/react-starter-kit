@@ -1,8 +1,8 @@
+import { Head } from '@inertiajs/react';
+import { Skeleton } from '@mantine/core';
 import AppLayout from '@/layouts/app-layout';
 import { dashboard } from '@/routes';
 import { type BreadcrumbItem } from '@/types';
-import { Head } from '@inertiajs/react';
-import { Skeleton } from '@mantine/core';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

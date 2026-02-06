@@ -1,6 +1,5 @@
 import '../css/app.css';
 
-import theme from '@/theme';
 import { createInertiaApp } from '@inertiajs/react';
 import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
@@ -8,6 +7,7 @@ import { Notifications } from '@mantine/notifications';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import theme from '@/theme';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -23,7 +23,7 @@ createInertiaApp({
 
         root.render(
             <StrictMode>
-                 <ColorSchemeScript
+                <ColorSchemeScript
                     nonce="8IBTHwOdqNKAWeKl7plt8g=="
                     defaultColorScheme="auto"
                 />

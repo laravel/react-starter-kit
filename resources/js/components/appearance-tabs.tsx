@@ -1,7 +1,9 @@
+import type { MantineColorScheme } from '@mantine/core';
+import { useMantineColorScheme } from '@mantine/core';
+import type { Icon } from '@tabler/icons-react';
+import { IconDeviceImac, IconMoon, IconSun } from '@tabler/icons-react';
+import type { HTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
-import { MantineColorScheme, useMantineColorScheme } from '@mantine/core';
-import { Icon, IconDeviceImac, IconMoon, IconSun } from '@tabler/icons-react';
-import { HTMLAttributes } from 'react';
 
 export default function AppearanceToggleTab({
     className = '',

@@ -1,9 +1,9 @@
-import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import AuthLayout from '@/layouts/auth-layout';
-import { store } from '@/routes/two-factor/login';
 import { Form, Head } from '@inertiajs/react';
 import { Button, InputError, PinInput, TextInput } from '@mantine/core';
 import { useMemo, useState } from 'react';
+import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import AuthLayout from '@/layouts/auth-layout';
+import { store } from '@/routes/two-factor/login';
 
 export default function TwoFactorChallenge() {
     const [showRecoveryInput, setShowRecoveryInput] = useState<boolean>(false);

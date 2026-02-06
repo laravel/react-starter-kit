@@ -1,16 +1,15 @@
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import { send } from '@/routes/verification';
-import { type BreadcrumbItem, type SharedData } from '@/types';
 import { Transition } from '@headlessui/react';
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-
+import { Button, TextInput } from '@mantine/core';
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
 import DeleteUser from '@/components/delete-user';
-import HeadingSmall from '@/components/heading-small';
 
+import Heading from '@/components/heading';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { edit } from '@/routes/profile';
-import { Button, TextInput } from '@mantine/core';
+import { send } from '@/routes/verification';
+import type { BreadcrumbItem, SharedData } from '@/types';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -36,7 +35,8 @@ export default function Profile({
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall
+                    <Heading
+                        variant="small"
                         title="Profile information"
                         description="Update your name and email address"
                     />

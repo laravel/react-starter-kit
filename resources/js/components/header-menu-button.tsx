@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils';
-import { Button, ButtonProps, Tooltip } from '@mantine/core';
+import type { ButtonProps } from '@mantine/core';
+import { Button, Tooltip } from '@mantine/core';
 import React from 'react';
+import { cn } from '@/lib/utils';
 
 type Props<T extends React.ElementType> = {
     component?: T;

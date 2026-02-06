@@ -1,3 +1,4 @@
+import { Link } from '@inertiajs/react';
 import {
     Anchor,
     Button,
@@ -15,7 +16,6 @@ import {
 } from '@mantine/core';
 import { DateTimePicker } from '@mantine/dates';
 
-import { Link } from '@inertiajs/react';
 import '@mantine/core/styles.css';
 import '@mantine/dates/styles.css';
 import '@mantine/notifications/styles.css';

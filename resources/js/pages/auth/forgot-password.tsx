@@ -1,11 +1,10 @@
 // Components
-import { login } from '@/routes';
-import { email } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
-
+import { Button, TextInput } from '@mantine/core';
 import TextLink from '@/components/text-link';
 import AuthLayout from '@/layouts/auth-layout';
-import { Button, TextInput } from '@mantine/core';
+import { login } from '@/routes';
+import { email } from '@/routes/password';
 
 export default function ForgotPassword({ status }: { status?: string }) {
     return (

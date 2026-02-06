@@ -1,11 +1,9 @@
+import { Form, Head } from '@inertiajs/react';
+import { Button, PasswordInput, TextInput } from '@mantine/core';
+import TextLink from '@/components/text-link';
+import AuthLayout from '@/layouts/auth-layout';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
-import { Form, Head } from '@inertiajs/react';
-
-import TextLink from '@/components/text-link';
-
-import AuthLayout from '@/layouts/auth-layout';
-import { Button, PasswordInput, TextInput } from '@mantine/core';
 
 export default function Register() {
     return (
@@ -100,7 +98,7 @@ export default function Register() {
                             </Button>
                         </div>
 
-                        <div className="text-muted-foreground text-center text-sm">
+                        <div className="text-center text-sm text-muted-foreground">
                             Already have an account?{' '}
                             <TextLink href={login()} tabIndex={6}>
                                 Log in

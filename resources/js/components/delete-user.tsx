@@ -1,10 +1,9 @@
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
-import HeadingSmall from '@/components/heading-small';
-import { useRef } from 'react';
-
 import { Form } from '@inertiajs/react';
 import { Button, Modal, PasswordInput } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
+import { useRef } from 'react';
+import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import Heading from './heading';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
@@ -13,7 +12,8 @@ export default function DeleteUser() {
 
     return (
         <div className="space-y-6">
-            <HeadingSmall
+            <Heading
+                variant="small"
                 title="Delete account"
                 description="Delete your account and all of its resources"
             />

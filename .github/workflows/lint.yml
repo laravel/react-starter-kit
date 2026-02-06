@@ -5,10 +5,14 @@ on:
     branches:
       - develop
       - main
+      - master
+      - workos
   pull_request:
     branches:
       - develop
       - main
+      - master
+      - workos
 
 permissions:
   contents: write
@@ -17,7 +21,7 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -30,7 +34,7 @@ jobs:
           npm install
 
       - name: Run Pint
-        run: vendor/bin/pint
+        run: composer lint
 
       - name: Format Frontend
         run: npm run format

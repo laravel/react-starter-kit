@@ -1,8 +1,8 @@
-import { update } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 
-import AuthLayout from '@/layouts/auth-layout';
 import { Button, PasswordInput, TextInput } from '@mantine/core';
+import AuthLayout from '@/layouts/auth-layout';
+import { update } from '@/routes/password';
 
 interface ResetPasswordProps {
     token: string;

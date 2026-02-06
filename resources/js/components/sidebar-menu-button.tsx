@@ -1,6 +1,7 @@
-import { cn } from '@/lib/utils';
 import { Link } from '@inertiajs/react';
-import { Button, ButtonProps, Tooltip } from '@mantine/core';
+import type { ButtonProps } from '@mantine/core';
+import { Button, Tooltip } from '@mantine/core';
+import { cn } from '@/lib/utils';
 
 type Props<T extends React.ElementType> = {
     component?: T;
@@ -77,9 +78,9 @@ export default function SidebarMenuButton<T extends React.ElementType>({
                             ...(props.styles?.root || {}),
                         },
                         ...(iconOnly && {
-                            // @ts-expect-error - types are incorrect
                             section: {
                                 marginRight: 0,
+                                // @ts-expect-error - types are incorrect
                                 ...(styles?.section || {}),
                             },
                         }),

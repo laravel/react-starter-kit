@@ -1,15 +1,14 @@
+import { Transition } from '@headlessui/react';
+import { Form, Head } from '@inertiajs/react';
+import { Button, PasswordInput } from '@mantine/core';
+import { useRef } from 'react';
 import PasswordController from '@/actions/App/Http/Controllers/Settings/PasswordController';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
-import { type BreadcrumbItem } from '@/types';
-import { Transition } from '@headlessui/react';
-import { Form, Head } from '@inertiajs/react';
-import { useRef } from 'react';
-
-import HeadingSmall from '@/components/heading-small';
-
 import { edit } from '@/routes/user-password';
-import { Button, PasswordInput } from '@mantine/core';
+import { type BreadcrumbItem } from '@/types';
+
+import Heading from '@/components/heading';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -30,7 +29,8 @@ export default function Password() {
 
             <SettingsLayout>
                 <div className="space-y-6">
-                    <HeadingSmall
+                    <Heading
+                        variant="small"
                         title="Update password"
                         description="Ensure your account is using a long, random password to stay secure"
                     />

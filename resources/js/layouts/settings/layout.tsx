@@ -1,14 +1,14 @@
+import { Link } from '@inertiajs/react';
+import { Button } from '@mantine/core';
+import { type PropsWithChildren } from 'react';
 import Heading from '@/components/heading';
-import { cn, toUrl } from '@/lib/utils';
-import { useActiveUrl } from '@/hooks/use-active-url';
+import { useCurrentUrl } from '@/hooks/use-current-url';
+import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
 import { edit as editPassword } from '@/routes/user-password';
 import { type NavItem } from '@/types';
-import { Link } from '@inertiajs/react';
-import { Button } from '@mantine/core';
-import { type PropsWithChildren } from 'react';
 
 const sidebarNavItems: NavItem[] = [
     {
@@ -34,7 +34,7 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { urlIsActive } = useActiveUrl();
+    const { isCurrentUrl } = useCurrentUrl();
 
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -71,7 +71,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 }
                                 styles={{
                                     root: {
-                                        ...(urlIsActive(item.href) && {
+                                        ...(isCurrentUrl(toUrl(item.href)) && {
                                             backgroundColor:
                                                 'var(--color-muted)',
                                         }),

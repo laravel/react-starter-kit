@@ -1,7 +1,7 @@
-import AuthLayout from '@/layouts/auth-layout';
-import { store } from '@/routes/password/confirm';
 import { Form, Head } from '@inertiajs/react';
 import { Button, PasswordInput } from '@mantine/core';
+import AuthLayout from '@/layouts/auth-layout';
+import { store } from '@/routes/password/confirm';
 
 export default function ConfirmPassword() {
     return (

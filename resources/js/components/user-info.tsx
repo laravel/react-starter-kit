@@ -1,6 +1,6 @@
+import { Avatar } from '@mantine/core';
 import { useInitials } from '@/hooks/use-initials';
 import { type User } from '@/types';
-import { Avatar } from '@mantine/core';
 
 export function UserInfo({
     user,

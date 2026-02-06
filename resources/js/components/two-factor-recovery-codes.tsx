@@ -1,4 +1,3 @@
-import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
 import { Button, Card, Group } from '@mantine/core';
 import {
@@ -8,19 +7,20 @@ import {
     IconRefresh,
 } from '@tabler/icons-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { regenerateRecoveryCodes } from '@/routes/two-factor';
 import AlertError from './alert-error';
 
-interface TwoFactorRecoveryCodesProps {
+type Props = {
     recoveryCodesList: string[];
     fetchRecoveryCodes: () => Promise<void>;
     errors: string[];
-}
+};
 
 export default function TwoFactorRecoveryCodes({
     recoveryCodesList,
     fetchRecoveryCodes,
     errors,
-}: TwoFactorRecoveryCodesProps) {
+}: Props) {
     const [codesAreVisible, setCodesAreVisible] = useState<boolean>(false);
     const codesSectionRef = useRef<HTMLDivElement | null>(null);
     const canRegenerateCodes = recoveryCodesList.length > 0 && codesAreVisible;

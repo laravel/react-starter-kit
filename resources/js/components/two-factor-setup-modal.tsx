@@ -1,10 +1,17 @@
-import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
-import { Button, InputError, Loader, Modal, PinInput, useComputedColorScheme} from '@mantine/core';
+import {
+    Button,
+    InputError,
+    Loader,
+    Modal,
+    PinInput,
+    useComputedColorScheme,
+} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconClipboard, IconScan } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
+import { confirm } from '@/routes/two-factor';
 import AlertError from './alert-error';
 
 function TwoFactorSetupStep({
@@ -179,7 +186,7 @@ function TwoFactorVerificationStep({
     );
 }
 
-interface TwoFactorSetupModalProps {
+type Props = {
     isOpen: boolean;
     onClose: () => void;
     requiresConfirmation: boolean;
@@ -189,7 +196,7 @@ interface TwoFactorSetupModalProps {
     clearSetupData: () => void;
     fetchSetupData: () => Promise<void>;
     errors: string[];
-}
+};
 
 export default function TwoFactorSetupModal({
     isOpen,
@@ -201,7 +208,7 @@ export default function TwoFactorSetupModal({
     clearSetupData,
     fetchSetupData,
     errors,
-}: TwoFactorSetupModalProps) {
+}: Props) {
     const [showVerificationStep, setShowVerificationStep] =
         useState<boolean>(false);
 
