@@ -1,8 +1,7 @@
-import { useAppearance } from '@/hooks/use-appearance';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
-import { Button, InputError, Loader, Modal, PinInput } from '@mantine/core';
+import { Button, InputError, Loader, Modal, PinInput, useComputedColorScheme} from '@mantine/core';
 import { useClipboard } from '@mantine/hooks';
 import { IconCheck, IconClipboard, IconScan } from '@tabler/icons-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -21,7 +20,7 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
-    const { resolvedAppearance } = useAppearance();
+    const colorScheme = useComputedColorScheme();
     const clipboard = useClipboard({ timeout: 500 });
     const IconComponent = clipboard.copied ? IconCheck : IconClipboard;
 
@@ -42,7 +41,7 @@ function TwoFactorSetupStep({
                                         }}
                                         style={{
                                             filter:
-                                                resolvedAppearance === 'dark'
+                                                colorScheme === 'dark'
                                                     ? 'invert(1) brightness(1.5)'
                                                     : undefined,
                                         }}

@@ -1,5 +1,5 @@
-import { Appearance, useAppearance } from '@/hooks/use-appearance';
 import { cn } from '@/lib/utils';
+import { MantineColorScheme, useMantineColorScheme } from '@mantine/core';
 import { Icon, IconDeviceImac, IconMoon, IconSun } from '@tabler/icons-react';
 import { HTMLAttributes } from 'react';
 
@@ -7,12 +7,12 @@ export default function AppearanceToggleTab({
     className = '',
     ...props
 }: HTMLAttributes<HTMLDivElement>) {
-    const { appearance, updateAppearance } = useAppearance();
+    const { colorScheme, setColorScheme } = useMantineColorScheme();
 
-    const tabs: { value: Appearance; icon: Icon; label: string }[] = [
+    const tabs: { value: MantineColorScheme; icon: Icon; label: string }[] = [
         { value: 'light', icon: IconSun, label: 'Light' },
         { value: 'dark', icon: IconMoon, label: 'Dark' },
-        { value: 'system', icon: IconDeviceImac, label: 'System' },
+        { value: 'auto', icon: IconDeviceImac, label: 'System' },
     ];
 
     return (
@@ -26,10 +26,10 @@ export default function AppearanceToggleTab({
             {tabs.map(({ value, icon: Icon, label }) => (
                 <button
                     key={value}
-                    onClick={() => updateAppearance(value)}
+                    onClick={() => setColorScheme(value)}
                     className={cn(
                         'flex items-center rounded-md px-3.5 py-1.5 transition-colors',
-                        appearance === value
+                        colorScheme === value
                             ? 'bg-white shadow-xs dark:bg-neutral-700 dark:text-neutral-100'
                             : 'text-neutral-500 hover:bg-neutral-200/60 hover:text-black dark:text-neutral-400 dark:hover:bg-neutral-700/60',
                     )}

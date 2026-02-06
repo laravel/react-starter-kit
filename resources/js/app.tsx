@@ -2,13 +2,12 @@ import '../css/app.css';
 
 import theme from '@/theme';
 import { createInertiaApp } from '@inertiajs/react';
-import { MantineProvider } from '@mantine/core';
+import { ColorSchemeScript, MantineProvider } from '@mantine/core';
 import { ModalsProvider } from '@mantine/modals';
 import { Notifications } from '@mantine/notifications';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
-import { initializeTheme } from './hooks/use-appearance';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -24,7 +23,11 @@ createInertiaApp({
 
         root.render(
             <StrictMode>
-                <MantineProvider theme={theme}>
+                 <ColorSchemeScript
+                    nonce="8IBTHwOdqNKAWeKl7plt8g=="
+                    defaultColorScheme="auto"
+                />
+                <MantineProvider defaultColorScheme="auto" theme={theme}>
                     <ModalsProvider>
                         <Notifications />
                         <App {...props} />
@@ -37,6 +40,3 @@ createInertiaApp({
         color: '#4B5563',
     },
 });
-
-// This will set light / dark mode on load...
-initializeTheme();
