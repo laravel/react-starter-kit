@@ -26,6 +26,8 @@ export default function Password() {
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Password settings" />
 
+            <h1 className="sr-only">Password Settings</h1>
+
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall

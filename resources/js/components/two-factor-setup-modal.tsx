@@ -1,3 +1,4 @@
+import { useAppearance } from '@/hooks/use-appearance';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
 import { confirm } from '@/routes/two-factor';
 import { Form } from '@inertiajs/react';
@@ -20,6 +21,7 @@ function TwoFactorSetupStep({
     onNextStep: () => void;
     errors: string[];
 }) {
+    const { resolvedAppearance } = useAppearance();
     const clipboard = useClipboard({ timeout: 500 });
     const IconComponent = clipboard.copied ? IconCheck : IconClipboard;
 
@@ -37,6 +39,12 @@ function TwoFactorSetupStep({
                                         className="aspect-square w-full rounded-lg bg-white p-2 [&_svg]:size-full"
                                         dangerouslySetInnerHTML={{
                                             __html: qrCodeSvg,
+                                        }}
+                                        style={{
+                                            filter:
+                                                resolvedAppearance === 'dark'
+                                                    ? 'invert(1) brightness(1.5)'
+                                                    : undefined,
                                         }}
                                     />
                                 ) : (

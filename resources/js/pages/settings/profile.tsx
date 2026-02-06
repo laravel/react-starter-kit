@@ -32,6 +32,8 @@ export default function Profile({
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Profile settings" />
 
+            <h1 className="sr-only">Profile Settings</h1>
+
             <SettingsLayout>
                 <div className="space-y-6">
                     <HeadingSmall

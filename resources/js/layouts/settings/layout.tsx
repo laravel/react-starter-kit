@@ -1,5 +1,6 @@
 import Heading from '@/components/heading';
-import { isSameUrl, resolveUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
+import { useActiveUrl } from '@/hooks/use-active-url';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit } from '@/routes/profile';
 import { show } from '@/routes/two-factor';
@@ -33,12 +34,12 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
+    const { urlIsActive } = useActiveUrl();
+
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
         return null;
     }
-
-    const currentPath = window.location.pathname;
 
     return (
         <div className="px-4 py-6">
@@ -49,11 +50,14 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
 
             <div className="flex flex-col lg:flex-row lg:space-x-12">
                 <aside className="w-full max-w-xl lg:w-48">
-                    <nav className="flex flex-col space-y-1 space-x-0">
+                    <nav
+                        className="flex flex-col space-y-1 space-x-0"
+                        aria-label="Settings"
+                    >
                         {sidebarNavItems.map((item, index) => (
                             <Button
-                                key={`${resolveUrl(item.href)}-${index}`}
-                                href={resolveUrl(item.href)}
+                                key={`${toUrl(item.href)}-${index}`}
+                                href={toUrl(item.href)}
                                 component={Link}
                                 prefetch
                                 size="sm"
@@ -67,10 +71,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 }
                                 styles={{
                                     root: {
-                                        ...(isSameUrl(
-                                            item.href,
-                                            currentPath,
-                                        ) && {
+                                        ...(urlIsActive(item.href) && {
                                             backgroundColor:
                                                 'var(--color-muted)',
                                         }),

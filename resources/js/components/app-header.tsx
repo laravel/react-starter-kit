@@ -1,6 +1,7 @@
 import { Breadcrumbs } from '@/components/breadcrumbs';
 import { useInitials } from '@/hooks/use-initials';
-import { cn, resolveUrl } from '@/lib/utils';
+import { useActiveUrl } from '@/hooks/use-active-url';
+import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
 import { NavItem, type BreadcrumbItem, type SharedData } from '@/types';
 import { Link, usePage } from '@inertiajs/react';
@@ -51,7 +52,7 @@ export function AppHeader({
     const page = usePage<SharedData>();
     const { auth } = page.props;
     const getInitials = useInitials();
-    const currentPath = window.location.pathname;
+    const { urlIsActive } = useActiveUrl();
     return (
         <>
             <div className="flex h-full items-center justify-between px-6 md:mx-auto md:max-w-7xl md:px-4">
@@ -74,12 +75,10 @@ export function AppHeader({
                         <Group h="100%" ml="xl" gap={0} visibleFrom="sm">
                             {mainNavItems.map((item) => (
                                 <HeaderMenuButton
-                                    key={resolveUrl(item.href)}
+                                    key={toUrl(item.href)}
                                     component={Link}
-                                    href={resolveUrl(item.href)}
-                                    isActive={currentPath.startsWith(
-                                        resolveUrl(item.href),
-                                    )}
+                                    href={toUrl(item.href)}
+                                    isActive={urlIsActive(item.href)}
                                     leftSection={
                                         item.icon && <item.icon size={20} />
                                     }
@@ -104,9 +103,9 @@ export function AppHeader({
                     </HeaderMenuButton>
                     {rightNavItems.map((item) => (
                         <HeaderMenuButton
-                            key={resolveUrl(item.href)}
+                            key={toUrl(item.href)}
                             component={Link}
-                            href={resolveUrl(item.href)}
+                            href={toUrl(item.href)}
                             tooltip={item.title}
                             classNames={{
                                 root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',

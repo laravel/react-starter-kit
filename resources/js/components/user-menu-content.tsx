@@ -33,6 +33,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                 <Menu.Item
                     component={Link}
                     href={edit()}
+                    className="block w-full cursor-pointer"
                     leftSection={<IconSettings color="gray" size={20} />}
                 >
                     Settings
@@ -45,6 +46,7 @@ export function UserMenuContent({ user }: UserMenuContentProps) {
                     }}
                 >
                     <Menu.Item
+                        className="block w-full cursor-pointer"
                         leftSection={<IconLogout color="gray" />}
                         type="submit"
                         data-test="logout-button"
