@@ -37,7 +37,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('api-tokens.store');
     Route::delete('settings/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])
         ->name('api-tokens.destroy');
-    
+
     Route::get('settings/business', [BusinessSettingsController::class, 'index'])
         ->name('business.index');
     Route::patch('settings/business/info', [BusinessSettingsController::class, 'updateBusiness'])

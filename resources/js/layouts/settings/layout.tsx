@@ -28,6 +28,11 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
+        title: 'Business Settings',
+        href: '/settings/business',
+        icon: null,
+    },
+    {
         title: 'API Tokens',
         href: '/settings/api-tokens',
         icon: null,
