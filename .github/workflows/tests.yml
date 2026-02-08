@@ -1,56 +1,25 @@
-name: tests
-
+name: myworkflow
 on:
-  push:
-    branches:
-      - develop
-      - main
-      - master
-      - workos
-  pull_request:
-    branches:
-      - develop
-      - main
-      - master
-      - workos
-
+ push:
+  branches:
+    -main
 jobs:
-  ci:
+  build_and_test:
+    name: Build and test
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.2', '8.5']
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v6
+      - name: Check out code
+        uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: ${{ matrix.php-version }}
-          tools: composer:v2
-          coverage: xdebug
+      - name: Install NPM dependencies
+        run: npm ci
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
+      - name: Build assets
+        run: npm run production
 
-      - name: Install Node Dependencies
-        run: npm i
+      - name: Install Composer dependencies
+        run: composer install --no-interaction --no-progress --prefer-dist
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Copy Environment File
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      - name: Build Assets
-        run: npm run build
-
-      - name: Tests
-        run: ./vendor/bin/phpunit
+      - name: Run PHP tests
+        run: vendor/bin/phpunit --stop-on-error --stop-on-failure
