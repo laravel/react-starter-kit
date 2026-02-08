@@ -1,11 +1,14 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/react-starter-kit",
+    "name": "larapasskit/larapasskit",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
+    "description": "LaraPassKit - A SaaS platform for creating and managing Apple Wallet and Google Wallet passes.",
     "keywords": [
         "laravel",
-        "framework"
+        "apple-wallet",
+        "google-wallet",
+        "passkit",
+        "saas"
     ],
     "license": "MIT",
     "require": {

@@ -1,25 +1,30 @@
-# Laravel + React Starter Kit
+# LaraPassKit
 
 ## Introduction
 
-Our React starter kit provides a robust, modern starting point for building Laravel applications with a React frontend using [Inertia](https://inertiajs.com).
+LaraPassKit is a comprehensive SaaS platform for creating and managing Apple Wallet and Google Wallet passes. Built with Laravel, React, TypeScript, and Inertia.js, it provides a modern, intuitive interface for pass management with subscription-based access tiers.
 
-Inertia allows you to build modern, single-page React applications using classic server-side routing and controllers. This lets you enjoy the frontend power of React combined with the incredible backend productivity of Laravel and lightning-fast Vite compilation.
+## Features
 
-This React starter kit utilizes React 19, TypeScript, Tailwind, and the [shadcn/ui](https://ui.shadcn.com) and [radix-ui](https://www.radix-ui.com) component libraries.
+- **Pass Management**: Create and manage Apple Wallet and Google Wallet passes
+- **Template System**: Build reusable pass templates with custom fields
+- **Multi-tenancy**: Single database architecture with user isolation
+- **Subscription Tiers**: Free, Pro, and Enterprise plans with different pass limits
+- **RESTful API**: Programmatic pass creation for external website integration
+- **Admin Dashboard**: Monitor users and subscriptions
+- **Business Settings**: Configure business information and wallet credentials
+- **API Token Management**: Secure token-based authentication for external integrations
 
-## Official Documentation
+## Technology Stack
 
-Documentation for all Laravel starter kits can be found on the [Laravel website](https://laravel.com/docs/starter-kits).
-
-## Contributing
-
-Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+- Laravel 12.50.0
+- React 19 with TypeScript
+- Inertia.js for SPA experience
+- Tailwind CSS
+- shadcn/ui and Radix UI components
+- Laravel Sanctum for API authentication
+- Laravel Cashier with Stripe for subscriptions
 
 ## License
 
-The Laravel + React starter kit is open-sourced software licensed under the MIT license.
+LaraPassKit is open-sourced software licensed under the MIT license.
