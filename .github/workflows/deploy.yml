@@ -20,6 +20,8 @@ jobs:
         with:
           node-version: '16'
       - name: install npm dependencies
+        run: npm install
+      - name: build assets
         run: npm run build
       - name: sync files to server
         uses: appleboy/scp-action@master
