@@ -17,6 +17,8 @@ import * as passes from '@/routes/passes';
 import * as templates from '@/routes/templates';
 import * as billing from '@/routes/billing';
 import adminRoutes from '@/routes/admin';
+import apiTokensRoutes from '@/routes/api-tokens';
+import businessRoutes from '@/routes/business';
 import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 
@@ -63,13 +65,12 @@ export function AppSidebar() {
     const footerNavItems: NavItem[] = [
         {
             title: 'API',
-            href: '/settings/api-tokens',
+            href: apiTokensRoutes.index().url,
             icon: Key,
-            external: true,
         },
         {
             title: 'Business',
-            href: '/settings/business',
+            href: businessRoutes.index().url,
             icon: Building2,
         },
     ];
