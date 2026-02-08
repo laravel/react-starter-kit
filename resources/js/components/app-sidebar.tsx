@@ -1,5 +1,5 @@
-import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid } from 'lucide-react';
+import { Link, usePage } from '@inertiajs/react';
+import { BookOpen, CreditCard, Folder, LayoutGrid, Layers, Smartphone, Shield, Key, Building2 } from 'lucide-react';
 import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
 import { NavUser } from '@/components/nav-user';
@@ -13,31 +13,66 @@ import {
     SidebarMenuItem,
 } from '@/components/ui/sidebar';
 import { dashboard } from '@/routes';
-import type { NavItem } from '@/types';
+import * as passes from '@/routes/passes';
+import * as templates from '@/routes/templates';
+import * as billing from '@/routes/billing';
+import adminRoutes from '@/routes/admin';
+import type { NavItem, SharedData } from '@/types';
 import AppLogo from './app-logo';
 
-const mainNavItems: NavItem[] = [
-    {
-        title: 'Dashboard',
-        href: dashboard(),
-        icon: LayoutGrid,
-    },
-];
-
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
-
 export function AppSidebar() {
+    const { auth } = usePage<{ auth: SharedData['auth'] }>().props;
+    const isAdmin = auth.user.is_admin;
+
+    const mainNavItems: NavItem[] = [
+        {
+            title: 'Dashboard',
+            href: dashboard(),
+            icon: LayoutGrid,
+        },
+        {
+            title: 'Passes',
+            href: passes.index(),
+            icon: Smartphone,
+        },
+        {
+            title: 'Templates',
+            href: templates.index(),
+            icon: Layers,
+        },
+        {
+            title: 'Billing',
+            href: billing.index(),
+            icon: CreditCard,
+        },
+    ];
+
+    const adminNavItems: NavItem[] = [
+        {
+            title: 'Admin Dashboard',
+            href: adminRoutes.index().url,
+            icon: Shield,
+        },
+        {
+            title: 'User Management',
+            href: adminRoutes.users().url,
+            icon: Shield,
+        },
+    ];
+
+    const footerNavItems: NavItem[] = [
+        {
+            title: 'API',
+            href: '/settings/api-tokens',
+            icon: Key,
+            external: true,
+        },
+        {
+            title: 'Business',
+            href: '/settings/business',
+            icon: Building2,
+        },
+    ];
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -54,6 +89,7 @@ export function AppSidebar() {
 
             <SidebarContent>
                 <NavMain items={mainNavItems} />
+                {isAdmin && <NavMain items={adminNavItems} />}
             </SidebarContent>
 
             <SidebarFooter>

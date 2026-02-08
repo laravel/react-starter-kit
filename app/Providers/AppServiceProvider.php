@@ -15,7 +15,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        // Register pass generation services as singletons
+        $this->app->singleton(\App\Services\ApplePassService::class);
+        $this->app->singleton(\App\Services\GooglePassService::class);
+        $this->app->singleton(\App\Services\PassLimitService::class);
     }
 
     /**

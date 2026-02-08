@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Services\PassLimitService;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 
@@ -35,12 +36,28 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+        $subscriptionData = null;
+
+        if ($request->user()) {
+            $passLimitService = app(PassLimitService::class);
+            $currentPlan = $passLimitService->getCurrentPlan($request->user());
+            $planConfig = config('passkit.plans.' . $currentPlan);
+
+            $subscriptionData = [
+                'plan' => $currentPlan,
+                'passCount' => $request->user()->passes()->count(),
+                'passLimit' => $planConfig['pass_limit'] ?? null,
+                'platforms' => $planConfig['platforms'] ?? [],
+            ];
+        }
+
         return [
             ...parent::share($request),
             'name' => config('app.name'),
             'auth' => [
                 'user' => $request->user(),
             ],
+            'subscription' => $subscriptionData,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }
