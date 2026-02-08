@@ -26,6 +26,17 @@ class User extends Authenticatable
         'email',
         'password',
         'is_admin',
+        'business_name',
+        'business_address',
+        'business_phone',
+        'business_email',
+        'business_website',
+        'google_service_account_json',
+        'google_issuer_id',
+        'apple_certificate',
+        'apple_certificate_password',
+        'apple_team_id',
+        'apple_pass_type_id',
     ];
 
     /**
