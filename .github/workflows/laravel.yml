@@ -1,37 +1,41 @@
-name: Laravel
-
+name: Manual workflow
+# Controls when the action will run. Workflow runs when manually triggered using the UI
+# or API.
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+    branches:
+      - main
+  workflow_dispatch:
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  laravel-tests:
-
+  CodeCheckout:
+    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
+    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-    - uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
-      with:
-        php-version: '8.0'
-    - uses: actions/checkout@v4
-    - name: Copy .env
-      run: php -r "file_exists('.env') || copy('.env.example', '.env');"
-    - name: Install Dependencies
-      run: composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
-    - name: install composer update
-      run: composer update
-    - name: Generate key
-      run: php artisan key:generate
-    - name: Directory Permissions
-      run: chmod -R 777 storage bootstrap/cache
-    - name: Create Database
-      run: |
-        mkdir -p database
-        touch database/database.mysql
-    - name: Execute tests (Unit and Feature tests) via PHPUnit/Pest
-      env:
-        DB_CONNECTION: mysql
-        DB_DATABASE: database/database.mysql
-      run: php artisan test
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v4
+  CodeCheckout2:
+    # The type of runner that the job will run on
+    runs-on: self-hosted
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+  PullProject:
+    needs: CodeCheckout
+    runs-on: self-hosted
+    steps:
+      - name: Run project
+        run: |
+          cd /var/www/amro.rmcc.sa/
+          git -c credential.helper='!f() { echo "username=git username"; echo "password= git password(token pass)"; }; f' pull origin main
+      # Runs a single command using the runners shell
+      - name: Build assets
+        run: npm install && npm run build
+      - name: Install PHP dependencies
+        run: composer install --no-dev --optimize-autoloader
+      - name: Clear cache
+        run: php artisan clear-compiled
+      - name: Recreate cache
+        run: php artisan optimize
