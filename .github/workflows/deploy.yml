@@ -10,7 +10,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
       - name: Set up php
-        uses: actions/setup-php@v2
+        uses: shivammathur/setup-php@v2
         with:
           php-version: '8.2'
       - name: Install dependencies
@@ -22,7 +22,8 @@ jobs:
       - name: install npm dependencies
         run: npm run build
       - name: sync files to server
-        uses: easingthemes/ssh-deployments@v2.1.5
+        uses: appleboy/scp-action@master
+        
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           source: "."
@@ -30,7 +31,7 @@ jobs:
           REMOTE_USER: ${{ secrets.VPS_USER }}
           Target: "/var/ww/ToDoApp_laravel/public"
       - name: run remote/artisan commands
-        uses: appleboy/ssh-action@m0.1.6
+        uses: appleboy/ssh-action@master
         with:
           host: ${{secrets.VPS_HOST }}
           user: ${{secrets.VPS_USER }}
