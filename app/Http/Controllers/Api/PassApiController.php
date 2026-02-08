@@ -67,7 +67,7 @@ class PassApiController extends Controller
 
         // Get template and verify ownership
         $template = PassTemplate::findOrFail($validated['template_id']);
-        
+
         if ($template->user_id !== $user->id) {
             return response()->json([
                 'error' => 'Unauthorized',
@@ -77,7 +77,7 @@ class PassApiController extends Controller
 
         // Merge template data with custom fields
         $passData = $template->template_data;
-        
+
         // Replace placeholders in template with custom fields
         if (isset($validated['custom_fields'])) {
             $passData = $this->replacePlaceholders($passData, $validated['custom_fields']);
@@ -138,11 +138,11 @@ class PassApiController extends Controller
     private function replacePlaceholders(array $data, array $customFields): array
     {
         $json = json_encode($data);
-        
+
         foreach ($customFields as $key => $value) {
             $json = str_replace("{{" . $key . "}}", $value, $json);
         }
-        
+
         return json_decode($json, true);
     }
 }

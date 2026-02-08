@@ -18,11 +18,11 @@ return new class extends Migration
             $table->string('business_phone')->nullable();
             $table->string('business_email')->nullable();
             $table->string('business_website')->nullable();
-            
+
             // Google Wallet Configuration
             $table->text('google_service_account_json')->nullable();
             $table->string('google_issuer_id')->nullable();
-            
+
             // Apple Wallet Configuration
             $table->text('apple_certificate')->nullable();
             $table->text('apple_certificate_password')->nullable();

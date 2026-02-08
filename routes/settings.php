@@ -4,6 +4,7 @@ use App\Http\Controllers\Settings\PasswordController;
 use App\Http\Controllers\Settings\ProfileController;
 use App\Http\Controllers\Settings\TwoFactorAuthenticationController;
 use App\Http\Controllers\Settings\ApiTokenController;
+use App\Http\Controllers\Settings\BusinessSettingsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -36,4 +37,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('api-tokens.store');
     Route::delete('settings/api-tokens/{tokenId}', [ApiTokenController::class, 'destroy'])
         ->name('api-tokens.destroy');
+    
+    Route::get('settings/business', [BusinessSettingsController::class, 'index'])
+        ->name('business.index');
+    Route::patch('settings/business/info', [BusinessSettingsController::class, 'updateBusiness'])
+        ->name('business.update-info');
+    Route::patch('settings/business/google', [BusinessSettingsController::class, 'updateGoogle'])
+        ->name('business.update-google');
+    Route::patch('settings/business/apple', [BusinessSettingsController::class, 'updateApple'])
+        ->name('business.update-apple');
 });

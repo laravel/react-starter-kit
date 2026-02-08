@@ -248,7 +248,7 @@ export default function ApiTokens({ tokens }: Props) {
                                     <p className="text-sm text-muted-foreground">
                                         Create a new pass from a template with custom field values for your customer.
                                     </p>
-                                    
+
                                     <div className="space-y-2">
                                         <p className="text-sm font-medium">Request Body:</p>
                                         <pre className="block rounded bg-muted p-3 text-xs overflow-x-auto">
