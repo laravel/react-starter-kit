@@ -1,0 +1,42 @@
+name : workflow
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+      - name: Set up php
+        uses: actions/setup-php@v2
+        with:
+          php-version: '8.2'
+      - name: Install dependencies
+        run: composer install --opitimize-autoloader --no-dev --no-progress --no-interaction --prefer-dist  
+      - name: install node.js
+        uses: action/setup-node@v2
+        with:
+          node-version: '16'
+      - name: install npm dependencies
+        run: npm run build
+      - name: sync files to server
+        uses: easingthemes/ssh-deployments@v2.1.5
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "."
+          REMOTE_HOST: ${{ secrets.VPS_HOST }}
+          REMOTE_USER: ${{ secrets.VPS_USER }}
+          Target: "/var/ww/ToDoApp_laravel/public"
+      - name: run remote/artisan commands
+        uses: appleboy/ssh-action@m0.1.6
+        with:
+          host: ${{secrets.VPS_HOST }}
+          user: ${{secrets.VPS_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /var/ww/ToDoApp_laravel
+            php artisan migrate --force
+            php artisan optimize
+        
