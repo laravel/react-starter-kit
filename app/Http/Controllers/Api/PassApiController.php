@@ -38,7 +38,7 @@ class PassApiController extends Controller
         $user = $request->user();
 
         // Check if user can create more passes
-        if (!$this->passLimitService->canCreatePass($user)) {
+        if (!$this->passLimitService->canCreatePass($user, ['apple', 'google'])) {
             return response()->json([
                 'error' => 'Pass limit reached',
                 'message' => 'You have reached your pass creation limit. Please upgrade your plan.',
@@ -51,7 +51,8 @@ class PassApiController extends Controller
         $validator = Validator::make($request->all(), [
             'template_id' => ['required', 'exists:pass_templates,id'],
             'member_id' => ['nullable', 'string', 'max:255'],
-            'platform' => ['required', Rule::in(['apple', 'google'])],
+            'platforms' => ['required', 'array', 'min:1'],
+            'platforms.*' => ['required', Rule::in(['apple', 'google'])],
             'custom_fields' => ['nullable', 'array'],
             'custom_fields.*' => ['nullable', 'string'],
         ]);
@@ -86,7 +87,7 @@ class PassApiController extends Controller
         // Create the pass
         $pass = $user->passes()->create([
             'pass_template_id' => $template->id,
-            'platform' => $validated['platform'],
+            'platforms' => $validated['platforms'],
             'pass_type' => $template->pass_type,
             'serial_number' => \Illuminate\Support\Str::uuid()->toString(),
             'status' => 'active',
@@ -99,13 +100,15 @@ class PassApiController extends Controller
             'images' => $template->default_images ?? [],
         ]);
 
+        $platforms = $validated['platforms'];
+
         return response()->json([
             'success' => true,
             'message' => 'Pass created successfully',
             'pass' => $pass->load('template'),
             'download_urls' => [
-                'apple' => $validated['platform'] === 'apple' ? route('passes.download.apple', $pass) : null,
-                'google' => $validated['platform'] === 'google' ? route('passes.download.google', $pass) : null,
+                'apple' => in_array('apple', $platforms) ? route('passes.download.apple', $pass) : null,
+                'google' => in_array('google', $platforms) ? route('passes.download.google', $pass) : null,
             ],
         ], 201);
     }
@@ -126,8 +129,8 @@ class PassApiController extends Controller
             'success' => true,
             'pass' => $pass->load('template'),
             'download_urls' => [
-                'apple' => $pass->platform === 'apple' ? route('passes.download.apple', $pass) : null,
-                'google' => $pass->platform === 'google' ? route('passes.download.google', $pass) : null,
+                'apple' => in_array('apple', $pass->platforms ?? []) ? route('passes.download.apple', $pass) : null,
+                'google' => in_array('google', $pass->platforms ?? []) ? route('passes.download.google', $pass) : null,
             ],
         ]);
     }

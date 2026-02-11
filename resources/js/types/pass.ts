@@ -65,7 +65,7 @@ export interface Pass {
 	id: number;
 	user_id: number;
 	pass_template_id: number | null;
-	platform: PassPlatform;
+	platforms: PassPlatform[];
 	pass_type: PassType;
 	serial_number: string;
 	status: PassStatus;
@@ -88,7 +88,7 @@ export interface PassTemplate {
 	name: string;
 	description: string | null;
 	pass_type: PassType;
-	platform: PassPlatform;
+	platforms: PassPlatform[];
 	design_data: PassData;
 	images: PassImages | null;
 	created_at: string;
@@ -96,7 +96,7 @@ export interface PassTemplate {
 	passes_count?: number;
 }
 
-export type PlanKey = 'free' | 'pro_apple' | 'pro_google' | 'unlimited';
+export type PlanKey = 'free' | 'starter' | 'growth' | 'business' | 'enterprise';
 
 export interface Plan {
 	key: PlanKey;

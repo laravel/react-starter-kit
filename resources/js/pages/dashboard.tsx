@@ -107,9 +107,11 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                                                 </div>
                                             </div>
                                             <div className="flex items-center gap-2">
-                                                <Badge variant={pass.platform === 'apple' ? 'default' : 'secondary'}>
-                                                    {pass.platform}
-                                                </Badge>
+                                                {pass.platforms.map((p) => (
+                                                    <Badge key={p} variant={p === 'apple' ? 'default' : 'secondary'}>
+                                                        {p}
+                                                    </Badge>
+                                                ))}
                                                 <Badge variant={pass.status === 'active' ? 'default' : 'outline'}>
                                                     {pass.status}
                                                 </Badge>

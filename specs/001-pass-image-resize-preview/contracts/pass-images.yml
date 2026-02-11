@@ -1,0 +1,91 @@
+openapi: 3.0.3
+info:
+  title: Pass Image Upload API
+  version: 1.0.0
+paths:
+  /passes/images:
+    post:
+      summary: Upload and resize a pass image
+      description: Upload a pass image, generate platform-specific variants, and return stored paths.
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - image
+                - slot
+                - platform
+              properties:
+                image:
+                  type: string
+                  format: binary
+                slot:
+                  type: string
+                  enum: [icon, logo, strip, thumbnail, background, footer]
+                platform:
+                  type: string
+                  enum: [apple, google]
+                resize_mode:
+                  type: string
+                  enum: [contain, cover]
+                  default: contain
+      responses:
+        "200":
+          description: Upload succeeded with generated variants
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - original
+                  - variants
+                properties:
+                  original:
+                    type: object
+                    required: [path, url, width, height]
+                    properties:
+                      path:
+                        type: string
+                      url:
+                        type: string
+                      width:
+                        type: integer
+                      height:
+                        type: integer
+                  variants:
+                    type: array
+                    items:
+                      type: object
+                      required: [platform, slot, scale, path, url, width, height]
+                      properties:
+                        platform:
+                          type: string
+                        slot:
+                          type: string
+                        scale:
+                          type: string
+                        path:
+                          type: string
+                        url:
+                          type: string
+                        width:
+                          type: integer
+                        height:
+                          type: integer
+                        quality_warning:
+                          type: boolean
+        "422":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  errors:
+                    type: object
+        "500":
+          description: Processing error

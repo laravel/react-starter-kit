@@ -20,7 +20,7 @@ class Pass extends Model
     protected $fillable = [
         'user_id',
         'pass_template_id',
-        'platform',
+        'platforms',
         'pass_type',
         'serial_number',
         'status',
@@ -42,6 +42,7 @@ class Pass extends Model
     protected function casts(): array
     {
         return [
+            'platforms' => 'array',
             'pass_data' => 'array',
             'barcode_data' => 'array',
             'images' => 'array',

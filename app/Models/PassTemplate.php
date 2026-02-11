@@ -23,7 +23,7 @@ class PassTemplate extends Model
         'name',
         'description',
         'pass_type',
-        'platform',
+        'platforms',
         'design_data',
         'images',
     ];
@@ -36,6 +36,7 @@ class PassTemplate extends Model
     protected function casts(): array
     {
         return [
+            'platforms' => 'array',
             'design_data' => 'array',
             'images' => 'array',
         ];

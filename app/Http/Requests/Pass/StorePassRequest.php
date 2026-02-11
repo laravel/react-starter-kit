@@ -22,7 +22,8 @@ class StorePassRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'platform' => ['required', 'string', 'in:apple,google'],
+            'platforms' => ['required', 'array', 'min:1'],
+            'platforms.*' => ['required', 'string', 'in:apple,google'],
             'pass_type' => ['required', 'string', 'in:generic,coupon,boardingPass,eventTicket,storeCard,loyalty,offer,transit,stampCard'],
             'pass_template_id' => ['nullable', 'exists:pass_templates,id'],
             'pass_data' => ['required', 'array'],

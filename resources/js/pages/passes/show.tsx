@@ -127,7 +127,7 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
               <PassPreview
                 passData={pass.pass_data}
                 barcodeData={pass.barcode_data}
-                platform={pass.platform}
+                platform={pass.platforms[0] || 'apple'}
               />
             </CardContent>
           </Card>
@@ -143,18 +143,20 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
             <CardContent className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <Label className="text-muted-foreground">Platform</Label>
+                  <Label className="text-muted-foreground">Platforms</Label>
                   <div className="flex items-center gap-2 mt-1">
-                    {pass.platform === 'apple' ? (
-                      <>
+                    {pass.platforms.includes('apple') && (
+                      <div className="flex items-center gap-1">
                         <Apple className="h-4 w-4" />
                         <span>Apple Wallet</span>
-                      </>
-                    ) : (
-                      <>
+                      </div>
+                    )}
+                    {pass.platforms.length === 2 && <span className="text-muted-foreground">+</span>}
+                    {pass.platforms.includes('google') && (
+                      <div className="flex items-center gap-1">
                         <Smartphone className="h-4 w-4" />
                         <span>Google Wallet</span>
-                      </>
+                      </div>
                     )}
                   </div>
                 </div>
@@ -211,7 +213,7 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
-              {pass.platform === 'apple' && (
+              {pass.platforms.includes('apple') && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
@@ -236,7 +238,7 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
                 </div>
               )}
 
-              {pass.platform === 'google' && (
+              {pass.platforms.includes('google') && (
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <div>

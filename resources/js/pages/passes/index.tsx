@@ -50,11 +50,12 @@ export default function PassesIndex({ passes, filters }: PassesIndexProps) {
     }
   };
 
-  const getPlatformIcon = (platform: PassPlatform) => {
-    return platform === 'apple' ? (
-      <Apple className="h-4 w-4" />
-    ) : (
-      <Smartphone className="h-4 w-4" />
+  const getPlatformIcons = (platforms: PassPlatform[]) => {
+    return (
+      <div className="flex items-center gap-1">
+        {platforms.includes('apple') && <Apple className="h-4 w-4" />}
+        {platforms.includes('google') && <Smartphone className="h-4 w-4" />}
+      </div>
     );
   };
 
@@ -219,8 +220,8 @@ export default function PassesIndex({ passes, filters }: PassesIndexProps) {
                       <TableRow key={pass.id}>
                         <TableCell>
                           <div className="flex items-center gap-2">
-                            {getPlatformIcon(pass.platform)}
-                            <span className="capitalize">{pass.platform}</span>
+                            {getPlatformIcons(pass.platforms)}
+                            <span className="capitalize">{pass.platforms.join(' + ')}</span>
                           </div>
                         </TableCell>
                         <TableCell className="capitalize">

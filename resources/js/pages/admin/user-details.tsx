@@ -68,9 +68,10 @@ export default function AdminUserDetails({ user, passes, subscriptions }: AdminU
   const getPlanBadge = (plan: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
       free: 'outline',
-      pro_apple: 'default',
-      pro_google: 'default',
-      unlimited: 'default',
+      starter: 'default',
+      growth: 'default',
+      business: 'default',
+      enterprise: 'default',
     };
 
     return (
@@ -241,7 +242,7 @@ export default function AdminUserDetails({ user, passes, subscriptions }: AdminU
                   {passes.data.map((pass) => (
                     <TableRow key={pass.id}>
                       <TableCell className="font-mono text-xs">{pass.serial_number}</TableCell>
-                      <TableCell className="capitalize">{pass.platform}</TableCell>
+                      <TableCell className="capitalize">{pass.platforms.join(' + ')}</TableCell>
                       <TableCell className="capitalize">
                         {pass.pass_type.replace(/([A-Z])/g, ' $1').trim()}
                       </TableCell>

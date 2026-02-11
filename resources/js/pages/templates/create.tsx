@@ -12,7 +12,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Apple, ArrowLeft, Smartphone } from 'lucide-react';
+import { Apple, ArrowLeft, Check, Smartphone } from 'lucide-react';
 import { PassPlatform, PassType, PassField } from '@/types/pass';
 import { PassPreview } from '@/components/pass-preview';
 import { PassFieldEditor } from '@/components/pass-field-editor';
@@ -43,7 +43,7 @@ const transitTypes = [
 export default function TemplatesCreate() {
   const { data, setData, post, processing, errors } = useForm({
     name: '',
-    platform: '' as PassPlatform | '',
+    platforms: [] as PassPlatform[],
     pass_type: '' as PassType | '',
     design_data: {
       description: '',
@@ -117,20 +117,30 @@ export default function TemplatesCreate() {
             {/* Platform Selection */}
             <Card>
               <CardHeader>
-                <CardTitle>Platform *</CardTitle>
+                <CardTitle>Platforms *</CardTitle>
                 <CardDescription>
-                  Choose your target platform
+                  Choose your target platforms (select one or both)
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2">
                   <Card
                     className={cn(
-                      'cursor-pointer transition-colors hover:border-primary',
-                      data.platform === 'apple' && 'border-primary bg-primary/5'
+                      'cursor-pointer transition-colors hover:border-primary relative',
+                      data.platforms.includes('apple') && 'border-primary bg-primary/5'
                     )}
-                    onClick={() => setData('platform', 'apple')}
+                    onClick={() => {
+                      const platforms = data.platforms.includes('apple')
+                        ? data.platforms.filter((p) => p !== 'apple')
+                        : [...data.platforms, 'apple' as PassPlatform];
+                      setData('platforms', platforms);
+                    }}
                   >
+                    {data.platforms.includes('apple') && (
+                      <div className="absolute top-3 right-3 rounded-full bg-primary p-1">
+                        <Check className="h-3 w-3 text-primary-foreground" />
+                      </div>
+                    )}
                     <CardContent className="flex flex-col items-center justify-center py-8">
                       <Apple className="h-12 w-12 mb-4" />
                       <h3 className="font-semibold mb-1">Apple Wallet</h3>
@@ -139,19 +149,29 @@ export default function TemplatesCreate() {
 
                   <Card
                     className={cn(
-                      'cursor-pointer transition-colors hover:border-primary',
-                      data.platform === 'google' && 'border-primary bg-primary/5'
+                      'cursor-pointer transition-colors hover:border-primary relative',
+                      data.platforms.includes('google') && 'border-primary bg-primary/5'
                     )}
-                    onClick={() => setData('platform', 'google')}
+                    onClick={() => {
+                      const platforms = data.platforms.includes('google')
+                        ? data.platforms.filter((p) => p !== 'google')
+                        : [...data.platforms, 'google' as PassPlatform];
+                      setData('platforms', platforms);
+                    }}
                   >
+                    {data.platforms.includes('google') && (
+                      <div className="absolute top-3 right-3 rounded-full bg-primary p-1">
+                        <Check className="h-3 w-3 text-primary-foreground" />
+                      </div>
+                    )}
                     <CardContent className="flex flex-col items-center justify-center py-8">
                       <Smartphone className="h-12 w-12 mb-4" />
                       <h3 className="font-semibold mb-1">Google Wallet</h3>
                     </CardContent>
                   </Card>
                 </div>
-                {errors.platform && (
-                  <p className="text-sm text-destructive mt-2">{errors.platform}</p>
+                {errors.platforms && (
+                  <p className="text-sm text-destructive mt-2">{errors.platforms}</p>
                 )}
               </CardContent>
             </Card>
@@ -443,10 +463,10 @@ export default function TemplatesCreate() {
                 <CardTitle>Live Preview</CardTitle>
               </CardHeader>
               <CardContent>
-                {data.platform ? (
+                {data.platforms.length > 0 ? (
                   <PassPreview
                     passData={data.design_data}
-                    platform={data.platform}
+                    platform={data.platforms[0]}
                   />
                 ) : (
                   <div className="flex items-center justify-center h-64 bg-muted/30 rounded-lg">

@@ -93,18 +93,20 @@ export default function PassesEdit({ pass }: PassesEditProps) {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label>Platform</Label>
+                  <Label>Platforms</Label>
                   <div className="flex items-center gap-2 mt-2">
-                    {pass.platform === 'apple' ? (
-                      <>
+                    {pass.platforms.includes('apple') && (
+                      <div className="flex items-center gap-1">
                         <Apple className="h-4 w-4" />
                         <span>Apple Wallet</span>
-                      </>
-                    ) : (
-                      <>
+                      </div>
+                    )}
+                    {pass.platforms.length === 2 && <span className="text-muted-foreground">+</span>}
+                    {pass.platforms.includes('google') && (
+                      <div className="flex items-center gap-1">
                         <Smartphone className="h-4 w-4" />
                         <span>Google Wallet</span>
-                      </>
+                      </div>
                     )}
                     <Badge variant="secondary" className="ml-2">Read-only</Badge>
                   </div>
@@ -502,7 +504,7 @@ export default function PassesEdit({ pass }: PassesEditProps) {
                 <PassPreview
                   passData={data.pass_data}
                   barcodeData={data.has_barcode ? data.barcode_data : undefined}
-                  platform={pass.platform}
+                  platform={pass.platforms[0] || 'apple'}
                 />
               </CardContent>
             </Card>

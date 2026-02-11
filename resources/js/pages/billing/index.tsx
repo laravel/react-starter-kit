@@ -142,18 +142,10 @@ export default function BillingIndex({
                       : `Up to ${passLimit} passes`}
                   </span>
                 </div>
-                {currentPlan.platforms.includes('apple') && (
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Apple Wallet support</span>
-                  </div>
-                )}
-                {currentPlan.platforms.includes('google') && (
-                  <div className="flex items-center gap-2">
-                    <Check className="h-4 w-4 text-primary" />
-                    <span className="text-sm">Google Wallet support</span>
-                  </div>
-                )}
+                <div className="flex items-center gap-2">
+                  <Check className="h-4 w-4 text-primary" />
+                  <span className="text-sm">Apple Wallet + Google Wallet</span>
+                </div>
                 <div className="flex items-center gap-2">
                   <Check className="h-4 w-4 text-primary" />
                   <span className="text-sm">Public pass sharing</span>
@@ -174,7 +166,7 @@ export default function BillingIndex({
               <div className="bg-primary/5 border border-primary/20 rounded-lg p-4">
                 <h4 className="font-semibold mb-1">Ready to upgrade?</h4>
                 <p className="text-sm text-muted-foreground mb-3">
-                  Unlock unlimited passes and full platform support with a Pro or Unlimited plan.
+                  Unlock more passes and premium features with a paid plan.
                 </p>
                 <Button size="sm" onClick={() => document.getElementById('plans')?.scrollIntoView({ behavior: 'smooth' })}>
                   View Plans
@@ -187,7 +179,7 @@ export default function BillingIndex({
         {/* Available Plans */}
         <div id="plans">
           <h3 className="text-2xl font-bold mb-6">Available Plans</h3>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
             {plans.map((plan) => (
               <PlanCard
                 key={plan.key}

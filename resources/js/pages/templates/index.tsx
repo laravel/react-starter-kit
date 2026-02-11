@@ -45,11 +45,12 @@ export default function TemplatesIndex({ templates }: TemplatesIndexProps) {
     setDeleteDialogOpen(true);
   };
 
-  const getPlatformIcon = (platform: PassPlatform) => {
-    return platform === 'apple' ? (
-      <Apple className="h-4 w-4" />
-    ) : (
-      <Smartphone className="h-4 w-4" />
+  const getPlatformIcons = (platforms: PassPlatform[]) => {
+    return (
+      <div className="flex items-center gap-1">
+        {platforms.includes('apple') && <Apple className="h-4 w-4" />}
+        {platforms.includes('google') && <Smartphone className="h-4 w-4" />}
+      </div>
     );
   };
 
@@ -106,7 +107,7 @@ export default function TemplatesIndex({ templates }: TemplatesIndexProps) {
                       </CardDescription>
                     </div>
                     <div className="flex items-center gap-1">
-                      {getPlatformIcon(template.platform)}
+                      {getPlatformIcons(template.platforms)}
                     </div>
                   </div>
                   <div className="flex items-center gap-2 mt-2">
@@ -122,7 +123,7 @@ export default function TemplatesIndex({ templates }: TemplatesIndexProps) {
                     <div className="transform scale-75 origin-top-left w-[133%]">
                       <PassPreview
                         passData={template.design_data}
-                        platform={template.platform}
+                        platform={template.platforms[0] || 'apple'}
                       />
                     </div>
                   </div>

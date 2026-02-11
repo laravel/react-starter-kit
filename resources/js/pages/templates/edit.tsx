@@ -88,18 +88,19 @@ export default function TemplatesEdit({ template }: TemplatesEditProps) {
                 </div>
 
                 <div>
-                  <Label>Platform</Label>
-                  <div className="flex items-center gap-2 mt-2">
-                    {template.platform === 'apple' ? (
-                      <>
+                  <Label>Platforms</Label>
+                  <div className="flex items-center gap-3 mt-2">
+                    {template.platforms.includes('apple') && (
+                      <div className="flex items-center gap-1">
                         <Apple className="h-4 w-4" />
                         <span>Apple Wallet</span>
-                      </>
-                    ) : (
-                      <>
+                      </div>
+                    )}
+                    {template.platforms.includes('google') && (
+                      <div className="flex items-center gap-1">
                         <Smartphone className="h-4 w-4" />
                         <span>Google Wallet</span>
-                      </>
+                      </div>
                     )}
                     <Badge variant="secondary" className="ml-2">Read-only</Badge>
                   </div>
@@ -386,7 +387,7 @@ export default function TemplatesEdit({ template }: TemplatesEditProps) {
               <CardContent>
                 <PassPreview
                   passData={data.design_data}
-                  platform={template.platform}
+                  platform={template.platforms[0] || 'apple'}
                 />
               </CardContent>
             </Card>

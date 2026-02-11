@@ -20,7 +20,7 @@ class PassController extends Controller
 
         // Apply filters
         if ($request->filled('platform')) {
-            $query->where('platform', $request->platform);
+            $query->whereJsonContains('platforms', $request->platform);
         }
 
         if ($request->filled('status')) {

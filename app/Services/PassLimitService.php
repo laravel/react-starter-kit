@@ -10,7 +10,7 @@ class PassLimitService
      * Get the current subscription plan for a user.
      *
      * @param User $user
-     * @return string Plan key (free, pro_apple, pro_google, unlimited)
+     * @return string Plan key (free, starter, growth, business)
      */
     public function getCurrentPlan(User $user): string
     {
@@ -33,19 +33,21 @@ class PassLimitService
     }
 
     /**
-     * Check if a user can create a pass for the given platform.
+     * Check if a user can create a pass for the given platforms.
      *
      * @param User $user
-     * @param string $platform
+     * @param array $platforms
      * @return bool
      */
-    public function canCreatePass(User $user, string $platform): bool
+    public function canCreatePass(User $user, array $platforms): bool
     {
         $planConfig = $this->getPlanConfig($user);
 
-        // Check if platform is allowed
-        if (!in_array($platform, $planConfig['platforms'])) {
-            return false;
+        // Check if all requested platforms are allowed
+        foreach ($platforms as $platform) {
+            if (!in_array($platform, $planConfig['platforms'])) {
+                return false;
+            }
         }
 
         // Check pass limit

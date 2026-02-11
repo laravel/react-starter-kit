@@ -48,7 +48,7 @@ const breadcrumbs: BreadcrumbItem[] = [
 ];
 
 export default function ApiTokens({ tokens }: Props) {
-    const { flash } = usePage<{ flash: { success?: string; token?: string } }>().props;
+    const { flash } = usePage<{ flash?: { success?: string; token?: string } }>().props;
     const [showCreateDialog, setShowCreateDialog] = useState(false);
     const [newToken, setNewToken] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
@@ -59,10 +59,10 @@ export default function ApiTokens({ tokens }: Props) {
 
     // Capture the token from flash when it's available
     useEffect(() => {
-        if (flash.token) {
+        if (flash?.token) {
             setNewToken(flash.token);
         }
-    }, [flash.token]);
+    }, [flash?.token]);
 
     const handleCreate = (e: React.FormEvent) => {
         e.preventDefault();
@@ -255,7 +255,7 @@ export default function ApiTokens({ tokens }: Props) {
 {`{
   "template_id": 1,
   "member_id": "MEMBER123",
-  "platform": "apple",
+  "platforms": ["apple", "google"],
   "custom_fields": {
     "name": "John Doe",
     "points": "1000"
@@ -273,7 +273,7 @@ export default function ApiTokens({ tokens }: Props) {
   -d '{
     "template_id": 1,
     "member_id": "CUSTOMER123",
-    "platform": "apple",
+    "platforms": ["apple", "google"],
     "custom_fields": {
       "name": "John Doe"
     }

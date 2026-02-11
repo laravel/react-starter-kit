@@ -60,7 +60,7 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
   const totalSteps = 5;
 
   const { data, setData, post, processing, errors } = useForm({
-    platform: '' as PassPlatform | '',
+    platforms: [] as PassPlatform[],
     pass_type: '' as PassType | '',
     pass_template_id: '',
     pass_data: {
@@ -86,8 +86,13 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
     images: {},
   });
 
-  const handlePlatformSelect = (platform: PassPlatform) => {
-    setData('platform', platform);
+  const handlePlatformToggle = (platform: PassPlatform) => {
+    const current = data.platforms;
+    if (current.includes(platform)) {
+      setData('platforms', current.filter(p => p !== platform));
+    } else {
+      setData('platforms', [...current, platform]);
+    }
   };
 
   const handlePassTypeSelect = (passType: PassType) => {
@@ -105,7 +110,7 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
       setData({
         ...data,
         pass_template_id: templateId,
-        platform: template.platform,
+        platforms: template.platforms,
         pass_type: template.pass_type,
         pass_data: template.design_data,
         images: template.images,
@@ -119,7 +124,7 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
   };
 
   const canProceed = () => {
-    if (step === 1) return data.platform && data.pass_type;
+    if (step === 1) return data.platforms.length > 0 && data.pass_type;
     if (step === 2) return data.pass_data.description && data.pass_data.organizationName;
     return true;
   };
@@ -207,9 +212,9 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Select Platform</CardTitle>
+                  <CardTitle>Select Platforms</CardTitle>
                   <CardDescription>
-                    Choose between Apple Wallet or Google Wallet
+                    Choose one or both wallet platforms for this pass
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -217,12 +222,19 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                     <Card
                       className={cn(
                         'cursor-pointer transition-colors hover:border-primary',
-                        data.platform === 'apple' && 'border-primary bg-primary/5'
+                        data.platforms.includes('apple') && 'border-primary bg-primary/5'
                       )}
-                      onClick={() => handlePlatformSelect('apple')}
+                      onClick={() => handlePlatformToggle('apple')}
                     >
                       <CardContent className="flex flex-col items-center justify-center py-8">
-                        <Apple className="h-12 w-12 mb-4" />
+                        <div className="relative">
+                          <Apple className="h-12 w-12 mb-4" />
+                          {data.platforms.includes('apple') && (
+                            <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          )}
+                        </div>
                         <h3 className="font-semibold mb-1">Apple Wallet</h3>
                         <p className="text-sm text-muted-foreground text-center">
                           For iPhone and Apple Watch users
@@ -233,12 +245,19 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                     <Card
                       className={cn(
                         'cursor-pointer transition-colors hover:border-primary',
-                        data.platform === 'google' && 'border-primary bg-primary/5'
+                        data.platforms.includes('google') && 'border-primary bg-primary/5'
                       )}
-                      onClick={() => handlePlatformSelect('google')}
+                      onClick={() => handlePlatformToggle('google')}
                     >
                       <CardContent className="flex flex-col items-center justify-center py-8">
-                        <Smartphone className="h-12 w-12 mb-4" />
+                        <div className="relative">
+                          <Smartphone className="h-12 w-12 mb-4" />
+                          {data.platforms.includes('google') && (
+                            <div className="absolute -top-1 -right-1 bg-primary text-primary-foreground rounded-full p-0.5">
+                              <Check className="h-3 w-3" />
+                            </div>
+                          )}
+                        </div>
                         <h3 className="font-semibold mb-1">Google Wallet</h3>
                         <p className="text-sm text-muted-foreground text-center">
                           For Android device users
@@ -246,8 +265,14 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                       </CardContent>
                     </Card>
                   </div>
-                  {errors.platform && (
-                    <p className="text-sm text-destructive mt-2">{errors.platform}</p>
+                  {data.platforms.length === 2 && (
+                    <p className="text-sm text-primary mt-3 flex items-center gap-1">
+                      <Check className="h-4 w-4" />
+                      Both platforms selected — this pass will be available on Apple and Google Wallet
+                    </p>
+                  )}
+                  {errors.platforms && (
+                    <p className="text-sm text-destructive mt-2">{errors.platforms}</p>
                   )}
                 </CardContent>
               </Card>
@@ -540,15 +565,8 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                     <PassPreview
                       passData={data.pass_data}
                       barcodeData={data.has_barcode ? data.barcode_data : undefined}
-                      platform={data.platform}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Barcode */}
+                      platform={data.platforms[0] || 'apple'}
+                    />}
           {step === 3 && (
             <Card>
               <CardHeader>
@@ -790,18 +808,20 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <Label className="text-muted-foreground">Platform</Label>
+                      <Label className="text-muted-foreground">Platforms</Label>
                       <div className="flex items-center gap-2 mt-1">
-                        {data.platform === 'apple' ? (
-                          <>
+                        {data.platforms.includes('apple') && (
+                          <div className="flex items-center gap-1">
                             <Apple className="h-4 w-4" />
                             <span>Apple Wallet</span>
-                          </>
-                        ) : (
-                          <>
+                          </div>
+                        )}
+                        {data.platforms.length === 2 && <span className="text-muted-foreground">+</span>}
+                        {data.platforms.includes('google') && (
+                          <div className="flex items-center gap-1">
                             <Smartphone className="h-4 w-4" />
                             <span>Google Wallet</span>
-                          </>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -848,7 +868,7 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                     <pre className="text-xs bg-muted p-4 rounded-lg overflow-auto max-h-96">
                       {JSON.stringify(
                         {
-                          platform: data.platform,
+                          platforms: data.platforms,
                           pass_type: data.pass_type,
                           pass_data: data.pass_data,
                           barcode_data: data.has_barcode ? data.barcode_data : null,
@@ -870,7 +890,7 @@ export default function PassesCreate({ templates }: PassesCreateProps) {
                     <PassPreview
                       passData={data.pass_data}
                       barcodeData={data.has_barcode ? data.barcode_data : undefined}
-                      platform={data.platform}
+                      platform={data.platforms[0] || 'apple'}
                     />
                   </CardContent>
                 </Card>

@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import type { Plan, PlanKey } from '@/types/pass';
-import { Check } from 'lucide-react';
+import { Check, Minus } from 'lucide-react';
 
 interface PlanCardProps {
 	plan: Plan;
@@ -18,25 +18,61 @@ interface PlanCardProps {
 	onSelect: () => void;
 }
 
+interface Feature {
+	label: string;
+	included: boolean;
+}
+
 export function PlanCard({ plan, planKey, isCurrent, onSelect }: PlanCardProps) {
 	const prices: Record<PlanKey, string> = {
 		free: '$0',
-		pro_apple: '$29',
-		pro_google: '$29',
-		unlimited: '$49',
+		starter: '$19',
+		growth: '$49',
+		business: '$99',
+		enterprise: 'Custom',
 	};
 
-	const passLimitText = plan.pass_limit === null ? 'Unlimited' : plan.pass_limit;
+	const descriptions: Record<PlanKey, string> = {
+		free: 'Get started for free',
+		starter: 'For small projects',
+		growth: 'For growing businesses',
+		business: 'For large-scale operations',
+		enterprise: 'For 30,000+ passes',
+	};
+
+	const features: Feature[] = [
+		{
+			label: plan.pass_limit ? `${plan.pass_limit.toLocaleString()} passes` : 'Unlimited passes',
+			included: true,
+		},
+		{ label: 'Apple Wallet + Google Wallet', included: true },
+		{ label: 'Pass templates', included: true },
+		{ label: 'All pass types', included: true },
+		{
+			label: 'API access',
+			included: planKey === 'growth' || planKey === 'business' || planKey === 'enterprise',
+		},
+		{
+			label: 'Priority support',
+			included: planKey === 'business' || planKey === 'enterprise',
+		},
+		{
+			label: 'Dedicated account manager',
+			included: planKey === 'enterprise',
+		},
+	];
+
+	const isEnterprise = planKey === 'enterprise';
 
 	return (
-		<Card className={isCurrent ? 'border-primary' : ''}>
+		<Card className={`flex flex-col ${isCurrent ? 'border-primary' : ''}`}>
 			<CardHeader>
 				<div className="flex items-start justify-between">
 					<div>
 						<CardTitle>{plan.name}</CardTitle>
 						<div className="mt-2 flex items-baseline gap-1">
 							<span className="text-3xl font-bold">{prices[planKey]}</span>
-							{planKey !== 'free' && (
+							{!isEnterprise && planKey !== 'free' && (
 								<span className="text-sm text-muted-foreground">/month</span>
 							)}
 						</div>
@@ -44,47 +80,41 @@ export function PlanCard({ plan, planKey, isCurrent, onSelect }: PlanCardProps) 
 					{isCurrent && <Badge>Current Plan</Badge>}
 				</div>
 				<CardDescription className="mt-2">
-					Create up to {passLimitText} passes
+					{descriptions[planKey]}
 				</CardDescription>
 			</CardHeader>
-			<CardContent>
+			<CardContent className="flex-1">
 				<ul className="space-y-2 text-sm">
-					<li className="flex items-center gap-2">
-						<Check className="h-4 w-4 text-primary" />
-						<span>
-							{passLimitText === 'Unlimited'
-								? 'Unlimited passes'
-								: `${passLimitText} passes total`}
-						</span>
-					</li>
-					<li className="flex items-center gap-2">
-						<Check className="h-4 w-4 text-primary" />
-						<span>
-							Platforms:{' '}
-							{plan.platforms
-								.map((p) => (p === 'apple' ? 'Apple' : 'Google'))
-								.join(' + ')}
-						</span>
-					</li>
-					<li className="flex items-center gap-2">
-						<Check className="h-4 w-4 text-primary" />
-						<span>Pass templates</span>
-					</li>
-					<li className="flex items-center gap-2">
-						<Check className="h-4 w-4 text-primary" />
-						<span>All pass types</span>
-					</li>
+					{features.map((feature) => (
+						<li key={feature.label} className="flex items-center gap-2">
+							{feature.included ? (
+								<Check className="h-4 w-4 shrink-0 text-primary" />
+							) : (
+								<Minus className="h-4 w-4 shrink-0 text-muted-foreground/40" />
+							)}
+							<span className={feature.included ? '' : 'text-muted-foreground/60'}>
+								{feature.label}
+							</span>
+						</li>
+					))}
 				</ul>
 			</CardContent>
 			<CardFooter>
-				{!isCurrent && (
-					<Button onClick={onSelect} className="w-full">
-						{planKey === 'free' ? 'Current Plan' : 'Upgrade'}
-					</Button>
-				)}
-				{isCurrent && planKey !== 'free' && (
+				{isCurrent ? (
 					<Button variant="outline" className="w-full" disabled>
 						Active
+					</Button>
+				) : isEnterprise ? (
+					<Button variant="outline" className="w-full" asChild>
+						<a href="mailto:sales@larapasskit.com">Contact Sales</a>
+					</Button>
+				) : planKey === 'free' ? (
+					<Button variant="outline" className="w-full" disabled>
+						Free
+					</Button>
+				) : (
+					<Button onClick={onSelect} className="w-full">
+						Upgrade
 					</Button>
 				)}
 			</CardFooter>

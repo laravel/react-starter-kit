@@ -53,23 +53,29 @@ return [
             'platforms' => ['apple', 'google'],
             'stripe_price_id' => null,
         ],
-        'pro_apple' => [
-            'name' => 'Pro Apple',
-            'pass_limit' => null, // unlimited
-            'platforms' => ['apple'],
-            'stripe_price_id' => env('STRIPE_PRO_APPLE_PRICE_ID'),
-        ],
-        'pro_google' => [
-            'name' => 'Pro Google',
-            'pass_limit' => null, // unlimited
-            'platforms' => ['google'],
-            'stripe_price_id' => env('STRIPE_PRO_GOOGLE_PRICE_ID'),
-        ],
-        'unlimited' => [
-            'name' => 'Unlimited',
-            'pass_limit' => null, // unlimited
+        'starter' => [
+            'name' => 'Starter',
+            'pass_limit' => 100,
             'platforms' => ['apple', 'google'],
-            'stripe_price_id' => env('STRIPE_UNLIMITED_PRICE_ID'),
+            'stripe_price_id' => env('STRIPE_STARTER_PRICE_ID'),
+        ],
+        'growth' => [
+            'name' => 'Growth',
+            'pass_limit' => 500,
+            'platforms' => ['apple', 'google'],
+            'stripe_price_id' => env('STRIPE_GROWTH_PRICE_ID'),
+        ],
+        'business' => [
+            'name' => 'Business',
+            'pass_limit' => 2000,
+            'platforms' => ['apple', 'google'],
+            'stripe_price_id' => env('STRIPE_BUSINESS_PRICE_ID'),
+        ],
+        'enterprise' => [
+            'name' => 'Enterprise',
+            'pass_limit' => null,
+            'platforms' => ['apple', 'google'],
+            'stripe_price_id' => env('STRIPE_ENTERPRISE_PRICE_ID'),
         ],
     ],
 

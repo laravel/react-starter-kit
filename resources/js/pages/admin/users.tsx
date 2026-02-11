@@ -64,16 +64,18 @@ export default function AdminUsers({ users, filters }: AdminUsersProps) {
   const getPlanBadge = (plan: string) => {
     const variants: Record<string, 'default' | 'secondary' | 'outline'> = {
       free: 'outline',
-      pro_apple: 'default',
-      pro_google: 'default',
-      unlimited: 'default',
+      starter: 'default',
+      growth: 'default',
+      business: 'default',
+      enterprise: 'default',
     };
 
     const labels: Record<string, string> = {
       free: 'Free',
-      pro_apple: 'Pro Apple',
-      pro_google: 'Pro Google',
-      unlimited: 'Unlimited',
+      starter: 'Starter',
+      growth: 'Growth',
+      business: 'Business',
+      enterprise: 'Enterprise',
     };
 
     return (

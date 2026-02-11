@@ -65,12 +65,12 @@ export function AppSidebar() {
     const footerNavItems: NavItem[] = [
         {
             title: 'API',
-            href: apiTokensRoutes.index().url,
+            href: apiTokensRoutes.index(),
             icon: Key,
         },
         {
             title: 'Business',
-            href: businessRoutes.index().url,
+            href: businessRoutes.index(),
             icon: Building2,
         },
     ];
