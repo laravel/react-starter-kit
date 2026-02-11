@@ -1,32 +1,52 @@
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import passes from '@/routes/passes';
+import type { PassImageUploadResult, PassImageSlot, PassPlatform } from '@/types/pass';
 import { cn } from '@/lib/utils';
-import { router } from '@inertiajs/react';
-import { Upload, X } from 'lucide-react';
-import { useState } from 'react';
+import { AlertTriangle, Upload, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface ImageUploaderProps {
 	label: string;
-	type: string;
+	slot: PassImageSlot;
+	platform: PassPlatform;
 	value?: string;
-	onUpload: (path: string) => void;
+	qualityWarning?: boolean;
+	resizeMode?: 'contain' | 'cover';
+	onUpload: (result: PassImageUploadResult) => void;
+	onRemove: () => void;
 	description?: string;
 }
 
 export function ImageUploader({
 	label,
-	type,
+	slot,
+	platform,
 	value,
+	qualityWarning,
+	resizeMode,
 	onUpload,
+	onRemove,
 	description,
 }: ImageUploaderProps) {
 	const [uploading, setUploading] = useState(false);
 	const [preview, setPreview] = useState<string | undefined>(value);
 	const [dragActive, setDragActive] = useState(false);
+	const [showQualityWarning, setShowQualityWarning] = useState(
+		qualityWarning ?? false,
+	);
+
+	useEffect(() => {
+		setPreview(value);
+	}, [value]);
+
+	useEffect(() => {
+		setShowQualityWarning(qualityWarning ?? false);
+	}, [qualityWarning]);
 
 	const handleFile = async (file: File) => {
-		if (!file.type.startsWith('image/png')) {
-			alert('Only PNG images are allowed');
+		if (!file.type.startsWith('image/')) {
+			alert('Only image files are allowed');
 			return;
 		}
 
@@ -39,10 +59,12 @@ export function ImageUploader({
 
 		const formData = new FormData();
 		formData.append('image', file);
-		formData.append('type', type);
+		formData.append('slot', slot);
+		formData.append('platform', platform);
+		formData.append('resize_mode', resizeMode ?? 'contain');
 
 		try {
-			const response = await fetch(route('passes.images.store'), {
+			const response = await fetch(passes.images.store().url, {
 				method: 'POST',
 				body: formData,
 				headers: {
@@ -54,9 +76,11 @@ export function ImageUploader({
 
 			if (!response.ok) throw new Error('Upload failed');
 
-			const data = await response.json();
-			setPreview(data.url);
-			onUpload(data.path);
+			const data = (await response.json()) as PassImageUploadResult;
+			const nextPreview = data.variants[0]?.url ?? data.original.url;
+			setPreview(nextPreview);
+			setShowQualityWarning(data.variants.some((variant) => variant.quality_warning));
+			onUpload(data);
 		} catch (error) {
 			alert('Failed to upload image');
 			console.error(error);
@@ -93,7 +117,8 @@ export function ImageUploader({
 
 	const handleRemove = () => {
 		setPreview(undefined);
-		onUpload('');
+		setShowQualityWarning(false);
+		onRemove();
 	};
 
 	return (
@@ -112,6 +137,12 @@ export function ImageUploader({
 						alt={label}
 						className="h-24 w-24 rounded-lg border object-cover"
 					/>
+					{showQualityWarning && (
+						<div className="mt-2 flex items-center gap-2 text-xs text-amber-600">
+							<AlertTriangle className="h-3 w-3" />
+							<span>Image may appear blurry at required size.</span>
+						</div>
+					)}
 					<Button
 						type="button"
 						variant="destructive"

@@ -11,8 +11,8 @@
 
 **Purpose**: Shared configuration and scaffolding for image resizing and previews.
 
-- [ ] T001 [P] Add image size map and resize defaults in config/passkit.php
-- [ ] T002 [P] Add image metadata types (originals/variants) and slot/platform helpers in resources/js/types/pass.ts
+- [x] T001 [P] Add image size map and resize defaults in config/passkit.php
+- [x] T002 [P] Add image metadata types (originals/variants) and slot/platform helpers in resources/js/types/pass.ts
 
 ---
 
@@ -20,10 +20,10 @@
 
 **Purpose**: Core backend services and validation needed before user story work.
 
-- [ ] T003 Create PassImageRequest with validation for image, slot, platform, resize_mode in app/Http/Requests/PassImageRequest.php
-- [ ] T004 Implement PassImageService with GD resizing (contain + transparent padding) and variant storage in app/Services/PassImageService.php
-- [ ] T005 [P] Add ProcessPassImageJob for optional async resizing when uploads exceed threshold in app/Jobs/ProcessPassImageJob.php
-- [ ] T006 Update PassImageController to use PassImageRequest + PassImageService and return contract response in app/Http/Controllers/PassImageController.php
+- [x] T003 Create PassImageRequest with validation for image, slot, platform, resize_mode in app/Http/Requests/PassImageRequest.php
+- [x] T004 Implement PassImageService with GD resizing (contain + transparent padding) and variant storage in app/Services/PassImageService.php
+- [x] T005 [P] Add ProcessPassImageJob for optional async resizing when uploads exceed threshold in app/Jobs/ProcessPassImageJob.php
+- [x] T006 Update PassImageController to use PassImageRequest + PassImageService and return contract response in app/Http/Controllers/PassImageController.php
 
 **Checkpoint**: Foundation ready - user story implementation can now begin in parallel.
 
@@ -37,18 +37,18 @@
 
 ### Tests for User Story 1 (REQUIRED) ⚠️
 
-- [ ] T007 [P] [US1] Add feature test for successful upload + variant response in tests/Feature/PassImageUploadTest.php
-- [ ] T008 [P] [US1] Add feature test for invalid file type/size/slot validation errors in tests/Feature/PassImageUploadTest.php
+- [x] T007 [P] [US1] Add feature test for successful upload + variant response in tests/Feature/PassImageUploadTest.php
+- [x] T008 [P] [US1] Add feature test for invalid file type/size/slot validation errors in tests/Feature/PassImageUploadTest.php
 
 ### Implementation for User Story 1
 
-- [ ] T009 [US1] Update pass creation image handling to store upload metadata (originals/variants) in resources/js/pages/passes/create.tsx
-- [ ] T010 [US1] Update pass edit image handling to store upload metadata (originals/variants) in resources/js/pages/passes/edit.tsx
-- [ ] T011 [US1] Update template creation image handling to store upload metadata in resources/js/pages/templates/create.tsx
-- [ ] T012 [US1] Update template edit image handling to store upload metadata in resources/js/pages/templates/edit.tsx
-- [ ] T013 [US1] Update ImageUploader to send slot/platform/resize_mode and accept variant responses in resources/js/components/image-uploader.tsx
-- [ ] T014 [US1] Align pass/template store validation for new images JSON shape in app/Http/Controllers/PassController.php and app/Http/Controllers/PassTemplateController.php
-- [ ] T015 [US1] Map Apple pass image selection to new variants structure in app/Services/ApplePassService.php
+- [x] T009 [US1] Update pass creation image handling to store upload metadata (originals/variants) in resources/js/pages/passes/create.tsx
+- [x] T010 [US1] Update pass edit image handling to store upload metadata (originals/variants) in resources/js/pages/passes/edit.tsx
+- [x] T011 [US1] Update template creation image handling to store upload metadata in resources/js/pages/templates/create.tsx
+- [x] T012 [US1] Update template edit image handling to store upload metadata in resources/js/pages/templates/edit.tsx
+- [x] T013 [US1] Update ImageUploader to send slot/platform/resize_mode and accept variant responses in resources/js/components/image-uploader.tsx
+- [x] T014 [US1] Align pass/template store validation for new images JSON shape in app/Http/Controllers/PassController.php and app/Http/Controllers/PassTemplateController.php
+- [x] T015 [US1] Map Apple pass image selection to new variants structure in app/Services/ApplePassService.php
 
 **Checkpoint**: User Story 1 fully functional and independently testable.
 
@@ -62,13 +62,13 @@
 
 ### Tests for User Story 2 (REQUIRED) ⚠️
 
-- [ ] T016 [P] [US2] Add feature test coverage for preview platform availability on create/edit pages in tests/Feature/PassPreviewPlatformTest.php
+- [x] T016 [P] [US2] Add feature test coverage for preview platform availability on create/edit pages in tests/Feature/PassPreviewPlatformTest.php
 
 ### Implementation for User Story 2
 
-- [ ] T017 [US2] Add preview platform toggle and state to pass create/edit screens in resources/js/pages/passes/create.tsx and resources/js/pages/passes/edit.tsx
-- [ ] T018 [US2] Add preview platform toggle and state to template create/edit screens in resources/js/pages/templates/create.tsx and resources/js/pages/templates/edit.tsx
-- [ ] T019 [US2] Update PassPreview to render platform-specific layout differences (if applicable) in resources/js/components/pass-preview.tsx
+- [x] T017 [US2] Add preview platform toggle and state to pass create/edit screens in resources/js/pages/passes/create.tsx and resources/js/pages/passes/edit.tsx
+- [x] T018 [US2] Add preview platform toggle and state to template create/edit screens in resources/js/pages/templates/create.tsx and resources/js/pages/templates/edit.tsx
+- [x] T019 [US2] Update PassPreview to render platform-specific layout differences (if applicable) in resources/js/components/pass-preview.tsx
 
 **Checkpoint**: User Story 2 works independently on create/edit flows.
 
@@ -82,11 +82,11 @@
 
 ### Tests for User Story 3 (REQUIRED) ⚠️
 
-- [ ] T020 [P] [US3] Add feature test for undersized image warning flag in tests/Feature/PassImageUploadTest.php
+- [x] T020 [P] [US3] Add feature test for undersized image warning flag in tests/Feature/PassImageUploadTest.php
 
 ### Implementation for User Story 3
 
-- [ ] T021 [US3] Display quality warning messaging in ImageUploader using response metadata in resources/js/components/image-uploader.tsx
+- [x] T021 [US3] Display quality warning messaging in ImageUploader using response metadata in resources/js/components/image-uploader.tsx
 
 **Checkpoint**: User Story 3 works independently and surfaces warnings.
 
@@ -96,8 +96,8 @@
 
 **Purpose**: Validation and cross-story cleanup.
 
-- [ ] T022 [P] Run quickstart validation steps and update specs/001-pass-image-resize-preview/quickstart.md if needed
-- [ ] T023 [P] Run minimal test command and record in tasks notes (php artisan test --compact tests/Feature/PassImageUploadTest.php) in specs/001-pass-image-resize-preview/quickstart.md
+- [x] T022 [P] Run quickstart validation steps and update specs/001-pass-image-resize-preview/quickstart.md if needed
+- [x] T023 [P] Run minimal test command and record in tasks notes (php artisan test --compact tests/Feature/PassImageUploadTest.php) in specs/001-pass-image-resize-preview/quickstart.md
 
 ---
 

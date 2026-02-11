@@ -17,7 +17,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Apple, ArrowLeft, Check, Copy, Download, Edit, ExternalLink, QrCode, Smartphone, Trash2 } from 'lucide-react';
+import { Apple, ArrowLeft, Check, Chrome, Copy, Download, Edit, ExternalLink, QrCode, Trash2 } from 'lucide-react';
 import { Pass, PassStatus } from '@/types/pass';
 import { PassPreview } from '@/components/pass-preview';
 import { format } from 'date-fns';
@@ -154,7 +154,7 @@ export default function PassesShow({ pass, publicUrl }: PassesShowProps) {
                     {pass.platforms.length === 2 && <span className="text-muted-foreground">+</span>}
                     {pass.platforms.includes('google') && (
                       <div className="flex items-center gap-1">
-                        <Smartphone className="h-4 w-4" />
+                        <Chrome className="h-4 w-4" />
                         <span>Google Wallet</span>
                       </div>
                     )}

@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { Apple, Plus, Smartphone, Trash2 } from 'lucide-react';
+import { Apple, Chrome, Plus, Trash2 } from 'lucide-react';
 import { Pass, PassPlatform, PassStatus, PassType } from '@/types/pass';
 import { PaginatedData } from '@/types';
 import { formatDistance } from 'date-fns';
@@ -54,7 +54,7 @@ export default function PassesIndex({ passes, filters }: PassesIndexProps) {
     return (
       <div className="flex items-center gap-1">
         {platforms.includes('apple') && <Apple className="h-4 w-4" />}
-        {platforms.includes('google') && <Smartphone className="h-4 w-4" />}
+        {platforms.includes('google') && <Chrome className="h-4 w-4" />}
       </div>
     );
   };
@@ -187,7 +187,7 @@ export default function PassesIndex({ passes, filters }: PassesIndexProps) {
           <CardContent>
             {passes.data.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
-                <Smartphone className="h-12 w-12 text-muted-foreground mb-4" />
+                <Chrome className="h-12 w-12 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No passes found</h3>
                 <p className="text-sm text-muted-foreground mb-6 max-w-sm">
                   {Object.keys(filters).length > 0

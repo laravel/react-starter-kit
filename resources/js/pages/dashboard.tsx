@@ -10,7 +10,7 @@ import * as passes from '@/routes/passes';
 import * as templates from '@/routes/templates';
 import * as billing from '@/routes/billing';
 import type { BreadcrumbItem, Pass } from '@/types';
-import { Apple, Plus, Smartphone, Wallet } from 'lucide-react';
+import { Apple, Chrome, Plus, Wallet } from 'lucide-react';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -40,7 +40,7 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                     <StatCard
                         title="Total Passes"
                         value={stats.totalPasses}
-                        icon={<Smartphone className="h-4 w-4" />}
+                        icon={<Wallet className="h-4 w-4" />}
                         description="All digital wallet passes"
                     />
                     <StatCard
@@ -52,7 +52,7 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                     <StatCard
                         title="Google Wallet"
                         value={stats.googlePasses}
-                        icon={<Wallet className="h-4 w-4" />}
+                        icon={<Chrome className="h-4 w-4" />}
                         description="Android passes created"
                     />
                     <StatCard
@@ -78,7 +78,7 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                         <CardContent>
                             {recentPasses.length === 0 ? (
                                 <div className="py-12 text-center text-muted-foreground">
-                                    <Smartphone className="mx-auto mb-3 h-12 w-12 opacity-50" />
+                                    <Wallet className="mx-auto mb-3 h-12 w-12 opacity-50" />
                                     <p>No passes created yet</p>
                                     <Button asChild className="mt-4">
                                         <Link href={passes.create().url}>
@@ -97,7 +97,7 @@ export default function Dashboard({ stats, recentPasses }: DashboardProps) {
                                         >
                                             <div className="flex items-center gap-3">
                                                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                                                    <Smartphone className="h-5 w-5 text-primary" />
+                                                    <Wallet className="h-5 w-5 text-primary" />
                                                 </div>
                                                 <div>
                                                     <p className="font-medium">{pass.serial_number.substring(0, 8)}...</p>

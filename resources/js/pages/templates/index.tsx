@@ -16,7 +16,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { Apple, Edit, Layers, Plus, Smartphone, Trash2 } from 'lucide-react';
+import { Apple, Chrome, Edit, Layers, Plus, Trash2 } from 'lucide-react';
 import { PassTemplate, PassPlatform } from '@/types/pass';
 import { PaginatedData } from '@/types';
 import { PassPreview } from '@/components/pass-preview';
@@ -49,7 +49,7 @@ export default function TemplatesIndex({ templates }: TemplatesIndexProps) {
     return (
       <div className="flex items-center gap-1">
         {platforms.includes('apple') && <Apple className="h-4 w-4" />}
-        {platforms.includes('google') && <Smartphone className="h-4 w-4" />}
+        {platforms.includes('google') && <Chrome className="h-4 w-4" />}
       </div>
     );
   };

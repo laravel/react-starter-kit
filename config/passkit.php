@@ -96,4 +96,73 @@ return [
         'images_path' => env('PASSKIT_IMAGES_PATH', 'pass-images'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Image Resizing
+    |--------------------------------------------------------------------------
+    |
+    | Centralized image sizing rules for pass assets.
+    |
+    */
+
+    'images' => [
+        'resize_mode' => env('PASSKIT_IMAGE_RESIZE_MODE', 'contain'),
+        'max_upload_kb' => env('PASSKIT_IMAGE_MAX_UPLOAD_KB', 1024),
+        'quality_warning_ratio' => env('PASSKIT_IMAGE_QUALITY_WARNING_RATIO', 1.0),
+        'sizes' => [
+            'apple' => [
+                'icon' => [
+                    '1x' => ['width' => 29, 'height' => 29],
+                    '2x' => ['width' => 58, 'height' => 58],
+                    '3x' => ['width' => 87, 'height' => 87],
+                ],
+                'logo' => [
+                    '1x' => ['width' => 160, 'height' => 50],
+                    '2x' => ['width' => 320, 'height' => 100],
+                    '3x' => ['width' => 480, 'height' => 150],
+                ],
+                'strip' => [
+                    '1x' => ['width' => 375, 'height' => 123],
+                    '2x' => ['width' => 750, 'height' => 246],
+                    '3x' => ['width' => 1125, 'height' => 369],
+                ],
+                'thumbnail' => [
+                    '1x' => ['width' => 90, 'height' => 90],
+                    '2x' => ['width' => 180, 'height' => 180],
+                    '3x' => ['width' => 270, 'height' => 270],
+                ],
+                'background' => [
+                    '1x' => ['width' => 180, 'height' => 220],
+                    '2x' => ['width' => 360, 'height' => 440],
+                    '3x' => ['width' => 540, 'height' => 660],
+                ],
+                'footer' => [
+                    '1x' => ['width' => 286, 'height' => 15],
+                    '2x' => ['width' => 572, 'height' => 30],
+                    '3x' => ['width' => 858, 'height' => 45],
+                ],
+            ],
+            'google' => [
+                'icon' => [
+                    '1x' => ['width' => 48, 'height' => 48],
+                ],
+                'logo' => [
+                    '1x' => ['width' => 160, 'height' => 50],
+                ],
+                'strip' => [
+                    '1x' => ['width' => 375, 'height' => 123],
+                ],
+                'thumbnail' => [
+                    '1x' => ['width' => 90, 'height' => 90],
+                ],
+                'background' => [
+                    '1x' => ['width' => 180, 'height' => 220],
+                ],
+                'footer' => [
+                    '1x' => ['width' => 286, 'height' => 15],
+                ],
+            ],
+        ],
+    ],
+
 ];

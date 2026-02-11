@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use App\Models\Pass;
-use App\Models\PassTemplate;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
@@ -29,19 +28,18 @@ class PassFactory extends Factory
     {
         $passTypes = ['generic', 'coupon', 'eventTicket', 'boardingPass', 'storeCard', 'loyalty', 'stampCard'];
         $platforms = ['apple', 'google'];
-        $platform = fake()->randomElement($platforms);
         $passType = fake()->randomElement($passTypes);
 
         return [
             'user_id' => User::factory(),
             'pass_template_id' => null,
-            'platform' => $platform,
+            'platforms' => [fake()->randomElement($platforms)],
             'pass_type' => $passType,
             'serial_number' => Str::uuid()->toString(),
             'status' => 'active',
             'pass_data' => [
                 'description' => fake()->sentence(),
-                'backgroundColor' => 'rgb(' . fake()->numberBetween(0, 255) . ',' . fake()->numberBetween(0, 255) . ',' . fake()->numberBetween(0, 255) . ')',
+                'backgroundColor' => 'rgb('.fake()->numberBetween(0, 255).','.fake()->numberBetween(0, 255).','.fake()->numberBetween(0, 255).')',
                 'foregroundColor' => 'rgb(255,255,255)',
                 'labelColor' => 'rgb(200,200,200)',
                 'headerFields' => [
@@ -82,7 +80,7 @@ class PassFactory extends Factory
     public function apple(): static
     {
         return $this->state(fn (array $attributes) => [
-            'platform' => 'apple',
+            'platforms' => ['apple'],
         ]);
     }
 
@@ -92,7 +90,7 @@ class PassFactory extends Factory
     public function google(): static
     {
         return $this->state(fn (array $attributes) => [
-            'platform' => 'google',
+            'platforms' => ['google'],
         ]);
     }
 

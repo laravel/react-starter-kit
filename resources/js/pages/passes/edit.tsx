@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import * as passes from '@/routes/passes';
 import { Badge } from '@/components/ui/badge';
@@ -14,12 +15,27 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
-import { Apple, ArrowLeft, Smartphone } from 'lucide-react';
-import { Pass, PassField } from '@/types/pass';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Apple, ArrowLeft, Chrome } from 'lucide-react';
+import {
+  type Pass,
+  type PassField,
+  type PassImageSlot,
+  type PassImages,
+  type PassImageUploadResult,
+  type PassPlatform,
+} from '@/types/pass';
 import { PassPreview } from '@/components/pass-preview';
 import { PassFieldEditor } from '@/components/pass-field-editor';
 import { ColorPicker } from '@/components/color-picker';
 import { ImageUploader } from '@/components/image-uploader';
+import {
+  applyPassImageUpload,
+  getVariantPreviewUrl,
+  getVariantQualityWarning,
+  normalizePassImages,
+  removePassImageSlot,
+} from '@/lib/pass-images';
 
 interface PassesEditProps {
   pass: Pass;
@@ -41,6 +57,7 @@ const barcodeFormats = [
 ];
 
 export default function PassesEdit({ pass }: PassesEditProps) {
+  const [previewPlatform, setPreviewPlatform] = useState<PassPlatform>(pass.platforms[0] ?? 'apple');
   const { data, setData, put, processing, errors } = useForm({
     pass_data: pass.pass_data,
     barcode_data: pass.barcode_data || {
@@ -49,8 +66,32 @@ export default function PassesEdit({ pass }: PassesEditProps) {
       altText: '',
     },
     has_barcode: !!pass.barcode_data?.message,
-    images: pass.images || {},
+    images: normalizePassImages(pass.images ?? {}, pass.platforms[0] ?? 'apple') as PassImages,
   });
+
+  const uploadPlatform = previewPlatform;
+  const normalizedImages = normalizePassImages(data.images as PassImages, uploadPlatform);
+
+  const handleImageUpload = (slot: PassImageSlot) => (result: PassImageUploadResult) => {
+    const nextImages = applyPassImageUpload(
+      normalizePassImages(data.images as PassImages, uploadPlatform),
+      uploadPlatform,
+      slot,
+      result,
+    );
+
+    setData('images', nextImages);
+  };
+
+  const handleImageRemove = (slot: PassImageSlot) => () => {
+    const nextImages = removePassImageSlot(
+      normalizePassImages(data.images as PassImages, uploadPlatform),
+      uploadPlatform,
+      slot,
+    );
+
+    setData('images', nextImages);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -104,7 +145,7 @@ export default function PassesEdit({ pass }: PassesEditProps) {
                     {pass.platforms.length === 2 && <span className="text-muted-foreground">+</span>}
                     {pass.platforms.includes('google') && (
                       <div className="flex items-center gap-1">
-                        <Smartphone className="h-4 w-4" />
+                        <Chrome className="h-4 w-4" />
                         <span>Google Wallet</span>
                       </div>
                     )}
@@ -436,58 +477,71 @@ export default function PassesEdit({ pass }: PassesEditProps) {
               <CardHeader>
                 <CardTitle>Pass Images</CardTitle>
                 <CardDescription>
-                  Update images for your pass (all images are optional)
+                    Update images for your pass. We will resize with transparent
+                    padding for the selected platform.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-6 md:grid-cols-2">
                   <ImageUploader
                     label="Icon"
-                    description="29x29 pixels"
-                    value={data.images['icon.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'icon.png': file })
-                    }
-                  />
-                  <ImageUploader
-                    label="Icon @2x"
-                    description="58x58 pixels"
-                    value={data.images['icon@2x.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'icon@2x.png': file })
-                    }
+                    description="Required for Apple Wallet"
+                    slot="icon"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'icon')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'icon')}
+                    onUpload={handleImageUpload('icon')}
+                    onRemove={handleImageRemove('icon')}
                   />
                   <ImageUploader
                     label="Logo"
-                    description="160x50 pixels"
-                    value={data.images['logo.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'logo.png': file })
-                    }
-                  />
-                  <ImageUploader
-                    label="Logo @2x"
-                    description="320x100 pixels"
-                    value={data.images['logo@2x.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'logo@2x.png': file })
-                    }
+                    description="Appears near the top of the pass"
+                    slot="logo"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'logo')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'logo')}
+                    onUpload={handleImageUpload('logo')}
+                    onRemove={handleImageRemove('logo')}
                   />
                   <ImageUploader
                     label="Background"
-                    description="180x220 pixels"
-                    value={data.images['background.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'background.png': file })
-                    }
+                    description="Optional background image"
+                    slot="background"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'background')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'background')}
+                    onUpload={handleImageUpload('background')}
+                    onRemove={handleImageRemove('background')}
                   />
                   <ImageUploader
                     label="Strip"
-                    description="375x123 pixels"
-                    value={data.images['strip.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'strip.png': file })
-                    }
+                    description="Event/coupon passes"
+                    slot="strip"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'strip')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'strip')}
+                    onUpload={handleImageUpload('strip')}
+                    onRemove={handleImageRemove('strip')}
+                  />
+                  <ImageUploader
+                    label="Thumbnail"
+                    description="Small square image"
+                    slot="thumbnail"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'thumbnail')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'thumbnail')}
+                    onUpload={handleImageUpload('thumbnail')}
+                    onRemove={handleImageRemove('thumbnail')}
+                  />
+                  <ImageUploader
+                    label="Footer"
+                    description="Optional footer image"
+                    slot="footer"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'footer')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'footer')}
+                    onUpload={handleImageUpload('footer')}
+                    onRemove={handleImageRemove('footer')}
                   />
                 </div>
               </CardContent>
@@ -500,11 +554,34 @@ export default function PassesEdit({ pass }: PassesEditProps) {
               <CardHeader>
                 <CardTitle>Live Preview</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {pass.platforms.length > 1 && (
+                  <ToggleGroup
+                    type="single"
+                    value={previewPlatform}
+                    onValueChange={(value) => {
+                      if (value) {
+                        setPreviewPlatform(value as PassPlatform);
+                      }
+                    }}
+                    className="justify-start"
+                  >
+                    {pass.platforms.includes('apple') && (
+                      <ToggleGroupItem value="apple" aria-label="Apple Wallet preview">
+                        <Apple className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    )}
+                    {pass.platforms.includes('google') && (
+                      <ToggleGroupItem value="google" aria-label="Google Wallet preview">
+                        <Chrome className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    )}
+                  </ToggleGroup>
+                )}
                 <PassPreview
                   passData={data.pass_data}
                   barcodeData={data.has_barcode ? data.barcode_data : undefined}
-                  platform={pass.platforms[0] || 'apple'}
+                  platform={previewPlatform}
                 />
               </CardContent>
             </Card>

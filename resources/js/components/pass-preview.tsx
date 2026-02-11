@@ -19,6 +19,10 @@ export function PassPreview({
 }: PassPreviewProps) {
 	const backgroundColor = passData.backgroundColor || 'rgb(59, 130, 246)';
 	const foregroundColor = passData.foregroundColor || 'rgb(255, 255, 255)';
+	const platformBadgeClass =
+		platform === 'apple'
+			? 'bg-black/20'
+			: 'bg-emerald-600/20 text-emerald-50';
 
 	return (
 		<div
@@ -100,7 +104,12 @@ export function PassPreview({
 			</div>
 
 			{/* Platform Badge */}
-			<div className="absolute right-3 top-3 rounded-full bg-black/20 px-2 py-1 text-xs font-medium backdrop-blur-sm">
+			<div
+				className={cn(
+					'absolute right-3 top-3 rounded-full px-2 py-1 text-xs font-medium backdrop-blur-sm',
+					platformBadgeClass,
+				)}
+			>
 				{platform === 'apple' ? 'Apple Wallet' : 'Google Wallet'}
 			</div>
 		</div>

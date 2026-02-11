@@ -10,8 +10,14 @@
 /resources/js/routes
 /resources/js/wayfinder
 /vendor
+dist
+build
+coverage
+*.log
 .DS_Store
+Thumbs.db
 .env
+.env.*
 .env.backup
 .env.production
 .phpactor.json

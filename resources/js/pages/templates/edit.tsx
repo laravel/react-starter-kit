@@ -1,4 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
+import { useState } from 'react';
 import AppLayout from '@/layouts/app-layout';
 import * as templates from '@/routes/templates';
 import { Button } from '@/components/ui/button';
@@ -13,12 +14,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Apple, ArrowLeft, Smartphone } from 'lucide-react';
-import { PassTemplate, PassField } from '@/types/pass';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Apple, ArrowLeft, Chrome } from 'lucide-react';
+import {
+  type PassTemplate,
+  type PassField,
+  type PassImageSlot,
+  type PassImages,
+  type PassImageUploadResult,
+  type PassPlatform,
+} from '@/types/pass';
 import { PassPreview } from '@/components/pass-preview';
 import { PassFieldEditor } from '@/components/pass-field-editor';
 import { ColorPicker } from '@/components/color-picker';
 import { ImageUploader } from '@/components/image-uploader';
+import {
+  applyPassImageUpload,
+  getVariantPreviewUrl,
+  getVariantQualityWarning,
+  normalizePassImages,
+  removePassImageSlot,
+} from '@/lib/pass-images';
 
 interface TemplatesEditProps {
   template: PassTemplate;
@@ -33,11 +49,36 @@ const transitTypes = [
 ];
 
 export default function TemplatesEdit({ template }: TemplatesEditProps) {
+  const [previewPlatform, setPreviewPlatform] = useState<PassPlatform>(template.platforms[0] ?? 'apple');
   const { data, setData, put, processing, errors } = useForm({
     name: template.name,
     design_data: template.design_data,
-    images: template.images || {},
+    images: normalizePassImages(template.images ?? {}, template.platforms[0] ?? 'apple') as PassImages,
   });
+
+  const uploadPlatform = previewPlatform;
+  const normalizedImages = normalizePassImages(data.images as PassImages, uploadPlatform);
+
+  const handleImageUpload = (slot: PassImageSlot) => (result: PassImageUploadResult) => {
+    const nextImages = applyPassImageUpload(
+      normalizePassImages(data.images as PassImages, uploadPlatform),
+      uploadPlatform,
+      slot,
+      result,
+    );
+
+    setData('images', nextImages);
+  };
+
+  const handleImageRemove = (slot: PassImageSlot) => () => {
+    const nextImages = removePassImageSlot(
+      normalizePassImages(data.images as PassImages, uploadPlatform),
+      uploadPlatform,
+      slot,
+    );
+
+    setData('images', nextImages);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -98,7 +139,7 @@ export default function TemplatesEdit({ template }: TemplatesEditProps) {
                     )}
                     {template.platforms.includes('google') && (
                       <div className="flex items-center gap-1">
-                        <Smartphone className="h-4 w-4" />
+                        <Chrome className="h-4 w-4" />
                         <span>Google Wallet</span>
                       </div>
                     )}
@@ -336,42 +377,51 @@ export default function TemplatesEdit({ template }: TemplatesEditProps) {
               <CardHeader>
                 <CardTitle>Template Images</CardTitle>
                 <CardDescription>
-                  Update default images for this template
+                  Update default images. We will resize with transparent padding
+                  for the selected platform.
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="grid gap-6 md:grid-cols-2">
                   <ImageUploader
                     label="Icon"
-                    description="29x29 pixels"
-                    value={data.images['icon.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'icon.png': file })
-                    }
+                    description="Required for Apple Wallet"
+                    slot="icon"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'icon')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'icon')}
+                    onUpload={handleImageUpload('icon')}
+                    onRemove={handleImageRemove('icon')}
                   />
                   <ImageUploader
                     label="Logo"
-                    description="160x50 pixels"
-                    value={data.images['logo.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'logo.png': file })
-                    }
+                    description="Appears near the top of the pass"
+                    slot="logo"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'logo')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'logo')}
+                    onUpload={handleImageUpload('logo')}
+                    onRemove={handleImageRemove('logo')}
                   />
                   <ImageUploader
                     label="Background"
-                    description="180x220 pixels"
-                    value={data.images['background.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'background.png': file })
-                    }
+                    description="Optional background image"
+                    slot="background"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'background')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'background')}
+                    onUpload={handleImageUpload('background')}
+                    onRemove={handleImageRemove('background')}
                   />
                   <ImageUploader
                     label="Strip"
-                    description="375x123 pixels"
-                    value={data.images['strip.png']}
-                    onChange={(file) =>
-                      setData('images', { ...data.images, 'strip.png': file })
-                    }
+                    description="Event/coupon passes"
+                    slot="strip"
+                    platform={uploadPlatform}
+                    value={getVariantPreviewUrl(normalizedImages, uploadPlatform, 'strip')}
+                    qualityWarning={getVariantQualityWarning(normalizedImages, uploadPlatform, 'strip')}
+                    onUpload={handleImageUpload('strip')}
+                    onRemove={handleImageRemove('strip')}
                   />
                 </div>
               </CardContent>
@@ -384,10 +434,33 @@ export default function TemplatesEdit({ template }: TemplatesEditProps) {
               <CardHeader>
                 <CardTitle>Live Preview</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="space-y-4">
+                {template.platforms.length > 1 && (
+                  <ToggleGroup
+                    type="single"
+                    value={previewPlatform}
+                    onValueChange={(value) => {
+                      if (value) {
+                        setPreviewPlatform(value as PassPlatform);
+                      }
+                    }}
+                    className="justify-start"
+                  >
+                    {template.platforms.includes('apple') && (
+                      <ToggleGroupItem value="apple" aria-label="Apple Wallet preview">
+                        <Apple className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    )}
+                    {template.platforms.includes('google') && (
+                      <ToggleGroupItem value="google" aria-label="Google Wallet preview">
+                        <Chrome className="h-4 w-4" />
+                      </ToggleGroupItem>
+                    )}
+                  </ToggleGroup>
+                )}
                 <PassPreview
                   passData={data.design_data}
-                  platform={template.platforms[0] || 'apple'}
+                  platform={previewPlatform}
                 />
               </CardContent>
             </Card>

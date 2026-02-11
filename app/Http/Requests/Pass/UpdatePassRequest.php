@@ -41,6 +41,20 @@ class UpdatePassRequest extends FormRequest
             'barcode_data.messageEncoding' => ['nullable', 'string'],
             'barcode_data.altText' => ['nullable', 'string'],
             'images' => ['nullable', 'array'],
+            'images.originals' => ['nullable', 'array'],
+            'images.originals.*.path' => ['required', 'string'],
+            'images.originals.*.width' => ['required', 'integer'],
+            'images.originals.*.height' => ['required', 'integer'],
+            'images.originals.*.mime' => ['required', 'string'],
+            'images.originals.*.size_bytes' => ['nullable', 'integer'],
+            'images.variants' => ['nullable', 'array'],
+            'images.variants.*' => ['array'],
+            'images.variants.*.*' => ['array'],
+            'images.variants.*.*.*.path' => ['required', 'string'],
+            'images.variants.*.*.*.url' => ['nullable', 'string'],
+            'images.variants.*.*.*.width' => ['required', 'integer'],
+            'images.variants.*.*.*.height' => ['required', 'integer'],
+            'images.variants.*.*.*.quality_warning' => ['nullable', 'boolean'],
         ];
     }
 }

@@ -31,12 +31,12 @@ class PassTemplateFactory extends Factory
 
         return [
             'user_id' => User::factory(),
-            'name' => fake()->words(3, true) . ' Template',
+            'name' => fake()->words(3, true).' Template',
             'description' => fake()->sentence(),
             'pass_type' => $passType,
-            'platform' => fake()->randomElement($platforms),
+            'platforms' => [fake()->randomElement($platforms)],
             'design_data' => [
-                'backgroundColor' => 'rgb(' . fake()->numberBetween(0, 255) . ',' . fake()->numberBetween(0, 255) . ',' . fake()->numberBetween(0, 255) . ')',
+                'backgroundColor' => 'rgb('.fake()->numberBetween(0, 255).','.fake()->numberBetween(0, 255).','.fake()->numberBetween(0, 255).')',
                 'foregroundColor' => 'rgb(255,255,255)',
                 'labelColor' => 'rgb(200,200,200)',
                 'headerFields' => [

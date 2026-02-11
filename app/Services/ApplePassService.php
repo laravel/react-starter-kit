@@ -10,14 +10,23 @@ use ZipArchive;
 class ApplePassService
 {
     protected string $certificatePath;
+
     protected string $certificatePassword;
+
     protected string $wwdrCertificatePath;
+
     protected string $teamIdentifier;
+
     protected string $passTypeIdentifier;
+
     protected string $organizationName;
+
     protected string $passesDisk;
+
     protected string $passesPath;
+
     protected string $imagesDisk;
+
     protected string $imagesPath;
 
     public function __construct()
@@ -37,8 +46,8 @@ class ApplePassService
     /**
      * Generate a .pkpass file for the given pass.
      *
-     * @param Pass $pass
      * @return string The storage path to the generated .pkpass file
+     *
      * @throws RuntimeException
      */
     public function generate(Pass $pass): string
@@ -55,14 +64,14 @@ class ApplePassService
 
             // Build pass.json
             $passJson = $this->buildPassJson($pass);
-            file_put_contents($tempDir . '/pass.json', json_encode($passJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+            file_put_contents($tempDir.'/pass.json', json_encode($passJson, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
 
             // Copy images
             $this->copyImages($pass, $tempDir);
 
             // Create manifest
             $manifest = $this->createManifest($tempDir);
-            file_put_contents($tempDir . '/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT));
+            file_put_contents($tempDir.'/manifest.json', json_encode($manifest, JSON_PRETTY_PRINT));
 
             // Sign manifest
             $this->signManifest($tempDir);
@@ -86,9 +95,6 @@ class ApplePassService
 
     /**
      * Build the pass.json structure.
-     *
-     * @param Pass $pass
-     * @return array
      */
     protected function buildPassJson(Pass $pass): array
     {
@@ -105,13 +111,13 @@ class ApplePassService
         ];
 
         // Add colors
-        if (!empty($passData['backgroundColor'])) {
+        if (! empty($passData['backgroundColor'])) {
             $json['backgroundColor'] = $passData['backgroundColor'];
         }
-        if (!empty($passData['foregroundColor'])) {
+        if (! empty($passData['foregroundColor'])) {
             $json['foregroundColor'] = $passData['foregroundColor'];
         }
-        if (!empty($passData['labelColor'])) {
+        if (! empty($passData['labelColor'])) {
             $json['labelColor'] = $passData['labelColor'];
         }
 
@@ -121,18 +127,18 @@ class ApplePassService
 
         // Add field groups
         foreach (['headerFields', 'primaryFields', 'secondaryFields', 'auxiliaryFields', 'backFields'] as $fieldGroup) {
-            if (!empty($passData[$fieldGroup]) && is_array($passData[$fieldGroup])) {
+            if (! empty($passData[$fieldGroup]) && is_array($passData[$fieldGroup])) {
                 $json[$passTypeKey][$fieldGroup] = $passData[$fieldGroup];
             }
         }
 
         // Add transit type for boarding passes
-        if ($pass->pass_type === 'boardingPass' && !empty($passData['transitType'])) {
+        if ($pass->pass_type === 'boardingPass' && ! empty($passData['transitType'])) {
             $json[$passTypeKey]['transitType'] = $passData['transitType'];
         }
 
         // Add barcodes
-        if (!empty($barcodeData) && is_array($barcodeData)) {
+        if (! empty($barcodeData) && is_array($barcodeData)) {
             $json['barcodes'] = [$barcodeData];
             // Deprecated but still supported for older iOS versions
             $json['barcode'] = $barcodeData;
@@ -143,9 +149,6 @@ class ApplePassService
 
     /**
      * Get the pass type key for pass.json.
-     *
-     * @param string $passType
-     * @return string
      */
     protected function getPassTypeKey(string $passType): string
     {
@@ -164,14 +167,11 @@ class ApplePassService
 
     /**
      * Create manifest.json with SHA1 hashes of all files.
-     *
-     * @param string $tempDir
-     * @return array
      */
     protected function createManifest(string $tempDir): array
     {
         $manifest = [];
-        $files = glob($tempDir . '/*');
+        $files = glob($tempDir.'/*');
 
         foreach ($files as $file) {
             if (is_file($file)) {
@@ -186,45 +186,44 @@ class ApplePassService
     /**
      * Sign the manifest with PKCS#7 detached signature.
      *
-     * @param string $tempDir
      * @throws RuntimeException
      */
     protected function signManifest(string $tempDir): void
     {
-        if (!file_exists($this->certificatePath)) {
+        if (! file_exists($this->certificatePath)) {
             throw new RuntimeException("Certificate file not found at: {$this->certificatePath}");
         }
 
-        if (!file_exists($this->wwdrCertificatePath)) {
+        if (! file_exists($this->wwdrCertificatePath)) {
             throw new RuntimeException("WWDR certificate file not found at: {$this->wwdrCertificatePath}");
         }
 
         // Read the .p12 certificate
         $p12Content = file_get_contents($this->certificatePath);
         if ($p12Content === false) {
-            throw new RuntimeException("Failed to read certificate file");
+            throw new RuntimeException('Failed to read certificate file');
         }
 
         $certs = [];
-        if (!openssl_pkcs12_read($p12Content, $certs, $this->certificatePassword)) {
-            throw new RuntimeException("Failed to read PKCS12 certificate: " . openssl_error_string());
+        if (! openssl_pkcs12_read($p12Content, $certs, $this->certificatePassword)) {
+            throw new RuntimeException('Failed to read PKCS12 certificate: '.openssl_error_string());
         }
 
         // Extract certificate and private key
         $certResource = openssl_x509_read($certs['cert']);
         if ($certResource === false) {
-            throw new RuntimeException("Failed to read X509 certificate: " . openssl_error_string());
+            throw new RuntimeException('Failed to read X509 certificate: '.openssl_error_string());
         }
 
         $keyResource = openssl_pkey_get_private($certs['pkey']);
         if ($keyResource === false) {
-            throw new RuntimeException("Failed to read private key: " . openssl_error_string());
+            throw new RuntimeException('Failed to read private key: '.openssl_error_string());
         }
 
         // Sign the manifest
-        $manifestPath = $tempDir . '/manifest.json';
-        $signaturePath = $tempDir . '/signature';
-        $signaturePemPath = $tempDir . '/signature.pem';
+        $manifestPath = $tempDir.'/manifest.json';
+        $signaturePath = $tempDir.'/signature';
+        $signaturePemPath = $tempDir.'/signature.pem';
 
         $signResult = openssl_pkcs7_sign(
             $manifestPath,
@@ -236,14 +235,14 @@ class ApplePassService
             $this->wwdrCertificatePath
         );
 
-        if (!$signResult) {
-            throw new RuntimeException("Failed to sign manifest: " . openssl_error_string());
+        if (! $signResult) {
+            throw new RuntimeException('Failed to sign manifest: '.openssl_error_string());
         }
 
         // Convert PEM signature to DER format
         $pemContent = file_get_contents($signaturePemPath);
         if ($pemContent === false) {
-            throw new RuntimeException("Failed to read PEM signature");
+            throw new RuntimeException('Failed to read PEM signature');
         }
 
         // Extract the base64 content between headers
@@ -255,26 +254,27 @@ class ApplePassService
             $line = trim($line);
             if (empty($line)) {
                 $inContent = true; // Content starts after blank line in S/MIME format
+
                 continue;
             }
-            if ($inContent && !str_starts_with($line, '-')) {
+            if ($inContent && ! str_starts_with($line, '-')) {
                 $base64Content .= $line;
             }
         }
 
         if (empty($base64Content)) {
-            throw new RuntimeException("Failed to extract signature content from PEM");
+            throw new RuntimeException('Failed to extract signature content from PEM');
         }
 
         // Decode base64 to get DER format
         $derSignature = base64_decode($base64Content);
         if ($derSignature === false) {
-            throw new RuntimeException("Failed to decode signature to DER format");
+            throw new RuntimeException('Failed to decode signature to DER format');
         }
 
         // Write DER signature
         if (file_put_contents($signaturePath, $derSignature) === false) {
-            throw new RuntimeException("Failed to write DER signature");
+            throw new RuntimeException('Failed to write DER signature');
         }
 
         // Clean up temporary PEM file
@@ -287,13 +287,10 @@ class ApplePassService
 
     /**
      * Copy images from storage to temp directory.
-     *
-     * @param Pass $pass
-     * @param string $tempDir
      */
     protected function copyImages(Pass $pass, string $tempDir): void
     {
-        if (empty($pass->images) || !is_array($pass->images)) {
+        if (empty($pass->images) || ! is_array($pass->images)) {
             return;
         }
 
@@ -320,10 +317,43 @@ class ApplePassService
 
         $disk = Storage::disk($this->imagesDisk);
 
+        if (isset($pass->images['variants']['apple']) && is_array($pass->images['variants']['apple'])) {
+            foreach ($pass->images['variants']['apple'] as $slot => $scales) {
+                if (! is_array($scales)) {
+                    continue;
+                }
+
+                foreach ($scales as $scale => $variant) {
+                    if (! isset($variant['path']) || ! is_string($variant['path'])) {
+                        continue;
+                    }
+
+                    $baseName = $imageMapping[$slot] ?? null;
+                    if ($baseName === null) {
+                        continue;
+                    }
+
+                    $targetFileName = match ($scale) {
+                        '2x' => str_replace('.png', '@2x.png', $baseName),
+                        '3x' => str_replace('.png', '@3x.png', $baseName),
+                        default => $baseName,
+                    };
+
+                    if ($disk->exists($variant['path'])) {
+                        $content = $disk->get($variant['path']);
+                        $targetFile = $tempDir.'/'.$targetFileName;
+                        file_put_contents($targetFile, $content);
+                    }
+                }
+            }
+
+            return;
+        }
+
         foreach ($pass->images as $key => $path) {
             if (isset($imageMapping[$key]) && $disk->exists($path)) {
                 $content = $disk->get($path);
-                $targetFile = $tempDir . '/' . $imageMapping[$key];
+                $targetFile = $tempDir.'/'.$imageMapping[$key];
                 file_put_contents($targetFile, $content);
             }
         }
@@ -332,31 +362,30 @@ class ApplePassService
     /**
      * Create the .pkpass ZIP file.
      *
-     * @param string $tempDir
-     * @param Pass $pass
      * @return string Storage path
+     *
      * @throws RuntimeException
      */
     protected function createPkpass(string $tempDir, Pass $pass): string
     {
         $disk = Storage::disk($this->passesDisk);
-        $relativePath = $this->passesPath . '/' . $pass->user_id . '/pass_' . $pass->serial_number . '.pkpass';
+        $relativePath = $this->passesPath.'/'.$pass->user_id.'/pass_'.$pass->serial_number.'.pkpass';
 
         // Ensure directory exists
         $directory = dirname($relativePath);
-        if (!$disk->exists($directory)) {
+        if (! $disk->exists($directory)) {
             $disk->makeDirectory($directory);
         }
 
         $fullPath = $disk->path($relativePath);
 
-        $zip = new ZipArchive();
+        $zip = new ZipArchive;
         if ($zip->open($fullPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            throw new RuntimeException("Failed to create ZIP archive");
+            throw new RuntimeException('Failed to create ZIP archive');
         }
 
         // Add all files from temp directory
-        $files = glob($tempDir . '/*');
+        $files = glob($tempDir.'/*');
         foreach ($files as $file) {
             if (is_file($file)) {
                 $zip->addFile($file, basename($file));
@@ -371,15 +400,14 @@ class ApplePassService
     /**
      * Create a temporary directory.
      *
-     * @return string
      * @throws RuntimeException
      */
     protected function createTempDirectory(): string
     {
-        $tempDir = sys_get_temp_dir() . '/pkpass_' . uniqid();
+        $tempDir = sys_get_temp_dir().'/pkpass_'.uniqid();
 
-        if (!mkdir($tempDir, 0755, true)) {
-            throw new RuntimeException("Failed to create temporary directory");
+        if (! mkdir($tempDir, 0755, true)) {
+            throw new RuntimeException('Failed to create temporary directory');
         }
 
         return $tempDir;
@@ -387,16 +415,14 @@ class ApplePassService
 
     /**
      * Clean up temporary directory and its contents.
-     *
-     * @param string $tempDir
      */
     protected function cleanupTempDirectory(string $tempDir): void
     {
-        if (!is_dir($tempDir)) {
+        if (! is_dir($tempDir)) {
             return;
         }
 
-        $files = glob($tempDir . '/*');
+        $files = glob($tempDir.'/*');
         foreach ($files as $file) {
             if (is_file($file)) {
                 @unlink($file);

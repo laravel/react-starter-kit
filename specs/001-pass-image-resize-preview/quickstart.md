@@ -22,4 +22,9 @@
 
 ```
 php artisan test --compact tests/Feature/PassImageUploadTest.php
+php artisan test --compact tests/Feature/PassPreviewPlatformTest.php
 ```
+
+## Validation Notes
+
+- Run both test commands above after implementing image resizing and preview toggles.
