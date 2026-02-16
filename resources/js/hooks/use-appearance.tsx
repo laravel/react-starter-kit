@@ -59,7 +59,6 @@ const mediaQuery = (): MediaQueryList | null => {
 
 const handleSystemThemeChange = (): void => {
     applyTheme(currentAppearance);
-    notify();
 };
 
 export function initializeTheme(): void {
