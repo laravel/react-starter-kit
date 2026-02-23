@@ -38,7 +38,7 @@ jobs:
           node-version: '22'
 
       - name: Install Node Dependencies
-        run: npm i
+        run: npm ci
 
       - name: Install Dependencies
         run: composer install --no-interaction --prefer-dist --optimize-autoloader
