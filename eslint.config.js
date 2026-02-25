@@ -9,7 +9,7 @@ import typescript from 'typescript-eslint';
 /** @type {import('eslint').Linter.Config[]} */
 export default [
     js.configs.recommended,
-    reactHooks.configs.flat.recommended,
+    reactHooks.configs.flat['recommended-latest'],
     ...typescript.configs.recommended,
     {
         ...react.configs.flat.recommended,
@@ -31,14 +31,27 @@ export default [
         },
     },
     {
-        ...importPlugin.flatConfigs.recommended,
+        plugins: {
+            import: importPlugin,
+        },
         settings: {
             'import/resolver': {
-                typescript: true,
+                typescript: {
+                    alwaysTryTypes: true,
+                    project: './tsconfig.json',
+                },
                 node: true,
             },
         },
         rules: {
+            '@typescript-eslint/no-explicit-any': 'off',
+            '@typescript-eslint/consistent-type-imports': [
+                'error',
+                {
+                    prefer: 'type-imports',
+                    fixStyle: 'separate-type-imports',
+                },
+            ],
             'import/order': [
                 'error',
                 {
@@ -49,23 +62,22 @@ export default [
                     },
                 },
             ],
-        },
-    },
-    {
-        ...importPlugin.flatConfigs.typescript,
-        files: ['**/*.{ts,tsx}'],
-        rules: {
-            '@typescript-eslint/consistent-type-imports': [
+            'import/consistent-type-specifier-style': [
                 'error',
-                {
-                    prefer: 'type-imports',
-                    fixStyle: 'separate-type-imports',
-                },
+                'prefer-top-level',
             ],
         },
     },
     {
-        ignores: ['vendor', 'node_modules', 'public', 'bootstrap/ssr', 'tailwind.config.js', 'vite.config.ts'],
+        ignores: [
+            'vendor',
+            'node_modules',
+            'public',
+            'bootstrap/ssr',
+            'tailwind.config.js',
+            'vite.config.ts',
+            'resources/js/components/ui/*',
+        ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
 ];
