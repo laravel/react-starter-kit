@@ -2,6 +2,7 @@ import { Form } from '@inertiajs/react';
 import { REGEXP_ONLY_DIGITS } from 'input-otp';
 import { Check, Copy, ScanLine } from 'lucide-react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import AlertError from '@/components/alert-error';
 import InputError from '@/components/input-error';
 import { Button } from '@/components/ui/button';
 import {
@@ -16,11 +17,10 @@ import {
     InputOTPGroup,
     InputOTPSlot,
 } from '@/components/ui/input-otp';
+import { Spinner } from '@/components/ui/spinner';
 import { useAppearance } from '@/hooks/use-appearance';
 import { useClipboard } from '@/hooks/use-clipboard';
 import { OTP_MAX_LENGTH } from '@/hooks/use-two-factor-auth';
-import AlertError from './alert-error';
-import { Spinner } from './ui/spinner';
 import { confirm } from '@/routes/two-factor';
 
 function GridScanIcon() {
@@ -261,7 +261,7 @@ export default function TwoFactorSetupModal({
     }>(() => {
         if (twoFactorEnabled) {
             return {
-                title: 'Two-Factor Authentication Enabled',
+                title: 'Two-factor authentication enabled',
                 description:
                     'Two-factor authentication is now enabled. Scan the QR code or enter the setup key in your authenticator app.',
                 buttonText: 'Close',
@@ -270,7 +270,7 @@ export default function TwoFactorSetupModal({
 
         if (showVerificationStep) {
             return {
-                title: 'Verify Authentication Code',
+                title: 'Verify authentication code',
                 description:
                     'Enter the 6-digit code from your authenticator app',
                 buttonText: 'Continue',
@@ -278,7 +278,7 @@ export default function TwoFactorSetupModal({
         }
 
         return {
-            title: 'Enable Two-Factor Authentication',
+            title: 'Enable two-factor authentication',
             description:
                 'To finish enabling two-factor authentication, scan the QR code or enter the setup key in your authenticator app',
             buttonText: 'Continue',

@@ -19,7 +19,7 @@ type Props = {
 
 const breadcrumbs: BreadcrumbItem[] = [
     {
-        title: 'Two-Factor Authentication',
+        title: 'Two-factor authentication',
         href: show(),
     },
 ];
@@ -42,15 +42,15 @@ export default function TwoFactor({
 
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
-            <Head title="Two-Factor Authentication" />
+            <Head title="Two-factor authentication" />
 
-            <h1 className="sr-only">Two-Factor Authentication Settings</h1>
+            <h1 className="sr-only">Two-factor authentication settings</h1>
 
             <SettingsLayout>
                 <div className="space-y-6">
                     <Heading
                         variant="small"
-                        title="Two-Factor Authentication"
+                        title="Two-factor authentication"
                         description="Manage your two-factor authentication settings"
                     />
                     {twoFactorEnabled ? (
@@ -99,7 +99,7 @@ export default function TwoFactor({
                                         onClick={() => setShowSetupModal(true)}
                                     >
                                         <ShieldCheck />
-                                        Continue Setup
+                                        Continue setup
                                     </Button>
                                 ) : (
                                     <Form

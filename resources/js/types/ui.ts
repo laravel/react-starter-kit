@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { BreadcrumbItem } from './navigation';
+import type { BreadcrumbItem } from '@/types/navigation';
 
 export type AppLayoutProps = {
     children: ReactNode;

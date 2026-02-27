@@ -23,7 +23,7 @@ const sidebarNavItems: NavItem[] = [
         icon: null,
     },
     {
-        title: 'Two-Factor Auth',
+        title: 'Two-factor auth',
         href: show(),
         icon: null,
     },
@@ -35,7 +35,7 @@ const sidebarNavItems: NavItem[] = [
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
-    const { isCurrentUrl } = useCurrentUrl();
+    const { isCurrentOrParentUrl } = useCurrentUrl();
 
     // When server-side rendering, we only render the layout on the client...
     if (typeof window === 'undefined') {
@@ -62,7 +62,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 variant="ghost"
                                 asChild
                                 className={cn('w-full justify-start', {
-                                    'bg-muted': isCurrentUrl(item.href),
+                                    'bg-muted': isCurrentOrParentUrl(item.href),
                                 })}
                             >
                                 <Link href={item.href}>

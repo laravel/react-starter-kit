@@ -24,7 +24,7 @@ export default function TwoFactorChallenge() {
     }>(() => {
         if (showRecoveryInput) {
             return {
-                title: 'Recovery Code',
+                title: 'Recovery code',
                 description:
                     'Please confirm access to your account by entering one of your emergency recovery codes.',
                 toggleText: 'login using an authentication code',
@@ -32,7 +32,7 @@ export default function TwoFactorChallenge() {
         }
 
         return {
-            title: 'Authentication Code',
+            title: 'Authentication code',
             description:
                 'Enter the authentication code provided by your authenticator application.',
             toggleText: 'login using a recovery code',
@@ -50,7 +50,7 @@ export default function TwoFactorChallenge() {
             title={authConfigContent.title}
             description={authConfigContent.description}
         >
-            <Head title="Two-Factor Authentication" />
+            <Head title="Two-factor authentication" />
 
             <div className="space-y-6">
                 <Form

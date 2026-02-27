@@ -1,6 +1,7 @@
 import { Form } from '@inertiajs/react';
 import { Eye, EyeOff, LockKeyhole, RefreshCw } from 'lucide-react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import AlertError from '@/components/alert-error';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -9,7 +10,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import AlertError from './alert-error';
 import { regenerateRecoveryCodes } from '@/routes/two-factor';
 
 type Props = {
@@ -57,7 +57,7 @@ export default function TwoFactorRecoveryCodes({
             <CardHeader>
                 <CardTitle className="flex gap-3">
                     <LockKeyhole className="size-4" aria-hidden="true" />
-                    2FA Recovery Codes
+                    2FA recovery codes
                 </CardTitle>
                 <CardDescription>
                     Recovery codes let you regain access if you lose your 2FA
@@ -76,7 +76,7 @@ export default function TwoFactorRecoveryCodes({
                             className="size-4"
                             aria-hidden="true"
                         />
-                        {codesAreVisible ? 'Hide' : 'View'} Recovery Codes
+                        {codesAreVisible ? 'Hide' : 'View'} recovery codes
                     </Button>
 
                     {canRegenerateCodes && (
@@ -92,7 +92,7 @@ export default function TwoFactorRecoveryCodes({
                                     disabled={processing}
                                     aria-describedby="regenerate-warning"
                                 >
-                                    <RefreshCw /> Regenerate Codes
+                                    <RefreshCw /> Regenerate codes
                                 </Button>
                             )}
                         </Form>
@@ -149,7 +149,7 @@ export default function TwoFactorRecoveryCodes({
                                         access your account and will be removed
                                         after use. If you need more, click{' '}
                                         <span className="font-bold">
-                                            Regenerate Codes
+                                            Regenerate codes
                                         </span>{' '}
                                         above.
                                     </p>
