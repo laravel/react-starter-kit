@@ -58,12 +58,19 @@
         "lint": [
             "pint --parallel"
         ],
-        "test:lint": [
+        "lint:check": [
             "pint --parallel --test"
+        ],
+        "ci:check": [
+            "Composer\\Config::disableProcessTimeout",
+            "npm run lint:check",
+            "npm run format:check",
+            "npm run types:check",
+            "@test"
         ],
         "test": [
             "@php artisan config:clear --ansi",
-            "@test:lint",
+            "@lint:check",
             "@php artisan test"
         ],
         "post-autoload-dump": [
