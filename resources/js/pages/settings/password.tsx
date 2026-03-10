@@ -61,7 +61,7 @@ export default function Password() {
                     >
                         {({ errors, processing, recentlySuccessful }) => (
                             <>
-                                <div className="grid gap-2">
+                                <div className="grid gap-3">
                                     <Label htmlFor="current_password">
                                         Current password
                                     </Label>
@@ -70,7 +70,7 @@ export default function Password() {
                                         id="current_password"
                                         ref={currentPasswordInput}
                                         name="current_password"
-                                        className="mt-1 block w-full"
+                                        className="block w-full"
                                         autoComplete="current-password"
                                         placeholder="Current password"
                                     />
@@ -80,7 +80,7 @@ export default function Password() {
                                     />
                                 </div>
 
-                                <div className="grid gap-2">
+                                <div className="grid gap-3">
                                     <Label htmlFor="password">
                                         New password
                                     </Label>
@@ -89,7 +89,7 @@ export default function Password() {
                                         id="password"
                                         ref={passwordInput}
                                         name="password"
-                                        className="mt-1 block w-full"
+                                        className="block w-full"
                                         autoComplete="new-password"
                                         placeholder="New password"
                                     />
@@ -97,7 +97,7 @@ export default function Password() {
                                     <InputError message={errors.password} />
                                 </div>
 
-                                <div className="grid gap-2">
+                                <div className="grid gap-3">
                                     <Label htmlFor="password_confirmation">
                                         Confirm password
                                     </Label>
@@ -105,7 +105,7 @@ export default function Password() {
                                     <PasswordInput
                                         id="password_confirmation"
                                         name="password_confirmation"
-                                        className="mt-1 block w-full"
+                                        className="block w-full"
                                         autoComplete="new-password"
                                         placeholder="Confirm password"
                                     />
