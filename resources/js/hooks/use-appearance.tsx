@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 export type ResolvedAppearance = 'light' | 'dark';
 export type Appearance = ResolvedAppearance | 'system';
@@ -81,12 +81,11 @@ export function useAppearance(): UseAppearanceReturn {
         () => 'system',
     );
 
-    const resolvedAppearance: ResolvedAppearance = useMemo(
-        () => (isDarkMode(appearance) ? 'dark' : 'light'),
-        [appearance],
-    );
+    const resolvedAppearance: ResolvedAppearance = isDarkMode(appearance)
+        ? 'dark'
+        : 'light';
 
-    const updateAppearance = useCallback((mode: Appearance): void => {
+    const updateAppearance = (mode: Appearance): void => {
         currentAppearance = mode;
 
         // Store in localStorage for client-side persistence...
@@ -97,7 +96,7 @@ export function useAppearance(): UseAppearanceReturn {
 
         applyTheme(mode);
         notify();
-    }, []);
+    };
 
     return { appearance, resolvedAppearance, updateAppearance } as const;
 }
