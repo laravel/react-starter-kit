@@ -6,11 +6,19 @@ use App\Models\User;
 use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Laravel\Fortify\Features;
 use Tests\TestCase;
 
 class VerificationNotificationTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->skipUnlessFortifyFeature(Features::emailVerification());
+    }
 
     public function test_sends_verification_notification(): void
     {
