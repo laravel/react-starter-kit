@@ -1,10 +1,28 @@
 import js from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
 import prettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
 import react from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
 import typescript from 'typescript-eslint';
+
+const controlStatements = [
+    'if',
+    'return',
+    'for',
+    'while',
+    'do',
+    'switch',
+    'try',
+    'throw',
+];
+const paddingAroundControl = [
+    ...controlStatements.flatMap((stmt) => [
+        { blankLine: 'always', prev: '*', next: stmt },
+        { blankLine: 'always', prev: stmt, next: '*' },
+    ]),
+];
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
@@ -55,7 +73,14 @@ export default [
             'import/order': [
                 'error',
                 {
-                    groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+                    groups: [
+                        'builtin',
+                        'external',
+                        'internal',
+                        'parent',
+                        'sibling',
+                        'index',
+                    ],
                     alphabetize: {
                         order: 'asc',
                         caseInsensitive: true,
@@ -65,6 +90,17 @@ export default [
             'import/consistent-type-specifier-style': [
                 'error',
                 'prefer-top-level',
+            ],
+        },
+    },
+    {
+        plugins: {
+            '@stylistic': stylistic,
+        },
+        rules: {
+            '@stylistic/padding-line-between-statements': [
+                'error',
+                ...paddingAroundControl,
             ],
         },
     },
@@ -79,7 +115,17 @@ export default [
             'resources/js/actions/**',
             'resources/js/components/ui/*',
             'resources/js/routes/**',
+            'resources/js/wayfinder/**',
         ],
     },
     prettier, // Turn off all rules that might conflict with Prettier
+    {
+        plugins: {
+            '@stylistic': stylistic,
+        },
+        rules: {
+            curly: ['error', 'all'],
+            '@stylistic/brace-style': ['error', '1tbs', { allowSingleLine: false }],
+        },
+    },
 ];
