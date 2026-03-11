@@ -28,7 +28,12 @@ export type UseCurrentUrlReturn = {
 
 export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();
-    const currentUrlPath = new URL(page.url, window?.location.origin).pathname;
+    const currentUrlPath = new URL(
+        page.url,
+        typeof window !== 'undefined'
+            ? window.location.origin
+            : 'http://localhost',
+    ).pathname;
 
     const isCurrentUrl: IsCurrentUrlFn = (
         urlToCheck: NonNullable<InertiaLinkProps['href']>,
@@ -47,6 +52,7 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
 
         try {
             const absoluteUrl = new URL(urlString);
+
             return comparePath(absoluteUrl.pathname);
         } catch {
             return false;
