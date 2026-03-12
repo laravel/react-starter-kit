@@ -5,12 +5,6 @@ import { toUrl } from '@/lib/utils';
 export type IsCurrentUrlFn = (
     urlToCheck: NonNullable<InertiaLinkProps['href']>,
     currentUrl?: string,
-    startsWith?: boolean,
-) => boolean;
-
-export type IsCurrentOrParentUrlFn = (
-    urlToCheck: NonNullable<InertiaLinkProps['href']>,
-    currentUrl?: string,
 ) => boolean;
 
 export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
@@ -22,48 +16,44 @@ export type WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
 export type UseCurrentUrlReturn = {
     currentUrl: string;
     isCurrentUrl: IsCurrentUrlFn;
-    isCurrentOrParentUrl: IsCurrentOrParentUrlFn;
     whenCurrentUrl: WhenCurrentUrlFn;
 };
 
 export function useCurrentUrl(): UseCurrentUrlReturn {
     const page = usePage();
-    const currentUrlPath = new URL(
-        page.url,
-        typeof window !== 'undefined'
-            ? window.location.origin
-            : 'http://localhost',
-    ).pathname;
+    const currentUrlPath = new URL(page.url, window?.location.origin).pathname;
 
     const isCurrentUrl: IsCurrentUrlFn = (
         urlToCheck: NonNullable<InertiaLinkProps['href']>,
         currentUrl?: string,
-        startsWith: boolean = false,
     ) => {
         const urlToCompare = currentUrl ?? currentUrlPath;
         const urlString = toUrl(urlToCheck);
 
-        const comparePath = (path: string): boolean =>
-            startsWith ? urlToCompare.startsWith(path) : path === urlToCompare;
+        const matchesPathPrefix = (basePath: string, pathToCheck: string): boolean => {
+            if (basePath === pathToCheck) {
+                return true;
+            }
+
+            const normalizedBase =
+                basePath.endsWith('/') && basePath !== '/' ? basePath.slice(0, -1) : basePath;
+
+            return (
+                pathToCheck.startsWith(`${normalizedBase}/`) ||
+                pathToCheck === normalizedBase
+            );
+        };
 
         if (!urlString.startsWith('http')) {
-            return comparePath(urlString);
+            return matchesPathPrefix(urlString, urlToCompare);
         }
 
         try {
             const absoluteUrl = new URL(urlString);
-
-            return comparePath(absoluteUrl.pathname);
+            return matchesPathPrefix(absoluteUrl.pathname, urlToCompare);
         } catch {
             return false;
         }
-    };
-
-    const isCurrentOrParentUrl: IsCurrentOrParentUrlFn = (
-        urlToCheck: NonNullable<InertiaLinkProps['href']>,
-        currentUrl?: string,
-    ) => {
-        return isCurrentUrl(urlToCheck, currentUrl, true);
     };
 
     const whenCurrentUrl: WhenCurrentUrlFn = <TIfTrue, TIfFalse = null>(
@@ -77,7 +67,6 @@ export function useCurrentUrl(): UseCurrentUrlReturn {
     return {
         currentUrl: currentUrlPath,
         isCurrentUrl,
-        isCurrentOrParentUrl,
         whenCurrentUrl,
     };
 }
