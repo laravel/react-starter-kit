@@ -15,7 +15,7 @@ class SecurityTest extends TestCase
 
     public function test_security_page_is_displayed()
     {
-        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
         Features::twoFactorAuthentication([
             'confirm' => true,
@@ -36,7 +36,7 @@ class SecurityTest extends TestCase
 
     public function test_security_page_requires_password_confirmation_when_enabled()
     {
-        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
         $user = User::factory()->create();
 
@@ -53,7 +53,7 @@ class SecurityTest extends TestCase
 
     public function test_security_page_does_not_require_password_confirmation_when_disabled()
     {
-        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
         $user = User::factory()->create();
 
@@ -72,7 +72,7 @@ class SecurityTest extends TestCase
 
     public function test_security_page_renders_without_two_factor_when_feature_is_disabled()
     {
-        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
 
         config(['fortify.features' => []]);
 

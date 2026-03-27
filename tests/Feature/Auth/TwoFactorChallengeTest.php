@@ -16,7 +16,7 @@ class TwoFactorChallengeTest extends TestCase
     {
         parent::setUp();
 
-        $this->skipUnlessFortifyFeature(Features::twoFactorAuthentication());
+        $this->skipUnlessFortifyHas(Features::twoFactorAuthentication());
     }
 
     public function test_two_factor_challenge_redirects_to_login_when_not_authenticated(): void
