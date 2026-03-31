@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\TeamPermission;
 use App\Models\Team;
 use App\Models\User;
 
@@ -36,7 +37,7 @@ class TeamPolicy
      */
     public function update(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'team:update');
+        return $user->hasTeamPermission($team, TeamPermission::UpdateTeam);
     }
 
     /**
@@ -44,7 +45,7 @@ class TeamPolicy
      */
     public function addMember(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'member:add');
+        return $user->hasTeamPermission($team, TeamPermission::AddMember);
     }
 
     /**
@@ -52,7 +53,7 @@ class TeamPolicy
      */
     public function updateMember(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'member:update');
+        return $user->hasTeamPermission($team, TeamPermission::UpdateMember);
     }
 
     /**
@@ -60,7 +61,7 @@ class TeamPolicy
      */
     public function removeMember(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'member:remove');
+        return $user->hasTeamPermission($team, TeamPermission::RemoveMember);
     }
 
     /**
@@ -68,7 +69,7 @@ class TeamPolicy
      */
     public function inviteMember(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'invitation:create');
+        return $user->hasTeamPermission($team, TeamPermission::CreateInvitation);
     }
 
     /**
@@ -76,7 +77,7 @@ class TeamPolicy
      */
     public function cancelInvitation(User $user, Team $team): bool
     {
-        return $user->hasTeamPermission($team, 'invitation:cancel');
+        return $user->hasTeamPermission($team, TeamPermission::CancelInvitation);
     }
 
     /**
@@ -84,6 +85,6 @@ class TeamPolicy
      */
     public function delete(User $user, Team $team): bool
     {
-        return ! $team->is_personal && $user->hasTeamPermission($team, 'team:delete');
+        return ! $team->is_personal && $user->hasTeamPermission($team, TeamPermission::DeleteTeam);
     }
 }
