@@ -2,6 +2,7 @@
 
 namespace App\Concerns;
 
+use App\Enums\TeamPermission;
 use App\Enums\TeamRole;
 use App\Models\Membership;
 use App\Models\Team;
@@ -167,13 +168,13 @@ trait HasTeams
         $role = $this->teamRole($team);
 
         return new TeamPermissions(
-            canUpdateTeam: $role?->hasPermission('team:update') ?? false,
-            canDeleteTeam: $role?->hasPermission('team:delete') ?? false,
-            canAddMember: $role?->hasPermission('member:add') ?? false,
-            canUpdateMember: $role?->hasPermission('member:update') ?? false,
-            canRemoveMember: $role?->hasPermission('member:remove') ?? false,
-            canCreateInvitation: $role?->hasPermission('invitation:create') ?? false,
-            canCancelInvitation: $role?->hasPermission('invitation:cancel') ?? false,
+            canUpdateTeam: $role?->hasPermission(TeamPermission::UpdateTeam) ?? false,
+            canDeleteTeam: $role?->hasPermission(TeamPermission::DeleteTeam) ?? false,
+            canAddMember: $role?->hasPermission(TeamPermission::AddMember) ?? false,
+            canUpdateMember: $role?->hasPermission(TeamPermission::UpdateMember) ?? false,
+            canRemoveMember: $role?->hasPermission(TeamPermission::RemoveMember) ?? false,
+            canCreateInvitation: $role?->hasPermission(TeamPermission::CreateInvitation) ?? false,
+            canCancelInvitation: $role?->hasPermission(TeamPermission::CancelInvitation) ?? false,
         );
     }
 
@@ -188,7 +189,7 @@ trait HasTeams
     /**
      * Determine if the user has the given permission on the team.
      */
-    public function hasTeamPermission(Team $team, string $permission): bool
+    public function hasTeamPermission(Team $team, TeamPermission $permission): bool
     {
         return $this->teamRole($team)?->hasPermission($permission) ?? false;
     }
