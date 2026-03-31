@@ -13,7 +13,7 @@ enum TeamRole: string
      */
     public function label(): string
     {
-        return ucfirst($this->value);
+        return str($this->name)->snake(' ')->title()->toString();
     }
 
     /**
