@@ -14,7 +14,7 @@ class RegistrationTest extends TestCase
     {
         parent::setUp();
 
-        $this->skipUnlessFortifyFeature(Features::registration());
+        $this->skipUnlessFortifyHas(Features::registration());
     }
 
     public function test_registration_screen_can_be_rendered()
