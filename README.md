@@ -16,6 +16,8 @@ Documentation for all Laravel starter kits can be found on the [Laravel website]
 
 Thank you for considering contributing to our starter kit! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
 
+All contributions to the Starter Kits from now on should be made through [Maestro](https://github.com/laravel/maestro).
+
 ## Code of Conduct
 
 In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
