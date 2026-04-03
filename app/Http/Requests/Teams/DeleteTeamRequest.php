@@ -39,7 +39,7 @@ class DeleteTeamRequest extends FormRequest
                 $team = $this->route('team');
 
                 if ($this->input('name') !== $team->name) {
-                    $validator->errors()->add('name', 'The team name does not match.');
+                    $validator->errors()->add('name', __('The team name does not match.'));
                 }
             },
         ];
