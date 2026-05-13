@@ -9,7 +9,11 @@ import { Spinner } from '@/components/ui/spinner';
 import { login } from '@/routes';
 import { store } from '@/routes/register';
 
-export default function Register() {
+type Props = {
+    passwordRules: string;
+};
+
+export default function Register({ passwordRules }: Props) {
     return (
         <>
             <Head title="Register" />
@@ -63,6 +67,7 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password"
                                     placeholder="Password"
+                                    passwordrules={passwordRules}
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -78,6 +83,7 @@ export default function Register() {
                                     autoComplete="new-password"
                                     name="password_confirmation"
                                     placeholder="Confirm password"
+                                    passwordrules={passwordRules}
                                 />
                                 <InputError
                                     message={errors.password_confirmation}
