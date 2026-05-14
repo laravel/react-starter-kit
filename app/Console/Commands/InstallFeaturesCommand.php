@@ -55,14 +55,16 @@ class InstallFeaturesCommand extends Command
             ->interactive($this->input->isInteractive())
             ->withAnswers($providedAnswers);
 
+        $this->installNodeDependencies();
+
         $script->chisel($answers);
 
-        $this->rebuildAssets();
+        $this->buildAssets();
 
         return self::SUCCESS;
     }
 
-    protected function rebuildAssets(): void
+    protected function installNodeDependencies(): void
     {
         $npm = Chisel::in(base_path())->npm();
         $packageManager = $npm->packageManager();
@@ -70,10 +72,13 @@ class InstallFeaturesCommand extends Command
         $this->info('Installing dependencies with '.$packageManager->value.'...');
 
         $npm->install();
+    }
 
+    protected function buildAssets(): void
+    {
         $this->info('Building assets...');
 
-        $npm->run('build');
+        Chisel::in(base_path())->npm()->run('build');
 
         $this->info('Assets built successfully.');
     }
