@@ -4,22 +4,39 @@ require getenv('LARAVEL_INSTALLER_AUTOLOADER') ?: __DIR__.'/vendor/autoload.php'
 
 use Laravel\Chisel\Chisel;
 use Laravel\Chisel\Question;
+use Laravel\Prompts\Support\Logger;
+use Symfony\Component\Process\Process;
+
+use function Laravel\Prompts\task;
 
 function chiselRun(array $command, string $label): void
 {
-    $escaped = array_map('escapeshellarg', $command);
-    passthru(implode(' ', $escaped), $exitCode);
+    $process = task(
+        label: $label,
+        keepSummary: true,
+        callback: function (Logger $logger) use ($command, $label) {
+            $process = new Process($command);
+            $process->run(function ($type, $line) use ($logger) {
+                $logger->line($line);
+            });
 
-    if ($exitCode === 0) {
-        return;
-    }
+            if ($process->isSuccessful()) {
+                $logger->success(implode(' ', $command));
 
-    fwrite(
-        STDERR,
-        "\nchisel: {$label} step failed (exit {$exitCode}). Your project may be in a partially-modified state — review the output above before continuing.\n",
+                return $process;
+            }
+
+            $logger->error(implode(' ', $command));
+            $logger->error('Error output: ' . trim($process->getErrorOutput()));
+            $logger->error('Chisel: Your project may be in a partially-modified state — review the output above before continuing.');
+
+            return $process;
+        },
     );
 
-    exit($exitCode);
+    if (! $process->isSuccessful()) {
+        exit($process->getExitCode());
+    }
 }
 
 /**
@@ -241,7 +258,7 @@ return Chisel::script(__DIR__)
         );
 
         chiselRun(['composer', 'lint'], 'Composer Lint');
-        chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Wayfinder');
+        chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
         $c->npm()->run('lint');
         $c->npm()->run('format');
