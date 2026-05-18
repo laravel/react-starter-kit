@@ -6,6 +6,9 @@ use App\Http\Controllers\Teams\TeamController;
 use App\Http\Controllers\Teams\TeamInvitationController;
 use App\Http\Controllers\Teams\TeamMemberController;
 use App\Http\Middleware\EnsureTeamMembership;
+/* @chisel-password-confirmation */
+use Illuminate\Auth\Middleware\RequirePassword;
+/* @end-chisel-password-confirmation */
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -18,7 +21,11 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
-    Route::get('settings/security', [SecurityController::class, 'edit'])->name('security.edit');
+    Route::get('settings/security', [SecurityController::class, 'edit'])
+        /* @chisel-password-confirmation */
+        ->middleware(RequirePassword::class)
+        /* @end-chisel-password-confirmation */
+        ->name('security.edit');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
         ->middleware('throttle:6,1')
