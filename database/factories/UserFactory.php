@@ -30,9 +30,11 @@ class UserFactory extends Factory
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
+            /* @chisel-2fa */
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            /* @end-chisel-2fa */
         ];
     }
 
@@ -51,10 +53,12 @@ class UserFactory extends Factory
      */
     public function withTwoFactor(): static
     {
+        /* @chisel-2fa */
         return $this->state(fn (array $attributes) => [
             'two_factor_secret' => encrypt('secret'),
             'two_factor_recovery_codes' => encrypt(json_encode(['recovery-code-1'])),
             'two_factor_confirmed_at' => now(),
         ]);
+        /* @end-chisel-2fa */
     }
 }
