@@ -9,6 +9,7 @@ use Laravel\Chisel\Script;
 use RuntimeException;
 
 use function Laravel\Prompts\multiselect;
+use function Laravel\Prompts\spin;
 
 class InstallFeaturesCommand extends Command
 {
@@ -73,19 +74,19 @@ class InstallFeaturesCommand extends Command
         $npm = Chisel::in(base_path())->npm();
         $packageManager = $npm->packageManager();
 
-        $this->info('Installing dependencies with '.$packageManager->value.'...');
-
-        $npm->install();
+        spin(
+            fn () => $npm->install(),
+            "Installing dependencies with {$packageManager->value}...",
+        );
     }
 
     protected function buildAssets(): void
     {
         $npm = Chisel::in(base_path())->npm();
 
-        $this->info('Building assets...');
-
-        $npm->run('build');
-
-        $this->info('Assets built successfully.');
+        spin(
+            fn () => $npm->run('build'),
+            'Building assets...',
+        );
     }
 }
