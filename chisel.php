@@ -127,6 +127,7 @@ return Chisel::script(__DIR__)
             )->removeSection('email-verification');
 
             $c->files(
+                'app/Http/Responses/VerifyEmailResponse.php',
                 $paths['verify_email'],
                 'tests/Feature/Auth/EmailVerificationTest.php',
                 'tests/Feature/Auth/VerificationNotificationTest.php',
