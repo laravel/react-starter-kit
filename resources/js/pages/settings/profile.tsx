@@ -20,7 +20,7 @@ export default function Profile() {
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Profile information"
+                    title="Profile"
                     description="Update your name and email address"
                 />
 
