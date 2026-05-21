@@ -41,7 +41,7 @@ export default function Profile(
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Profile information"
+                    title="Profile"
                     description="Update your name and email address"
                 />
 
@@ -104,7 +104,7 @@ export default function Profile(
                                                 as="button"
                                                 className="text-foreground underline decoration-neutral-300 underline-offset-4 transition-colors duration-300 ease-out hover:decoration-current! dark:decoration-neutral-500"
                                             >
-                                                Click here to resend the
+                                                Click here to re-send the
                                                 verification email.
                                             </Link>
                                         </p>

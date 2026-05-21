@@ -64,7 +64,7 @@ export default function ConfirmPassword() {
 }
 
 ConfirmPassword.layout = {
-    title: 'Confirm your password',
+    title: 'Confirm password',
     description:
         'This is a secure area of the application. Please confirm your password before continuing.',
 };

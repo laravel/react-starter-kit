@@ -52,7 +52,7 @@ export default function PasskeyVerify({
                     {isLoading ? <Spinner /> : <KeyRound className="h-4 w-4" />}
                     {isLoading
                         ? (loadingLabel ?? 'Authenticating...')
-                        : (label ?? 'Sign in with passkey')}
+                        : (label ?? 'Sign in with a passkey')}
                 </Button>
                 {error && (
                     <InputError message={error} className="text-center" />
