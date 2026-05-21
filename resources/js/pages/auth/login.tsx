@@ -62,7 +62,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            Forgot password?
+                                            Forgot your password?
                                         </TextLink>
                                     )}
                                 </div>
