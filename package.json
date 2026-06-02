@@ -29,7 +29,6 @@
         "typescript-eslint": "^8.23.0"
     },
     "dependencies": {
-        "@headlessui/react": "^2.2.0",
         "@inertiajs/react": "^3.0.0",
         "@inertiajs/vite": "^3.0.0",
         "@laravel/passkeys": "^0.2.0",
