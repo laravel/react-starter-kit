@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Support;
+namespace App\Data;
 
 readonly class TeamPermissions
 {
