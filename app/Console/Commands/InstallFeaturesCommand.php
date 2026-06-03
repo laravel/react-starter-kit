@@ -30,7 +30,7 @@ class InstallFeaturesCommand extends Command
 
     public function handle(): int
     {
-        if (getenv('LARAVEL_INSTALLER_DEFER_HOOKS') && $this->option('answers') === null) {
+        if ($this->shouldDeferInstallerHooks()) {
             return self::SUCCESS;
         }
 
@@ -67,6 +67,20 @@ class InstallFeaturesCommand extends Command
         $this->buildAssets();
 
         return self::SUCCESS;
+    }
+
+    protected function shouldDeferInstallerHooks(): bool
+    {
+        if ($this->option('answers') !== null) {
+            return false;
+        }
+
+        return filter_var(
+            $_ENV['LARAVEL_INSTALLER_DEFER_HOOKS']
+                ?? $_SERVER['LARAVEL_INSTALLER_DEFER_HOOKS']
+                ?? getenv('LARAVEL_INSTALLER_DEFER_HOOKS'),
+            FILTER_VALIDATE_BOOL,
+        );
     }
 
     protected function installNodeDependencies(): void
