@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 use Laravel\Chisel\Chisel;
 use Laravel\Chisel\Question;
 use Laravel\Chisel\Script;
-use RuntimeException;
 
 use function Laravel\Prompts\multiselect;
 use function Laravel\Prompts\spin;
@@ -47,16 +46,13 @@ class InstallFeaturesCommand extends Command
 
         $answers = $script
             ->collectAnswers()
-            ->onQuestion(fn (Question $question) => match ($question->type) {
-                'multiselect' => multiselect(
-                    label: $question->label,
-                    options: $question->options,
-                    default: $question->default ?? [],
-                    required: $question->required,
-                    hint: $question->hint,
-                ),
-                default => throw new RuntimeException("Unsupported question type [{$question->type}]."),
-            })
+            ->onQuestion(fn (Question $question) => multiselect(
+                label: $question->label,
+                options: $question->options,
+                default: $question->default ?? [],
+                required: $question->required,
+                hint: $question->hint,
+            ))
             ->interactive($this->input->isInteractive())
             ->withAnswers($providedAnswers);
 
