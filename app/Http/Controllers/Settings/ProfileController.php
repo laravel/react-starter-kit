@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
 use Laravel\WorkOS\Http\Requests\AuthKitAccountDeletionRequest;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class ProfileController extends Controller
 {
@@ -38,7 +39,7 @@ class ProfileController extends Controller
     /**
      * Delete the user's account.
      */
-    public function destroy(AuthKitAccountDeletionRequest $request): RedirectResponse
+    public function destroy(AuthKitAccountDeletionRequest $request): SymfonyRedirectResponse
     {
         return $request->delete(
             using: fn (User $user) => $user->delete(),

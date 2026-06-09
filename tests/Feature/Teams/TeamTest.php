@@ -6,6 +6,7 @@ use App\Enums\TeamRole;
 use App\Models\Team;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Inertia\Testing\AssertableInertia as Assert;
 use Tests\TestCase;
 
 class TeamTest extends TestCase
@@ -72,7 +73,13 @@ class TeamTest extends TestCase
             ->actingAs($user)
             ->get(route('teams.edit', $team));
 
-        $response->assertOk();
+        $response
+            ->assertOk()
+            ->assertInertia(fn (Assert $page) => $page
+                ->component('teams/edit')
+                ->where('members.0.role', TeamRole::Owner->value)
+                ->where('members.0.role_label', TeamRole::Owner->label()),
+            );
     }
 
     public function test_teams_can_be_updated_by_owners()
