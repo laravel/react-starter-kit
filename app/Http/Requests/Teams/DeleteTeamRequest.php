@@ -47,6 +47,9 @@ class DeleteTeamRequest extends FormRequest
         ];
     }
 
+    /**
+     * Get the team associated with the request.
+     */
     private function team(): Team
     {
         $team = $this->route('team');
