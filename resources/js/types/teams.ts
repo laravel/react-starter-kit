@@ -27,6 +27,20 @@ export type TeamInvitation = {
     created_at: string;
 };
 
+export type TeamInvitationContext = {
+    code: string;
+    teamName: string;
+};
+
+export type DashboardInvitation = {
+    code: string;
+    inviterName: string;
+    team: {
+        name: string;
+        slug: string;
+    };
+};
+
 export type TeamPermissions = {
     canUpdateTeam: boolean;
     canDeleteTeam: boolean;
