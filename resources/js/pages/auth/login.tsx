@@ -1,6 +1,7 @@
 import { Form, Head } from '@inertiajs/react';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
+import TeamInvitationAlert from '@/components/team-invitation-alert';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -15,16 +16,29 @@ import { request } from '@/routes/password';
 /* @chisel-passkeys */
 import PasskeyVerify from '@/components/passkey-verify';
 /* @end-chisel-passkeys */
+import type { TeamInvitationContext } from '@/types';
 
 type Props = {
     status?: string;
     canResetPassword: boolean;
+    teamInvitation?: TeamInvitationContext | null;
 };
 
-export default function Login({ status, canResetPassword }: Props) {
+export default function Login({
+    status,
+    canResetPassword,
+    teamInvitation,
+}: Props) {
     return (
         <>
             <Head title="Log in" />
+
+            {teamInvitation && (
+                <TeamInvitationAlert
+                    invitation={teamInvitation}
+                    action="Log in"
+                />
+            )}
 
             {/* @chisel-passkeys */}
             <PasskeyVerify />
@@ -62,7 +76,7 @@ export default function Login({ status, canResetPassword }: Props) {
                                             className="ml-auto text-sm"
                                             tabIndex={5}
                                         >
-                                            Forgot your password?
+                                            Forgot password?
                                         </TextLink>
                                     )}
                                 </div>
@@ -101,7 +115,15 @@ export default function Login({ status, canResetPassword }: Props) {
                         {/* @chisel-registration */}
                         <div className="text-center text-sm text-muted-foreground">
                             Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
+                            <TextLink
+                                href={register({
+                                    query: {
+                                        invitation: teamInvitation?.code,
+                                    },
+                                })}
+                                data-test="register-link"
+                                tabIndex={5}
+                            >
                                 Sign up
                             </TextLink>
                         </div>
