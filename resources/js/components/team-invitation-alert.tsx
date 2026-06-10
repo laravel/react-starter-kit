@@ -15,7 +15,7 @@ export default function TeamInvitationAlert({ invitation, action }: Props) {
         >
             <InfoIcon />
             <AlertDescription className="text-blue-900 dark:text-blue-100">
-                {action} to join the "{invitation.teamName}" Team.
+                {action} to join the "{invitation.teamName}" team.
             </AlertDescription>
         </Alert>
     );
