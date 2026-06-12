@@ -118,6 +118,32 @@ class TeamController extends Controller
     }
 
     /**
+     * Leave the specified team.
+     */
+    public function leave(Request $request, Team $team): RedirectResponse
+    {
+        Gate::authorize('leave', $team);
+
+        $user = $request->user();
+
+        $fallbackTeam = $user->isCurrentTeam($team)
+            ? $user->fallbackTeam($team)
+            : null;
+
+        $team->memberships()
+            ->where('user_id', $user->id)
+            ->delete();
+
+        if ($fallbackTeam) {
+            $user->switchTeam($fallbackTeam);
+        }
+
+        Inertia::flash('toast', ['type' => 'success', 'message' => __('You left the team ":name"', ['name' => $team->name])]);
+
+        return to_route('teams.index');
+    }
+
+    /**
      * Delete the specified team.
      */
     public function destroy(DeleteTeamRequest $request, Team $team): RedirectResponse

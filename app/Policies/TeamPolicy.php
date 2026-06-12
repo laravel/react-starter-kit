@@ -41,6 +41,16 @@ class TeamPolicy
     }
 
     /**
+     * Determine whether the user can leave the team.
+     */
+    public function leave(User $user, Team $team): bool
+    {
+        return ! $team->is_personal
+            && $user->belongsToTeam($team)
+            && ! $user->ownsTeam($team);
+    }
+
+    /**
      * Determine whether the user can add a member to the team.
      */
     public function addMember(User $user, Team $team): bool
