@@ -13,13 +13,21 @@ export default function PasskeyRegistration({ onSuccess }: Props) {
     const [name, setName] = useState(() => {
         const ua = navigator.userAgent;
 
-        const browser = ['Chrome', 'Firefox', 'Safari', 'Edge', 'Opera'].find(
-            (browser) => new RegExp(browser).test(ua),
-        );
+        const browser = [
+            { pattern: /Edg|Edge/, name: 'Edge' },
+            { pattern: /OPR|Opera|OPiOS/, name: 'Opera' },
+            { pattern: /Firefox|FxiOS/, name: 'Firefox' },
+            { pattern: /Chrome|CriOS/, name: 'Chrome' },
+            { pattern: /Safari/, name: 'Safari' },
+        ].find(({ pattern }) => pattern.test(ua))?.name;
 
-        const os = ['iPhone', 'iPad', 'Android', 'Mac', 'Windows'].find((os) =>
-            new RegExp(os).test(ua),
-        );
+        const os = [
+            { pattern: /iPhone/, name: 'iPhone' },
+            { pattern: /iPad|Macintosh(?=.*Mobile)/, name: 'iPad' },
+            { pattern: /Android/, name: 'Android' },
+            { pattern: /Mac/, name: 'Mac' },
+            { pattern: /Windows/, name: 'Windows' },
+        ].find(({ pattern }) => pattern.test(ua))?.name;
 
         return [browser, os].filter(Boolean).join(' on ') || '';
     });
