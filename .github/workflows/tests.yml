@@ -3,16 +3,8 @@ name: tests
 on:
   push:
     branches:
-      - develop
       - main
-      - master
-      - workos
   pull_request:
-    branches:
-      - develop
-      - main
-      - master
-      - workos
 
 permissions:
   contents: read
@@ -20,9 +12,6 @@ permissions:
 jobs:
   ci:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        php-version: ['8.3', '8.4', '8.5']
 
     steps:
       - name: Checkout code
@@ -33,32 +22,17 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # v2
         with:
-          php-version: ${{ matrix.php-version }}
+          php-version: '8.3'
           tools: composer:v2
-          coverage: xdebug
+          coverage: none
 
       - name: Setup Node
         uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
         with:
           node-version: '22'
 
-      - name: Install Node Dependencies
-        run: npm i
+      - name: Setup Application
+        run: composer setup
 
-      - name: Install Dependencies
-        run: composer install --no-interaction --prefer-dist --optimize-autoloader
-
-      - name: Copy Environment File
-        run: cp .env.example .env
-
-      - name: Generate Application Key
-        run: php artisan key:generate
-
-      - name: Build Assets
-        run: npm run build
-
-      - name: Run Type Analysis
-        run: composer types:check
-
-      - name: Tests
-        run: php artisan test
+      - name: Run CI Checks
+        run: composer ci:check
