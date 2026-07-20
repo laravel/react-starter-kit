@@ -56,11 +56,17 @@ class InstallFeaturesCommand extends Command
             ->interactive($this->input->isInteractive())
             ->withAnswers($providedAnswers);
 
-        $this->installNodeDependencies();
+        $skipNode = $this->shouldSkipNode();
+
+        if (! $skipNode) {
+            $this->installNodeDependencies();
+        }
 
         $script->chisel($answers);
 
-        $this->buildAssets();
+        if (! $skipNode) {
+            $this->buildAssets();
+        }
 
         return self::SUCCESS;
     }
@@ -71,10 +77,18 @@ class InstallFeaturesCommand extends Command
             return false;
         }
 
+        return $this->installerFlag('LARAVEL_INSTALLER_DEFER_HOOKS');
+    }
+
+    protected function shouldSkipNode(): bool
+    {
+        return $this->installerFlag('LARAVEL_INSTALLER_NO_NODE');
+    }
+
+    protected function installerFlag(string $name): bool
+    {
         return filter_var(
-            $_ENV['LARAVEL_INSTALLER_DEFER_HOOKS']
-                ?? $_SERVER['LARAVEL_INSTALLER_DEFER_HOOKS']
-                ?? getenv('LARAVEL_INSTALLER_DEFER_HOOKS'),
+            $_ENV[$name] ?? $_SERVER[$name] ?? getenv($name),
             FILTER_VALIDATE_BOOL,
         );
     }

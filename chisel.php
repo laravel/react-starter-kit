@@ -39,6 +39,29 @@ function chiselRun(array $command, string $label): void
     }
 }
 
+function chiselSkipsNode(): bool
+{
+    return filter_var(
+        $_ENV['LARAVEL_INSTALLER_NO_NODE']
+            ?? $_SERVER['LARAVEL_INSTALLER_NO_NODE']
+            ?? getenv('LARAVEL_INSTALLER_NO_NODE'),
+        FILTER_VALIDATE_BOOL,
+    );
+}
+
+function chiselRemoveNpmPackages(Chisel $c, string ...$packages): void
+{
+    if (! chiselSkipsNode()) {
+        $c->npm()->remove(...$packages);
+
+        return;
+    }
+
+    foreach ($packages as $package) {
+        $c->file('package.json')->removeLinesContaining('"'.$package.'":');
+    }
+}
+
 /**
  * Framework-specific filenames are supplied by the sibling chisel-paths.php
  * that ships with each Inertia kit (React/Svelte/Vue). After build both files
@@ -164,7 +187,7 @@ return Chisel::script(__DIR__)
             )->removeSection('2fa');
 
             if ($paths['two_factor_otp_package'] !== null) {
-                $c->npm()->remove($paths['two_factor_otp_package']);
+                chiselRemoveNpmPackages($c, $paths['two_factor_otp_package']);
             }
 
             $c->files(...[
@@ -210,7 +233,7 @@ return Chisel::script(__DIR__)
                 $paths['confirm_password'],
             )->removeSection('passkeys');
 
-            $c->npm()->remove('@laravel/passkeys');
+            chiselRemoveNpmPackages($c, '@laravel/passkeys');
 
             $c->files(...[
                 ...$paths['passkey_files'],
@@ -266,8 +289,10 @@ return Chisel::script(__DIR__)
         chiselRun(['composer', 'lint'], 'Composer Lint');
         chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
-        $c->npm()->run('lint');
-        $c->npm()->run('format');
+        if (! chiselSkipsNode()) {
+            $c->npm()->run('lint');
+            $c->npm()->run('format');
+        }
 
         $c->file('composer.json')
             ->removeLinesContaining('"@php artisan install:features --ansi"');
