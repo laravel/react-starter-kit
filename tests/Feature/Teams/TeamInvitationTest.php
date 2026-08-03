@@ -204,7 +204,7 @@ class TeamInvitationTest extends TestCase
 
         $response = $this
             ->actingAs($invitedUser)
-            ->get(route('invitations.accept', $invitation));
+            ->post(route('invitations.accept', $invitation));
 
         $response->assertRedirect(route('dashboard'));
         $response->assertInertiaFlash('toast', ['type' => 'success', 'message' => 'Invitation accepted.']);
@@ -304,7 +304,7 @@ class TeamInvitationTest extends TestCase
 
         $response = $this
             ->actingAs($uninvitedUser)
-            ->get(route('invitations.accept', $invitation));
+            ->post(route('invitations.accept', $invitation));
 
         $response->assertSessionHasErrors('invitation');
 
@@ -327,7 +327,7 @@ class TeamInvitationTest extends TestCase
 
         $response = $this
             ->actingAs($invitedUser)
-            ->get(route('invitations.accept', $invitation));
+            ->post(route('invitations.accept', $invitation));
 
         $response->assertSessionHasErrors('invitation');
 
