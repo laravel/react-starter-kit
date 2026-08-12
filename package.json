@@ -50,7 +50,7 @@
         "@vitejs/plugin-react": "^5.2.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
-        "concurrently": "^9.0.1",
+        "concurrently": "^10.0.3",
         "globals": "^15.14.0",
         "laravel-vite-plugin": "^3.1",
         "lucide-react": "^0.475.0",
@@ -64,6 +64,7 @@
         "vite": "^8.0.0"
     },
     "optionalDependencies": {
+        "@laravel/multiplex": "^0.4.1",
         "@rollup/rollup-linux-x64-gnu": "4.9.5",
         "@rollup/rollup-win32-x64-msvc": "4.9.5",
         "@tailwindcss/oxide-linux-x64-gnu": "^4.0.1",
