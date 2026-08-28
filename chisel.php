@@ -283,21 +283,15 @@ return Chisel::script(__DIR__)
         },
     )
     ->apply(function (Chisel $c): void {
-        $c->file('eslint.config.js')->replace(
-            "// alphabetize: { order: 'asc', caseInsensitive: true },",
-            "alphabetize: { order: 'asc', caseInsensitive: true },",
-        );
+        $c->file('composer.json')
+            ->removeLinesContaining('"@php artisan install:features --ansi"');
 
         chiselRun(['composer', 'lint'], 'Composer Lint');
         chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
         if (! chiselSkipsNode()) {
-            $c->npm()->run('lint');
-            $c->npm()->run('format');
+            $c->npm()->run('check:fix');
         }
-
-        $c->file('composer.json')
-            ->removeLinesContaining('"@php artisan install:features --ansi"');
 
         $c->files(
             'app/Console/Commands/InstallFeaturesCommand.php',
