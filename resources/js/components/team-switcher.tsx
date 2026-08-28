@@ -60,7 +60,7 @@ export function TeamSwitcher({ inHeader = false }: TeamSwitcherProps) {
                     className={
                         inHeader
                             ? 'h-8 gap-1 px-2'
-                            : 'w-full justify-start px-2 has-[>svg]:px-2 data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
+                            : 'data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground w-full justify-start px-2 has-[>svg]:px-2'
                     }
                 >
                     <Users
@@ -106,7 +106,7 @@ export function TeamSwitcher({ inHeader = false }: TeamSwitcherProps) {
                 align={inHeader ? 'end' : 'start'}
                 sideOffset={inHeader ? undefined : 4}
             >
-                <DropdownMenuLabel className="text-xs text-muted-foreground">
+                <DropdownMenuLabel className="text-muted-foreground text-xs">
                     Teams
                 </DropdownMenuLabel>
                 {teams.map((team) => (

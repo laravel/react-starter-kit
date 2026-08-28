@@ -189,7 +189,7 @@ export default function TeamEdit({
                                         <div className="font-medium">
                                             {member.name}
                                         </div>
-                                        <div className="text-sm text-muted-foreground">
+                                        <div className="text-muted-foreground text-sm">
                                             {member.email}
                                         </div>
                                     </div>
@@ -278,14 +278,14 @@ export default function TeamEdit({
                                     className="flex items-center justify-between rounded-lg border p-4"
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-muted">
-                                            <Mail className="h-5 w-5 text-muted-foreground" />
+                                        <div className="bg-muted flex h-10 w-10 items-center justify-center rounded-full">
+                                            <Mail className="text-muted-foreground h-5 w-5" />
                                         </div>
                                         <div>
                                             <div className="font-medium">
                                                 {invitation.email}
                                             </div>
-                                            <div className="text-sm text-muted-foreground">
+                                            <div className="text-muted-foreground text-sm">
                                                 {invitation.role_label}
                                             </div>
                                         </div>

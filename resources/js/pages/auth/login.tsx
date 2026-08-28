@@ -113,7 +113,7 @@ export default function Login({
                         </div>
 
                         {/* @chisel-registration */}
-                        <div className="text-center text-sm text-muted-foreground">
+                        <div className="text-muted-foreground text-center text-sm">
                             Don't have an account?{' '}
                             <TextLink
                                 href={register({
