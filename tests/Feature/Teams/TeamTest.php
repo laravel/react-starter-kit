@@ -42,6 +42,24 @@ class TeamTest extends TestCase
         ]);
     }
 
+    public function test_personal_team_returns_the_team_owned_by_the_user()
+    {
+        $otherUser = User::factory()->create();
+        $user = User::factory()->make();
+        $user->save();
+
+        $otherUser->personalTeam()->members()->attach($user, [
+            'role' => TeamRole::Member->value,
+        ]);
+
+        $personalTeam = Team::factory()->personal()->create();
+        $personalTeam->members()->attach($user, [
+            'role' => TeamRole::Owner->value,
+        ]);
+
+        $this->assertTrue($personalTeam->is($user->personalTeam()));
+    }
+
     public function test_team_slug_uses_next_available_suffix()
     {
         $user = User::factory()->create();
