@@ -72,7 +72,7 @@ export default function TeamsIndex({ teams }: Props) {
                                                 </Badge>
                                             ) : null}
                                         </div>
-                                        <span className="text-muted-foreground text-sm">
+                                        <span className="text-sm text-muted-foreground">
                                             {team.roleLabel}
                                         </span>
                                     </div>
@@ -154,7 +154,7 @@ export default function TeamsIndex({ teams }: Props) {
                     })}
 
                     {teams.length === 0 ? (
-                        <p className="text-muted-foreground py-8 text-center">
+                        <p className="py-8 text-center text-muted-foreground">
                             You don't belong to any teams yet.
                         </p>
                     ) : null}
