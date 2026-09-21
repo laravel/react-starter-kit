@@ -15,7 +15,7 @@ function chiselRun(array $command, string $label): void
         label: $label,
         keepSummary: true,
         callback: function (Logger $logger) use ($command) {
-            $process = new Process($command);
+            $process = new Process($command, __DIR__);
             $process->run(function ($type, $line) use ($logger) {
                 $logger->line($line);
             });
@@ -287,7 +287,8 @@ return Chisel::script(__DIR__)
             ->removeLinesContaining('"@php artisan install:features --ansi"');
 
         chiselRun(['composer', 'lint'], 'Composer Lint');
-        chiselRun(['php', 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
+        // Use the same PHP executable as Artisan when Windows has multiple installations on PATH.
+        chiselRun([PHP_BINARY, 'artisan', 'wayfinder:generate', '--with-form', '--no-interaction'], 'Generate Wayfinder Resources');
 
         if (! chiselSkipsNode()) {
             $c->npm()->run('check:fix');
