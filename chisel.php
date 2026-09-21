@@ -64,7 +64,7 @@ function chiselRemoveNpmPackages(Chisel $c, string ...$packages): void
 
 /**
  * Framework-specific filenames are supplied by the sibling chisel-paths.php
- * that ships with each Inertia kit (React/Svelte/Vue). After build both files
+ * that ships with each Inertia kit (React/Svelte/Vue). After build, both files
  * land in the project root.
  *
  * @var array{
