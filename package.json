@@ -51,7 +51,7 @@
         "@rolldown/plugin-babel": "^0.2.3",
         "@types/node": "^22.13.5",
         "babel-plugin-react-compiler": "^1.0.0",
-        "vite-plus": "0.3.0"
+        "vite-plus": "1.1.0"
     },
     "optionalDependencies": {
         "@laravel/multiplex": "^0.4.1",
