@@ -20,7 +20,7 @@ import ManageTwoFactor from '@/components/manage-two-factor';
 type Props = {
     passwordRules: string;
 } /* @chisel-passkeys */ & ManagePasskeysProps /* @end-chisel-passkeys */ /* @chisel-2fa */ &
-    ManageTwoFactorProps /* @end-chisel-2fa */;
+    ManageTwoFactorProps; /* @end-chisel-2fa */
 
 export default function Security(props: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
