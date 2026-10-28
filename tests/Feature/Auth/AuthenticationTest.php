@@ -82,6 +82,7 @@ class AuthenticationTest extends TestCase
     }
     /* @end-chisel-passkeys */
 
+    /* @chisel-2fa */
     public function test_users_with_two_factor_enabled_are_redirected_to_two_factor_challenge()
     {
         if (! Features::canManageTwoFactorAuthentication()) {
@@ -104,6 +105,7 @@ class AuthenticationTest extends TestCase
         $response->assertSessionHas('login.id', $user->id);
         $this->assertGuest();
     }
+    /* @end-chisel-2fa */
 
     public function test_users_can_not_authenticate_with_invalid_password()
     {

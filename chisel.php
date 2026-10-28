@@ -164,6 +164,7 @@ return Chisel::script(__DIR__)
             $c->files(
                 'app/Models/User.php',
                 'database/factories/UserFactory.php',
+                'tests/Feature/Auth/AuthenticationTest.php',
                 $paths['security'],
                 $paths['auth_types'],
                 'config/fortify.php',
@@ -179,6 +180,7 @@ return Chisel::script(__DIR__)
             $c->files(
                 'app/Models/User.php',
                 'database/factories/UserFactory.php',
+                'tests/Feature/Auth/AuthenticationTest.php',
                 'config/fortify.php',
                 'app/Providers/FortifyServiceProvider.php',
                 'app/Http/Controllers/Settings/SecurityController.php',
