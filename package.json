@@ -29,7 +29,7 @@
         "@tailwindcss/vite": "^4.1.11",
         "@types/react": "^19.2.0",
         "@types/react-dom": "^19.2.0",
-        "@vitejs/plugin-react": "^6.1.1",
+        "@vitejs/plugin-react": "^6.2.0",
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "concurrently": "^10.0.3",
@@ -46,9 +46,8 @@
     },
     "devDependencies": {
         "@laravel/vite-plugin-wayfinder": "^0.1.3",
-        "@rolldown/plugin-babel": "^0.2.3",
         "@types/node": "^22.13.5",
-        "babel-plugin-react-compiler": "^1.0.0",
+        "oxc-transform-react": "^0.156.0",
         "vite-plus": "1.8.0"
     },
     "optionalDependencies": {
